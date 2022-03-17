@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "package": "dev.emi.emi.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "accessor.ScreenHandlerAccessor"
+  ],
+  "client": [
+    "accessor.HandledScreenAccessor",
+    "accessor.ItemRendererAccessor",
+    "accessor.ScreenAccessor",
+    "accessor.SmithingRecipeAccessor",
+    "ClientPlayNetworkHandlerMixin",
+    "HandledScreenMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "gui_light": "front",
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [8, 16, 16],
+      "faces": {
+        "south": {
+          "texture": "#left",
+          "cullface": "south"
+        }
+      }
+    },
+    {
+      "from": [8, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "south": {
+          "texture": "#right",
+          "cullface": "south"
+        }
+      }
+    }
+  ]
+}

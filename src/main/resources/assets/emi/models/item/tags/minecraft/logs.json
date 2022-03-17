@@ -1,0 +1,73 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "top_left": "minecraft:block/oak_log_top",
+    "top_right": "minecraft:block/stripped_dark_oak_log",
+    "north_left": "minecraft:block/crimson_stem",
+    "north_right": "minecraft:block/birch_log",
+    "east_left": "minecraft:block/spruce_log",
+    "east_right": "minecraft:block/stripped_warped_stem"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [8, 16, 16],
+      "faces": {
+        "up": {
+          "texture": "#top_right",
+          "cullface": "up"
+        }
+      }
+    },
+    {
+      "from": [8, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "up": {
+          "texture": "#top_left",
+          "cullface": "up"
+        }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 8, 16],
+      "faces": {
+        "north": {
+          "texture": "#north_left",
+          "cullface": "north"
+        }
+      }
+    },
+    {
+      "from": [0, 8, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {
+          "texture": "#north_right",
+          "cullface": "north"
+        }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 8],
+      "faces": {
+        "east": {
+          "texture": "#east_left",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [0, 0, 8],
+      "to": [16, 16, 16],
+      "faces": {
+        "east": {
+          "texture": "#east_right",
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}
