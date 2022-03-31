@@ -103,7 +103,9 @@ public class VanillaPlugin implements EmiPlugin {
 			registry.addRecipe(new EmiStonecuttingRecipe(recipe));
 		}
 		for (Tag<Item> tag : ItemTags.getTagGroup().getTags().values()) {
-			registry.addRecipe(new EmiTagRecipe(tag));
+			if (tag.values().size() > 1) {
+				registry.addRecipe(new EmiTagRecipe(tag));
+			}
 		}
 	}
 }

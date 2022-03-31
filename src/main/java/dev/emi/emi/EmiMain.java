@@ -40,6 +40,7 @@ public class EmiMain implements ModInitializer {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void onInitialize() {
+		EmiConfig.load();
 		ServerPlayNetworking.registerGlobalReceiver(FILL_RECIPE, (server, player, networkHandler, buf, sender) -> {
 			int syncId = buf.readInt();
 			int action = buf.readByte();

@@ -2,6 +2,7 @@ package dev.emi.emi;
 
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.bom.BoM;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 
@@ -46,6 +47,7 @@ public class EmiReloadManager {
 					continue;
 				}
 				EmiRecipes.bake();
+				BoM.reload();
 			} while (restart);
 			finish();
 		}

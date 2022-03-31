@@ -5,22 +5,14 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
-import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
-import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.bom.BoM;
-import dev.emi.emi.screen.BoMScreen;
-import dev.emi.emi.screen.RecipeScreen;
+import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -93,49 +85,16 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (button == 0) {
-			EmiApi.displayRecipes(stack);
-			if (recipe != null) {
-				EmiApi.focusRecipe(recipe);
-			}
-		} else if (button == 1) {
-			EmiApi.displayUses(stack);
+		if (EmiScreenManager.stackInteraction(stack, recipe, bind -> bind.matchesMouse(button))) {
+			return true;
 		} else if (button == 2 && EmiConfig.devMode && recipe != null) {
 			MinecraftClient.getInstance().keyboard.setClipboard("\n    \"" + recipe.getId().toString() + "\",");
-		} else {
-			return false;
-		}
-		return true;
+		} 
+		return false;
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_Y) {
-			EmiApi.displayAllRecipes();
-		} else if (keyCode == GLFW.GLFW_KEY_V && recipe != null) {
-			BoM.setGoal(recipe);
-		} else if (keyCode == GLFW.GLFW_KEY_B && recipe != null) {
-			if (stack instanceof EmiStack es) {
-				BoM.addRecipe(recipe, es);
-			}
-		} else if (keyCode == GLFW.GLFW_KEY_C) {
-			Screen s = MinecraftClient.getInstance().currentScreen;
-			if (s instanceof HandledScreen<?> hs) {
-				MinecraftClient.getInstance().setScreen(new BoMScreen(hs));
-			} else if (s instanceof RecipeScreen rs) {
-				MinecraftClient.getInstance().setScreen(new BoMScreen(rs.old));
-			}
-		}
-
-		if (keyCode == GLFW.GLFW_KEY_R) {
-			EmiApi.displayRecipes(stack);
-		} else if (keyCode == GLFW.GLFW_KEY_U) {
-			EmiApi.displayUses(stack);
-		} else if (keyCode == GLFW.GLFW_KEY_A) {
-			EmiFavorites.addFavorite(stack, recipe);
-		} else {
-			return false;
-		}
-		return true;
+		return EmiScreenManager.stackInteraction(stack, recipe, bind -> bind.matchesKey(keyCode, scanCode));
 	}
 }

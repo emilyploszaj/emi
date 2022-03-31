@@ -21,6 +21,7 @@ import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 
@@ -66,6 +67,15 @@ public class EmiApi {
 		}
 	}
 
+	public static void viewRecipeTree() {
+		Screen s = client.currentScreen;
+		if (s instanceof HandledScreen<?> hs) {
+			client.setScreen(new BoMScreen(hs));
+		} else if (s instanceof RecipeScreen rs) {
+			client.setScreen(new BoMScreen(rs.old));
+		}
+	}
+
 	public static void focusRecipe(EmiRecipe recipe) {
 		if (client.currentScreen instanceof RecipeScreen rs) {
 			rs.focusRecipe(recipe);
@@ -73,7 +83,6 @@ public class EmiApi {
 	}
 
 	public static boolean canFill(EmiRecipe recipe) {
-		MinecraftClient client = MinecraftClient.getInstance();
 		HandledScreen<?> hs;
 		if (client.currentScreen instanceof RecipeScreen rs) {
 			hs = rs.old;
@@ -86,7 +95,6 @@ public class EmiApi {
 	}
 
 	public static void performFill(EmiRecipe recipe, boolean all) {
-		MinecraftClient client = MinecraftClient.getInstance();
 		HandledScreen<?> hs;
 		if (client.currentScreen instanceof RecipeScreen rs) {
 			hs = rs.old;
@@ -97,7 +105,7 @@ public class EmiApi {
 		}
 		List<ItemStack> stacks = recipe.getFill(hs, all);
 		if (stacks != null) {
-			MinecraftClient.getInstance().setScreen(hs);
+			client.setScreen(hs);
 			int action = 0;
 			if (EmiUtil.isControlDown()) {
 				action = 1;

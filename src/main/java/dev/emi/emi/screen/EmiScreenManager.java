@@ -1,18 +1,20 @@
 package dev.emi.emi.screen;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
-import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.search.EmiSearch;
@@ -248,17 +250,10 @@ public class EmiScreenManager {
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false);
-		if (!ingredient.isEmpty()) {
-			if (button == 0) {
-				if (ingredient instanceof EmiFavorite fav && fav.getRecipe() != null) {
-					EmiApi.performFill(fav.getRecipe(), EmiUtil.isShiftDown());
-				} else {
-					EmiApi.displayRecipes(ingredient);
-				}
-			} else if (button == 1) {
-				EmiApi.displayUses(ingredient);
-			}
+		if (stackInteraction(getHoveredStack((int) mouseX, (int) mouseY, false), bind -> bind.matchesMouse(button))) {
+			return true;
+		}
+		if (genericInteraction(bind -> bind.matchesMouse(button))) {
 			return true;
 		}
 		return false;
@@ -278,17 +273,46 @@ public class EmiScreenManager {
 			return true;
 		} else {
 			recalculate();
-			EmiIngredient ingredient = getHoveredStack(lastMouseX, lastMouseY, true);
-			if (!ingredient.isEmpty()) {
-				if (keyCode == GLFW.GLFW_KEY_R) {
-					EmiApi.displayRecipes(ingredient);
-				} else if (keyCode == GLFW.GLFW_KEY_U) {
-					EmiApi.displayUses(ingredient);
-				} else if (keyCode == GLFW.GLFW_KEY_A) {
-					EmiFavorites.addFavorite(ingredient);
-				} else if (keyCode == GLFW.GLFW_KEY_Y) {
-					EmiApi.displayAllRecipes();
+			if (stackInteraction(getHoveredStack(lastMouseX, lastMouseY, true), bind -> bind.matchesKey(keyCode, scanCode))) {
+				return true;
+			}
+			if (genericInteraction(bind -> bind.matchesKey(keyCode, scanCode))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean stackInteraction(EmiIngredient ingredient, Function<EmiBind, Boolean> function) {
+		return stackInteraction(ingredient, null, function);
+	}
+
+	public static boolean genericInteraction(Function<EmiBind, Boolean> function) {
+		if (function.apply(EmiConfig.viewTree)) {
+			EmiApi.viewRecipeTree();
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean stackInteraction(EmiIngredient ingredient, EmiRecipe recipe, Function<EmiBind, Boolean> function) {
+		if (!ingredient.isEmpty()) {
+			if (ingredient instanceof EmiFavorite fav && fav.getRecipe() != null) {
+				// TODO more binds for favorite interaction
+				//EmiApi.performFill(fav.getRecipe(), EmiUtil.isShiftDown());
+			}
+			if (function.apply(EmiConfig.viewRecipes)) {
+				EmiApi.displayRecipes(ingredient);
+				if (recipe != null) {
+					EmiApi.focusRecipe(recipe);
 				}
+				return true;
+			} else if (function.apply(EmiConfig.viewUses)) {
+				EmiApi.displayUses(ingredient);
+				return true;
+			} else if (function.apply(EmiConfig.favorite)) {
+				EmiFavorites.addFavorite(ingredient, recipe);
+				return true;
 			}
 		}
 		return false;

@@ -16,11 +16,13 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.widget.RecipeFillButtonWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.widget.RecipeBackground;
+import dev.emi.emi.widget.RecipeDefaultButtonWidget;
+import dev.emi.emi.widget.RecipeFillButtonWidget;
+import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
@@ -189,6 +191,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				if (!EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), Set.of()).isEmpty()) {
 					currentPage.add(new RecipeFillButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 12, r));
 				}
+				currentPage.add(new RecipeTreeButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 26, r));
+				currentPage.add(new RecipeDefaultButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 40, r));
 				off += r.getDisplayHeight() + RECIPE_PADDING;
 			}
 			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tabs.get(tab).category, List.of());
@@ -266,6 +270,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
 
+	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.onClose();

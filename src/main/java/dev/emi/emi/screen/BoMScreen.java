@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
+import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.bom.BoM;
@@ -12,6 +13,7 @@ import dev.emi.emi.bom.MaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -52,6 +54,7 @@ public class BoMScreen extends Screen {
 			nodeHeight = getNodeHeight(BoM.goal);
 			addNodes(BoM.goal, 1, 1, nodeWidth * NODE_WIDTH / -2, 0, nodeWidth);
 		}
+		MinecraftClient.getInstance().setScreen(new ConfigScreen(old));
 	}
 	
 	@Override
@@ -217,6 +220,18 @@ public class BoMScreen extends Screen {
 			return 0.1f;
 		}
 		return 1 + zoom * 0.2f;
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+			this.onClose();
+			return true;
+		} else if (this.client.options.keyInventory.matchesKey(keyCode, scanCode)) {
+			this.onClose();
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override

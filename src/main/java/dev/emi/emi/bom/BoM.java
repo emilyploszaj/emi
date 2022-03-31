@@ -2,8 +2,10 @@ package dev.emi.emi.bom;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -21,6 +23,7 @@ public class BoM {
 	public static Map<EmiRecipe, MaterialCost> remainders = Maps.newHashMap();
 	public static Map<EmiStack, EmiRecipe> defaultRecipes = Maps.newHashMap();
 	public static Map<EmiStack, EmiRecipe> addedRecipes = Maps.newHashMap();
+	public static Set<EmiRecipe> disabledRecipes = Sets.newHashSet();
 
 	public static void setDefaults(List<RecipeDefault> defaults) {
 		BoM.defaults = defaults;
@@ -40,10 +43,17 @@ public class BoM {
 		}
 	}
 
+	public static boolean isRecipeEnabled(EmiRecipe recipe) {
+		return !disabledRecipes.contains(recipe) && (defaultRecipes.values().contains(recipe) || addedRecipes.values().contains(recipe));
+	}
+
 	public static EmiRecipe getRecipe(EmiIngredient stack) {
 		EmiRecipe recipe = addedRecipes.get(stack);
 		if (recipe == null) {
 			recipe = defaultRecipes.get(stack);
+		}
+		if (recipe != null && disabledRecipes.contains(recipe)) {
+			return null;
 		}
 		return recipe;
 	}
@@ -56,7 +66,13 @@ public class BoM {
 	}
 
 	public static void addRecipe(EmiRecipe recipe, EmiStack stack) {
+		disabledRecipes.remove(recipe);
 		addedRecipes.put(stack, recipe);
+		goal.recalculate();
+	}
+
+	public static void removeRecipe(EmiRecipe recipe) {
+		disabledRecipes.add(recipe);
 		goal.recalculate();
 	}
 
