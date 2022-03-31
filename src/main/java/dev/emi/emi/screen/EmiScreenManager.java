@@ -6,10 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
+import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -270,6 +272,9 @@ public class EmiScreenManager {
 
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
+			return true;
+		} if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
+			MinecraftClient.getInstance().setScreen(new ConfigScreen(client.currentScreen));
 			return true;
 		} else {
 			recalculate();

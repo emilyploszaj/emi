@@ -1,7 +1,6 @@
 package dev.emi.emi.screen;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -14,7 +13,6 @@ import dev.emi.emi.screen.widget.BooleanWidget;
 import dev.emi.emi.screen.widget.EmiBindWidget;
 import dev.emi.emi.screen.widget.ListWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.util.InputUtil;
@@ -79,30 +77,6 @@ public class ConfigScreen extends Screen {
 				}
 			}
 		} catch (Exception e) {
-		}
-		for (int i = 0; i < 10; i++) {
-			final int j = i;
-			list.addEntry(new ListWidget.Entry() {
-	
-				@Override
-				public void render(MatrixStack matrices, int var2, int var3, int var4, int var5, int var6, int var7, int var8,
-						boolean var9, float var10) {
-					drawStringWithShadow(matrices, textRenderer, "bunny bun bun", var4, var3, -1);
-					if (var9) {
-						drawStringWithShadow(matrices, textRenderer, "bunny bun bun", var4, var3, 0xff0000);
-					}
-				}
-	
-				@Override
-				public int getHeight() {
-					return 30 + j * 10;
-				}
-	
-				@Override
-				public List<? extends Element> children() {
-					return List.of();
-				}
-			});
 		}
 
 		this.addSelectableChild(list);

@@ -13,7 +13,6 @@ import dev.emi.emi.bom.MaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -54,7 +53,6 @@ public class BoMScreen extends Screen {
 			nodeHeight = getNodeHeight(BoM.goal);
 			addNodes(BoM.goal, 1, 1, nodeWidth * NODE_WIDTH / -2, 0, nodeWidth);
 		}
-		MinecraftClient.getInstance().setScreen(new ConfigScreen(old));
 	}
 	
 	@Override
