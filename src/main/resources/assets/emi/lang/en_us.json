@@ -15,6 +15,20 @@
   "key.emi.craft_all_to_inventory": "Craft All to Inventory",
   "key.emi.craft_one_to_cursor": "Craft One to Cursor",
 
+  "config.emi.ui.move_effects": "Move Effects",
+  "config.emi.ui.fluid_unit": "Fluid Unit",
+  "config.emi.ui.recipe_favorite_button": "Recipe Favorite Button",
+  "config.emi.ui.recipe_default_button": "Recipe Default Button",
+  "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
+  "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+
+  "config.emi.dev.dev_mode": "Dev Mode",
+
+  "emi.unit.liters": "Liters",
+  "emi.unit.millibuckets": "Millibuckets",
+  "emi.fluid.amount.liters": "%s L",
+  "emi.fluid.amount.millibuckets": "%s mB",
+
   "emi.page": "Page %s of %s",
   "emi.total_cost": "Total Cost",
   "emi.leftovers": "Leftovers",
@@ -36,6 +50,8 @@
   "emi.category.minecraft.campfire_cooking": "Campfire Cooking",
   "emi.category.minecraft.stonecutting": "Stonecutting",
   "emi.category.minecraft.smithing": "Smithing",
+  "emi.category.minecraft.brewing": "Brewing",
+  "emi.category.minecraft.world_interaction": "World Interaction",
   "emi.category.minecraft.tag": "Tags",
 
   "emi.category.emi.ingredient": "Ingredients",

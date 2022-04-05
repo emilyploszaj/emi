@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
@@ -56,7 +57,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	protected void init() {
 		super.init();
 		this.client.keyboard.setRepeatEvents(true);
-		backgroundHeight = height - 52;
+		backgroundHeight = height - 52 - EmiConfig.verticalPadding;
 		x = (this.width - backgroundWidth) / 2;
 		y = (this.height - backgroundHeight) / 2 + 1;
 		addDrawableChild(new ArrowButtonWidget(x + 2, y - 18, 12, 12, 0, 64,
@@ -120,7 +121,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 		for (Widget widget : currentPage) {
 			if (widget.getBounds().contains(mouseX, mouseY)) {
-				((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, widget.getTooltip(), mouseX, mouseY);
+				((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, widget.getTooltip(), mouseX, Math.max(16, mouseY));
 			}
 		}
 
@@ -133,7 +134,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				List<Text> list = Lists.newArrayList();
 				list.add(new TranslatableText(EmiUtil.translateId("emi.category.", t.category.getId())));
 				list.add(new LiteralText(EmiUtil.getModName(t.category.getId().getNamespace())).formatted(Formatting.BLUE));
-				this.renderTooltip(matrices, list, mouseX, mouseY);
+				this.renderTooltip(matrices, list, mouseX, Math.max(16, mouseY));
 			}
 		}
 	}
@@ -188,11 +189,24 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				int wy = y + 36 + off;
 				currentPage.add(new RecipeBackground(wx - 4, wy - 4, r.getDisplayWidth() + 8, r.getDisplayHeight() + 8));
 				r.addWidgets(currentPage, wx, wy);
-				if (!EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), Set.of()).isEmpty()) {
-					currentPage.add(new RecipeFillButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 12, r));
+				int bx = wy + r.getDisplayHeight() - 12;
+				if (r.getDisplayHeight() <= 18) {
+					bx += 4;
 				}
-				currentPage.add(new RecipeTreeButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 26, r));
-				currentPage.add(new RecipeDefaultButtonWidget(wx + r.getDisplayWidth() + 5, wy + r.getDisplayHeight() - 40, r));
+				int button = 0;
+				if (!EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), Set.of()).isEmpty()) {
+					if (EmiConfig.recipeFillButton) {
+						currentPage.add(new RecipeFillButtonWidget(wx + r.getDisplayWidth() + 5, bx + 14 * button++, r));
+					}
+				}
+				if (r.supportsRecipeTree()) {
+					if (EmiConfig.recipeTreeButton) {
+						currentPage.add(new RecipeTreeButtonWidget(wx + r.getDisplayWidth() + 5, bx - 14 * button++, r));
+					}
+					if (EmiConfig.recipeDefaultButton) {
+						currentPage.add(new RecipeDefaultButtonWidget(wx + r.getDisplayWidth() + 5, bx - 14 * button++, r));
+					}
+				}
 				off += r.getDisplayHeight() + RECIPE_PADDING;
 			}
 			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tabs.get(tab).category, List.of());

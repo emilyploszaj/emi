@@ -47,6 +47,10 @@ public interface EmiIngredient {
 		return true;
 	}
 
+	public static EmiIngredient of(Tag<Item> tag) {
+		return new EmiTagIngredient(tag);
+	}
+
 	public static EmiIngredient of(Ingredient ingredient) {
 		List<Item> items = Arrays.stream(ingredient.getMatchingStacks()).map(i -> i.getItem()).collect(Collectors.toList());
 		if (items.size() == 0) {

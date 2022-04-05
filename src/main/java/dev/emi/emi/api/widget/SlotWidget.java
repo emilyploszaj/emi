@@ -20,15 +20,19 @@ import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.text.LiteralText;
 
 public class SlotWidget extends Widget {
-	private final EmiIngredient stack;
-	private final int x, y;
-	private boolean drawBack = true, output = false;
+	protected final EmiIngredient stack;
+	protected final int x, y;
+	protected boolean drawBack = true, output = false, catalyst = false;
 	private EmiRecipe recipe;
 
 	public SlotWidget(EmiIngredient stack, int x, int y) {
 		this.stack = stack;
 		this.x = x;
 		this.y = y;
+	}
+
+	protected EmiIngredient getStack() {
+		return stack;
 	}
 
 	public SlotWidget drawBack(boolean drawBack) {
@@ -38,6 +42,11 @@ public class SlotWidget extends Widget {
 
 	public SlotWidget output(boolean output) {
 		this.output = output;
+		return this;
+	}
+
+	public SlotWidget catalyst(boolean catalyst) {
+		this.catalyst = catalyst;
 		return this;
 	}
 
@@ -70,14 +79,17 @@ public class SlotWidget extends Widget {
 				DrawableHelper.drawTexture(matrices, bounds.getX(), bounds.getY(), 18, 18, 0, 0, 18, 18, 256, 256);
 			}
 		}
-		stack.render(matrices, bounds.getX() + off, bounds.getY() + off, delta);
+		getStack().render(matrices, bounds.getX() + off, bounds.getY() + off, delta);
+		if (catalyst) {
+			EmiRenderHelper.renderCatalyst(getStack(), matrices, x + off, y + off);
+		}
 	}
 	
 	@Override
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
-		list.addAll(stack.getTooltip());
-		if (recipe != null && EmiConfig.devMode) {
+		list.addAll(getStack().getTooltip());
+		if (recipe != null && recipe.getId() != null && EmiConfig.devMode) {
 			list.add(TooltipComponent.of(new LiteralText(recipe.getId().toString()).asOrderedText()));
 		}
 		return list;
@@ -85,16 +97,17 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (EmiScreenManager.stackInteraction(stack, recipe, bind -> bind.matchesMouse(button))) {
+		if (EmiScreenManager.stackInteraction(getStack(), recipe, bind -> bind.matchesMouse(button))) {
 			return true;
 		} else if (button == 2 && EmiConfig.devMode && recipe != null) {
-			MinecraftClient.getInstance().keyboard.setClipboard("\n    \"" + recipe.getId().toString() + "\",");
+			MinecraftClient client = MinecraftClient.getInstance();
+			client.keyboard.setClipboard("\n    \"" + recipe.getId().toString() + "\",");
 		} 
 		return false;
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return EmiScreenManager.stackInteraction(stack, recipe, bind -> bind.matchesKey(keyCode, scanCode));
+		return EmiScreenManager.stackInteraction(getStack(), recipe, bind -> bind.matchesKey(keyCode, scanCode));
 	}
 }

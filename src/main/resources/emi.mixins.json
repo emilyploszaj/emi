@@ -7,12 +7,14 @@
   ],
   "client": [
     "accessor.HandledScreenAccessor",
+    "accessor.HoeItemAccessor",
     "accessor.ItemRendererAccessor",
     "accessor.ScreenAccessor",
     "accessor.SmithingRecipeAccessor",
     "AbstractInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "HoeItemMixin"
   ],
   "server": [],
   "injectors": {

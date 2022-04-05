@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.util.registry.Registry;
 
 public class RegexModQuery extends Query {
 	private final Pattern pattern;
@@ -24,7 +23,7 @@ public class RegexModQuery extends Query {
 		if (pattern == null) {
 			return false;
 		}
-		String namespace = Registry.ITEM.getId(stack.getItemStack().getItem()).getNamespace();
+		String namespace = stack.getId().getNamespace();
 		String mod = EmiUtil.getModName(namespace);
 		Matcher m = pattern.matcher(mod);
 		return m.find();

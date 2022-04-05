@@ -83,6 +83,10 @@ public class EmiTagIngredient implements EmiIngredient {
 					TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
 			immediate.draw();
 
+			if (!model.isSideLit()) {
+				DiffuseLighting.enableGuiDepthLighting();
+			}
+
 			vs.pop();
 			RenderSystem.applyModelViewMatrix();
 		}

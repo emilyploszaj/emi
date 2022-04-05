@@ -1,19 +1,25 @@
 package dev.emi.emi;
 
 import java.util.Optional;
+import java.util.Random;
 
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmiUtil {
-	public static int CONTROL_MASK = 1;
-	public static int ALT_MASK = 2;
-	public static int SHIFT_MASK = 4;
+	public static final Random RANDOM = new Random();
+	public static final int CONTROL_MASK = 1;
+	public static final int ALT_MASK = 2;
+	public static final int SHIFT_MASK = 4;
 
 	public static boolean isControlDown() {
 		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)
@@ -53,6 +59,22 @@ public class EmiUtil {
 			ret |= SHIFT_MASK;
 		}
 		return ret;
+	}
+
+	public static String subId(Identifier id) {
+		return id.getNamespace() + "/" + id.getPath();
+	}
+
+	public static String subId(Block block) {
+		return subId(Registry.BLOCK.getId(block));
+	}
+
+	public static String subId(Item item) {
+		return subId(Registry.ITEM.getId(item));
+	}
+
+	public static String subId(Fluid fluid) {
+		return subId(Registry.FLUID.getId(fluid));
 	}
 
 	public static String translateId(String prefix, Identifier id) {

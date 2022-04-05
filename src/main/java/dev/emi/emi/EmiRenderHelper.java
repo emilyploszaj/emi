@@ -61,13 +61,26 @@ public class EmiRenderHelper {
 		for (EmiStack stack : ingredient.getEmiStacks()) {
 			EmiStack remainder = stack.getRemainder();
 			if (!remainder.isEmpty()) {
-				matrices.push();
-				matrices.translate(0, 0, 200);
-				RenderSystem.setShaderTexture(0, WIDGETS);
-				DrawableHelper.drawTexture(matrices, x + 12, y, 4, 252, 4, 4, 256, 256);
-				matrices.pop();
+				if (remainder.equals(ingredient)) {
+					renderCatalyst(ingredient, matrices, x, y);
+				} else {
+					matrices.push();
+					matrices.translate(0, 0, 200);
+					RenderSystem.setShaderTexture(0, WIDGETS);
+					DrawableHelper.drawTexture(matrices, x + 12, y, 4, 252, 4, 4, 256, 256);
+					matrices.pop();
+				}
 				return;
 			}
 		}
+	}
+
+	public static void renderCatalyst(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+			matrices.push();
+			matrices.translate(0, 0, 200);
+			RenderSystem.setShaderTexture(0, WIDGETS);
+			DrawableHelper.drawTexture(matrices, x + 12, y, 12, 252, 4, 4, 256, 256);
+			matrices.pop();
+			return;
 	}
 }

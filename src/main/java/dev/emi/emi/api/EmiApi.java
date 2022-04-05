@@ -23,6 +23,7 @@ import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.ItemStack;
 
 public class EmiApi {
@@ -34,6 +35,10 @@ public class EmiApi {
 
 	public static void displayRecipeCategory(EmiRecipeCategory category) {
 		setPages(Map.of(category, EmiRecipes.byCategory.get(category)));
+	}
+
+	public static void displayRecipe(EmiRecipe recipe) {
+		setPages(Map.of(recipe.getCategory(), List.of(recipe)));
 	}
 	
 	public static void displayRecipes(EmiIngredient stack) {
@@ -47,27 +52,20 @@ public class EmiApi {
 		} else if (stack instanceof EmiIngredientList list) {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiIngredientRecipe(stack))));
 		} else if (stack.getEmiStacks().size() > 0) {
-			setPages(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()));
+			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()), stack));
 		}
 	}
 
 	public static void displayUses(EmiIngredient stack) {
-		if (stack instanceof EmiTagIngredient tag) {
-			if (stack.getEmiStacks().size() > 1) {
-				setPages(EmiRecipes.byInput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of())
-					.entrySet().stream().map(e -> {
-						return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> r.getInputs().stream()
-							.anyMatch(i -> containsAll(i, stack))).toList());
-					}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
-				return;
-			}
-		}
 		if (!stack.isEmpty()) {
-			setPages(EmiRecipes.byInput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()));
+			setPages(pruneUses(EmiRecipes.byInput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()), stack));
 		}
 	}
 
 	public static void viewRecipeTree() {
+		if (client.currentScreen == null) {
+			client.setScreen(new InventoryScreen(client.player));
+		}
 		Screen s = client.currentScreen;
 		if (s instanceof HandledScreen<?> hs) {
 			client.setScreen(new BoMScreen(hs));
@@ -117,6 +115,23 @@ public class EmiApi {
 		}
 	}
 
+	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneUses(Map<EmiRecipeCategory, List<EmiRecipe>> map,
+			EmiIngredient context) {
+		return map.entrySet().stream().map(e -> {
+			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
+				r.getInputs().stream().anyMatch(i -> containsAll(i, context))
+				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context))).toList());
+		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+	}
+
+	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneSources(Map<EmiRecipeCategory, List<EmiRecipe>> map,
+			EmiIngredient context) {
+		return map.entrySet().stream().map(e -> {
+			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
+				r.getOutputs().stream().anyMatch(i -> containsAll(i, context))).toList());
+		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+	}
+
 	private static boolean containsAll(EmiIngredient collection, EmiIngredient ingredient) {
 		outer:
 		for (EmiStack ing : ingredient.getEmiStacks()) {
@@ -131,7 +146,12 @@ public class EmiApi {
 	}
 
 	private static void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
+		recipes = recipes.entrySet().stream().filter(e -> !e.getValue().isEmpty())
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
+			if (client.currentScreen == null) {
+				client.setScreen(new InventoryScreen(client.player));
+			}
 			if (client.currentScreen instanceof HandledScreen<?> hs) {
 				client.setScreen(new RecipeScreen(hs));
 			} else if (client.currentScreen instanceof BoMScreen bs) {

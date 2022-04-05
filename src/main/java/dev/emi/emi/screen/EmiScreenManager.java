@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
@@ -11,12 +13,15 @@ import org.lwjgl.glfw.GLFW;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
+import dev.emi.emi.EmiLog;
+import dev.emi.emi.EmiReloadManager;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bind.EmiBind;
+import dev.emi.emi.bom.BoM;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.search.EmiSearch;
@@ -196,7 +201,13 @@ public class EmiScreenManager {
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		Screen screen = client.currentScreen;
+		if (EmiReloadManager.isReloading()) {
+			client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 12, -1);
+			return;
+		}
 		if (screen instanceof EmiScreen emi) {
+			EmiScreenManager.search.setZOffset(0);
+			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
 			recalculate();
 			int pageSize = tw * th;
 			int totalPages = (stacks.size() - 1) / pageSize + 1;
@@ -217,7 +228,13 @@ public class EmiScreenManager {
 					}
 					int cx = tx + xo * ENTRY_SIZE;
 					int cy = ty + yo * ENTRY_SIZE;
-					stacks.get(i++).renderIcon(matrices, cx + 1, cy + 1, delta);
+					EmiStack stack = stacks.get(i++);
+					stack.renderIcon(matrices, cx + 1, cy + 1, delta);
+					if (EmiConfig.devMode) {
+						if (BoM.getRecipe(stack) != null) {
+							DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
+						}
+					}
 				}
 			}
 			
@@ -236,12 +253,34 @@ public class EmiScreenManager {
 
 			EmiIngredient hov = getHoveredStack(mouseX, mouseY, false);
 			((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, hov.getTooltip(), mouseX, mouseY);
-	
-			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
+		}
+		if (EmiConfig.devMode) {
+			int color = 0xFFFFFF;
+			if (EmiLog.WARNINGS.size() > 0) {
+				color = 0xFF0000;
+				String warnCount = EmiLog.WARNINGS.size() + " Warnings";
+				int width = Math.max(client.textRenderer.getWidth("EMI Dev Mode"), client.textRenderer.getWidth(warnCount));
+				if (mouseX < width + 8 && mouseY > screen.height - 28) {
+					screen.renderTooltip(matrices, Stream.concat(Stream.of("See log for more information"),
+						EmiLog.WARNINGS.stream()).map(s -> {
+							String a = s;
+							if (a.length() > 10 && client.textRenderer.getWidth(a) > screen.width - 20) {
+								a = client.textRenderer.trimToWidth(a, screen.width - 30) + "...";
+							}
+							return new LiteralText(a);
+						})
+						.collect(Collectors.toList()), 0, 20);
+				}
+				client.textRenderer.drawWithShadow(matrices, warnCount, 4, screen.height - 24, color);
+			}
+			client.textRenderer.drawWithShadow(matrices, "EMI Dev Mode", 4, screen.height - 12, color);
 		}
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		if (EmiReloadManager.isReloading()) {
+			return false;
+		}
 		recalculate();
 		if (mouseX > xMin && mouseX < xMax && mouseY > yMin && mouseY < yMax) {
 			EmiScreenManager.currentPage += (int) -amount;
@@ -251,6 +290,9 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (EmiReloadManager.isReloading()) {
+			return false;
+		}
 		recalculate();
 		if (stackInteraction(getHoveredStack((int) mouseX, (int) mouseY, false), bind -> bind.matchesMouse(button))) {
 			return true;
@@ -262,6 +304,9 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+		if (EmiReloadManager.isReloading()) {
+			return false;
+		}
 		recalculate();
 		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false);
 		if (!ingredient.isEmpty()) {
@@ -271,10 +316,16 @@ public class EmiScreenManager {
 	}
 
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (EmiReloadManager.isReloading()) {
+			return false;
+		}
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
-		} if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
+		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
 			MinecraftClient.getInstance().setScreen(new ConfigScreen(client.currentScreen));
+			return true;
+		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+			EmiApi.displayAllRecipes();
 			return true;
 		} else {
 			recalculate();

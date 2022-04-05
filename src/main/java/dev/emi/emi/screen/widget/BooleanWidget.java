@@ -21,7 +21,7 @@ public class BooleanWidget extends Entry {
 		this.name = name;
 		this.mutator = mutator;
 
-		button = new ButtonWidget(0, 0, 75, 20, getText(), button -> {
+		button = new ButtonWidget(0, 0, 150, 20, getText(), button -> {
 			mutator.set(!mutator.get());
 			button.setMessage(getText());
 		});

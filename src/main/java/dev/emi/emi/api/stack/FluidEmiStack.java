@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
-import dev.emi.emi.api.stack.comparison.FluidStackComparison;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -20,9 +20,12 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.registry.Registry;
 
@@ -31,22 +34,31 @@ public class FluidEmiStack extends EmiStack {
 	private final FluidVariant fluid;
 
 	public FluidEmiStack(FluidVariant fluid) {
+		this(fluid, 0);
+	}
+
+	public FluidEmiStack(FluidVariant fluid, int amount) {
 		entry = new FluidEntry(fluid);
 		this.fluid = fluid;
-		this.comparison = new FluidStackComparison();
+		this.amount = amount;
 	}
 
 	@Override
 	public EmiStack copy() {
 		EmiStack e = new FluidEmiStack(fluid);
 		e.setRemainder(getRemainder().copy());
-		e.comparison = comparison.copy();
+		e.comparison = comparison;
 		return e;
 	}
 
 	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+
+	@Override
+	public NbtCompound getNbt() {
+		return fluid.getNbt();
 	}
 
 	@Override
@@ -57,6 +69,11 @@ public class FluidEmiStack extends EmiStack {
 	@Override
 	public Entry<?> getEntry() {
 		return entry;
+	}
+
+	@Override
+	public Identifier getId() {
+		return Registry.FLUID.getId(fluid.getFluid());
 	}
 
 	@Override
@@ -91,6 +108,22 @@ public class FluidEmiStack extends EmiStack {
 		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
 		bufferBuilder.end();
 		BufferRenderer.draw(bufferBuilder);
+
+		/*
+		matrices.push();
+		MinecraftClient client = MinecraftClient.getInstance();
+		
+		float scale = (float) client.getWindow().getScaleFactor();
+		float invScale = 1 / scale;
+		int s = (int) scale;
+		int size = s * 16;
+		matrices.scale(invScale, invScale, 1);
+		matrices.translate(0, 0, 300);
+
+		Text text = getTranslatedAmount();
+		client.textRenderer.draw(matrices, text, x * s + size - client.textRenderer.getWidth(text) - 2,
+			y * s + size - client.textRenderer.fontHeight - 2, -1);
+		matrices.pop();*/
 	}
 
 	@Override
@@ -107,6 +140,9 @@ public class FluidEmiStack extends EmiStack {
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = getTooltipText().stream().map(Text::asOrderedText).map(TooltipComponent::of)
 			.collect(Collectors.toList());
+		if (amount != 0) {
+			list.add(TooltipComponent.of(getTranslatedAmount().asOrderedText()));
+		}
 		String namespace = Registry.FLUID.getId(fluid.getFluid()).getNamespace();
 		String mod = EmiUtil.getModName(namespace);
 		list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
@@ -114,6 +150,18 @@ public class FluidEmiStack extends EmiStack {
 			list.add(new RemainderTooltipComponent(this));
 		}
 		return list;
+	}
+
+	private Text getTranslatedAmount() {
+		if (amount != 0) {
+			int liters = amount / 81;
+			if (EmiConfig.fluidUnit == EmiConfig.FluidUnit.MILLIBUCKETS) {
+				return new TranslatableText("emi.fluid.amount.millibuckets", liters);
+			} else {
+				return new TranslatableText("emi.fluid.amount.liters", liters);
+			}
+		}
+		return new LiteralText("");
 	}
 
 	@Override
@@ -130,6 +178,11 @@ public class FluidEmiStack extends EmiStack {
 		@Override
 		Class<FluidVariant> getType() {
 			return FluidVariant.class;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof FluidEntry e && getValue().getFluid().equals(e.getValue().getFluid());
 		}
 	}
 }

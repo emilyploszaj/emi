@@ -5,12 +5,14 @@ import java.lang.reflect.Field;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiConfig.ConfigEnum;
 import dev.emi.emi.EmiConfig.ConfigValue;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.widget.BooleanWidget;
 import dev.emi.emi.screen.widget.EmiBindWidget;
+import dev.emi.emi.screen.widget.EnumWidget;
 import dev.emi.emi.screen.widget.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -73,6 +75,25 @@ public class ConfigScreen extends Screen {
 						}));
 					} else if (field.getType() == EmiBind.class) {
 						list.addEntry(new EmiBindWidget(this, (EmiBind) field.get(null)));
+					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {
+						list.addEntry(new EnumWidget(translation, new Mutator<ConfigEnum>() {
+
+							public ConfigEnum get() {
+								try {
+									return (ConfigEnum) field.get(null);
+								} catch(Exception e) {
+									throw new RuntimeException(e);
+								}
+							}
+
+							public void set(ConfigEnum en) {
+								try {
+									field.set(null, en);
+								} catch(Exception e) {
+									throw new RuntimeException(e);
+								}
+							}
+						}));
 					}
 				}
 			}

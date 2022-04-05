@@ -35,7 +35,7 @@ public class ArrowButtonWidget extends ButtonWidget {
 		RenderSystem.enableDepthTest();
 		drawTexture(matrices, this.x, this.y, this.u, v, this.width, this.height, 256, 256);
 		if (this.hovered) {
-			this.renderTooltip(matrices, mouseX, mouseY);
+			this.renderTooltip(matrices, mouseX, Math.max(16, mouseY));
 		}
 	}
 }

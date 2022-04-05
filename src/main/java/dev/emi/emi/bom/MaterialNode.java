@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 
 public class MaterialNode {
 	public EmiIngredient ingredient;
@@ -16,6 +17,9 @@ public class MaterialNode {
 	public int divisor = 1;
 
 	public MaterialNode(EmiIngredient ingredient) {
+		if (ingredient instanceof EmiStack s) {
+			ingredient = s.copy().setAmount(1);
+		}
 		this.ingredient = ingredient;
 		this.amount = 1;
 	}

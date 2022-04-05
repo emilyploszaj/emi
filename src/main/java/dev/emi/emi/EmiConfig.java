@@ -22,6 +22,8 @@ import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import joptsimple.internal.Strings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 public class EmiConfig {
 	private static Map<Class<?>, Setter> SETTERS = Maps.newHashMap();
@@ -30,14 +32,23 @@ public class EmiConfig {
 	private static Map<String, String> unparsed = Maps.newHashMap();
 
 	// General
-	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
-	@ConfigValue("general.dev-mode")
-	public static boolean devMode = false;
 
 	// UI
 	@Comment("Whether to move status effects to the left of the screen.")
 	@ConfigValue("ui.move-effects")
 	public static boolean moveEffects = true;
+
+	@Comment("The amount of vertical padding to give in the recipe screen.")
+	@ConfigValue("ui.vertical-padding")
+	public static int verticalPadding = 20;
+
+	//@Comment("Maximum columns")
+	//@ConfigValue("ui.max-columns")
+	//public static int maxColumns = 14;
+
+	@Comment("The unit to display fluids as.")
+	@ConfigValue("ui.fluid-unit")
+	public static FluidUnit fluidUnit = FluidUnit.LITERS;
 
 	@Comment("Whether recipes should have a button to favorite the result.")
 	@ConfigValue("ui.recipe-favorite-button")
@@ -50,6 +61,10 @@ public class EmiConfig {
 	@Comment("Whether recipes should have a button to show the recipe tree.")
 	@ConfigValue("ui.recipe-tree-button")
 	public static boolean recipeTreeButton = true;
+
+	@Comment("Whether recipes should have a button to fill the ingredients in a handler.")
+	@ConfigValue("ui.recipe-fill-button")
+	public static boolean recipeFillButton = true;
 
 	// Binds
 	@Comment("Toggles the visibility of EMI.")
@@ -106,6 +121,11 @@ public class EmiConfig {
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+	
+	// Dev
+	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
+	@ConfigValue("dev.dev-mode")
+	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	public static void load() {
 		try {
@@ -259,6 +279,7 @@ public class EmiConfig {
 				}
 				return list;
 			});
+		defineType(FluidUnit.class, (css, annot, field) -> field.set(null, FluidUnit.fromName(css.get(annot).get())));
 	}
 	
 	@Target(ElementType.FIELD)
@@ -283,5 +304,62 @@ public class EmiConfig {
 
 	private static interface MultiWriter<T> {
 		List<String> writeValue(T value);
+	}
+
+	public static interface ConfigEnum {
+
+		public String getName();
+
+		public Text getText();
+
+		public ConfigEnum next();
+	}
+
+	public static enum FluidUnit implements ConfigEnum {
+		LITERS("liters"),
+		MILLIBUCKETS("millibuckets"),
+		;
+
+		private final String name;
+		private final Text translation;
+
+		private FluidUnit(String name) {
+			this.name = name;
+			translation = new TranslatableText("emi.unit." + name);
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public Text getText() {
+			return translation;
+		}
+
+		@Override
+		public ConfigEnum next() {
+			int i = this.ordinal() + 1;
+			if (i < values().length) {
+				return values()[i];
+			} else {
+				return values()[0];
+			}
+		}
+
+		public static FluidUnit fromName(String name) {
+			for (FluidUnit u : values()) {
+				if (u.getName().equals(name)) {
+					return u;
+				}
+			}
+			return FluidUnit.LITERS;
+		}
 	}
 }

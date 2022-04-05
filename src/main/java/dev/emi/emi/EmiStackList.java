@@ -1,9 +1,9 @@
 package dev.emi.emi;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.stack.EmiStack;
@@ -18,10 +18,12 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
 public class EmiStackList {
+	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = Lists.newArrayList();
 
 	public static void reload() {
-		List<EmiStack> stacks = Lists.newLinkedList();
+		invalidators.clear();
+		List<EmiStack> stacks = Lists.newArrayList();
 		for (int i = 0; i < Registry.ITEM.size(); i++) {
 			Item item = Registry.ITEM.get(i);
 			if (item == Items.AIR) {
@@ -41,6 +43,17 @@ public class EmiStackList {
 			}
 		}
 		
-		EmiStackList.stacks = ImmutableList.copyOf(stacks);
+		EmiStackList.stacks = stacks;
+	}
+
+	public static void bake() {
+		stacks = stacks.stream().filter(s -> {
+			for (Predicate<EmiStack> invalidator : invalidators) {
+				if (invalidator.test(s)) {
+					return false;
+				}
+			}
+			return true;
+		}).toList();;
 	}
 }

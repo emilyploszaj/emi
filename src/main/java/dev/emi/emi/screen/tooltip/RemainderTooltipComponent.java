@@ -6,6 +6,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -46,8 +47,8 @@ public class RemainderTooltipComponent implements TooltipComponent {
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
-			itemRenderer.renderInGui(remainder.inputs.get(0).getItemStack(), x, y + 18 * i);
-			itemRenderer.renderInGui(remainder.remainder.getItemStack(), x + 18 * 2, y + 18 * i);
+			remainder.inputs.get(0).renderIcon(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
+			remainder.remainder.renderIcon(matrices, x+ 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
 		}
 	}
 

@@ -62,24 +62,30 @@ public class BoM {
 		EmiStack output = recipe.getOutputs().get(0);
 		goal = new MaterialNode(output);
 		goal.defineRecipe(recipe);
-		goal.recalculate();
+		recalculate();
 	}
 
 	public static void addRecipe(EmiRecipe recipe, EmiStack stack) {
 		disabledRecipes.remove(recipe);
 		addedRecipes.put(stack, recipe);
-		goal.recalculate();
+		recalculate();
 	}
 
 	public static void removeRecipe(EmiRecipe recipe) {
 		disabledRecipes.add(recipe);
-		goal.recalculate();
+		recalculate();
 	}
 
 	public static void calculateCost() {
 		costs.clear();
 		remainders.clear();
 		calculateCost(costs, remainders, goal.amount, goal);
+	}
+
+	private static void recalculate() {
+		if (goal != null) {
+			goal.recalculate();
+		}
 	}
 
 	private static void calculateCost(List<MaterialCost> costs, Map<EmiRecipe, MaterialCost> remainders, int amount, MaterialNode node) {

@@ -5,10 +5,13 @@ import java.util.List;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class EmptyEmiStack extends EmiStack {
+	private static final Identifier ID = new Identifier("emi", "empty");
 	public static final EmptyEntry ENTRY = new EmptyEntry();
 
 	@Override
@@ -22,7 +25,7 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public EmiIngredient setRemainder(EmiStack stack) {
+	public EmiStack setRemainder(EmiStack stack) {
 		throw new UnsupportedOperationException("Cannot mutate an empty stack");
 	}
 
@@ -37,6 +40,11 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
+	public NbtCompound getNbt() {
+		return null;
+	}
+
+	@Override
 	public Object getKey() {
 		return ENTRY;
 	}
@@ -44,6 +52,11 @@ public class EmptyEmiStack extends EmiStack {
 	@Override
 	public Entry<?> getEntry() {
 		return ENTRY;
+	}
+
+	@Override
+	public Identifier getId() {
+		return ID;
 	}
 
 	@Override

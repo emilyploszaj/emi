@@ -5,12 +5,16 @@ import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.api.stack.comparison.ReferenceComparison;
+import dev.emi.emi.EmiComparisonDefaults;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 /**
  * An abstract representation of an object in EMI.
@@ -19,7 +23,7 @@ import net.minecraft.text.Text;
 public abstract class EmiStack implements EmiIngredient {
 	public static final EmiStack EMPTY = new EmptyEmiStack();
 	private EmiStack remainder = EMPTY;
-	protected Comparison comparison = ReferenceComparison.INSTANCE;
+	protected Comparison comparison = Comparison.DEFAULT_COMPARISON;
 	protected int amount = 1;
 
 	@Override
@@ -31,7 +35,7 @@ public abstract class EmiStack implements EmiIngredient {
 		return remainder;
 	}
 
-	public EmiIngredient setRemainder(EmiStack stack) {
+	public EmiStack setRemainder(EmiStack stack) {
 		remainder = stack;
 		return this;
 	}
@@ -48,10 +52,23 @@ public abstract class EmiStack implements EmiIngredient {
 	public int getAmount() {
 		return amount;
 	}
+	
+	public EmiStack setAmount(int amount) {
+		this.amount = amount;
+		return this;
+	}
+
+	public abstract NbtCompound getNbt();
+
+	public boolean hasNbt() {
+		return getNbt() != null;
+	}
 
 	public abstract Object getKey();
 
 	public abstract Entry<?> getEntry();
+
+	public abstract Identifier getId();
 
 	@SuppressWarnings("unchecked")
 	public <T> @Nullable Entry<T> getEntryOfType(Class<T> clazz) {
@@ -67,12 +84,26 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public boolean isEqual(EmiStack stack) {
-		return comparison.areEqual(this, stack) && stack.comparison.areEqual(stack, this);
+		boolean amount = comparison.amount.orElseGet(() -> EmiComparisonDefaults.get(getKey()).amount.orElse(false))
+			|| stack.comparison.amount.orElseGet(() -> EmiComparisonDefaults.get(stack.getKey()).amount.orElse(false));
+		boolean nbt = comparison.nbt.orElseGet(() -> EmiComparisonDefaults.get(getKey()).nbt.orElse(false))
+			|| stack.comparison.nbt.orElseGet(() -> EmiComparisonDefaults.get(stack.getKey()).nbt.orElse(false));
+		if (!getEntry().equals(stack.getEntry())) {
+			return false;
+		}
+		if (nbt && (hasNbt() != stack.hasNbt() || (hasNbt() && !getNbt().equals(stack.getNbt())))) {
+			return false;
+		}
+		if (amount && getAmount() != stack.getAmount()) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta) {
 		renderIcon(matrices, x, y, delta);
+		renderOverlay(matrices, x, y, delta);
 	}
 
 	public abstract void renderIcon(MatrixStack matrices, int x, int y, float delta);
@@ -99,8 +130,24 @@ public abstract class EmiStack implements EmiIngredient {
 		return new ItemEmiStack(stack);
 	}
 
-	public static EmiStack of(Item item) {
+	public static EmiStack of(ItemConvertible item) {
 		return of(new ItemStack(item));
+	}
+
+	public static EmiStack of(FluidVariant fluid) {
+		return new FluidEmiStack(fluid);
+	}
+
+	public static EmiStack of(FluidVariant fluid, int amount) {
+		return new FluidEmiStack(fluid, amount);
+	}
+
+	public static EmiStack of(Fluid fluid) {
+		return of(FluidVariant.of(fluid));
+	}
+
+	public static EmiStack of(Fluid fluid, int amount) {
+		return of(FluidVariant.of(fluid), amount);
 	}
 
 	public static abstract class Entry<T> {
@@ -115,16 +162,5 @@ public abstract class EmiStack implements EmiIngredient {
 		}
 
 		abstract Class<T> getType();
-	}
-
-	public static interface Comparison {
-
-		boolean areEqual(EmiStack a, EmiStack b);
-
-		Comparison copy();
-
-		Comparison nbt(boolean compare);
-
-		Comparison amount(boolean compare);
 	}
 }

@@ -27,6 +27,7 @@ import net.minecraft.util.Identifier;
  */
 public class EmiMain implements ModInitializer {
 	public static final Identifier FILL_RECIPE = new Identifier("emi:fill_recipe");
+	public static final Identifier COMMAND = new Identifier("emi:command");
 	public static final EmiRecipeHandler<?> INVENTORY = new InventoryRecipeHandler();
 	public static final EmiRecipeHandler<?> CRAFTING = new CraftingRecipeHandler();
 	public static final EmiRecipeHandler<?> COOKING = new CookingRecipeHandler();
@@ -40,7 +41,7 @@ public class EmiMain implements ModInitializer {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void onInitialize() {
-		EmiConfig.load();
+		EmiCommands.init();
 		ServerPlayNetworking.registerGlobalReceiver(FILL_RECIPE, (server, player, networkHandler, buf, sender) -> {
 			int syncId = buf.readInt();
 			int action = buf.readByte();

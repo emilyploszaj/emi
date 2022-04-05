@@ -3,6 +3,7 @@ package dev.emi.emi;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
@@ -17,6 +18,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
+	public static List<Predicate<EmiRecipe>> invalidators = Lists.newArrayList();
+
 	public static List<EmiRecipeCategory> categories = Lists.newArrayList();
 	public static Map<EmiRecipeCategory, List<EmiIngredient>> workstations = Maps.newHashMap();
 	public static List<EmiRecipe> recipes = Lists.newArrayList();
@@ -27,6 +30,7 @@ public class EmiRecipes {
 	public static Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
 	
 	public static void reload() {
+		invalidators.clear();
 		categories.clear();
 		workstations.clear();
 		recipes.clear();
@@ -39,20 +43,28 @@ public class EmiRecipes {
 	public static void bake() {
 		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byInput = Maps.newHashMap();
 		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byOutput = Maps.newHashMap();
+		outer:
 		for (EmiRecipe recipe : recipes) {
+			for (Predicate<EmiRecipe> predicate : invalidators) {
+				if (predicate.test(recipe)) {
+					continue outer;
+				}
+			}
 			Identifier id = recipe.getId();
 			EmiRecipeCategory category = recipe.getCategory();
 			if (!categories.contains(category)) {
-				System.err.println("[emi] Recipe " + id + " loaded with unregistered category: " + category.getId());
+				EmiLog.warn("Recipe " + id + " loaded with unregistered category: " + category.getId());
 			}
 			byCategory.computeIfAbsent(category, a -> Lists.newArrayList()).add(recipe);
 			if (id != null) {
 				if (byId.containsKey(id)) {
-					System.err.println("[emi] Recipe loaded with duplicate id: " + id);
+					EmiLog.warn("Recipe loaded with duplicate id: " + id);
 				}
 				byId.put(id, recipe);
 			}
 			getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
+				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+			getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
 			getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
