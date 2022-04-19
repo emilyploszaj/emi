@@ -8,9 +8,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -18,11 +16,17 @@ public class EmiCraftingRecipe implements EmiRecipe {
 	protected final Identifier id;
 	protected final List<EmiIngredient> input;
 	protected final EmiStack output;
-	
+	protected final boolean shapeless;
+
 	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
+		this(input, output, id, true);
+	}
+
+	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
 		this.input = input;
 		this.output = output;
 		this.id = id;
+		this.shapeless = shapeless;
 	}
 
 	@Override
@@ -56,16 +60,18 @@ public class EmiCraftingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 60, y + 18, 24, 17, 44, 0));
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 97, y, 16, 14, 95, 0));
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
+		if (shapeless) {
+			widgets.addTexture(EmiRenderHelper.WIDGETS, 97, 0, 16, 14, 95, 0);
+		}
 		for (int i = 0; i < 9; i++) {
 			if (i < input.size()) {
-				widgets.add(new SlotWidget(input.get(i), x + i % 3 * 18, y + i / 3 * 18));
+				widgets.addSlot(input.get(i), i % 3 * 18, i / 3 * 18);
 			} else {
-				widgets.add(new SlotWidget(EmiStack.of(ItemStack.EMPTY), x + i % 3 * 18, y + i / 3 * 18));
+				widgets.addSlot(EmiStack.of(ItemStack.EMPTY), i % 3 * 18, i / 3 * 18);
 			}
 		}
-		widgets.add(new SlotWidget(output, x + 92, y + 14).output(true).recipeContext(this));
+		widgets.addSlot(output, 92, 14).output(true).recipeContext(this);
 	}
 }

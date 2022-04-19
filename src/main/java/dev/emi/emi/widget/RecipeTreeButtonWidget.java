@@ -17,7 +17,7 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 	@Override
 	public int getTextureOffset(int mouseX, int mouseY) {
 		int v = super.getTextureOffset(mouseX, mouseY);
-		if (BoM.goal != null && BoM.goal.recipe == recipe) {
+		if (BoM.tree != null && BoM.tree.goal.recipe == recipe) {
 			v += 36;
 		}
 		return v;

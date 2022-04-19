@@ -9,12 +9,14 @@ public class TextWidget extends Widget {
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	private final OrderedText text;
 	private final int x, y;
+	private final int color;
 	private final boolean shadow;
 
-	public TextWidget(OrderedText text, int x, int y, boolean shadow) {
+	public TextWidget(OrderedText text, int x, int y, int color, boolean shadow) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
+		this.color = color;
 		this.shadow = shadow;
 	}
 
@@ -26,9 +28,9 @@ public class TextWidget extends Widget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (shadow) {
-			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, -1);
+			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, color);
 		} else {
-			CLIENT.textRenderer.draw(matrices, text, x, y, -1);
+			CLIENT.textRenderer.draw(matrices, text, x, y, color);
 		}
 	}
 }

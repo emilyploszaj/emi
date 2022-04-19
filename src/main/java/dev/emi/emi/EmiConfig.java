@@ -29,9 +29,16 @@ public class EmiConfig {
 	private static Map<Class<?>, Setter> SETTERS = Maps.newHashMap();
 	private static Map<Class<?>, Writer<?>> WRITERS = Maps.newHashMap();
 	private static Map<Class<?>, MultiWriter<?>> MULTI_WRITERS = Maps.newHashMap();
-	private static Map<String, String> unparsed = Maps.newHashMap();
+	private static Map<String, List<String>> unparsed = Maps.newHashMap();
 
 	// General
+	@Comment("Whether EMI is enabled and visible.")
+	@ConfigValue("general.enabled")
+	public static boolean enabled = true;
+
+	@Comment("Whether cheating in items is enabled.")
+	@ConfigValue("general.cheat-mode")
+	public static boolean cheatMode = false;
 
 	// UI
 	@Comment("Whether to move status effects to the left of the screen.")
@@ -70,6 +77,10 @@ public class EmiConfig {
 	@Comment("Toggles the visibility of EMI.")
 	@ConfigValue("binds.toggle-visibility")
 	public static EmiBind toggleVisibility = new EmiBind("key.emi.toggle_visibility", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_O);
+
+	@Comment("Focuses the search bar.")
+	@ConfigValue("binds.focus-search")
+	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_F);
 
 	@Comment("Display the recipes for creating an item.")
 	@ConfigValue("binds.view-recipes")
@@ -121,6 +132,16 @@ public class EmiConfig {
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+
+	@Comment("Cheat in one of an item.")
+	@ConfigValue("binds.cheat-all")
+	public static EmiBind cheatOne = new EmiBind("key.emi.cheat_one", 
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiUtil.CONTROL_MASK));
+
+	@Comment("Cheat in a stack of an item.")
+	@ConfigValue("binds.cheat-stack")
+	public static EmiBind cheatStack = new EmiBind("key.emi.cheat_stack", 
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
 	
 	// Dev
 	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
@@ -144,7 +165,7 @@ public class EmiConfig {
 				}
 				for (String key : css.keySet()) {
 					if (!consumed.contains(key)) {
-						unparsed.put(key, css.get(key).get());
+						unparsed.put(key, css.getAll(key));
 					}
 				}
 			}
@@ -187,12 +208,14 @@ public class EmiConfig {
 					unparsed.computeIfAbsent(group, g -> Lists.newArrayList()).add(text);
 				}
 			}
-			for (Map.Entry<String, String> entry : EmiConfig.unparsed.entrySet()) {
+			for (Map.Entry<String, List<String>> entry : EmiConfig.unparsed.entrySet()) {
 				String[] parts = entry.getKey().split("\\.");
 				String group = parts[0];
 				String key = parts[1];
-				unparsed.computeIfAbsent(group, g -> Lists.newArrayList()).add("\t/** unparsed */\n\t" + key + ": "
-					+ entry.getValue() + ";\n");
+				for (String value : entry.getValue()) {
+					unparsed.computeIfAbsent(group, g -> Lists.newArrayList()).add("\t/** unparsed */\n\t" + key + ": "
+						+ value + ";\n");
+				}
 			}
 			FileWriter writer = new FileWriter(getConfigFile());
 			writer.write("/** EMI Config */\n\n");

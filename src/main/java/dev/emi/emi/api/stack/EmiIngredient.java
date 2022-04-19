@@ -2,19 +2,18 @@ package dev.emi.emi.api.stack;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiUtil;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
-import net.minecraft.util.Identifier;
+import net.minecraft.tag.TagKey;
 
 public interface EmiIngredient {
 	
@@ -46,9 +45,9 @@ public interface EmiIngredient {
 		}
 		return true;
 	}
-
-	public static EmiIngredient of(Tag<Item> tag) {
-		return new EmiTagIngredient(tag);
+	
+	public static EmiIngredient of(TagKey<Item> key) {
+		return new EmiTagIngredient(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {
@@ -58,32 +57,31 @@ public interface EmiIngredient {
 		} else if (items.size() == 1) {
 			return EmiStack.of(items.get(0));
 		}
-		List<Tag<Item>> tags = Lists.newArrayList();
-		for (Map.Entry<Identifier, Tag<Item>> entry : ItemTags.getTagGroup().getTags().entrySet().stream()
-				.sorted((a, b) -> Integer.compare(b.getValue().values().size(), a.getValue().values().size())).toList()) {
-			Tag<Item> tag = entry.getValue();
-			if (tag.values().size() < 2) {
+		List<TagKey<Item>> keys = Lists.newArrayList();
+		for (TagKey<Item> key : EmiClient.itemTags) {
+			List<Item> values = EmiUtil.values(key).map(i -> i.value()).toList();
+			if (values.size() < 2) {
 				continue;
 			}
-			if (items.containsAll(tag.values())) {
-				items.removeAll(tag.values());
-				tags.add(tag);
+			if (items.containsAll(values)) {
+				items.removeAll(values);
+				keys.add(key);
 			}
 			if (items.size() == 0) {
 				break;
 			}
 		}
-		if (tags.isEmpty()) {
+		if (keys.isEmpty()) {
 			return new EmiIngredientList(Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList());
 		} else if (items.isEmpty()) {
-			if (tags.size() == 1) {
-				return new EmiTagIngredient(tags.get(0));
+			if (keys.size() == 1) {
+				return new EmiTagIngredient(keys.get(0));
 			} else {
-				return new EmiIngredientList(tags.stream().map(EmiTagIngredient::new).toList());
+				return new EmiIngredientList(keys.stream().map(EmiTagIngredient::new).toList());
 			}
 		} else {
 			return new EmiIngredientList(List.of(items.stream().map(ItemStack::new).map(EmiStack::of).toList(),
-					tags.stream().map(EmiTagIngredient::new).toList())
+					keys.stream().map(EmiTagIngredient::new).toList())
 				.stream().flatMap(a -> a.stream()).toList());
 		}
 

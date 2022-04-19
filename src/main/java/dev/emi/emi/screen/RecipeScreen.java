@@ -19,6 +19,8 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.widget.RecipeBackground;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
@@ -37,6 +39,7 @@ import net.minecraft.util.Identifier;
 public class RecipeScreen extends Screen implements EmiScreen {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
 	private static final int RECIPE_PADDING = 9;
+	public static MaterialNode resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
 	public HandledScreen<?> old;
 	private List<RecipeTab> tabs = Lists.newArrayList();
@@ -188,7 +191,30 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				int wx = x + xOff;
 				int wy = y + 36 + off;
 				currentPage.add(new RecipeBackground(wx - 4, wy - 4, r.getDisplayWidth() + 8, r.getDisplayHeight() + 8));
-				r.addWidgets(currentPage, wx, wy);
+				WidgetHolder holder = new WidgetHolder() {
+
+					public int getX() {
+						return wx;
+					}
+		
+					public int getY() {
+						return wy;
+					}
+		
+					public int getWidth() {
+						return r.getDisplayWidth();
+					}
+		
+					public int getHeight() {
+						return r.getDisplayHeight();
+					}
+		
+					public <T extends Widget> T add(T widget) {
+						currentPage.add(widget);
+						return widget;
+					}
+				};
+				r.addWidgets(holder);
 				int bx = wy + r.getDisplayHeight() - 12;
 				if (r.getDisplayHeight() <= 18) {
 					bx += 4;
@@ -219,6 +245,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	}
 
 	public void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
+		resolve = null;
 		this.recipes = recipes;
 		if (!recipes.isEmpty()) {
 			EmiRecipeCategory current = null;
@@ -287,12 +314,12 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			this.onClose();
+			this.close();
 			return true;
 		} else if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
-		} else if (this.client.options.keyInventory.matchesKey(keyCode, scanCode)) {
-			this.onClose();
+		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+			this.close();
 			return true;
 		}
 
@@ -313,7 +340,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		this.client.setScreen(old);
 	}
 

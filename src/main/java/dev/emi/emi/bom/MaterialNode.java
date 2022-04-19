@@ -31,14 +31,14 @@ public class MaterialNode {
 		this.divisor = node.divisor;
 	}
 
-	public void recalculate() {
-		recalculate(Lists.newArrayList());
+	public void recalculate(MaterialTree tree) {
+		recalculate(tree, Lists.newArrayList());
 	}
 
-	private void recalculate(List<EmiRecipe> used) {
+	private void recalculate(MaterialTree tree, List<EmiRecipe> used) {
 		EmiRecipe recipe = this.recipe;
 		if (!used.isEmpty()) {
-			recipe = BoM.getRecipe(ingredient);
+			recipe = tree.getRecipe(ingredient);
 		}
 		if (recipe != null) {
 			if (used.contains(recipe)) {
@@ -47,7 +47,7 @@ public class MaterialNode {
 			used.add(recipe);
 			defineRecipe(recipe);
 			for (MaterialNode node : children) {
-				node.recalculate(used);
+				node.recalculate(tree, used);
 			}
 			used.remove(used.size() - 1);
 		}

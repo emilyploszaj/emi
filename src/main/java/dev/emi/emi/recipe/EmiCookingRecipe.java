@@ -7,12 +7,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.AnimatedTextureWidget;
-import dev.emi.emi.api.widget.FillingArrowWidget;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.text.TranslatableText;
@@ -68,20 +63,19 @@ public class EmiCookingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new FillingArrowWidget(x + 24, y + 5, 50 * recipe.getCookTime()).tooltip(() -> {
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addFillingArrow(24, 5, 50 * recipe.getCookTime()).tooltip(() -> {
 			return List.of(TooltipComponent.of(new TranslatableText("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
-		}));
+		});
 		if (infiniBurn) {
-			widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 1, y + 24, 14, 14, 68, 14));
+			widgets.addTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14);
 		} else {
-			widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 1, y + 24, 14, 14, 68, 0));
-			widgets.add(new AnimatedTextureWidget(EmiRenderHelper.WIDGETS, x + 1, y + 24, 14, 14, 68, 14, 4000 / fuelMultiplier,
-				false, true, true));
+			widgets.addTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 0);
+			widgets.addAnimatedTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14, 4000 / fuelMultiplier,
+				false, true, true);
 		}
-		widgets.add(new TextWidget(new TranslatableText("emi.cooking.experience",
-			recipe.getExperience()).asOrderedText(), x + 26, y + 28, true));
-		widgets.add(new SlotWidget(input, x, y + 4));
-		widgets.add(new SlotWidget(output, x + 56, y).output(true).recipeContext(this));
+		widgets.addText(new TranslatableText("emi.cooking.experience", recipe.getExperience()).asOrderedText(), 26, 28, -1, true);
+		widgets.addSlot(input, 0, 4);
+		widgets.addSlot(output, 56, 0).output(true).recipeContext(this);
 	}
 }

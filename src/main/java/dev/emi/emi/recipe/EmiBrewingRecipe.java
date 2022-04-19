@@ -9,10 +9,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.AnimatedTextureWidget;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.Items;
 import net.minecraft.text.TranslatableText;
@@ -65,15 +62,16 @@ public class EmiBrewingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(BACKGROUND, x, y, 103, 61, 16, 14));
-		widgets.add(new AnimatedTextureWidget(BACKGROUND, x + 81, y + 2, 9, 28, 176, 0, 1000 * 20, false, false, false).tooltip(() -> {
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(BACKGROUND, 0, 0, 103, 61, 16, 14);
+		widgets.addAnimatedTexture(BACKGROUND, 81, 2, 9, 28, 176, 0, 1000 * 20, false, false, false).tooltip(() -> {
 			return List.of(TooltipComponent.of(new TranslatableText("emi.cooking.time", 20).asOrderedText()));
-		}));
-		widgets.add(new AnimatedTextureWidget(BACKGROUND, x + 47, y, 12, 29, 185, 0, 700, false, true, false));
-		widgets.add(new SlotWidget(BLAZE_POWDER, x, y + 2).drawBack(false));
-		widgets.add(new SlotWidget(input, x + 39, y + 36).drawBack(false));
-		widgets.add(new SlotWidget(ingredient, x + 62, y + 2).drawBack(false));
-		widgets.add(new SlotWidget(output, x + 85, y + 36).drawBack(false).recipeContext(this));
+		});
+		widgets.addAnimatedTexture(BACKGROUND, 47, 0, 12, 29, 185, 0, 700, false, true, false);
+		widgets.addTexture(BACKGROUND, 44, 30, 18, 4, 176, 29);
+		widgets.addSlot(BLAZE_POWDER, 0, 2).drawBack(false);
+		widgets.addSlot(input, 39, 36).drawBack(false);
+		widgets.addSlot(ingredient, 62, 2).drawBack(false);
+		widgets.addSlot(output, 85, 36).drawBack(false).recipeContext(this);
 	}
 }

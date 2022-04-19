@@ -5,9 +5,7 @@ import java.util.List;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.util.Identifier;
 
 public class EmiDualResultWorldRecipe extends EmiCustomWorldRecipe {
@@ -49,12 +47,12 @@ public class EmiDualResultWorldRecipe extends EmiCustomWorldRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 22, y + 3, 13, 13, 82, 0));
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 61, y + 1, 24, 17, 44, 0));
-		widgets.add(new SlotWidget(input, x, y));
-		widgets.add(new SlotWidget(catalyst, x + 40, y).catalyst(isCatalyst));
-		widgets.add(new SlotWidget(result1, x + 89, y).recipeContext(this));
-		widgets.add(new SlotWidget(result2, x + 107, y).recipeContext(this));
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 22, 3, 13, 13, 82, 0);
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 61, 1, 24, 17, 44, 0);
+		widgets.addSlot(input, 0, 0);
+		widgets.addSlot(catalyst, 40, 0).catalyst(isCatalyst);
+		widgets.addSlot(result1, 89, 0).recipeContext(this);
+		widgets.addSlot(result2, 107, 0).recipeContext(this);
 	}	
 }

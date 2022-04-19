@@ -12,6 +12,7 @@
     "accessor.ScreenAccessor",
     "accessor.SmithingRecipeAccessor",
     "AbstractInventoryScreenMixin",
+    "CreativeInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
     "HoeItemMixin"

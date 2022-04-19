@@ -21,8 +21,12 @@ public class EmiStackList {
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = Lists.newArrayList();
 
-	public static void reload() {
+	public static void clear() {
 		invalidators.clear();
+		stacks = Lists.newArrayList();
+	}
+
+	public static void reload() {
 		List<EmiStack> stacks = Lists.newArrayList();
 		for (int i = 0; i < Registry.ITEM.size(); i++) {
 			Item item = Registry.ITEM.get(i);

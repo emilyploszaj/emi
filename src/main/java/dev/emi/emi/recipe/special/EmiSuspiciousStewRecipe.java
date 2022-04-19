@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class EmiSuspiciousStewRecipe extends EmiPatternCraftingRecipe {
-	private static final List<Item> FLOWERS = Registry.ITEM.getEntries().stream().map(e -> e.getValue())
+	private static final List<Item> FLOWERS = Registry.ITEM.stream()
 		.filter(i -> i instanceof BlockItem bi && bi.getBlock() instanceof FlowerBlock).collect(Collectors.toList());
 
 	public EmiSuspiciousStewRecipe(Identifier id) {

@@ -2,21 +2,21 @@ package dev.emi.emi.screen;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiExclusionAreas;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiLog;
+import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiReloadManager;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -24,145 +24,84 @@ import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
+import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.search.EmiSearch;
-import dev.emi.emi.search.QueryType;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Pair;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmiScreenManager {
 	private static final int ENTRY_SIZE = 18;
-	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
 	private static MinecraftClient client = MinecraftClient.getInstance();
-	private static List<Pair<Integer, Style>> styles;
 	private static List<EmiStack> stacks;
 	/*package*/ static int lastMouseX, lastMouseY;
 	private static int left, right;
-	private static int xMin, xMax, yMin, yMax;
-	private static int tx, ty, tw, th;
-	private static int fxMin, fxMax, fyMin, fyMax;
-	private static int ftx, fty, ftw, fth;
-	public static TextFieldWidget search;
+	private static int lastWidth, lastHeight;
+	private static List<Rect2i> lastExclusion;
+	private static ScreenSpace searchSpace;
+	private static ScreenSpace favoriteSpace;
+	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);;
 	public static int currentPage = 0;
 
-	static {
-		search = new TextFieldWidget(client.textRenderer, 0, 0, 160, 18, new TranslatableText("emi.search"));
-		search.setFocusUnlocked(true);
-		search.setEditableColor(-1);
-		search.setUneditableColor(-1);
-		search.setDrawsBackground(true);
-		search.setMaxLength(256);
-		search.setRenderTextProvider((string, stringStart) -> {
-			MutableText text = null;
-			int s = 0;
-			int last = 0;
-			for (; s < styles.size(); s++) {
-				Pair<Integer, Style> style = styles.get(s);
-				int end = style.getLeft();
-				if (end > stringStart) {
-					if (end - stringStart >= string.length()) {
-						text = new LiteralText(string.substring(0, string.length())).setStyle(style.getRight());
-						// Skip second loop
-						s = styles.size();
-						break;
-					}
-					text = new LiteralText(string.substring(0, end - stringStart)).setStyle(style.getRight());
-					last = end - stringStart;
-					s++;
-					break;
-				}
-			}
-			for (; s < styles.size(); s++) {
-				Pair<Integer, Style> style = styles.get(s);
-				int end = style.getLeft();
-				if (end - stringStart >= string.length()) {
-					text.append(new LiteralText(string.substring(last, string.length())).setStyle(style.getRight()));
-					break;
-				}
-				text.append(new LiteralText(string.substring(last, end - stringStart)).setStyle(style.getRight()));
-				last = end - stringStart;
-			}
-			return text.asOrderedText();
-		});
-		search.setChangedListener(string -> {
-			Matcher matcher = EmiSearch.TOKENS.matcher(string);
-			List<Pair<Integer, Style>> styles = Lists.newArrayList();
-			int last = 0;
-			while (matcher.find()) {
-				int start = matcher.start();
-				int end = matcher.end();
-				if (last < start) {
-					styles.add(new Pair<Integer, Style>(start, Style.EMPTY.withFormatting(Formatting.WHITE)));
-				}
-				String group = matcher.group();
-				QueryType type = QueryType.fromString(group);
-				int subStart = type.prefix.length();
-				if (group.length() > 1 + subStart && group.substring(subStart).startsWith("/") && group.endsWith("/")) {
-					int rOff = start + subStart + 1;
-					styles.add(new Pair<Integer, Style>(rOff, type.slashColor));
-					Matcher rMatcher = ESCAPE.matcher(string.substring(rOff, end - 1));
-					int rLast = 0;
-					while (rMatcher.find()) {
-						int rStart = rMatcher.start();
-						int rEnd = rMatcher.end();
-						if (rLast < rStart) {
-							styles.add(new Pair<Integer, Style>(rStart + rOff, type.regexColor));
-						}
-						styles.add(new Pair<Integer, Style>(rEnd + rOff, type.escapeColor));
-						rLast = rEnd;
-					}
-					if (rLast < end - 1) {
-						styles.add(new Pair<Integer, Style>(end - 1, type.regexColor));
-					}
-					styles.add(new Pair<Integer, Style>(end, type.slashColor));
-				} else {
-					styles.add(new Pair<Integer, Style>(end, type.color));
-				}
-
-				last = end;
-			}
-			if (last < string.length()) {
-				styles.add(new Pair<Integer, Style>(string.length(), Style.EMPTY.withFormatting(Formatting.WHITE)));
-			}
-			EmiScreenManager.styles = styles;
-			
-			EmiSearch.search(string);
-		});
-		search.setText("");
+	private static boolean isDisabled() {
+		return EmiReloadManager.isReloading() || !EmiConfig.enabled;
 	}
 
 	private static void recalculate() {
+		stacks = EmiSearch.stacks;
 		Screen screen = client.currentScreen;
+		List<Rect2i> exclusion = EmiExclusionAreas.getExclusion(screen);
+		if (lastWidth == screen.width && lastHeight == screen.height && exclusion.size() == lastExclusion.size()) {
+			boolean same = true;
+			for (int i = 0; i < exclusion.size(); i++) {
+				Rect2i a = exclusion.get(i);
+				Rect2i b = lastExclusion.get(i);
+				if (a.getX() != b.getX() || a.getY() != b.getY() || a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
+					same = false;
+					break;
+				}
+			}
+			if (same) {
+				return;
+			}
+		}
+		lastWidth = screen.width;
+		lastHeight = screen.height;
+		lastExclusion = exclusion;
 		if (screen instanceof EmiScreen emi) {
-			stacks = EmiSearch.stacks;
 			left = emi.emi$getLeft();
 			right = emi.emi$getRight();
-			xMin = right;
-			xMax = screen.width;
-			yMin = 16;
-			yMax = screen.height - 2;
-			tx = xMin + (xMax - xMin) % ENTRY_SIZE / 2;
-			ty = yMin;
-			tw = (xMax - xMin) / ENTRY_SIZE;
-			th = (yMax - yMin) / ENTRY_SIZE;
-			fxMin = 0;
-			fxMax = left;
-			fyMin = 16;
-			fyMax = screen.height - 2;
-			ftx = fxMin + (fxMax - fxMin) % ENTRY_SIZE / 2;
-			fty = fyMin;
-			ftw = (fxMax - fxMin) / ENTRY_SIZE;
-			fth = (fyMax - fyMin) / ENTRY_SIZE;
+			int xMin = right;
+			int xMax = screen.width;
+			int yMin = 16;
+			int yMax = screen.height - 2;
+			int tx = xMin + (xMax - xMin) % ENTRY_SIZE / 2;
+			int ty = yMin;
+			int tw = (xMax - xMin) / ENTRY_SIZE;
+			int th = (yMax - yMin) / ENTRY_SIZE;
+			searchSpace = new ScreenSpace(xMin, xMax, yMin, yMax, tx, ty, tw, th, true, exclusion);
+			int fxMin = 0;
+			int fxMax = left;
+			int fyMin = 16;
+			int fyMax = screen.height - 2;
+			int ftx = fxMin + (fxMax - fxMin) % ENTRY_SIZE / 2;
+			int fty = fyMin;
+			int ftw = (fxMax - fxMin) / ENTRY_SIZE;
+			int fth = (fyMax - fyMin) / ENTRY_SIZE;
+			favoriteSpace = new ScreenSpace(fxMin, fxMax, fyMin, fyMax, ftx, fty, ftw, fth, false, exclusion);
 		}
 	}
 
@@ -177,20 +116,19 @@ public class EmiScreenManager {
 				}
 			}
 		}
-		if (mouseX >= tx && mouseX < tx + tw * ENTRY_SIZE && mouseY >= ty && mouseY < ty + th * ENTRY_SIZE) {
-			int x = (mouseX - tx) / ENTRY_SIZE;
-			int y = (mouseY - ty) / ENTRY_SIZE;
-			int pageSize = tw * th;
-			int n = pageSize * currentPage + y * tw + x;
-			if (n < stacks.size()) {
+		if (searchSpace.contains(mouseX, mouseY) && mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
+			int x = (mouseX - searchSpace.tx) / ENTRY_SIZE;
+			int y = (mouseY - searchSpace.ty) / ENTRY_SIZE;
+			int n = searchSpace.getRawOffset(x, y);
+			if (n != -1 && (n = n + searchSpace.pageSize * currentPage) < stacks.size()) {
 				return stacks.get(n);
 			}
 		}
-		if (mouseX >= ftx && mouseX < ftx + ftw * ENTRY_SIZE && mouseY >= fty && mouseY < fty + fth * ENTRY_SIZE) {
-			int x = (mouseX - ftx) / ENTRY_SIZE;
-			int y = (mouseY - fty) / ENTRY_SIZE;
-			int n = y * ftw + x;
-			if (n < EmiFavorites.favorites.size()) {
+		if (favoriteSpace.contains(mouseX, mouseY) && mouseX >= favoriteSpace.tx && mouseY >= favoriteSpace.ty) {
+			int x = (mouseX - favoriteSpace.tx) / ENTRY_SIZE;
+			int y = (mouseY - favoriteSpace.ty) / ENTRY_SIZE;
+			int n = favoriteSpace.getRawOffset(x, y);
+			if (n != -1 && (n = n + favoriteSpace.pageSize * 0) < EmiFavorites.favorites.size()) {
 				return EmiFavorites.favorites.get(n);
 			}
 		}
@@ -201,15 +139,17 @@ public class EmiScreenManager {
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		Screen screen = client.currentScreen;
-		if (EmiReloadManager.isReloading()) {
-			client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 12, -1);
+		if (isDisabled()) {
+			if (EmiReloadManager.isReloading()) {
+				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 12, -1);
+			}
 			return;
 		}
 		if (screen instanceof EmiScreen emi) {
 			EmiScreenManager.search.setZOffset(0);
 			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
 			recalculate();
-			int pageSize = tw * th;
+			int pageSize = searchSpace.pageSize;
 			int totalPages = (stacks.size() - 1) / pageSize + 1;
 			if (currentPage >= totalPages) {
 				currentPage = totalPages - 1;
@@ -218,16 +158,16 @@ public class EmiScreenManager {
 			}
 	
 			DrawableHelper.drawCenteredText(matrices, client.textRenderer, new TranslatableText("emi.page", currentPage + 1, totalPages),
-				xMin + (xMax - xMin) / 2, 5, 0xFFFFFF);
+				searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
 			int i = pageSize * currentPage;
 			outer:
-			for (int yo = 0; yo < th; yo++) {
-				for (int xo = 0; xo < tw; xo++) {
+			for (int yo = 0; yo < searchSpace.th; yo++) {
+				for (int xo = 0; xo < searchSpace.getWidth(yo); xo++) {
 					if (i >= stacks.size()) {
 						break outer;
 					}
-					int cx = tx + xo * ENTRY_SIZE;
-					int cy = ty + yo * ENTRY_SIZE;
+					int cx = searchSpace.getX(xo, yo);
+					int cy = searchSpace.getY(xo, yo);
 					EmiStack stack = stacks.get(i++);
 					stack.renderIcon(matrices, cx + 1, cy + 1, delta);
 					if (EmiConfig.devMode) {
@@ -240,13 +180,13 @@ public class EmiScreenManager {
 			
 			i = 0;
 			outer: 
-			for (int yo = 0; yo < fth; yo++) {
-				for (int xo = 0; xo < ftw; xo++) {
+			for (int yo = 0; yo < favoriteSpace.th; yo++) {
+				for (int xo = 0; xo < favoriteSpace.getWidth(yo); xo++) {
 					if (i >= EmiFavorites.favorites.size()) {
 						break outer;
 					}
-					int cx = ftx + xo * ENTRY_SIZE;
-					int cy = fty + yo * ENTRY_SIZE;
+					int cx = favoriteSpace.getX(xo, yo);
+					int cy = favoriteSpace.getY(xo, yo);
 					EmiFavorites.favorites.get(i++).render(matrices, cx + 1, cy + 1, delta);
 				}
 			}
@@ -278,11 +218,11 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (EmiReloadManager.isReloading()) {
+		if (isDisabled()) {
 			return false;
 		}
 		recalculate();
-		if (mouseX > xMin && mouseX < xMax && mouseY > yMin && mouseY < yMax) {
+		if (searchSpace.contains((int) mouseX, (int) mouseY)) {
 			EmiScreenManager.currentPage += (int) -amount;
 			return true;
 		}
@@ -290,10 +230,27 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (EmiReloadManager.isReloading()) {
+		// TODO This makes sure focus always goes away, but might double fire, is that a problem?
+		EmiScreenManager.search.mouseClicked(mouseX, mouseY, button);
+		if (isDisabled()) {
+			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
+				EmiConfig.enabled = !EmiConfig.enabled;
+				EmiConfig.writeConfig();
+				return true;
+			}
 			return false;
 		}
 		recalculate();
+		if (EmiConfig.cheatMode) {
+			if (client.currentScreen instanceof HandledScreen<?> handled) {
+				ItemStack cursor = handled.getScreenHandler().getCursorStack();
+				if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
+					handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
+					ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
+					return true;
+				}
+			}
+		}
 		if (stackInteraction(getHoveredStack((int) mouseX, (int) mouseY, false), bind -> bind.matchesMouse(button))) {
 			return true;
 		}
@@ -304,7 +261,7 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
-		if (EmiReloadManager.isReloading()) {
+		if (isDisabled()) {
 			return false;
 		}
 		recalculate();
@@ -316,13 +273,18 @@ public class EmiScreenManager {
 	}
 
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (EmiReloadManager.isReloading()) {
+		if (isDisabled()) {
+			if (EmiConfig.toggleVisibility.matchesKey(keyCode, scanCode)) {
+				EmiConfig.enabled = !EmiConfig.enabled;
+				EmiConfig.writeConfig();
+				return true;
+			}
 			return false;
 		}
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
 		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
-			MinecraftClient.getInstance().setScreen(new ConfigScreen(client.currentScreen));
+			client.setScreen(new ConfigScreen(client.currentScreen));
 			return true;
 		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
@@ -339,23 +301,56 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean stackInteraction(EmiIngredient ingredient, Function<EmiBind, Boolean> function) {
-		return stackInteraction(ingredient, null, function);
-	}
-
 	public static boolean genericInteraction(Function<EmiBind, Boolean> function) {
-		if (function.apply(EmiConfig.viewTree)) {
+		if (function.apply(EmiConfig.toggleVisibility)) {
+			EmiConfig.enabled = !EmiConfig.enabled;
+			EmiConfig.writeConfig();
+			return true;
+		} else if (function.apply(EmiConfig.focusSearch)) {
+			if (client.currentScreen != null) {
+				client.currentScreen.setFocused(search);
+				search.setTextFieldFocused(true);
+				return true;
+			}
+		} else if (function.apply(EmiConfig.viewTree)) {
 			EmiApi.viewRecipeTree();
 			return true;
 		}
 		return false;
 	}
 
+	public static boolean stackInteraction(EmiIngredient ingredient, Function<EmiBind, Boolean> function) {
+		return stackInteraction(ingredient, null, function);
+	}
+
 	public static boolean stackInteraction(EmiIngredient ingredient, EmiRecipe recipe, Function<EmiBind, Boolean> function) {
 		if (!ingredient.isEmpty()) {
 			if (ingredient instanceof EmiFavorite fav && fav.getRecipe() != null) {
-				// TODO more binds for favorite interaction
-				//EmiApi.performFill(fav.getRecipe(), EmiUtil.isShiftDown());
+				if (function.apply(EmiConfig.craftAllToInventory)) {
+					EmiApi.performFill(fav.getRecipe(), EmiFillAction.QUICK_MOVE, true);
+					return true;
+				} else if (function.apply(EmiConfig.craftOneToInventory)) {
+					EmiApi.performFill(fav.getRecipe(), EmiFillAction.QUICK_MOVE, false);
+					return true;
+				} else if (function.apply(EmiConfig.craftOneToCursor)) {
+					EmiApi.performFill(fav.getRecipe(), EmiFillAction.CURSOR, false);
+					return true;
+				} else if (function.apply(EmiConfig.craftAll)) {
+					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, true);
+					return true;
+				} else if (function.apply(EmiConfig.craftAll)) {
+					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, false);
+					return true;
+				}
+			}
+			if (EmiConfig.cheatMode) {
+				if (ingredient.getEmiStacks().size() == 1) {
+					if (function.apply(EmiConfig.cheatOne)) {
+						return give(ingredient.getEmiStacks().get(0), 1);
+					} else if (function.apply(EmiConfig.cheatStack)) {
+						return give(ingredient.getEmiStacks().get(0), ingredient.getEmiStacks().get(0).getItemStack().getMaxCount());
+					}
+				}
 			}
 			if (function.apply(EmiConfig.viewRecipes)) {
 				EmiApi.displayRecipes(ingredient);
@@ -372,5 +367,102 @@ public class EmiScreenManager {
 			}
 		}
 		return false;
+	}
+
+	// TODO make a custom packet and fall back to this if client only
+	// Yes I'm just putting strings together
+	private static boolean give(EmiStack stack, int amount) {
+		ItemStack is = stack.getItemStack();
+		if (!is.isEmpty()) {
+			Identifier id = Registry.ITEM.getId(is.getItem());
+			String command = "/give @s " + id;
+			if (is.hasNbt()) {
+				command += is.getNbt().toString();
+			}
+			command += " " + amount;
+			if (command.length() < 256) {
+				client.world.sendPacket(new ChatMessageC2SPacket(command));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static class ScreenSpace {
+		public final int xMin, xMax, yMin, yMax;
+		public final int tx, ty, tw, th;
+		public final int pageSize;
+		public final boolean rtl;
+		public final int[] widths;
+
+		public ScreenSpace(int xMin, int xMax, int yMin, int yMax, int tx, int ty, int tw, int th, boolean rtl, List<Rect2i> exclusion) {
+			this.xMin = xMin;
+			this.xMax = xMax;
+			this.yMin = yMin;
+			this.yMax = yMax;
+			this.tx = tx;
+			this.ty = ty;
+			this.tw = tw;
+			this.th = th;
+			this.rtl = rtl;
+			int[] widths = new int[th];
+			int pageSize = 0;
+			for (int y = 0; y < th; y++) {
+				int width = 0;
+				int cy = ty + y * ENTRY_SIZE;
+				outer:
+				for (int x = 0; x < tw; x++) {
+					int cx = tx + (rtl ? (tw - 1 - x) : x) * ENTRY_SIZE;
+					int rx = cx + 18;
+					int ry = cy + 18;
+					for (Rect2i rect : exclusion) {
+						if (rect.contains(cx, cy) || rect.contains(rx, cy) || rect.contains(cx, ry) || rect.contains(rx, ry)) {
+							break outer;
+						}
+					}
+					width++;
+				}
+				widths[y] = width;
+				pageSize += width;
+			}
+			this.pageSize = pageSize;
+			this.widths = widths;
+		}
+
+		public int getWidth(int y) {
+			return widths[y];
+		}
+
+		public int getX(int x, int y) {
+			return tx + (rtl ? x + tw - getWidth(y) : x) * ENTRY_SIZE;
+		}
+
+		public int getY(int x, int y) {
+			return ty + y * ENTRY_SIZE;
+		}
+
+		public int getRawOffset(int x, int y) {
+			if (x >= 0 && y >= 0 && x < tw && y < th) {
+				int off = 0;
+				for (int i = 0; i < y; i++) {
+					off += widths[i];
+				}
+				if (rtl) {
+					int to = tw - widths[y];
+					if (x >= to) {
+						return off + x - to;
+					}
+				} else {
+					if (x < widths[y]) {
+						return off + x;
+					}
+				}
+			}
+			return -1;
+		}
+
+		public boolean contains(int x, int y) {
+			return x >= xMin && x < xMax && y >= yMin && y < yMax;
+		}
 	}
 }

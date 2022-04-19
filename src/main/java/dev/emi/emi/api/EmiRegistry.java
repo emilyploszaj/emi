@@ -8,6 +8,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.util.Identifier;
 
@@ -63,6 +64,18 @@ public interface EmiRegistry {
 	default void removeEmiStacks(EmiStack stack) {
 		removeEmiStacks(s -> s.equals(stack));
 	}
+
+	/**
+	 * Adds an EmiExclusionArea to screens of a given class.
+	 * Exclusion areas can provide rectangles where EMI will not place EmiStacks.
+	 */
+	<T extends Screen> void addExclusionArea(Class<T> clazz, EmiExclusionArea<T> area);
+
+	/**
+	 * Adds an EmiExclusionArea to every screen.
+	 * Exclusion areas can provide rectangles where EMI will not place EmiStacks.
+	 */
+	void addGenericExclusionArea(EmiExclusionArea<Screen> area);
 
 	void addRecipeHandler(EmiRecipeCategory category, EmiRecipeHandler<?> handler);
 

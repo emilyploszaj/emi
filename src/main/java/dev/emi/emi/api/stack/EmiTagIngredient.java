@@ -27,8 +27,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -36,12 +35,16 @@ import net.minecraft.util.Identifier;
 public class EmiTagIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
-	public final Tag<Item> tag;
+	public final TagKey<Item> key;
 
-	public EmiTagIngredient(Tag<Item> tag) {
-		this.id = ItemTags.getTagGroup().getUncheckedTagId(tag);
-		this.tag = tag;
-		this.stacks = tag.values().stream().map(ItemStack::new).map(EmiStack::of).toList();
+	public EmiTagIngredient(TagKey<Item> key) {
+		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
+	}
+
+	public EmiTagIngredient(TagKey<Item> key, List<EmiStack> stacks) {
+		this.id = key.id();
+		this.key = key;
+		this.stacks = stacks;
 	}
 
 	@Override
@@ -53,8 +56,8 @@ public class EmiTagIngredient implements EmiIngredient {
 	public void render(MatrixStack matrices, int x, int y, float delta) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if (!EmiClient.MODELED_TAGS.contains(id)) {
-			if (tag.values().size() > 0) {
-				EmiStack.of(tag.values().get(0)).renderIcon(matrices, x, y, delta);
+			if (stacks.size() > 0) {
+				stacks.get(0).renderIcon(matrices, x, y, delta);
 			}
 		} else {
 			BakedModel model = client.getBakedModelManager()
@@ -62,7 +65,7 @@ public class EmiTagIngredient implements EmiIngredient {
 				
 			MatrixStack vs = RenderSystem.getModelViewStack();
 			vs.push();
-			vs.translate(x, y, 100.0f);
+			vs.translate(x, y, 100.0f + EmiClient.tagZOffset);
 			vs.translate(8.0, 8.0, 0.0);
 			vs.scale(1.0f, -1.0f, 1.0f);
 			vs.scale(16.0f, 16.0f, 16.0f);
@@ -104,7 +107,7 @@ public class EmiTagIngredient implements EmiIngredient {
 		} else {
 			list.add(TooltipComponent.of(new LiteralText("#" + id).asOrderedText()));
 		}
-		list.add(new TagTooltipComponent(tag));
+		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
 			if (!stack.getRemainder().isEmpty()) {
 				list.add(new RemainderTooltipComponent(this));

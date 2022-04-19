@@ -6,10 +6,7 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.GeneratedSlotWidget;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.DyeableItem;
@@ -51,17 +48,17 @@ public class EmiArmorWashingRecipe extends EmiCustomWorldRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 23, y + 3, 13, 13, 82, 0));
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 79, y + 1, 24, 17, 44, 0));
-		widgets.add(new GeneratedSlotWidget(r -> {
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 23, 3, 13, 13, 82, 0);
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 79, 1, 24, 17, 44, 0);
+		widgets.addGeneratedSlot(r -> {
 			ItemStack stack = new ItemStack(armor);
 			((DyeableItem) armor).setColor(stack, r.nextInt(0xFFFFFF + 1));
 			return EmiStack.of(stack);
-		}, unique, x, y));
-		widgets.add(new SlotWidget(CAULDRON, x + 40, y));
-		widgets.add(new SlotWidget(WATER, x + 58, y));
-		widgets.add(new SlotWidget(emiArmor, x + 107, y).recipeContext(this));
+		}, unique, 0, 0);
+		widgets.addSlot(CAULDRON, 40, 0);
+		widgets.addSlot(WATER, 58, 0);
+		widgets.addSlot(emiArmor, 107, 0).recipeContext(this);
 	}
 
 	@Override

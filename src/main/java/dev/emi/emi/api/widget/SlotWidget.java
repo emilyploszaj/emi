@@ -8,9 +8,13 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.bom.BoM;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.emi.screen.RecipeScreen;
+import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -89,15 +93,24 @@ public class SlotWidget extends Widget {
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
 		list.addAll(getStack().getTooltip());
-		if (recipe != null && recipe.getId() != null && EmiConfig.devMode) {
-			list.add(TooltipComponent.of(new LiteralText(recipe.getId().toString()).asOrderedText()));
+		if (recipe != null) {
+			if (recipe.getId() != null && EmiConfig.devMode) {
+				list.add(TooltipComponent.of(new LiteralText(recipe.getId().toString()).asOrderedText()));
+			}
+			if (recipe.supportsRecipeTree()) {
+				list.add(new RecipeCostTooltipComponent(recipe));
+			}
 		}
 		return list;
 	}
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (EmiScreenManager.stackInteraction(getStack(), recipe, bind -> bind.matchesMouse(button))) {
+		if (button == 0 && recipe != null && RecipeScreen.resolve != null) {
+			BoM.addResolution(RecipeScreen.resolve.ingredient, recipe);
+			EmiApi.viewRecipeTree();
+			return true;
+		} else if (EmiScreenManager.stackInteraction(getStack(), recipe, bind -> bind.matchesMouse(button))) {
 			return true;
 		} else if (button == 2 && EmiConfig.devMode && recipe != null) {
 			MinecraftClient client = MinecraftClient.getInstance();

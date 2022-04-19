@@ -7,8 +7,7 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.recipe.EmiCraftingRecipe;
 import net.minecraft.util.Identifier;
 
@@ -24,13 +23,13 @@ public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	public abstract SlotWidget getOutputWidget(int x, int y);
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 60, y + 18, 24, 17, 44, 0));
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 97, y, 16, 14, 95, 0));
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 97, 0, 16, 14, 95, 0);
 		for (int i = 0; i < 9; i++) {
-			widgets.add(getInputWidget(i, x + i % 3 * 18, y + i / 3 * 18));
+			widgets.add(getInputWidget(i, widgets.getX() + i % 3 * 18, widgets.getY() + i / 3 * 18));
 		}
-		widgets.add(getOutputWidget(x + 92, y + 14).output(true).recipeContext(this));
+		widgets.add(getOutputWidget(widgets.getX() + 92, widgets.getY() + 14).output(true).recipeContext(this));
 	}
 
 	@Override

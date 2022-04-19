@@ -9,10 +9,11 @@ import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.bom.MaterialCost;
+import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -35,10 +36,8 @@ public class BoMScreen extends Screen {
 	private static final int NODE_VERTICAL_SPACING = 16;
 	private static int zoom = 0;
 	private double offX, offY;
-	private List<Line> lines = Lists.newArrayList();
 	private List<Node> nodes = Lists.newArrayList();
 	public HandledScreen<?> old;
-	private int horizontalOffset = 0;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
 
@@ -49,24 +48,23 @@ public class BoMScreen extends Screen {
 
 	public void init() {
 		offY = height / -3;
-		if (BoM.goal != null) {
-			TreeVolume volume = addNewNodes(BoM.goal, 1, 1, 0);
+		if (BoM.tree != null) {
+			TreeVolume volume = addNewNodes(BoM.tree.goal, 1, 1, 0);
 			nodes = volume.nodes;
-			horizontalOffset = (volume.getMaxRight() + volume.getMinLeft()) / 2;
+			int horizontalOffset = (volume.getMaxRight() + volume.getMinLeft()) / 2;
+			for (Node node : volume.nodes) {
+				node.x -= horizontalOffset;
+			}
 
-			nodeHeight = getNodeHeight(BoM.goal);
-			nodeWidth = getNodeWidth(BoM.goal);
-			/*
-			nodes.clear();
-			lines.clear();
-			addNodes(BoM.goal, 1, 1, nodeWidth * NODE_WIDTH / -2, 0, nodeWidth);*/
+			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
+			nodeHeight = getNodeHeight(BoM.tree.goal);
 		}
 	}
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackground(matrices);
-		if (BoM.goal != null) {
+		if (BoM.tree != null) {
 			float scale = getScale();
 			int scaledWidth = (int) (width / scale);
 			int scaledHeight = (int) (height / scale);
@@ -85,28 +83,24 @@ public class BoMScreen extends Screen {
 			viewMatrices.scale(scale, scale, 1);
 			viewMatrices.translate(offX, offY, 0);
 			RenderSystem.applyModelViewMatrix();
-			BoM.calculateCost();
-			int cx = (BoM.costs.size() * 40) / -2 + 10;
+			BoM.tree.calculateCost(false);
+			int cx = (BoM.tree.costs.size() * 40) / -2 + 10;
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2 + 10;
 			DrawableHelper.drawCenteredText(matrices, textRenderer, new TranslatableText("emi.total_cost"), 0, cy - 16, -1);
-			for (MaterialCost cost : BoM.costs) {
+			for (FlatMaterialCost cost : BoM.tree.costs) {
 				cost.ingredient.render(matrices, cx, cy, 0);
 				textRenderer.drawWithShadow(matrices, "" + cost.amount, cx + 18, cy, -1);
 				cx += 40;
 			}
-			if (!BoM.remainders.isEmpty()) {
-				cx = (BoM.remainders.size() * 40) / -2 + 10;
+			if (!BoM.tree.remainders.isEmpty()) {
+				cx = (BoM.tree.remainders.size() * 40) / -2 + 10;
 				cy += 40;
 				DrawableHelper.drawCenteredText(matrices, textRenderer, new TranslatableText("emi.leftovers"), 0, cy - 16, -1);
-				for (MaterialCost cost : BoM.remainders.values()) {
+				for (FlatMaterialCost cost : BoM.tree.remainders.values()) {
 					cost.ingredient.render(matrices, cx, cy, 0);
 					textRenderer.drawWithShadow(matrices, "" + cost.amount, cx + 18, cy, -1);
 					cx += 40;
 				}
-			}
-
-			for (Line line : lines) {
-				drawLine(matrices, line.x1, line.y1, line.x2, line.y2);
 			}
 
 			for (Node node : nodes) {
@@ -121,10 +115,10 @@ public class BoMScreen extends Screen {
 					drawLine(matrices, nx, ny - 10, nx, py + 14);
 				}
 				if (node.leaf) {
-					//fill(matrices, node.x - 9, node.y - 9, node.x + 9, node.y + 9, 0x66ff0000);
-					drawLine(matrices, node.x - 9, node.y + 10, node.x + 9, node.y + 10);
-					drawLine(matrices, node.x - 9, node.y + 10, node.x - 9, node.y + 6);
-					drawLine(matrices, node.x + 9, node.y + 10, node.x + 9, node.y + 6);
+					fill(matrices, node.x - 9, node.y - 9, node.x + 9, node.y + 9, 0x66ff0000);
+					//drawLine(matrices, node.x - 9, node.y + 10, node.x + 9, node.y + 10);
+					//drawLine(matrices, node.x - 9, node.y + 10, node.x - 9, node.y + 6);
+					//drawLine(matrices, node.x + 9, node.y + 10, node.x + 9, node.y + 6);
 				}
 				node.node.ingredient.render(matrices, node.x - 8, node.y - 8, 0);
 				textRenderer.drawWithShadow(matrices, "" + node.amount, node.x + 10, node.y + 4, -1);
@@ -155,45 +149,6 @@ public class BoMScreen extends Screen {
 			}
 		}
 		return null;
-	}
-
-	// TODO delete
-	public void addNodes(MaterialNode node, int multiplier, int divisor, int x, int y, int width) {
-		int cx = x + width * NODE_WIDTH / 2;
-		multiplier = node.amount * (int) Math.ceil(multiplier / (float) divisor);
-		nodes.add(new Node(node, multiplier, cx - 8, y));
-		int x1 = cx;
-		int y1 = y + 22;
-		int y2 = y + 29;
-		if (node.recipe != null) {
-			lines.add(new Line(x1, y + 17, x1, y1));
-			int tw = 0;
-			int min = Integer.MAX_VALUE;
-			int max = Integer.MIN_VALUE;
-			for (MaterialNode n : node.children) {
-				int w = getNodeWidth(n);
-				addNodes(n, multiplier, node.divisor, x + tw * NODE_WIDTH, y + 30, w);
-				int e = x + tw * NODE_WIDTH + w * NODE_WIDTH / 2;
-				min = Math.min(min, e);
-				max = Math.max(max, e);
-				lines.add(new Line(e, y1, e, y2));
-				tw += w;
-			}
-			if (max > min) {
-				lines.add(new Line(min, y1, max, y1));
-			}
-		}
-	}
-
-	public int getNodeWidth(MaterialNode node) {
-		if (node.recipe != null) {
-			int i = 0;
-			for (MaterialNode n : node.children) {
-				i += getNodeWidth(n);
-			}
-			return i;
-		}
-		return 1;
 	}
 
 	public int getNodeHeight(MaterialNode node) {
@@ -261,10 +216,10 @@ public class BoMScreen extends Screen {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			this.onClose();
+			this.close();
 			return true;
-		} else if (this.client.options.keyInventory.matchesKey(keyCode, scanCode)) {
-			this.onClose();
+		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+			this.close();
 			return true;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
@@ -275,6 +230,7 @@ public class BoMScreen extends Screen {
 		Node node = getNode((int) mouseX, (int) mouseY);
 		if (node != null) {
 			EmiApi.displayRecipes(node.node.ingredient);
+			RecipeScreen.resolve = node.node;
 			if (node.node.recipe != null) {
 				EmiApi.focusRecipe(node.node.recipe);
 			}
@@ -300,6 +256,11 @@ public class BoMScreen extends Screen {
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
 
+	@Override
+	public void close() {
+		MinecraftClient.getInstance().setScreen(old);
+	}
+
 	private static class Node {
 		public Node parent = null;
 		public MaterialNode node;
@@ -312,9 +273,6 @@ public class BoMScreen extends Screen {
 			this.x = x;
 			this.y = y;
 		}
-	}
-
-	private static record Line(int x1, int y1, int x2, int y2) {
 	}
 
 	private static class TreeVolume {

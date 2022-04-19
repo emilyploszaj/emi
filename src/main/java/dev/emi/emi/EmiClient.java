@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.data.EmiTagExclusionsLoader;
 import dev.emi.emi.data.RecipeDefaultLoader;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
@@ -18,21 +19,28 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class EmiClient implements ClientModInitializer {
+	public static int tagZOffset = 0;
 	public static final Map<Consumer<ItemUsageContext>, List<EmiStack>> HOE_ACTIONS = Maps.newHashMap();
 	public static final Set<Identifier> MODELED_TAGS = Sets.newHashSet();
+	public static Set<Identifier> excludedTags = Sets.newHashSet();
+	public static List<TagKey<Item>> itemTags = List.of();
 
 	@Override
 	public void onInitializeClient() {
 		EmiConfig.load();
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
+			MODELED_TAGS.clear();
 			for (Identifier id : manager.findResources("models/item/tags", s -> s.endsWith(".json"))) {
 				String path = id.getPath();
 				path = path.substring(0, path.length() - 5);

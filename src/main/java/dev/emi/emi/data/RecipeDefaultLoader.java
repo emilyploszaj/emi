@@ -10,6 +10,8 @@ import com.google.gson.JsonObject;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiStackSerializer;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -19,9 +21,9 @@ import net.minecraft.resource.SinglePreparationResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.Registry;
 
-public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<RecipeDefault>> implements IdentifiableResourceReloadListener {
+public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<RecipeDefault>>
+		implements IdentifiableResourceReloadListener {
 	private static final Gson GSON = new Gson();
 	public static final Identifier ID = new Identifier("emi:recipe_defaults");
 
@@ -46,11 +48,14 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 								}
 							}
 						} else if (el.isJsonObject()) {
+							Identifier kid = new Identifier(key);
 							JsonObject object = el.getAsJsonObject();
 							for (Entry<String, JsonElement> entry : object.entrySet()) {
 								Identifier recipe = new Identifier(entry.getKey());
-								EmiStack stack = parseEmiStack(key, entry.getValue());
-								defaults.add(new RecipeDefault(recipe, stack));
+								EmiIngredient stack = EmiStackSerializer.deserialize(kid, object);
+								for (EmiStack es : stack.getEmiStacks()) {
+									defaults.add(new RecipeDefault(recipe, es));
+								}
 							}
 						}
 					}
@@ -71,19 +76,5 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 	@Override
 	public Identifier getFabricId() {
 		return ID;
-	}
-
-	private EmiStack parseEmiStack(String type, JsonElement element) {
-		if (type.equals("item")) {
-			if (element.isJsonPrimitive()) {
-				Identifier id = new Identifier(element.getAsString());
-				return EmiStack.of(Registry.ITEM.get(id));
-			} else {
-				// TODO
-			}
-		} else if (type.equals("fluid")) {
-			// TODO
-		}
-		return EmiStack.EMPTY;
 	}
 }

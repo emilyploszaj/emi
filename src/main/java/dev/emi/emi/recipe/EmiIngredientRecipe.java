@@ -7,8 +7,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.util.Identifier;
 
 public class EmiIngredientRecipe implements EmiRecipe {
@@ -49,11 +48,11 @@ public class EmiIngredientRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new SlotWidget(ingredient, x + 63, y));
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addSlot(ingredient, 63, 0);
 		List<EmiStack> stacks = ingredient.getEmiStacks();
 		for (int i = 0; i < stacks.size() && i < 7 * 8; i++) {
-			widgets.add(new SlotWidget(stacks.get(i), x + i % 8 * 18, y + i / 8 * 18 + 24));
+			widgets.addSlot(stacks.get(i), i % 8 * 18, i / 8 * 18 + 24);
 		}
 	}
 }

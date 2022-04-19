@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiClient;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
@@ -45,11 +46,13 @@ public class RemainderTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
+		EmiClient.tagZOffset = z;
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
 			remainder.inputs.get(0).renderIcon(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
 			remainder.remainder.renderIcon(matrices, x+ 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
 		}
+		EmiClient.tagZOffset = 0;
 	}
 
 	@Override

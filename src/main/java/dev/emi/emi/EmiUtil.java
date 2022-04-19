@@ -2,6 +2,7 @@ package dev.emi.emi;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -12,8 +13,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryEntryList.Named;
 
 public class EmiUtil {
 	public static final Random RANDOM = new Random();
@@ -75,6 +79,15 @@ public class EmiUtil {
 
 	public static String subId(Fluid fluid) {
 		return subId(Registry.FLUID.getId(fluid));
+	}
+
+	public static Stream<RegistryEntry<Item>> values(TagKey<Item> key) {
+		Optional<Named<Item>> opt = Registry.ITEM.getEntryList(key);
+		if (opt.isEmpty()) {
+			return Stream.of();
+		} else {
+			return opt.get().stream();
+		}
 	}
 
 	public static String translateId(String prefix, Identifier id) {

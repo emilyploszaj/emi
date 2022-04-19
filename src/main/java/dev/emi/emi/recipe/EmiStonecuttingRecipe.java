@@ -8,9 +8,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.util.Identifier;
 
@@ -56,9 +54,9 @@ public class EmiStonecuttingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 26, y + 1, 24, 17, 44, 0));
-		widgets.add(new SlotWidget(input, x, y));
-		widgets.add(new SlotWidget(output, x + 58, y).recipeContext(this));
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 26, 1, 24, 17, 44, 0);
+		widgets.addSlot(input, 0, 0);
+		widgets.addSlot(output, 58, 0).recipeContext(this);
 	}
 }

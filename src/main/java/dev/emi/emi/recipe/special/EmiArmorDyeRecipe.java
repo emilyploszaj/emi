@@ -20,7 +20,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
-	public static final List<Item> DYEABLE_ITEMS = Registry.ITEM.getEntries().stream().map(e -> e.getValue())
+	public static final List<Item> DYEABLE_ITEMS = Registry.ITEM.stream()
 		.filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
 	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(c -> DyeItem.byColor(c)).collect(Collectors.toList());
 	private final Item armor;

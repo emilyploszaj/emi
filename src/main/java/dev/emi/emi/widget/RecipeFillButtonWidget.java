@@ -4,6 +4,7 @@ import java.util.List;
 
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
@@ -43,7 +44,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (canFill) {
 			this.playButtonSound();
-			EmiApi.performFill(recipe, EmiUtil.isShiftDown());
+			EmiApi.performFill(recipe, EmiFillAction.FILL, EmiUtil.isShiftDown());
 			return true;
 		}
 		return false;

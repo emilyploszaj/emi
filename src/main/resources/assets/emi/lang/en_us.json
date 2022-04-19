@@ -4,6 +4,7 @@
   "key.keyboard.shift": "Shift",
 
   "key.emi.toggle_visibility": "Toggle Visibility",
+  "key.emi.focus_search": "Focus Search",
   "key.emi.view_recipes": "View Recipes",
   "key.emi.view_uses": "View Uses",
   "key.emi.favorite": "Favorite",
@@ -14,6 +15,16 @@
   "key.emi.craft_one_to_inventory": "Craft One to Inventory",
   "key.emi.craft_all_to_inventory": "Craft All to Inventory",
   "key.emi.craft_one_to_cursor": "Craft One to Cursor",
+  "key.emi.cheat_one": "Cheat One",
+  "key.emi.cheat_stack": "Cheat Stack",
+
+  "config.emi.group.general": "General",
+  "config.emi.group.ui": "UI",
+  "config.emi.group.binds": "Binds",
+  "config.emi.group.dev": "Dev",
+
+  "config.emi.general.enabled": "Enabled",
+  "config.emi.general.cheat_mode": "Cheat Mode",
 
   "config.emi.ui.move_effects": "Move Effects",
   "config.emi.ui.fluid_unit": "Fluid Unit",
@@ -31,6 +42,7 @@
 
   "emi.page": "Page %s of %s",
   "emi.total_cost": "Total Cost",
+  "emi.cost_per": "Cost Each",
   "emi.leftovers": "Leftovers",
   "tooltip.emi.fill_recipe": "Fill Recipe",
   "tooltip.emi.set_default": "Set as Default Recipe",

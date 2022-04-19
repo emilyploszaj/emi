@@ -10,9 +10,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextureWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
@@ -89,21 +87,21 @@ public class EmiShapedRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public void addWidgets(List<Widget> widgets, int x, int y) {
+	public void addWidgets(WidgetHolder widgets) {
 		int w = recipe.getWidth();
 		int h = recipe.getHeight();
-		widgets.add(new TextureWidget(EmiRenderHelper.WIDGETS, x + 60, y + 18, 24, 17, 44, 0));
+		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
 		for (int i = 0; i < input.size(); i++) {
-			widgets.add(new SlotWidget(input.get(i), x + i % w * 18, y + i / w * 18));
+			widgets.addSlot(input.get(i), i % w * 18, i / w * 18);
 		}
 		for (int sx = 0; sx < 3; sx++) {
 			for (int sy = 0; sy < 3; sy++) {
 				if (sx >= w || sy >= h) {
-					widgets.add(new SlotWidget(EmiStack.of(ItemStack.EMPTY), x + sx * 18, y + sy * 18));
+					widgets.addSlot(EmiStack.of(ItemStack.EMPTY), sx * 18, sy * 18);
 				}
 			}
 		}
-		widgets.add(new SlotWidget(output, x + 92, y + 14).output(true).recipeContext(this));
+		widgets.addSlot(output, 92, 14).output(true).recipeContext(this);
 	}
 
 	@Override

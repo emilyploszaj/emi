@@ -13,6 +13,7 @@ import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.widget.BooleanWidget;
 import dev.emi.emi.screen.widget.EmiBindWidget;
 import dev.emi.emi.screen.widget.EnumWidget;
+import dev.emi.emi.screen.widget.GroupNameWidget;
 import dev.emi.emi.screen.widget.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -43,7 +44,7 @@ public class ConfigScreen extends Screen {
 	}
 
 	@Override
-	public void onClose() {
+	public void close() {
 		EmiConfig.writeConfig();
 		MinecraftClient.getInstance().setScreen(last);
 	}
@@ -53,9 +54,15 @@ public class ConfigScreen extends Screen {
 		super.init();
 		list = new ListWidget(client, width, height, 0, height);
 		try {
+			String lastGroup = "";
 			for (Field field : EmiConfig.class.getFields()) {
 				ConfigValue annot = field.getAnnotation(ConfigValue.class);
 				if (annot != null) {
+					String group = annot.value().split("\\.")[0];
+					if (!group.equals(lastGroup)) {
+						lastGroup = group;
+						list.addEntry(new GroupNameWidget(new TranslatableText("config.emi.group." + group)));
+					}
 					Text translation = new TranslatableText("config.emi." + annot.value().replace('-', '_'));
 					if (field.getType() == boolean.class) {
 						list.addEntry(new BooleanWidget(translation, new Mutator<Boolean>() {
@@ -98,6 +105,7 @@ public class ConfigScreen extends Screen {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		this.addSelectableChild(list);
@@ -105,13 +113,14 @@ public class ConfigScreen extends Screen {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackgroundTexture((int) list.getScrollAmount());
+		this.renderBackgroundTexture(-100);
 		list.render(matrices, mouseX, mouseY, delta);
 	}
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (activeBind != null) {
+			pushModifier(0);
 			activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.MOUSE.createFromCode(button), activeModifiers));
 			activeBind = null;
 			return true;
@@ -142,10 +151,10 @@ public class ConfigScreen extends Screen {
 			return true;
 		} else {
 			if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-				this.onClose();
+				this.close();
 				return true;
-			} else if (this.client.options.keyInventory.matchesKey(keyCode, scanCode)) {
-				this.onClose();
+			} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+				this.close();
 				return true;
 			}
 		}

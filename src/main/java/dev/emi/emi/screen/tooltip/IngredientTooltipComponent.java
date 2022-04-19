@@ -29,16 +29,16 @@ public class IngredientTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
+		matrices.push();
+		matrices.translate(0, 0, z);
 		for (int i = 0; i < ingredients.size(); i++) {
 			EmiIngredient ingredient = ingredients.get(i);
 			ingredient.render(matrices, x + i % 8 * 18, y + i / 8 * 18, MinecraftClient.getInstance().getTickDelta());
 			if (!ingredient.isEmpty()) {
-				matrices.push();
-				matrices.translate(0, 0, z);
 				EmiRenderHelper.renderTag(ingredient, matrices, x + i % 8 * 18, y + i / 8 * 18);
 				EmiRenderHelper.renderRemainder(ingredient, matrices, x + i % 8 * 18, y + i / 8 * 18);
-				matrices.pop();
 			}
 		}
+		matrices.pop();
 	}
 }

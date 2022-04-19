@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiRecipes;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -44,15 +43,16 @@ public class EmiApi {
 	public static void displayRecipes(EmiIngredient stack) {
 		if (stack instanceof EmiTagIngredient tag) {
 			for (EmiRecipe recipe : EmiRecipes.byCategory.get(VanillaPlugin.TAG)) {
-				if (recipe instanceof EmiTagRecipe tr && tr.tag == tag.tag) {
+				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
 					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)));
 					break;
 				}
 			}
 		} else if (stack instanceof EmiIngredientList list) {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiIngredientRecipe(stack))));
-		} else if (stack.getEmiStacks().size() > 0) {
-			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()), stack));
+		} else if (stack.getEmiStacks().size() == 1) {
+			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()),
+				stack.getEmiStacks().get(0)));
 		}
 	}
 
@@ -92,7 +92,7 @@ public class EmiApi {
 		return recipe.canFill(hs);
 	}
 
-	public static void performFill(EmiRecipe recipe, boolean all) {
+	public static void performFill(EmiRecipe recipe, EmiFillAction action, boolean all) {
 		HandledScreen<?> hs;
 		if (client.currentScreen instanceof RecipeScreen rs) {
 			hs = rs.old;
@@ -104,15 +104,16 @@ public class EmiApi {
 		List<ItemStack> stacks = recipe.getFill(hs, all);
 		if (stacks != null) {
 			client.setScreen(hs);
-			int action = 0;
-			if (EmiUtil.isControlDown()) {
-				action = 1;
-			}
-			if (EmiUtil.isShiftDown()) {
-				action = 2;
-			}
-			EmiClient.sendFillRecipe(hs.getScreenHandler().syncId, action, stacks);
+			EmiClient.sendFillRecipe(hs.getScreenHandler().syncId, action.id, stacks);
 		}
+	}
+
+	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneSources(Map<EmiRecipeCategory, List<EmiRecipe>> map,
+			EmiStack context) {
+		return map.entrySet().stream().map(e -> {
+			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
+				r.getOutputs().stream().anyMatch(i -> i.isEqual(context))).toList());
+		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 
 	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneUses(Map<EmiRecipeCategory, List<EmiRecipe>> map,
@@ -121,14 +122,6 @@ public class EmiApi {
 			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
 				r.getInputs().stream().anyMatch(i -> containsAll(i, context))
 				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context))).toList());
-		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-	}
-
-	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneSources(Map<EmiRecipeCategory, List<EmiRecipe>> map,
-			EmiIngredient context) {
-		return map.entrySet().stream().map(e -> {
-			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
-				r.getOutputs().stream().anyMatch(i -> containsAll(i, context))).toList());
 		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 

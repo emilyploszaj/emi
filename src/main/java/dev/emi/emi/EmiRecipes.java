@@ -29,7 +29,7 @@ public class EmiRecipes {
 	public static Map<EmiRecipeCategory, List<EmiRecipe>> byCategory = Maps.newHashMap();
 	public static Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
 	
-	public static void reload() {
+	public static void clear() {
 		invalidators.clear();
 		categories.clear();
 		workstations.clear();

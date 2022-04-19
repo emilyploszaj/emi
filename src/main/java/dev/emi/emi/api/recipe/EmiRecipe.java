@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -52,7 +52,7 @@ public interface EmiRecipe {
 
 	int getDisplayHeight();
 
-	void addWidgets(List<Widget> widgets, int x, int y);
+	void addWidgets(WidgetHolder widgets);
 
 	default boolean supportsRecipeTree() {
 		return !getOutputs().isEmpty();

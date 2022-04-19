@@ -1,0 +1,5 @@
+{
+  "exclusions": [
+    "minecraft:occludes_vibration_signals"
+  ]
+}

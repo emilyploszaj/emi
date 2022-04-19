@@ -36,6 +36,9 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public EmiStack setRemainder(EmiStack stack) {
+		if (stack == this) {
+			stack = stack.copy();
+		}
 		remainder = stack;
 		return this;
 	}

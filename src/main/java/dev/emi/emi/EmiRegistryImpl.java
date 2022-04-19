@@ -5,6 +5,9 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Sets;
 
+import org.apache.commons.compress.utils.Lists;
+
+import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -13,6 +16,7 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
 
 public class EmiRegistryImpl implements EmiRegistry {
@@ -61,6 +65,16 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void removeEmiStacks(Predicate<EmiStack> predicate) {
 		EmiStackList.invalidators.add(predicate);
+	}
+
+	@Override
+	public <T extends Screen> void addExclusionArea(Class<T> clazz, EmiExclusionArea<T> area) {
+		EmiExclusionAreas.fromClass.computeIfAbsent(clazz, c -> Lists.newArrayList()).add(area);
+	}
+
+	@Override
+	public void addGenericExclusionArea(EmiExclusionArea<Screen> area) {
+		EmiExclusionAreas.generic.add(area);
 	}
 	
 	@Override
