@@ -55,12 +55,17 @@ public class EmiScreenManager {
 	private static ScreenSpace favoriteSpace;
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);;
 	public static int currentPage = 0;
+	private static final StackBatcher searchBatcher = new StackBatcher();
+	private static final StackBatcher favoriteBatcher = new StackBatcher();
 
 	private static boolean isDisabled() {
 		return EmiReloadManager.isReloading() || !EmiConfig.enabled;
 	}
 
 	private static void recalculate() {
+		if (stacks != EmiSearch.stacks) {
+			searchBatcher.repopulate();
+		}
 		stacks = EmiSearch.stacks;
 		Screen screen = client.currentScreen;
 		List<Rect2i> exclusion = EmiExclusionAreas.getExclusion(screen);
@@ -78,6 +83,8 @@ public class EmiScreenManager {
 				return;
 			}
 		}
+		searchBatcher.repopulate();
+		favoriteBatcher.repopulate();
 		lastWidth = screen.width;
 		lastHeight = screen.height;
 		lastExclusion = exclusion;
@@ -136,6 +143,7 @@ public class EmiScreenManager {
 	}
 	
 	public static void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		client.getProfiler().push("emi");
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		Screen screen = client.currentScreen;
@@ -143,9 +151,12 @@ public class EmiScreenManager {
 			if (EmiReloadManager.isReloading()) {
 				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 12, -1);
 			}
+			client.getProfiler().pop();
 			return;
 		}
+		client.getProfiler().push("sidebars");
 		if (screen instanceof EmiScreen emi) {
+			client.getProfiler().push("prep");
 			EmiScreenManager.search.setZOffset(0);
 			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
 			recalculate();
@@ -153,10 +164,14 @@ public class EmiScreenManager {
 			int totalPages = (stacks.size() - 1) / pageSize + 1;
 			if (currentPage >= totalPages) {
 				currentPage = totalPages - 1;
+				searchBatcher.repopulate();
 			} else if (currentPage < 0) {
 				currentPage = 0;
+				searchBatcher.repopulate();
 			}
 	
+			client.getProfiler().swap("search");
+			searchBatcher.begin(searchSpace.xMin, searchSpace.yMin, 0);
 			DrawableHelper.drawCenteredText(matrices, client.textRenderer, new TranslatableText("emi.page", currentPage + 1, totalPages),
 				searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
 			int i = pageSize * currentPage;
@@ -169,7 +184,7 @@ public class EmiScreenManager {
 					int cx = searchSpace.getX(xo, yo);
 					int cy = searchSpace.getY(xo, yo);
 					EmiStack stack = stacks.get(i++);
-					stack.renderIcon(matrices, cx + 1, cy + 1, delta);
+					searchBatcher.render(stack, matrices, cx + 1, cy + 1, delta);
 					if (EmiConfig.devMode) {
 						if (BoM.getRecipe(stack) != null) {
 							DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
@@ -177,9 +192,11 @@ public class EmiScreenManager {
 					}
 				}
 			}
-			
+			searchBatcher.draw();
+			client.getProfiler().swap("favorite");
+			favoriteBatcher.begin(favoriteSpace.xMin, favoriteSpace.yMin, 0);
 			i = 0;
-			outer: 
+			outer:
 			for (int yo = 0; yo < favoriteSpace.th; yo++) {
 				for (int xo = 0; xo < favoriteSpace.getWidth(yo); xo++) {
 					if (i >= EmiFavorites.favorites.size()) {
@@ -187,19 +204,23 @@ public class EmiScreenManager {
 					}
 					int cx = favoriteSpace.getX(xo, yo);
 					int cy = favoriteSpace.getY(xo, yo);
-					EmiFavorites.favorites.get(i++).render(matrices, cx + 1, cy + 1, delta);
+					favoriteBatcher.render(EmiFavorites.favorites.get(i++).getStack(), matrices, cx + 1, cy + 1, delta);
 				}
 			}
-
+			favoriteBatcher.draw();
+			client.getProfiler().swap("hover");
 			EmiIngredient hov = getHoveredStack(mouseX, mouseY, false);
 			((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, hov.getTooltip(), mouseX, mouseY);
+			client.getProfiler().pop();
 		}
 		if (EmiConfig.devMode) {
+			client.getProfiler().swap("dev");
 			int color = 0xFFFFFF;
+			String title = "EMI Dev Mode";
 			if (EmiLog.WARNINGS.size() > 0) {
 				color = 0xFF0000;
 				String warnCount = EmiLog.WARNINGS.size() + " Warnings";
-				int width = Math.max(client.textRenderer.getWidth("EMI Dev Mode"), client.textRenderer.getWidth(warnCount));
+				int width = Math.max(client.textRenderer.getWidth(title), client.textRenderer.getWidth(warnCount));
 				if (mouseX < width + 8 && mouseY > screen.height - 28) {
 					screen.renderTooltip(matrices, Stream.concat(Stream.of("See log for more information"),
 						EmiLog.WARNINGS.stream()).map(s -> {
@@ -213,8 +234,10 @@ public class EmiScreenManager {
 				}
 				client.textRenderer.drawWithShadow(matrices, warnCount, 4, screen.height - 24, color);
 			}
-			client.textRenderer.drawWithShadow(matrices, "EMI Dev Mode", 4, screen.height - 12, color);
+			client.textRenderer.drawWithShadow(matrices, title, 4, screen.height - 12, color);
 		}
+		client.getProfiler().pop();
+		client.getProfiler().pop();
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
@@ -224,6 +247,7 @@ public class EmiScreenManager {
 		recalculate();
 		if (searchSpace.contains((int) mouseX, (int) mouseY)) {
 			EmiScreenManager.currentPage += (int) -amount;
+			searchBatcher.repopulate();
 			return true;
 		}
 		return false;
@@ -363,6 +387,7 @@ public class EmiScreenManager {
 				return true;
 			} else if (function.apply(EmiConfig.favorite)) {
 				EmiFavorites.addFavorite(ingredient, recipe);
+				favoriteBatcher.repopulate();
 				return true;
 			}
 		}
