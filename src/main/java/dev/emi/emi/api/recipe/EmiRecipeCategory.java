@@ -6,11 +6,20 @@ import net.minecraft.util.Identifier;
 
 public class EmiRecipeCategory {
 	public Identifier id;
-	public EmiStack icon;
+	public Renderer renderer;
 	
 	public EmiRecipeCategory(Identifier id, EmiStack icon) {
+		this(id, new Renderer() {
+
+			public void render(MatrixStack matrices, int x, int y, float delta) {
+				icon.renderIcon(matrices, x, y, delta);
+			}
+		});
+	}
+
+	public EmiRecipeCategory(Identifier id, Renderer drawable) {
 		this.id = id;
-		this.icon = icon;
+		this.renderer = drawable;
 	}
 
 	public Identifier getId() {
@@ -18,6 +27,11 @@ public class EmiRecipeCategory {
 	}
 
 	public void render(MatrixStack matrices, int x, int y, float delta) {
-		icon.renderIcon(matrices, x, y, delta);
+		renderer.render(matrices, x, y, delta);
+	}
+
+	public static interface Renderer {
+
+		void render(MatrixStack matrices, int x, int y, float delta);
 	}
 }

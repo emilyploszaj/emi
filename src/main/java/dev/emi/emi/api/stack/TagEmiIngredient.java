@@ -32,16 +32,16 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
-public class EmiTagIngredient implements EmiIngredient {
+public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
 	public final TagKey<Item> key;
 
-	public EmiTagIngredient(TagKey<Item> key) {
+	public TagEmiIngredient(TagKey<Item> key) {
 		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
 	}
 
-	public EmiTagIngredient(TagKey<Item> key, List<EmiStack> stacks) {
+	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks) {
 		this.id = key.id();
 		this.key = key;
 		this.stacks = stacks;

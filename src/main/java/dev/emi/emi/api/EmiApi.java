@@ -14,9 +14,9 @@ import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiIngredientList;
+import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.stack.EmiTagIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;
@@ -43,14 +43,14 @@ public class EmiApi {
 	}
 	
 	public static void displayRecipes(EmiIngredient stack) {
-		if (stack instanceof EmiTagIngredient tag) {
+		if (stack instanceof TagEmiIngredient tag) {
 			for (EmiRecipe recipe : EmiRecipes.byCategory.get(VanillaPlugin.TAG)) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
 					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)));
 					break;
 				}
 			}
-		} else if (stack instanceof EmiIngredientList list) {
+		} else if (stack instanceof ListEmiIngredient list) {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))));
 		} else if (stack.getEmiStacks().size() == 1) {
 			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()),

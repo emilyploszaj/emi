@@ -10,7 +10,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.stack.EmiTagIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import net.minecraft.item.Item;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -23,7 +23,7 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 	public EmiTagRecipe(TagKey<Item> key, List<EmiStack> stacks) {
 		this.key = key;
 		this.stacks = stacks;
-		this.ingredient = new EmiTagIngredient(key, stacks);
+		this.ingredient = new TagEmiIngredient(key, stacks);
 	}
 
 	@Override

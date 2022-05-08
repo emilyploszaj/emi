@@ -47,7 +47,7 @@ public interface EmiIngredient {
 	}
 	
 	public static EmiIngredient of(TagKey<Item> key) {
-		return new EmiTagIngredient(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
+		return new TagEmiIngredient(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {
@@ -72,16 +72,16 @@ public interface EmiIngredient {
 			}
 		}
 		if (keys.isEmpty()) {
-			return new EmiIngredientList(Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList());
+			return new ListEmiIngredient(Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList());
 		} else if (items.isEmpty()) {
 			if (keys.size() == 1) {
-				return new EmiTagIngredient(keys.get(0));
+				return new TagEmiIngredient(keys.get(0));
 			} else {
-				return new EmiIngredientList(keys.stream().map(EmiTagIngredient::new).toList());
+				return new ListEmiIngredient(keys.stream().map(TagEmiIngredient::new).toList());
 			}
 		} else {
-			return new EmiIngredientList(List.of(items.stream().map(ItemStack::new).map(EmiStack::of).toList(),
-					keys.stream().map(EmiTagIngredient::new).toList())
+			return new ListEmiIngredient(List.of(items.stream().map(ItemStack::new).map(EmiStack::of).toList(),
+					keys.stream().map(TagEmiIngredient::new).toList())
 				.stream().flatMap(a -> a.stream()).toList());
 		}
 
@@ -93,7 +93,7 @@ public interface EmiIngredient {
 		} else if (list.size() == 1) {
 			return list.get(0);
 		} else {
-			return new EmiIngredientList(list);
+			return new ListEmiIngredient(list);
 		}
 	}
 }

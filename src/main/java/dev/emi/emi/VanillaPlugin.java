@@ -123,14 +123,15 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addCategory(INGREDIENT);
 		registry.addCategory(RESOLUTION);
 
-		registry.addWorkstation(CRAFTING, CRAFTING.icon);
-		registry.addWorkstation(SMELTING, SMELTING.icon);
-		registry.addWorkstation(BLASTING, BLASTING.icon);
-		registry.addWorkstation(SMOKING, SMOKING.icon);
-		registry.addWorkstation(CAMPFIRE_COOKING, CAMPFIRE_COOKING.icon);
-		registry.addWorkstation(STONECUTTING, STONECUTTING.icon);
-		registry.addWorkstation(SMITHING, SMITHING.icon);
-		registry.addWorkstation(BREWING, BREWING.icon);
+		registry.addWorkstation(CRAFTING, EmiStack.of(Items.CRAFTING_TABLE));
+		registry.addWorkstation(SMELTING, EmiStack.of(Items.FURNACE));
+		registry.addWorkstation(BLASTING, EmiStack.of(Items.BLAST_FURNACE));
+		registry.addWorkstation(SMOKING, EmiStack.of(Items.SMOKER));
+		registry.addWorkstation(CAMPFIRE_COOKING, EmiStack.of(Items.CAMPFIRE));
+		registry.addWorkstation(CAMPFIRE_COOKING, EmiStack.of(Items.SOUL_CAMPFIRE));
+		registry.addWorkstation(STONECUTTING, EmiStack.of(Items.STONECUTTER));
+		registry.addWorkstation(SMITHING, EmiStack.of(Items.SMITHING_TABLE));
+		registry.addWorkstation(BREWING, EmiStack.of(Items.BREWING_STAND));
 
 		registry.addRecipeHandler(CRAFTING, EmiMain.CRAFTING);
 		registry.addRecipeHandler(CRAFTING, EmiMain.INVENTORY);

@@ -3,7 +3,7 @@ package dev.emi.emi.api.recipe;
 import java.util.List;
 
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiIngredientList;
+import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -22,7 +22,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(new EmiIngredientList(getStacks()));
+		return List.of(new ListEmiIngredient(getStacks()));
 	}
 
 	@Override

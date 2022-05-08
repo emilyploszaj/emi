@@ -10,11 +10,11 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
-public class EmiIngredientList implements EmiIngredient {
+public class ListEmiIngredient implements EmiIngredient {
 	private final List<? extends EmiIngredient> ingredients;
 	private final List<EmiStack> fullList;
 
-	public EmiIngredientList(List<? extends EmiIngredient> ingredients) {
+	public ListEmiIngredient(List<? extends EmiIngredient> ingredients) {
 		if (ingredients.isEmpty()) {
 			throw new IllegalArgumentException("EmiIngredientList cannot be empty");
 		}
