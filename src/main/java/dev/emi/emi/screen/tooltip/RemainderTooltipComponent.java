@@ -2,9 +2,10 @@ package dev.emi.emi.screen.tooltip;
 
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
@@ -46,13 +47,17 @@ public class RemainderTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		EmiClient.tagZOffset = z;
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.push();
+		view.translate(0, 0, z);
+		RenderSystem.applyModelViewMatrix();
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
 			remainder.inputs.get(0).renderIcon(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
-			remainder.remainder.renderIcon(matrices, x+ 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
+			remainder.remainder.renderIcon(matrices, x + 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
 		}
-		EmiClient.tagZOffset = 0;
+		view.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 
 	@Override

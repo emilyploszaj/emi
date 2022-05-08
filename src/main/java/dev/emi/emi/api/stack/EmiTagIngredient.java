@@ -65,7 +65,7 @@ public class EmiTagIngredient implements EmiIngredient {
 				
 			MatrixStack vs = RenderSystem.getModelViewStack();
 			vs.push();
-			vs.translate(x, y, 100.0f + EmiClient.tagZOffset);
+			vs.translate(x, y, 100.0f);
 			vs.translate(8.0, 8.0, 0.0);
 			vs.scale(1.0f, -1.0f, 1.0f);
 			vs.scale(16.0f, 16.0f, 16.0f);

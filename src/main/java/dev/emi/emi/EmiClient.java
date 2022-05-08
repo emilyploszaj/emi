@@ -28,7 +28,6 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class EmiClient implements ClientModInitializer {
-	public static int tagZOffset = 0;
 	public static final Map<Consumer<ItemUsageContext>, List<EmiStack>> HOE_ACTIONS = Maps.newHashMap();
 	public static final Set<Identifier> MODELED_TAGS = Sets.newHashSet();
 	public static Set<Identifier> excludedTags = Sets.newHashSet();

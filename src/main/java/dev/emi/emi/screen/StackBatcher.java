@@ -135,6 +135,7 @@ public class StackBatcher {
 		bldr.reset();
 	}
 
+	@SuppressWarnings("unused")
 	private static class AccessibleImmediateVertexConsumerProvider extends VertexConsumerProvider.Immediate {
 
 		protected AccessibleImmediateVertexConsumerProvider(BufferBuilder fallbackBuffer, Map<RenderLayer, BufferBuilder> layerBuffers) {

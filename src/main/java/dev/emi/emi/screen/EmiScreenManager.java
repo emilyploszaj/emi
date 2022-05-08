@@ -20,6 +20,7 @@ import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
@@ -33,15 +34,11 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EmiScreenManager {
 	private static final int ENTRY_SIZE = 18;
@@ -50,7 +47,7 @@ public class EmiScreenManager {
 	/*package*/ static int lastMouseX, lastMouseY;
 	private static int left, right;
 	private static int lastWidth, lastHeight;
-	private static List<Rect2i> lastExclusion;
+	private static List<Bounds> lastExclusion;
 	private static ScreenSpace searchSpace;
 	private static ScreenSpace favoriteSpace;
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);;
@@ -68,13 +65,13 @@ public class EmiScreenManager {
 		}
 		stacks = EmiSearch.stacks;
 		Screen screen = client.currentScreen;
-		List<Rect2i> exclusion = EmiExclusionAreas.getExclusion(screen);
+		List<Bounds> exclusion = EmiExclusionAreas.getExclusion(screen);
 		if (lastWidth == screen.width && lastHeight == screen.height && exclusion.size() == lastExclusion.size()) {
 			boolean same = true;
 			for (int i = 0; i < exclusion.size(); i++) {
-				Rect2i a = exclusion.get(i);
-				Rect2i b = lastExclusion.get(i);
-				if (a.getX() != b.getX() || a.getY() != b.getY() || a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
+				Bounds a = exclusion.get(i);
+				Bounds b = lastExclusion.get(i);
+				if (a.x() != b.x() || a.y() != b.y() || a.width() != b.width() || a.height() != b.height()) {
 					same = false;
 					break;
 				}
@@ -163,10 +160,10 @@ public class EmiScreenManager {
 			int pageSize = searchSpace.pageSize;
 			int totalPages = (stacks.size() - 1) / pageSize + 1;
 			if (currentPage >= totalPages) {
-				currentPage = totalPages - 1;
+				currentPage = 0;
 				searchBatcher.repopulate();
 			} else if (currentPage < 0) {
-				currentPage = 0;
+				currentPage = totalPages - 1;
 				searchBatcher.repopulate();
 			}
 	
@@ -394,9 +391,17 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	// TODO make a custom packet and fall back to this if client only
-	// Yes I'm just putting strings together
 	private static boolean give(EmiStack stack, int amount) {
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		if (stack.getItemStack().isEmpty()) {
+			return false;
+		}
+		ItemStack is = stack.getItemStack().copy();
+		is.setCount(amount);
+		buf.writeItemStack(is);
+		ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
+		return true;
+		/* Client only backup
 		ItemStack is = stack.getItemStack();
 		if (!is.isEmpty()) {
 			Identifier id = Registry.ITEM.getId(is.getItem());
@@ -410,7 +415,7 @@ public class EmiScreenManager {
 				return true;
 			}
 		}
-		return false;
+		return false;*/
 	}
 
 	private static class ScreenSpace {
@@ -420,7 +425,7 @@ public class EmiScreenManager {
 		public final boolean rtl;
 		public final int[] widths;
 
-		public ScreenSpace(int xMin, int xMax, int yMin, int yMax, int tx, int ty, int tw, int th, boolean rtl, List<Rect2i> exclusion) {
+		public ScreenSpace(int xMin, int xMax, int yMin, int yMax, int tx, int ty, int tw, int th, boolean rtl, List<Bounds> exclusion) {
 			this.xMin = xMin;
 			this.xMax = xMax;
 			this.yMin = yMin;
@@ -440,7 +445,7 @@ public class EmiScreenManager {
 					int cx = tx + (rtl ? (tw - 1 - x) : x) * ENTRY_SIZE;
 					int rx = cx + 18;
 					int ry = cy + 18;
-					for (Rect2i rect : exclusion) {
+					for (Bounds rect : exclusion) {
 						if (rect.contains(cx, cy) || rect.contains(rx, cy) || rect.contains(cx, ry) || rect.contains(rx, ry)) {
 							break outer;
 						}

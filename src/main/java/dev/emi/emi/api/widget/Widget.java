@@ -5,11 +5,10 @@ import java.util.List;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 
 public abstract class Widget implements Drawable {
 
-	public abstract Rect2i getBounds();
+	public abstract Bounds getBounds();
 	
 	public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
 

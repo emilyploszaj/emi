@@ -1,4 +1,4 @@
-package dev.emi.emi.screen;
+package dev.emi.emi.screen.widget;
 
 import java.util.function.BooleanSupplier;
 

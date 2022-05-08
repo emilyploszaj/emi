@@ -2,7 +2,8 @@ package dev.emi.emi.screen.tooltip;
 
 import java.text.DecimalFormat;
 
-import dev.emi.emi.EmiClient;
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.MaterialTree;
 import net.minecraft.client.MinecraftClient;
@@ -36,22 +37,26 @@ public class RecipeCostTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		matrices.push();
-		matrices.translate(0, 0, z);
-		EmiClient.tagZOffset = z;
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.push();
+		view.translate(0, 0, z);
+		RenderSystem.applyModelViewMatrix();
 		DecimalFormat format = new DecimalFormat("0.##");
 		for (int i = 0; i < tree.fractionalCosts.size(); i++) {
 			int ix = x + i % 4 * 24;
 			int iy = y + 10 + i / 4 * 18;
 			tree.fractionalCosts.get(i).ingredient.render(matrices, ix, iy, MinecraftClient.getInstance().getTickDelta());
-			matrices.translate(0, 0, 200);
+			matrices.push();
+			// This terrifies me, I'd like to do something else
+			matrices.translate(0, 0, 590);
+			RenderSystem.disableDepthTest();
 			float amount = tree.fractionalCosts.get(i).amount;
 			String s = format.format(amount);
 			textRenderer.drawWithShadow(matrices, s, ix + 17 - Math.min(10, textRenderer.getWidth(s)), iy + 9, -1);
-			matrices.translate(0, 0, -200);
+			matrices.pop();
 		}
-		EmiClient.tagZOffset = 0;
-		matrices.pop();
+		view.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 
 	@Override

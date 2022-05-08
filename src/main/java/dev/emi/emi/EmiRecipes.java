@@ -27,6 +27,7 @@ public class EmiRecipes {
 	public static Map<Object, Map<EmiRecipeCategory, List<EmiRecipe>>> byInput = Maps.newHashMap();
 	public static Map<Object, Map<EmiRecipeCategory, List<EmiRecipe>>> byOutput = Maps.newHashMap();
 	public static Map<EmiRecipeCategory, List<EmiRecipe>> byCategory = Maps.newHashMap();
+	public static Map<EmiStack, List<EmiRecipe>> byWorkstation = Maps.newHashMap();
 	public static Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
 	
 	public static void clear() {
@@ -37,6 +38,7 @@ public class EmiRecipes {
 		byInput.clear();
 		byOutput.clear();
 		byCategory.clear();
+		byWorkstation.clear();
 		byId.clear();
 	}
 
@@ -75,6 +77,13 @@ public class EmiRecipes {
 		EmiRecipes.byOutput = byOutput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
 			return m.getValue().entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue().stream().toList()));
 		}));
+		for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : byCategory.entrySet()) {
+			for (EmiIngredient ingredient : workstations.getOrDefault(entry.getKey(), List.of())) {
+				for (EmiStack stack : ingredient.getEmiStacks()) {
+					byWorkstation.computeIfAbsent(stack, (s) -> Lists.newArrayList()).addAll(entry.getValue());
+				}
+			}
+		}
 	}
 
 	public static void addCategory(EmiRecipeCategory category) {

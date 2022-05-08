@@ -4,13 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.sound.SoundEvents;
 
 public class RecipeButtonWidget extends Widget {
@@ -38,8 +38,8 @@ public class RecipeButtonWidget extends Widget {
 	}
 
 	@Override
-	public Rect2i getBounds() {
-		return new Rect2i(x, y, 11, 11);
+	public Bounds getBounds() {
+		return new Bounds(x, y, 11, 11);
 	}
 
 	@Override

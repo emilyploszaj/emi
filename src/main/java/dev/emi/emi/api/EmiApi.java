@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 
+import org.apache.commons.compress.utils.Lists;
+
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.VanillaPlugin;
@@ -15,7 +17,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiIngredientList;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiTagIngredient;
-import dev.emi.emi.recipe.EmiIngredientRecipe;
+import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.RecipeScreen;
@@ -49,7 +51,7 @@ public class EmiApi {
 				}
 			}
 		} else if (stack instanceof EmiIngredientList list) {
-			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiIngredientRecipe(stack))));
+			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))));
 		} else if (stack.getEmiStacks().size() == 1) {
 			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()),
 				stack.getEmiStacks().get(0)));
@@ -58,7 +60,18 @@ public class EmiApi {
 
 	public static void displayUses(EmiIngredient stack) {
 		if (!stack.isEmpty()) {
-			setPages(pruneUses(EmiRecipes.byInput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()), stack));
+			EmiStack zero = stack.getEmiStacks().get(0);
+			Map<EmiRecipeCategory, List<EmiRecipe>> map = Maps.newHashMap();
+			for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry
+					: pruneUses(EmiRecipes.byInput.getOrDefault(zero.getKey(), Map.of()), stack).entrySet()) {
+				List<EmiRecipe> list = Lists.newArrayList();
+				list.addAll(entry.getValue());
+				map.put(entry.getKey(), list);
+			}
+			for (EmiRecipe recipe : EmiRecipes.byWorkstation.getOrDefault(zero, List.of())) {
+				map.computeIfAbsent(recipe.getCategory(), (r) -> Lists.newArrayList()).add(recipe);
+			}
+			setPages(map);
 		}
 	}
 

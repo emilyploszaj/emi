@@ -27,6 +27,7 @@ import net.minecraft.util.Identifier;
  */
 public class EmiMain implements ModInitializer {
 	public static final Identifier FILL_RECIPE = new Identifier("emi:fill_recipe");
+	public static final Identifier CREATE_ITEM = new Identifier("emi:create_item");
 	public static final Identifier DESTROY_HELD = new Identifier("emi:destroy_held");
 	public static final Identifier COMMAND = new Identifier("emi:command");
 	public static final EmiRecipeHandler<?> INVENTORY = new InventoryRecipeHandler();
@@ -114,11 +115,19 @@ public class EmiMain implements ModInitializer {
 			});
 		});
 		ServerPlayNetworking.registerGlobalReceiver(DESTROY_HELD, (server, player, networkHandler, buf, sender) -> {
-			server.execute(() -> {
-				if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
+			if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
+				server.execute(() -> {
 					player.currentScreenHandler.setCursorStack(ItemStack.EMPTY);
-				}
-			});
+				});
+			}
+		});
+		ServerPlayNetworking.registerGlobalReceiver(CREATE_ITEM, (server, player, networkHandler, buf, sender) -> {
+			if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
+				ItemStack stack = buf.readItemStack();
+				server.execute(() -> {
+					player.getInventory().offerOrDrop(stack);
+				});
+			}
 		});
 	}
 

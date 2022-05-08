@@ -9,7 +9,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.util.Identifier;
 
 public class TextureWidget extends Widget {
@@ -46,8 +45,8 @@ public class TextureWidget extends Widget {
 	}
 
 	@Override
-	public Rect2i getBounds() {
-		return new Rect2i(x, y, width, height);
+	public Bounds getBounds() {
+		return new Bounds(x, y, width, height);
 	}
 
 	@Override

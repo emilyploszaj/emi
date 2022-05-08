@@ -62,7 +62,7 @@ public class EmiFavorites {
 		if (stack instanceof EmiFavorite) {
 			favorites.remove(stack);
 		} else if (stack instanceof EmiStack es) {
-			es = es.copy().comparison(c -> c.copy().nbt(false).amount(false).build());
+			es = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
 			if (context == null && es instanceof ItemEmiStack ies) {
 				ies.getItemStack().setCount(1);
 			}

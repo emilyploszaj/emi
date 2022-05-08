@@ -2,7 +2,6 @@ package dev.emi.emi.api.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.text.OrderedText;
 
 public class TextWidget extends Widget {
@@ -21,8 +20,8 @@ public class TextWidget extends Widget {
 	}
 
 	@Override
-	public Rect2i getBounds() {
-		return new Rect2i(x, y, CLIENT.textRenderer.getWidth(text), 10);
+	public Bounds getBounds() {
+		return new Bounds(x, y, CLIENT.textRenderer.getWidth(text), 10);
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.Widget;
@@ -39,23 +38,15 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		matrices.push();
-		matrices.translate(0, 0, z);
-		EmiClient.tagZOffset = z;
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.translate(0, 0, z);
+		RenderSystem.applyModelViewMatrix();
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		EmiRenderHelper.drawNinePatch(matrices, x, y, getWidth(textRenderer), getHeight(), 0, 0, 4, 1);
 		List<Widget> widgets = Lists.newArrayList();
 		WidgetHolder holder = new WidgetHolder() {
-
-			public int getX() {
-				return x + 4;
-			}
-
-			public int getY() {
-				return y + 4;
-			}
 
 			public int getWidth() {
 				return recipe.getDisplayWidth();
@@ -70,11 +61,14 @@ public class RecipeTooltipComponent implements TooltipComponent {
 				return widget;
 			}
 		};
+		view.push();
+		view.translate(x + 4, y + 4, 0);
+		RenderSystem.applyModelViewMatrix();
 		recipe.addWidgets(holder);
 		for (Widget widget : widgets) {
 			widget.render(matrices, -1000, -1000, MinecraftClient.getInstance().getTickDelta());
 		}
-		EmiClient.tagZOffset = 0;
-		matrices.pop();
+		view.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 }

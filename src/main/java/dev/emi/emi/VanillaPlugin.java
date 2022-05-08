@@ -15,6 +15,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
@@ -41,7 +42,6 @@ import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -170,7 +170,7 @@ public class VanillaPlugin implements EmiPlugin {
 								width = 32;
 							}
 						}
-						consumer.accept(new Rect2i(left, ((HandledScreenAccessor) inv).getY(), width, height));
+						consumer.accept(new Bounds(left, ((HandledScreenAccessor) inv).getY(), width, height));
 					}
 				}
 			}

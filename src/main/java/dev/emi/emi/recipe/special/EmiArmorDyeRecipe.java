@@ -40,7 +40,6 @@ public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
 			final int s = slot - 1;
 			return new GeneratedSlotWidget(r -> {
 				List<DyeItem> dyes = getDyes(r);
-				System.out.println(s + " " + dyes.size());
 				if (s < dyes.size()) {
 					return EmiStack.of(dyes.get(s));
 				}

@@ -13,10 +13,6 @@ public class EmiRecipeCategory {
 		this.icon = icon;
 	}
 
-	public EmiStack getIcon() {
-		return icon;
-	}
-
 	public Identifier getId() {
 		return id;
 	}

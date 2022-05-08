@@ -8,9 +8,9 @@ import com.google.common.collect.Maps;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.EmiExclusionArea;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.screen.EmiScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.Rect2i;
 
 public class EmiExclusionAreas {
 	public static Map<Class<?>, List<EmiExclusionArea<?>>> fromClass = Maps.newHashMap();
@@ -22,23 +22,23 @@ public class EmiExclusionAreas {
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static List<Rect2i> getExclusion(Screen screen) {
-		List<Rect2i> list = Lists.newArrayList();
+	public static List<Bounds> getExclusion(Screen screen) {
+		List<Bounds> list = Lists.newArrayList();
 		if (screen instanceof EmiScreen emi) {
 			int left = emi.emi$getLeft();
 			int right = emi.emi$getRight();
-			list.add(new Rect2i(left, 0, right - left, screen.height));
+			list.add(new Bounds(left, 0, right - left, screen.height));
 		}
 		if (fromClass.containsKey(screen.getClass())) {
 			for (EmiExclusionArea exclusion : fromClass.get(screen.getClass())) {
 				exclusion.addExclusionArea(screen, rect -> {
-					list.add((Rect2i) rect);
+					list.add((Bounds) rect);
 				});
 			}
 		}
 		for (EmiExclusionArea exclusion : generic) {
 			exclusion.addExclusionArea(screen, rect -> {
-				list.add((Rect2i) rect);
+				list.add((Bounds) rect);
 			});
 		}
 		return list;

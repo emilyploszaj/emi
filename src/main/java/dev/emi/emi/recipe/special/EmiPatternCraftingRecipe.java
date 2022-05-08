@@ -27,9 +27,9 @@ public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 97, 0, 16, 14, 95, 0);
 		for (int i = 0; i < 9; i++) {
-			widgets.add(getInputWidget(i, widgets.getX() + i % 3 * 18, widgets.getY() + i / 3 * 18));
+			widgets.add(getInputWidget(i, i % 3 * 18, i / 3 * 18));
 		}
-		widgets.add(getOutputWidget(widgets.getX() + 92, widgets.getY() + 14).output(true).recipeContext(this));
+		widgets.add(getOutputWidget(92, 14).output(true).recipeContext(this));
 	}
 
 	@Override

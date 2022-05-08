@@ -14,12 +14,25 @@ import net.minecraft.util.Identifier;
 
 public interface EmiRegistry {
 
+	/**
+	 * @return The vanilla recipe manager, for iterating recipe types.
+	 */
 	RecipeManager getRecipeManager();
 	
+	/**
+	 * Adds a recipe category.
+	 * Recipes are organized based on recipe category.
+	 */
 	void addCategory(EmiRecipeCategory category);
 
+	/**
+	 * Adds a workstation to a recipe category.
+	 */
 	void addWorkstation(EmiRecipeCategory category, EmiIngredient workstation);
 
+	/**
+	 * Adds a recipe to EMI that can be viewed and associated with its components.
+	 */
 	void addRecipe(EmiRecipe recipe);
 
 	/**
@@ -77,11 +90,21 @@ public interface EmiRegistry {
 	 */
 	void addGenericExclusionArea(EmiExclusionArea<Screen> area);
 
-	void addRecipeHandler(EmiRecipeCategory category, EmiRecipeHandler<?> handler);
-
+	/**
+	 * Adds a default compraison method for a stack key.
+	 * @param key A stack key such as an item or fluid.
+	 * @param comparison A function to mutate the current comprison method.
+	 */
 	void setDefaultComparison(Object key, Function<Comparison, Comparison> comparison);
 
+	/**
+	 * Adds a default compraison method for a stack using its key.
+	 * @param stack A stack to derive a key from.
+	 * @param comparison A function to mutate the current comprison method.
+	 */
 	default void setDefaultComparison(EmiStack stack, Function<Comparison, Comparison> comparison) {
 		setDefaultComparison(stack.getKey(), comparison);
 	}
+
+	void addRecipeHandler(EmiRecipeCategory category, EmiRecipeHandler<?> handler);
 }

@@ -48,14 +48,33 @@ public interface EmiRecipe {
 	 */
 	List<EmiStack> getOutputs();
 
+	/**
+	 * @return The width taken up by the recipe's widgets
+	 *  EMI will grow to accomodate requested width.
+	 */
 	int getDisplayWidth();
 
+	/**
+	 * @return The maximum height taken up by the recipe's widgets.
+	 * 	Vertical screen space is capped, however, and EMI may opt to provide less vertical space.
+	 * 
+	 * @see {@link WidgetHolder#getHeight()} when adding widgets for the EMI adjusted height.
+	 */
 	int getDisplayHeight();
 
+	/**
+	 * Called to add widgets that display the recipe.
+	 * Can be used in several places, including the main recipe screen, and tooltips.
+	 */
 	void addWidgets(WidgetHolder widgets);
 
+	/**
+	 * @return Whether the recipe supports the recipe tree.
+	 * 	The basic requirement is having quantifiable inputs and outputs.
+	 * 	Recipes that have random or chanced outputs cannot be accurately modeled in a tree, and should exclude themselves.
+	 */
 	default boolean supportsRecipeTree() {
-		return !getOutputs().isEmpty();
+		return !getInputs().isEmpty() && !getOutputs().isEmpty();
 	}
 
 	default boolean canFill(HandledScreen<?> hs) {

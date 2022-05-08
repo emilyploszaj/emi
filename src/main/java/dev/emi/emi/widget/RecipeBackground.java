@@ -3,9 +3,9 @@ package dev.emi.emi.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.util.Identifier;
 
 public class RecipeBackground extends Widget {
@@ -20,8 +20,8 @@ public class RecipeBackground extends Widget {
 	}
 
 	@Override
-	public Rect2i getBounds() {
-		return new Rect2i(0, 0, 0, 0);
+	public Bounds getBounds() {
+		return new Bounds(0, 0, 0, 0);
 	}
 
 	@Override
