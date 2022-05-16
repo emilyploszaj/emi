@@ -13,15 +13,15 @@ public class MaterialNode {
 	public EmiIngredient ingredient;
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
-	public int amount;
+	public int amount = 1;
 	public int divisor = 1;
 
 	public MaterialNode(EmiIngredient ingredient) {
 		if (ingredient instanceof EmiStack s) {
+			this.amount = s.getAmount();
 			ingredient = s.copy().setAmount(1);
 		}
 		this.ingredient = ingredient;
-		this.amount = 1;
 	}
 
 	public MaterialNode(MaterialNode node) {

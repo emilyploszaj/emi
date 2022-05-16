@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
 import dev.emi.emi.api.EmiPlugin;
@@ -41,6 +42,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
@@ -80,33 +82,33 @@ import net.minecraft.util.registry.RegistryEntryList;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory CRAFTING = new EmiRecipeCategory(new Identifier("minecraft:crafting"),
-		EmiStack.of(Items.CRAFTING_TABLE));
+		EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240));
 	public static EmiRecipeCategory SMELTING = new EmiRecipeCategory(new Identifier("minecraft:smelting"),
-		EmiStack.of(Items.FURNACE));
+		EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240));
 	public static EmiRecipeCategory BLASTING = new EmiRecipeCategory(new Identifier("minecraft:blasting"),
-		EmiStack.of(Items.BLAST_FURNACE));
+		EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240));
 	public static EmiRecipeCategory SMOKING = new EmiRecipeCategory(new Identifier("minecraft:smoking"),
-		EmiStack.of(Items.SMOKER));
+		EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240));
 	public static EmiRecipeCategory CAMPFIRE_COOKING = new EmiRecipeCategory(new Identifier("minecraft:campfire_cooking"),
-		EmiStack.of(Items.CAMPFIRE));
+		EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240));
 	public static EmiRecipeCategory STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
-		EmiStack.of(Items.STONECUTTER));
+		EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240));
 	public static EmiRecipeCategory SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
-		EmiStack.of(Items.SMITHING_TABLE));
+		EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224));
 	public static EmiRecipeCategory BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
-		EmiStack.of(Items.BREWING_STAND));
+		EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224));
 	public static EmiRecipeCategory WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("minecraft:world_interaction"),
-		EmiStack.of(Items.GRASS_BLOCK));
+		EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224));
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("minecraft:tag"),
-		EmiStack.of(Items.NAME_TAG));
+		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208));
 
 	// composting, fuel, anvil repairing
 	
 	// Synthetic
 	public static EmiRecipeCategory INGREDIENT = new EmiRecipeCategory(new Identifier("emi:ingredient"),
-		EmiStack.of(Items.COMPASS));
+		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
 	public static EmiRecipeCategory RESOLUTION = new EmiRecipeCategory(new Identifier("emi:resolution"),
-		EmiStack.of(Items.COMPASS));
+		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
 
 	@Override
 	public void register(EmiRegistry registry) {
@@ -218,7 +220,7 @@ public class VanillaPlugin implements EmiPlugin {
 							EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.LINGERING_POTION), entry.value())),
 							arrow, arrow, arrow, arrow
 						),
-						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW), entry.value())),
+						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
 						new Identifier("emi", "tipped_arrow/" + EmiUtil.subId(Registry.POTION.getId(entry.value()))),
 						false));
 				});
@@ -377,6 +379,13 @@ public class VanillaPlugin implements EmiPlugin {
 				registry.addRecipe(new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
 			}
 		});
+	}
+
+	private static EmiRecipeCategory.Renderer simplifiedRenderer(int u, int v) {
+		return (matrices, x, y, delta) -> {
+			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+			DrawableHelper.drawTexture(matrices, x, y, u, v, 16, 16, 256, 256);
+		};
 	}
 
 	private void addConcreteRecipe(EmiRegistry registry, Block powder, EmiStack water, Block result) {

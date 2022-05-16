@@ -14,6 +14,7 @@ import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -27,10 +28,7 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	@Inject(at = @At(value = "TAIL"), method = "init")
 	private void init(CallbackInfo info) {
 		this.client.keyboard.setRepeatEvents(true);
-		EmiScreenManager.search.x = x + (backgroundWidth - EmiScreenManager.search.getWidth()) / 2;
-		EmiScreenManager.search.y = height - 22;
-		EmiScreenManager.search.setTextFieldFocused(false);
-		addSelectableChild(EmiScreenManager.search);
+		EmiScreenManager.addWidgets(this);
 	}
 
 	@Inject(at = @At(value = "INVOKE",
@@ -73,6 +71,13 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		}
 	}
 
+	@Inject(at = @At("HEAD"), method = "mouseDragged(DDIDD)Z", cancellable = true)
+    public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> info) {
+		if (EmiScreenManager.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+			info.setReturnValue(true);
+		}
+	}
+
 	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/client/option/KeyBinding.matchesKey(II)Z", ordinal = 0),
 		method = "keyPressed(III)Z", cancellable = true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> info) {
@@ -83,6 +88,11 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 
 	@Override
 	public int emi$getLeft() {
+		if (this instanceof RecipeBookProvider provider) {
+			if (provider.getRecipeBookWidget().isOpen()) {
+				return x - 177;
+			}
+		}
 		return x;
 	}
 

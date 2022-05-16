@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -20,10 +22,12 @@ import net.minecraft.util.registry.Registry;
 public class EmiStackList {
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = Lists.newArrayList();
+	public static Object2IntMap<EmiStack> indices = new Object2IntOpenHashMap<>();
 
 	public static void clear() {
 		invalidators.clear();
 		stacks = Lists.newArrayList();
+		indices.clear();
 	}
 
 	public static void reload() {
@@ -58,6 +62,9 @@ public class EmiStackList {
 				}
 			}
 			return true;
-		}).toList();;
+		}).toList();
+		for (int i = 0; i < stacks.size(); i++) {
+			indices.put(stacks.get(i), i);
+		}
 	}
 }

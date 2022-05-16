@@ -32,6 +32,8 @@ public class EmiClient implements ClientModInitializer {
 	public static final Set<Identifier> MODELED_TAGS = Sets.newHashSet();
 	public static Set<Identifier> excludedTags = Sets.newHashSet();
 	public static List<TagKey<Item>> itemTags = List.of();
+	// Flag used by a mixin
+	public static boolean shiftTooltipsLeft = false;
 
 	@Override
 	public void onInitializeClient() {

@@ -48,6 +48,16 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof TagEmiIngredient tag && tag.key.equals(this.key);
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
 	public List<EmiStack> getEmiStacks() {
 		return stacks;
 	}

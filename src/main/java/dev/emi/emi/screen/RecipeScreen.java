@@ -22,7 +22,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
-import dev.emi.emi.screen.widget.ArrowButtonWidget;
+import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import dev.emi.emi.widget.RecipeFillButtonWidget;
@@ -31,10 +31,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen implements EmiScreen {
@@ -46,7 +43,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	private List<RecipeTab> tabs = Lists.newArrayList();
 	private int tabPageSize = 6;
 	private int tabPage = 0, tab = 0, page = 0;
-	private List<ArrowButtonWidget> arrows;
+	private List<SizedButtonWidget> arrows;
 	private List<WidgetGroup> currentPage = Lists.newArrayList();
 	private int tabOff = 0;
 	int backgroundWidth = 176;
@@ -54,23 +51,24 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	int x = (this.width - backgroundWidth) / 2;
 	int y = (this.height - backgroundHeight) / 2;
 
-	public RecipeScreen(HandledScreen<?> old) {
+	public RecipeScreen(HandledScreen<?> old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
 		super(new TranslatableText("screen.emi.recipe"));
 		this.old = old;
 		arrows = List.of(
-			new ArrowButtonWidget(x + 2, y - 18, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 2, y - 18, 12, 12, 0, 64,
 				() -> tabs.size() > tabPageSize, w -> setPage(tabPage - 1, tab, page)),
-			new ArrowButtonWidget(x + backgroundWidth - 14, y - 18, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 14, y - 18, 12, 12, 12, 64,
 				() -> tabs.size() > tabPageSize, w -> setPage(tabPage + 1, tab, page)),
-			new ArrowButtonWidget(x + 5, y + 5, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 5, y + 5, 12, 12, 0, 64,
 				() -> tabs.size() > 1, w -> setPage(tabPage, tab - 1, page)),
-			new ArrowButtonWidget(x + backgroundWidth - 17, y + 5, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 17, y + 5, 12, 12, 12, 64,
 				() -> tabs.size() > 1, w -> setPage(tabPage, tab + 1, page)),
-			new ArrowButtonWidget(x + 5, y + 18, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 5, y + 18, 12, 12, 0, 64,
 				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page - 1)),
-			new ArrowButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 64,
 				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page + 1))
-		);
+		);		resolve = null;
+		this.recipes = recipes;
 	}
 
 	@Override
@@ -81,17 +79,33 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		x = (this.width - backgroundWidth) / 2;
 		y = (this.height - backgroundHeight) / 2 + 1;
 		
-		for (ArrowButtonWidget widget : arrows) {
+		for (SizedButtonWidget widget : arrows) {
 			addDrawableChild(widget);
 		}
-		EmiScreenManager.search.x = (this.width - 176) / 2 + (176 - EmiScreenManager.search.getWidth()) / 2;
-		EmiScreenManager.search.y = height - 22;
-		EmiScreenManager.search.setTextFieldFocused(false);
-		addSelectableChild(EmiScreenManager.search);
+		EmiScreenManager.addWidgets(this);
 		if (recipes != null) {
-			setPages(recipes);
+			EmiRecipe current = null;
+			if (tab < tabs.size() && page < tabs.get(tab).recipes.size() && tabs.get(tab).recipes.get(page).size() > 0) {
+				current = tabs.get(tab).recipes.get(page).get(0);
+			}
+			tabs.clear();
+			if (!recipes.isEmpty()) {
+				for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : recipes.entrySet().stream()
+						.sorted((a, b) -> EmiRecipes.categories.indexOf(a.getKey()) - EmiRecipes.categories.indexOf(b.getKey())).toList()) {
+					List<EmiRecipe> set = entry.getValue();
+					if (!set.isEmpty()) {
+						tabs.add(new RecipeTab(entry.getKey(), set));
+					}
+				}
+				
+				tab = -1;
+				setPage(tabPage, 0, 0);
+			}
+			//setPages(recipes);
+			if (current != null) {
+				focusRecipe(current);
+			}
 		}
-		setPage(tabPage, tab, page);
 		setRecipePageWidth(backgroundWidth);
 	}
 
@@ -175,11 +189,21 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (mouseX >= x + 16 + tabOff && mouseX < x + backgroundWidth && mouseY >= y - 24 && mouseY < y) {
 			int n = (mouseX - x - 16 - tabOff) / 24 + tabPage * tabPageSize;
 			if (n < tabs.size() && n >= tabPage * tabPageSize && n < (tabPage + 1) * tabPageSize) {
-				RecipeTab t = tabs.get(n);
-				List<Text> list = Lists.newArrayList();
-				list.add(new TranslatableText(EmiUtil.translateId("emi.category.", t.category.getId())));
-				list.add(new LiteralText(EmiUtil.getModName(t.category.getId().getNamespace())).formatted(Formatting.BLUE));
-				this.renderTooltip(matrices, list, mouseX, Math.max(16, mouseY));
+				((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices,
+					tabs.get(n).category.getTooltip(), mouseX, Math.max(16, mouseY));
+			}
+		}
+	}
+
+	public EmiRecipeCategory getFocusedCategory() {
+		return tabs.get(tab).category;
+	}
+
+	public void focusCategory(EmiRecipeCategory category) {
+		for (int i = 0; i < tabs.size(); i++) {
+			if (tabs.get(i).category == category) {
+				setPage(tabPage, i, 0);
+				return;
 			}
 		}
 	}
@@ -294,37 +318,6 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 	}
 
-	public void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
-		resolve = null;
-		this.recipes = recipes;
-		if (!recipes.isEmpty()) {
-			EmiRecipeCategory current = null;
-			if (tab < tabs.size()) {
-				current = tabs.get(tab).category;
-			}
-			tabs.clear();
-			for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : recipes.entrySet().stream()
-					.sorted((a, b) -> EmiRecipes.categories.indexOf(a.getKey()) - EmiRecipes.categories.indexOf(b.getKey())).toList()) {
-				List<EmiRecipe> set = entry.getValue();
-				if (!set.isEmpty()) {
-					tabs.add(new RecipeTab(entry.getKey(), set));
-				}
-			}
-
-			int newTab = 0;
-			for (int i = 0; i < tabs.size(); i++) {
-				if (tabs.get(i).category == current) {
-					newTab = i;
-					break;
-				}
-			}
-			
-			// Force tabPage adjustment
-			tab = -1;
-			setPage(tabPage, newTab, 0);
-		}
-	}
-
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		int mx = (int) mouseX;
@@ -352,6 +345,23 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		if (EmiScreenManager.mouseReleased(mouseX, mouseY, button)) {
+			return true;
+		}
+		return super.mouseReleased(mouseX, mouseY, button);
+	}
+
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		if (EmiScreenManager.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+			return true;
+		}
+		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+	}
+
+	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (EmiScreenManager.mouseScrolled(mouseX, mouseY, amount)) {
 			return true;

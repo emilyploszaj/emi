@@ -8,8 +8,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.bom.BoM;
@@ -147,7 +147,7 @@ public class SlotWidget extends Widget {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0 && getRecipe() != null && RecipeScreen.resolve != null) {
 			BoM.addResolution(RecipeScreen.resolve.ingredient, getRecipe());
-			EmiApi.viewRecipeTree();
+			EmiHistory.pop();
 			return true;
 		} else if (EmiScreenManager.stackInteraction(getStack(), getRecipe(), bind -> bind.matchesMouse(button))) {
 			return true;

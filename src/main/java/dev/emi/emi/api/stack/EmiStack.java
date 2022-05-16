@@ -103,6 +103,21 @@ public abstract class EmiStack implements EmiIngredient {
 		return true;
 	}
 
+	public boolean isEqual(EmiStack stack, Comparison comparison) {
+		boolean amount = comparison.amount.orElse(false);
+		boolean nbt = comparison.nbt.orElse(false);
+		if (!getEntry().equals(stack.getEntry())) {
+			return false;
+		}
+		if (nbt && (hasNbt() != stack.hasNbt() || (hasNbt() && !getNbt().equals(stack.getNbt())))) {
+			return false;
+		}
+		if (amount && getAmount() != stack.getAmount()) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta) {
 		renderIcon(matrices, x, y, delta);

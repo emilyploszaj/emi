@@ -55,12 +55,46 @@ public class EmiFavorites {
 		addFavorite(stack, null);
 	}
 
+	public static void addFavoriteAt(EmiIngredient stack, int offset) {
+		EmiFavorite favorite;
+		if (stack instanceof EmiFavorite fav) {
+			int original = favorites.indexOf(fav);
+			if (original != -1) {
+				if (original < offset) {
+					offset--;
+				}
+				favorites.remove(original);
+			}
+			favorite = fav;
+		} else if (stack instanceof EmiStack es) {
+			for (int i = 0; i < favorites.size(); i++) {
+				EmiFavorite fav = favorites.get(i);
+				if (fav.getRecipe() == null && fav.getStack().isEqual(es)) {
+					favorites.remove(i--);
+				}
+			}
+			favorite = new EmiFavorite(es, null);
+		} else {
+			return;
+		}
+		if (offset < 0) {
+			offset = 0;
+		}
+		if (offset >= favorites.size()) {
+			favorites.add(favorite);
+		} else {
+			favorites.add(offset, favorite);
+		}
+	}
+
 	public static void addFavorite(EmiIngredient stack, EmiRecipe context) {
 		if (context != null && !EmiRecipeFiller.RECIPE_HANDLERS.containsKey(context.getCategory())) {
 			context = null;
 		}
-		if (stack instanceof EmiFavorite) {
-			favorites.remove(stack);
+		if (stack instanceof EmiFavorite f) {
+			if (!favorites.remove(f)) {
+				favorites.add(f);
+			}
 		} else if (stack instanceof EmiStack es) {
 			es = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
 			if (context == null && es instanceof ItemEmiStack ies) {

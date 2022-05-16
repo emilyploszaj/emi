@@ -27,6 +27,7 @@
   "config.emi.general.cheat_mode": "Cheat Mode",
 
   "config.emi.ui.move_effects": "Move Effects",
+  "config.emi.ui.center_search_bar": "Center Search Bar",
   "config.emi.ui.fluid_unit": "Fluid Unit",
   "config.emi.ui.recipe_favorite_button": "Recipe Favorite Button",
   "config.emi.ui.recipe_default_button": "Recipe Default Button",
@@ -44,9 +45,20 @@
   "emi.total_cost": "Total Cost",
   "emi.cost_per": "Cost Each",
   "emi.leftovers": "Leftovers",
+  "emi.tree_welcome": "Welcome to %s",
+  "emi.no_tree": "You haven't set a recipe tree to view yet...",
+  "emi.random_tree": "Perhaps you'd like to see a random one?",
+  "emi.random_tree_input": "Press §6[ctrl + r]",
   "tooltip.emi.fill_recipe": "Fill Recipe",
   "tooltip.emi.set_default": "Set as Default Recipe",
   "tooltip.emi.view_tree": "View Recipe Tree",
+
+  "tooltip.emi.config": "%s Config",
+  "tooltip.emi.recipe_tree": "Recipe Tree",
+  "tooltip.emi.craftable_toggle_index": "Showing Index",
+  "tooltip.emi.craftable_toggle_craftable": "Showing Craftable Recipes",
+  "tooltip.emi.local_craftable_toggle_off": "Showing All Craftable Recipes",
+  "tooltip.emi.local_craftable_toggle_on": "Showing Only Craftable in Workstation",
 
   "screen.emi.recipe": "Recipe",
   "screen.emi.com": "Recipe Tree",

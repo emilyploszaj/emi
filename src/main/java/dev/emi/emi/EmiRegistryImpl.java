@@ -7,9 +7,11 @@ import com.google.common.collect.Sets;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.Comparison;
@@ -75,6 +77,26 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void addGenericExclusionArea(EmiExclusionArea<Screen> area) {
 		EmiExclusionAreas.generic.add(area);
+	}
+
+	@Override
+	public <T extends Screen> void addDragDropHandler(Class<T> clazz, EmiDragDropHandler<T> handler) {
+		EmiDragDropHandlers.fromClass.computeIfAbsent(clazz, c -> Lists.newArrayList()).add(handler);
+	}
+
+	@Override
+	public void addGenericDragDropHandler(EmiDragDropHandler<Screen> handler) {
+		EmiDragDropHandlers.generic.add(handler);
+	}
+
+	@Override
+	public <T extends Screen> void addStackProvider(Class<T> clazz, EmiStackProvider<T> provider) {
+		EmiStackProviders.fromClass.computeIfAbsent(clazz, c -> Lists.newArrayList()).add(provider);
+	}
+
+	@Override
+	public void addGenericStackProvider(EmiStackProvider<Screen> provider) {
+		EmiStackProviders.generic.add(provider);
 	}
 	
 	@Override

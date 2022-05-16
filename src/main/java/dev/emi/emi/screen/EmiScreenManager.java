@@ -5,15 +5,23 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiDragDropHandlers;
 import dev.emi.emi.EmiExclusionAreas;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
+import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiMain;
+import dev.emi.emi.EmiPlayerInventory;
 import dev.emi.emi.EmiReloadManager;
+import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.EmiStackProviders;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
@@ -23,9 +31,9 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
+import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -36,34 +44,86 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 
 public class EmiScreenManager {
-	private static final int ENTRY_SIZE = 18;
+	private static final int PADDING_SIZE = 1;
+	private static final int ENTRY_SIZE = 16 + PADDING_SIZE * 2;
+	private static final StackBatcher searchBatcher = new StackBatcher();
+	private static final StackBatcher favoriteBatcher = new StackBatcher();
 	private static MinecraftClient client = MinecraftClient.getInstance();
-	private static List<EmiStack> stacks;
-	/*package*/ static int lastMouseX, lastMouseY;
+	private static List<? extends EmiIngredient> stacks;
 	private static int left, right;
 	private static int lastWidth, lastHeight;
 	private static List<Bounds> lastExclusion;
 	private static ScreenSpace searchSpace;
 	private static ScreenSpace favoriteSpace;
-	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);;
-	public static int currentPage = 0;
-	private static final StackBatcher searchBatcher = new StackBatcher();
-	private static final StackBatcher favoriteBatcher = new StackBatcher();
+	public static EmiPlayerInventory lastPlayerInventory;
+	public static int searchPage, favoritePage;
+	public static int lastMouseX, lastMouseY;
+	// The stack that was clicked on, for determining when a drag properly starts
+	private static EmiIngredient pressedStack = EmiStack.EMPTY;
+	private static EmiIngredient draggedStack = EmiStack.EMPTY;
+
+	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);
+	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 64,
+		() -> true, (w) -> client.setScreen(new ConfigScreen(client.currentScreen)),
+		List.of(new TranslatableText("tooltip.emi.config", EmiRenderHelper.getEmiText())));
+	public static SizedButtonWidget tree = new SizedButtonWidget(0, 0, 20, 20, 184, 64,
+		() -> true, (w) -> EmiApi.viewRecipeTree(),
+		List.of(new TranslatableText("tooltip.emi.recipe_tree")));
+	public static SizedButtonWidget craftableButton = new SizedButtonWidget(0, 0, 20, 20, 164, 64, () -> true, (w) -> {
+		EmiConfig.craftable = !EmiConfig.craftable;
+		EmiConfig.writeConfig();
+		EmiSearch.update();
+		lastPlayerInventory = null;
+		recalculate();
+	}, () -> EmiConfig.craftable ? 60 : 0,
+		() -> List.of(EmiConfig.craftable ? new TranslatableText("tooltip.emi.craftable_toggle_craftable")
+			: new TranslatableText("tooltip.emi.craftable_toggle_index")));
+	public static SizedButtonWidget localCraftables = new SizedButtonWidget(0, 0, 20, 20, 144, 64, () -> EmiConfig.craftable, (w) -> {
+		EmiConfig.localCraftable = !EmiConfig.localCraftable;
+		EmiConfig.writeConfig();
+		lastPlayerInventory = null;
+		recalculate();
+	}, () -> EmiConfig.localCraftable ? 60 : 0,
+	() -> List.of(EmiConfig.localCraftable ? new TranslatableText("tooltip.emi.local_craftable_toggle_on")
+		: new TranslatableText("tooltip.emi.local_craftable_toggle_off")));
+	public static SizedButtonWidget searchLeft = new SizedButtonWidget(0, 0, 16, 16, 224, 64,
+		EmiScreenManager::hasMultipleSearchPages, (w) -> scrollSearch(-1));
+	public static SizedButtonWidget searchRight = new SizedButtonWidget(0, 0, 16, 16, 240, 64,
+		EmiScreenManager::hasMultipleSearchPages, (w) -> scrollSearch(1));
+	public static SizedButtonWidget favoriteLeft = new SizedButtonWidget(0, 0, 16, 16, 224, 64,
+		EmiScreenManager::hasMultipleFavoritePages, (w) -> scrollFavorite(-1));
+	public static SizedButtonWidget favoriteRight = new SizedButtonWidget(0, 0, 16, 16, 240, 64,
+		EmiScreenManager::hasMultipleFavoritePages, (w) -> scrollFavorite(1));
+
+	private static boolean hasMultipleSearchPages() {
+		return searchSpace.pageSize < stacks.size();
+	}
+
+	private static boolean hasMultipleFavoritePages() {
+		return favoriteSpace.pageSize < EmiFavorites.favorites.size();
+	}
 
 	private static boolean isDisabled() {
 		return EmiReloadManager.isReloading() || !EmiConfig.enabled;
 	}
 
 	private static void recalculate() {
+		if (EmiConfig.craftable) {
+			EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
+			if (!inv.isEqual(lastPlayerInventory)) {
+				lastPlayerInventory = inv;
+				EmiSearch.update();
+			}
+		}
 		if (stacks != EmiSearch.stacks) {
 			searchBatcher.repopulate();
 		}
 		stacks = EmiSearch.stacks;
+
 		Screen screen = client.currentScreen;
 		List<Bounds> exclusion = EmiExclusionAreas.getExclusion(screen);
 		if (lastWidth == screen.width && lastHeight == screen.height && exclusion.size() == lastExclusion.size()) {
@@ -89,42 +149,48 @@ public class EmiScreenManager {
 			left = emi.emi$getLeft();
 			right = emi.emi$getRight();
 			int xMin = right;
-			int xMax = screen.width;
-			int yMin = 16;
-			int yMax = screen.height - 2;
+			int xMax = screen.width - 1;
+			int yMin = 18;
+			int yMax = screen.height - 22;
 			int tx = xMin + (xMax - xMin) % ENTRY_SIZE / 2;
 			int ty = yMin;
 			int tw = (xMax - xMin) / ENTRY_SIZE;
 			int th = (yMax - yMin) / ENTRY_SIZE;
 			searchSpace = new ScreenSpace(xMin, xMax, yMin, yMax, tx, ty, tw, th, true, exclusion);
-			int fxMin = 0;
+			int fxMin = 1;
 			int fxMax = left;
-			int fyMin = 16;
-			int fyMax = screen.height - 2;
+			int fyMin = 18;
+			int fyMax = screen.height - 22;
 			int ftx = fxMin + (fxMax - fxMin) % ENTRY_SIZE / 2;
 			int fty = fyMin;
 			int ftw = (fxMax - fxMin) / ENTRY_SIZE;
 			int fth = (fyMax - fyMin) / ENTRY_SIZE;
 			favoriteSpace = new ScreenSpace(fxMin, fxMax, fyMin, fyMax, ftx, fty, ftw, fth, false, exclusion);
+
+			searchLeft.x = searchSpace.tx;
+			searchLeft.y = 2;
+			searchRight.x = searchSpace.tx + searchSpace.tw * ENTRY_SIZE - 16;
+			searchRight.y = 2;
+	
+			favoriteLeft.x = favoriteSpace.tx;
+			favoriteLeft.y = 2;
+			favoriteRight.x = favoriteSpace.tx + favoriteSpace.tw * ENTRY_SIZE - 16;
+			favoriteRight.y = 2;
 		}
 	}
 
-	private static EmiIngredient getHoveredStack(int mouseX, int mouseY, boolean checkHandled) {
-		Screen screen = client.currentScreen;
-		if (checkHandled && screen instanceof HandledScreenAccessor handled) {
-			Slot s = handled.getFocusedSlot();
-			if (s != null) {
-				ItemStack stack = s.getStack();
-				if (!stack.isEmpty()) {
-					return EmiStack.of(stack);
-				}
+	public static EmiIngredient getHoveredStack(int mouseX, int mouseY, boolean checkHandled) {
+		if (checkHandled) {
+			EmiIngredient stack = EmiStackProviders.getStackAt(client.currentScreen, mouseX, mouseY);
+			if (!stack.isEmpty()) {
+				return stack;
 			}
 		}
 		if (searchSpace.contains(mouseX, mouseY) && mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
 			int x = (mouseX - searchSpace.tx) / ENTRY_SIZE;
 			int y = (mouseY - searchSpace.ty) / ENTRY_SIZE;
 			int n = searchSpace.getRawOffset(x, y);
-			if (n != -1 && (n = n + searchSpace.pageSize * currentPage) < stacks.size()) {
+			if (n != -1 && (n = n + searchSpace.pageSize * searchPage) < stacks.size()) {
 				return stacks.get(n);
 			}
 		}
@@ -132,7 +198,7 @@ public class EmiScreenManager {
 			int x = (mouseX - favoriteSpace.tx) / ENTRY_SIZE;
 			int y = (mouseY - favoriteSpace.ty) / ENTRY_SIZE;
 			int n = favoriteSpace.getRawOffset(x, y);
-			if (n != -1 && (n = n + favoriteSpace.pageSize * 0) < EmiFavorites.favorites.size()) {
+			if (n != -1 && (n = n + favoriteSpace.pageSize * favoritePage) < EmiFavorites.favorites.size()) {
 				return EmiFavorites.favorites.get(n);
 			}
 		}
@@ -146,7 +212,7 @@ public class EmiScreenManager {
 		Screen screen = client.currentScreen;
 		if (isDisabled()) {
 			if (EmiReloadManager.isReloading()) {
-				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 12, -1);
+				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 48, screen.height - 16, -1);
 			}
 			client.getProfiler().pop();
 			return;
@@ -157,21 +223,22 @@ public class EmiScreenManager {
 			EmiScreenManager.search.setZOffset(0);
 			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
 			recalculate();
-			int pageSize = searchSpace.pageSize;
-			int totalPages = (stacks.size() - 1) / pageSize + 1;
-			if (currentPage >= totalPages) {
-				currentPage = 0;
-				searchBatcher.repopulate();
-			} else if (currentPage < 0) {
-				currentPage = totalPages - 1;
-				searchBatcher.repopulate();
-			}
 	
 			client.getProfiler().swap("search");
-			searchBatcher.begin(searchSpace.xMin, searchSpace.yMin, 0);
-			DrawableHelper.drawCenteredText(matrices, client.textRenderer, new TranslatableText("emi.page", currentPage + 1, totalPages),
+			int searchPageSize = searchSpace.pageSize;
+			int totalSearchPages = (stacks.size() - 1) / searchPageSize + 1;
+			if (searchPage >= totalSearchPages) {
+				searchPage = 0;
+				searchBatcher.repopulate();
+			} else if (searchPage < 0) {
+				searchPage = totalSearchPages - 1;
+				searchBatcher.repopulate();
+			}
+			// Do not ask for whom the offsets toll, for it is you
+			searchBatcher.begin(searchSpace.tx + PADDING_SIZE - 2, searchSpace.ty + PADDING_SIZE - 3, 0);
+			DrawableHelper.drawCenteredText(matrices, client.textRenderer, new TranslatableText("emi.page", searchPage + 1, totalSearchPages),
 				searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
-			int i = pageSize * currentPage;
+			int i = searchPageSize * searchPage;
 			outer:
 			for (int yo = 0; yo < searchSpace.th; yo++) {
 				for (int xo = 0; xo < searchSpace.getWidth(yo); xo++) {
@@ -180,19 +247,33 @@ public class EmiScreenManager {
 					}
 					int cx = searchSpace.getX(xo, yo);
 					int cy = searchSpace.getY(xo, yo);
-					EmiStack stack = stacks.get(i++);
-					searchBatcher.render(stack, matrices, cx + 1, cy + 1, delta);
+					EmiIngredient stack = stacks.get(i++);
+					searchBatcher.render(stack.getEmiStacks().get(0), matrices, cx + 1, cy + 1, delta);
 					if (EmiConfig.devMode) {
 						if (BoM.getRecipe(stack) != null) {
+							RenderSystem.enableDepthTest();
 							DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
 						}
 					}
 				}
 			}
 			searchBatcher.draw();
+
 			client.getProfiler().swap("favorite");
-			favoriteBatcher.begin(favoriteSpace.xMin, favoriteSpace.yMin, 0);
-			i = 0;
+			int favoritePageSize = favoriteSpace.pageSize;
+			int totalFavoritePages = (EmiFavorites.favorites.size() - 1) / favoritePageSize + 1;
+			if (favoritePage >= totalFavoritePages) {
+				favoritePage = 0;
+				favoriteBatcher.repopulate();
+			} else if (favoritePage < 0) {
+				favoritePage = totalFavoritePages - 1;
+				favoriteBatcher.repopulate();
+			}
+			favoriteBatcher.begin(favoriteSpace.tx + PADDING_SIZE - 2, favoriteSpace.ty + PADDING_SIZE - 3, 0);
+			DrawableHelper.drawCenteredText(matrices, client.textRenderer,
+				new TranslatableText("emi.page", favoritePage + 1, totalFavoritePages),
+				favoriteSpace.xMin + (favoriteSpace.xMax - favoriteSpace.xMin) / 2, 5, 0xFFFFFF);
+			i = favoritePageSize * favoritePage;
 			outer:
 			for (int yo = 0; yo < favoriteSpace.th; yo++) {
 				for (int xo = 0; xo < favoriteSpace.getWidth(yo); xo++) {
@@ -205,20 +286,52 @@ public class EmiScreenManager {
 				}
 			}
 			favoriteBatcher.draw();
-			client.getProfiler().swap("hover");
-			EmiIngredient hov = getHoveredStack(mouseX, mouseY, false);
-			((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, hov.getTooltip(), mouseX, mouseY);
-			client.getProfiler().pop();
+			if (!draggedStack.isEmpty()) {
+				if (favoriteSpace.contains(mouseX, mouseY)) {
+					int index = favoriteSpace.getClosestEdge(mouseX, mouseY);
+					if (index + favoriteSpace.pageSize * favoritePage > EmiFavorites.favorites.size()) {
+						index = EmiFavorites.favorites.size() - favoriteSpace.pageSize * favoritePage;	
+					}
+					int dx = favoriteSpace.getEdgeX(index);
+					int dy = favoriteSpace.getEdgeY(index);
+					DrawableHelper.fill(matrices, dx - 1, dy, dx + 1, dy + 18, 0xFF00FFFF);
+				}
+				MatrixStack view = RenderSystem.getModelViewStack();
+				view.push();
+				view.translate(0, 0, 200);
+				RenderSystem.applyModelViewMatrix();
+				draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta);
+				view.pop();
+				RenderSystem.applyModelViewMatrix();
+			} else {
+				client.getProfiler().swap("hover");
+				MatrixStack view = RenderSystem.getModelViewStack();
+				view.push();
+				view.translate(0, 0, 200);
+				RenderSystem.applyModelViewMatrix();
+				EmiIngredient hov = getHoveredStack(mouseX, mouseY, false);
+				if (mouseX >= searchSpace.xMin) {
+					EmiClient.shiftTooltipsLeft = true;
+				}
+				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, hov.getTooltip(), mouseX, mouseY);
+				EmiClient.shiftTooltipsLeft = false;
+				view.pop();
+				RenderSystem.applyModelViewMatrix();
+				client.getProfiler().pop();
+			}
 		}
 		if (EmiConfig.devMode) {
 			client.getProfiler().swap("dev");
 			int color = 0xFFFFFF;
 			String title = "EMI Dev Mode";
+			int off = -16;
 			if (EmiLog.WARNINGS.size() > 0) {
 				color = 0xFF0000;
+				off = -11;
 				String warnCount = EmiLog.WARNINGS.size() + " Warnings";
+				client.textRenderer.drawWithShadow(matrices, warnCount, 48, screen.height - 21, color);
 				int width = Math.max(client.textRenderer.getWidth(title), client.textRenderer.getWidth(warnCount));
-				if (mouseX < width + 8 && mouseY > screen.height - 28) {
+				if (mouseX >= 48 && mouseX < width + 48 && mouseY > screen.height - 28) {
 					screen.renderTooltip(matrices, Stream.concat(Stream.of("See log for more information"),
 						EmiLog.WARNINGS.stream()).map(s -> {
 							String a = s;
@@ -229,12 +342,92 @@ public class EmiScreenManager {
 						})
 						.collect(Collectors.toList()), 0, 20);
 				}
-				client.textRenderer.drawWithShadow(matrices, warnCount, 4, screen.height - 24, color);
 			}
-			client.textRenderer.drawWithShadow(matrices, title, 4, screen.height - 12, color);
+			client.textRenderer.drawWithShadow(matrices, title, 48, screen.height + off, color);
 		}
 		client.getProfiler().pop();
 		client.getProfiler().pop();
+	}
+
+	public static void addWidgets(Screen screen) {
+		// force recalculation
+		lastWidth = -1;
+		lastPlayerInventory = null;
+		recalculate();
+		if (EmiConfig.centerSearchBar) {
+			search.x = (screen.width - 160) / 2;
+			search.y = screen.height - 22;
+			search.setWidth(160);
+		} else {
+			search.x = searchSpace.tx;
+			search.y = screen.height - 21;
+			search.setWidth(searchSpace.xMax - searchSpace.xMin - 54);
+		}
+		search.setTextFieldFocused(false);
+
+		emi.x = 2;
+		emi.y = screen.height - 22;
+
+		tree.x = 24;
+		tree.y = screen.height - 22;
+
+		craftableButton.x = screen.width - 22;
+		craftableButton.y = screen.height - 22;
+
+		localCraftables.x = screen.width - 44;
+		localCraftables.y = screen.height - 22;
+
+		searchLeft.x = searchSpace.tx;
+		searchLeft.y = 2;
+		searchRight.x = searchSpace.tx + searchSpace.tw * ENTRY_SIZE - 16;
+		searchRight.y = 2;
+
+		favoriteLeft.x = favoriteSpace.tx;
+		favoriteLeft.y = 2;
+		favoriteRight.x = favoriteSpace.tx + favoriteSpace.tw * ENTRY_SIZE - 16;
+		favoriteRight.y = 2;
+
+		ScreenAccessor acc = (ScreenAccessor) screen;
+
+		acc.invokeAddDrawableChild(search);
+		acc.invokeAddDrawableChild(emi);
+		acc.invokeAddDrawableChild(tree);
+		acc.invokeAddDrawableChild(craftableButton);
+		acc.invokeAddDrawableChild(localCraftables);
+		acc.invokeAddDrawableChild(searchLeft);
+		acc.invokeAddDrawableChild(searchRight);
+		acc.invokeAddDrawableChild(favoriteLeft);
+		acc.invokeAddDrawableChild(favoriteRight);
+	}
+
+	public static void scrollSearch(int delta) {
+		searchPage += delta;
+		int pageSize = searchSpace.pageSize;
+		int totalPages = (stacks.size() - 1) / pageSize + 1;
+		if (totalPages <= 1) {
+			return;
+		}
+		if (searchPage >= totalPages) {
+			searchPage = 0;
+		} else if (searchPage < 0) {
+			searchPage = totalPages - 1;
+		}
+		searchBatcher.repopulate();
+	}
+
+	public static void scrollFavorite(int delta) {
+		favoritePage += delta;
+		int pageSize = favoriteSpace.pageSize;
+		int totalPages = (EmiFavorites.favorites.size() - 1) / pageSize + 1;
+		if (totalPages <= 1) {
+			return;
+		}
+		if (favoritePage >= totalPages) {
+			favoritePage = 0;
+		} else if (favoritePage < 0) {
+			favoritePage = totalPages - 1;
+		}
+		favoriteBatcher.repopulate();
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
@@ -243,8 +436,10 @@ public class EmiScreenManager {
 		}
 		recalculate();
 		if (searchSpace.contains((int) mouseX, (int) mouseY)) {
-			EmiScreenManager.currentPage += (int) -amount;
-			searchBatcher.repopulate();
+			scrollSearch((int) -amount);
+			return true;
+		} else if (favoriteSpace.contains((int) mouseX, (int) mouseY)) {
+			scrollFavorite((int) -amount);
 			return true;
 		}
 		return false;
@@ -272,23 +467,60 @@ public class EmiScreenManager {
 				}
 			}
 		}
-		if (stackInteraction(getHoveredStack((int) mouseX, (int) mouseY, false), bind -> bind.matchesMouse(button))) {
-			return true;
-		}
-		if (genericInteraction(bind -> bind.matchesMouse(button))) {
+		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false);
+		pressedStack = ingredient;
+		if (!ingredient.isEmpty()) {
 			return true;
 		}
 		return false;
 	}
 
 	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+		try {
+			if (isDisabled()) {
+				return false;
+			}
+			recalculate();
+			if (!draggedStack.isEmpty()) {
+				int mx = (int) mouseX;
+				int my = (int) mouseY;
+				if (favoriteSpace.contains(mx, my)) {
+					int index = favoriteSpace.getClosestEdge(mx, my);
+					EmiFavorites.addFavoriteAt(draggedStack, index + favoriteSpace.pageSize * favoritePage);
+					favoriteBatcher.repopulate();
+					return true;
+				} else {
+					if (EmiDragDropHandlers.dropStack(client.currentScreen, draggedStack, mx, my)) {
+						return true;
+					}
+				}
+			} else {
+				EmiIngredient hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+				if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
+					return true;
+				}
+			}
+			if (genericInteraction(bind -> bind.matchesMouse(button))) {
+				return true;
+			}
+			return false;
+		} finally {
+			pressedStack = EmiStack.EMPTY;
+			draggedStack = EmiStack.EMPTY;
+		}
+	}
+
+	public static boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (isDisabled()) {
 			return false;
 		}
-		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false);
-		if (!ingredient.isEmpty()) {
-			return true;
+		if (draggedStack.isEmpty()) {
+			recalculate();
+			EmiIngredient hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+			if (hovered != pressedStack) {
+				draggedStack = pressedStack;
+				pressedStack = EmiStack.EMPTY;
+			}
 		}
 		return false;
 	}
@@ -303,9 +535,6 @@ public class EmiScreenManager {
 			return false;
 		}
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
-			return true;
-		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
-			client.setScreen(new ConfigScreen(client.currentScreen));
 			return true;
 		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
@@ -336,6 +565,22 @@ public class EmiScreenManager {
 		} else if (function.apply(EmiConfig.viewTree)) {
 			EmiApi.viewRecipeTree();
 			return true;
+		} else if (function.apply(EmiConfig.back)) {
+			EmiHistory.pop();
+			return true;
+		} else if (function.apply(EmiConfig.toggleCraftable)) {
+			EmiConfig.craftable = !EmiConfig.craftable;
+			EmiConfig.writeConfig();
+			EmiSearch.update();
+			lastPlayerInventory = null;
+			recalculate();
+			return true;
+		} else if (function.apply(EmiConfig.toggleLocalCraftable) && EmiConfig.craftable) {
+			EmiConfig.localCraftable = !EmiConfig.localCraftable;
+			EmiConfig.writeConfig();
+			lastPlayerInventory = null;
+			recalculate();
+			return true;
 		}
 		return false;
 	}
@@ -359,7 +604,7 @@ public class EmiScreenManager {
 				} else if (function.apply(EmiConfig.craftAll)) {
 					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, true);
 					return true;
-				} else if (function.apply(EmiConfig.craftAll)) {
+				} else if (function.apply(EmiConfig.craftOne)) {
 					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, false);
 					return true;
 				}
@@ -469,6 +714,57 @@ public class EmiScreenManager {
 
 		public int getY(int x, int y) {
 			return ty + y * ENTRY_SIZE;
+		}
+
+		public int getEdgeX(int off) {
+			int t = 0;
+			int y = 0;
+			while (y < th && t + getWidth(y) < off) {
+				t += getWidth(y++);
+			}
+			return getX(off - t, y);
+		}
+
+		public int getEdgeY(int off) {
+			int t = 0;
+			int y = 0;
+			while (y < th && t + getWidth(y) < off) {
+				t += getWidth(y++);
+			}
+			return ty + y * ENTRY_SIZE;
+		}
+
+		public int getClosestEdge(int x, int y) {
+			if (y < ty) {
+				return 0;
+			} else if (y >= ty + th * ENTRY_SIZE) {
+				return pageSize;
+			} else {
+				x = (x - xMin) / ENTRY_SIZE;
+				y = (y - yMin) / ENTRY_SIZE;
+				int off = 0;
+				for (int i = 0; i < y; i++) {
+					off += widths[i];
+				}
+				if (x < xMin) {
+					return y;
+				} else if (x >= xMax) {
+					return y + widths[y];
+				}
+				if (rtl) {
+					int to = tw - widths[y];
+					if (x >= to) {
+						off += x - to;
+					}
+				} else {
+					if (x < widths[y]) {
+						off += x;
+					} else {
+						off += widths[y];
+					}
+				}
+				return off;
+			}
 		}
 
 		public int getRawOffset(int x, int y) {

@@ -91,6 +91,30 @@ public interface EmiRegistry {
 	void addGenericExclusionArea(EmiExclusionArea<Screen> area);
 
 	/**
+	 * Adds an EmiDragDropHandler to screens of a given class.
+	 * Drag drop handlers can consume events related to sidebar stacks being dragged and dropped.
+	 */
+	<T extends Screen> void addDragDropHandler(Class<T> clazz, EmiDragDropHandler<T> handler);
+
+	/**
+	 * Adds an EmiDragDropHandler to every screen.
+	 * Drag drop handlers can consume events related to sidebar stacks being dragged and dropped.
+	 */
+	void addGenericDragDropHandler(EmiDragDropHandler<Screen> handler);
+
+	/**
+	 * Adds an EmiStackProvider to screens of a given class.
+	 * Stack providers can inform EMI of EmiIngredients that are located on the screen.
+	 */
+	<T extends Screen> void addStackProvider(Class<T> clazz, EmiStackProvider<T> provider);
+
+	/**
+	 * Adds an EmiStackProvider to every screen.
+	 * Stack providers can inform EMI of EmiIngredients that are located on the screen.
+	 */
+	void addGenericStackProvider(EmiStackProvider<Screen> provider);
+
+	/**
 	 * Adds a default compraison method for a stack key.
 	 * @param key A stack key such as an item or fluid.
 	 * @param comparison A function to mutate the current comprison method.

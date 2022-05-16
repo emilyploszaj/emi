@@ -3,7 +3,6 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -18,9 +17,7 @@ import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -133,9 +130,9 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	public List<TooltipComponent> getTooltip() {
 		if (!stack.isEmpty()) {
 			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
-			String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
-			String mod = EmiUtil.getModName(namespace);
-			list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+			//String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
+			//String mod = EmiUtil.getModName(namespace);
+			//list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
 			if (!getRemainder().isEmpty()) {
 				list.add(new RemainderTooltipComponent(this));
 			}

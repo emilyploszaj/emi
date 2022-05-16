@@ -59,6 +59,9 @@ public class ConfigScreen extends Screen {
 				ConfigValue annot = field.getAnnotation(ConfigValue.class);
 				if (annot != null) {
 					String group = annot.value().split("\\.")[0];
+					if (group.equals("persistent")) {
+						continue;
+					}
 					if (!group.equals(lastGroup)) {
 						lastGroup = group;
 						list.addEntry(new GroupNameWidget(new TranslatableText("config.emi.group." + group)));

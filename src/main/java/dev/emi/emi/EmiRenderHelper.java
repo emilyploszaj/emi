@@ -6,6 +6,9 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmiRenderHelper {
@@ -37,6 +40,12 @@ public class EmiRenderHelper {
 		DrawableHelper.drawTexture(matrices, x + cor,   y + corih, innerWidth, cor,         u + cor,    v + corcen, cen, cor, 256, 256);
 		// BR
 		DrawableHelper.drawTexture(matrices, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
+	}
+
+	public static Text getEmiText() {
+		return new LiteralText("E").setStyle(Style.EMPTY.withColor(0xeb7bfc))
+			.append(new LiteralText("M").setStyle(Style.EMPTY.withColor(0x7bfca2)))
+			.append(new LiteralText("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
 	}
 
 	public static void renderIngredient(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {

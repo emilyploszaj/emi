@@ -55,6 +55,8 @@ public class EmiReloadManager {
 				EmiRecipes.clear();
 				EmiStackList.clear();
 				EmiExclusionAreas.clear();
+				EmiDragDropHandlers.clear();
+				EmiStackProviders.clear();
 				if (clear) {
 					clear = false;
 					break;

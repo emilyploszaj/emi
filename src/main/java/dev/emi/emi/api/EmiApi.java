@@ -9,6 +9,8 @@ import com.google.common.collect.Maps;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -20,6 +22,7 @@ import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;
+import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -29,6 +32,32 @@ import net.minecraft.item.ItemStack;
 
 public class EmiApi {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+
+	public static boolean isCheatMode() {
+		return EmiConfig.cheatMode;
+	}
+
+	/**
+	 * Gets the currently hovered EmiIngredient at the privded screen coordinates,
+	 * or {@link EmiStack#EMPTY} if none.
+	 * @param includeStandard Whether to include the EmiIngredient representation of
+	 * 	standard stacks in slots or otherwise provided to EMI.
+	 */
+	public static EmiIngredient getHoveredStack(int mouseX, int mouseY, boolean includeStandard) {
+		return EmiScreenManager.getHoveredStack(mouseX, mouseY, includeStandard);
+	}
+
+	public static HandledScreen<?> getHandledScreen() {
+		Screen s = client.currentScreen;
+		if (s instanceof HandledScreen<?> hs) {
+			return hs;
+		} else if (s instanceof RecipeScreen rs) {
+			return rs.old;
+		} else if (s instanceof BoMScreen bs) {
+			return bs.old;
+		}
+		return null;
+	}
 
 	public static void displayAllRecipes() {
 		setPages(EmiRecipes.byCategory);
@@ -81,8 +110,10 @@ public class EmiApi {
 		}
 		Screen s = client.currentScreen;
 		if (s instanceof HandledScreen<?> hs) {
+			push();
 			client.setScreen(new BoMScreen(hs));
 		} else if (s instanceof RecipeScreen rs) {
+			push();
 			client.setScreen(new BoMScreen(rs.old));
 		}
 	}
@@ -118,6 +149,16 @@ public class EmiApi {
 		if (stacks != null) {
 			client.setScreen(hs);
 			EmiClient.sendFillRecipe(hs.getScreenHandler().syncId, action.id, stacks);
+		}
+	}
+
+	private static void push() {
+		if (client.currentScreen instanceof RecipeScreen rs) {
+			EmiHistory.push(rs);
+		} else if (client.currentScreen instanceof BoMScreen bs) {
+			EmiHistory.push(bs);
+		} else {
+			EmiHistory.clear();
 		}
 	}
 
@@ -159,12 +200,16 @@ public class EmiApi {
 				client.setScreen(new InventoryScreen(client.player));
 			}
 			if (client.currentScreen instanceof HandledScreen<?> hs) {
-				client.setScreen(new RecipeScreen(hs));
+				push();
+				client.setScreen(new RecipeScreen(hs, recipes));
 			} else if (client.currentScreen instanceof BoMScreen bs) {
-				client.setScreen(new RecipeScreen(bs.old));
-			}
-			if (client.currentScreen instanceof RecipeScreen rs) {
-				rs.setPages(recipes);
+				push();
+				client.setScreen(new RecipeScreen(bs.old, recipes));
+			} else if (client.currentScreen instanceof RecipeScreen rs) {
+				push();
+				RecipeScreen n = new RecipeScreen(rs.old, recipes);
+				client.setScreen(n);
+				n.focusCategory(rs.getFocusedCategory());
 			}
 		}
 	}

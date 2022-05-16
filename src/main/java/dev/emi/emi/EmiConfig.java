@@ -45,13 +45,17 @@ public class EmiConfig {
 	@ConfigValue("ui.move-effects")
 	public static boolean moveEffects = true;
 
+	@Comment("Whether to have the search bar in the center of the screen, instead of to the side.")
+	@ConfigValue("ui.center-search-bar")
+	public static boolean centerSearchBar = true;
+
 	@Comment("The amount of vertical padding to give in the recipe screen.")
 	@ConfigValue("ui.vertical-padding")
 	public static int verticalPadding = 20;
 
 	//@Comment("Maximum columns")
 	//@ConfigValue("ui.max-columns")
-	//public static int maxColumns = 14;
+	//public static int maxColumns = 9;
 
 	@Comment("The unit to display fluids as.")
 	@ConfigValue("ui.fluid-unit")
@@ -106,10 +110,23 @@ public class EmiConfig {
 	@ConfigValue("binds.view-tree")
 	public static EmiBind viewTree = new EmiBind("key.emi.view_tree", InputUtil.UNKNOWN_KEY.getCode());
 
+	@Comment("Returns to the previous page in EMI.")
+	@ConfigValue("binds.back")
+	public static EmiBind back = new EmiBind("key.emi.back", GLFW.GLFW_KEY_BACKSPACE);
+
+	@Comment("Toggles between index and craftable search modes.")
+	@ConfigValue("binds.toggle-craftable")
+	public static EmiBind toggleCraftable = new EmiBind("key.emi.toggle_craftable", InputUtil.UNKNOWN_KEY.getCode());
+
+	@Comment("Toggles craftable filter between all recipes and current workstation.")
+	@ConfigValue("binds.toggle-local-craftable")
+	public static EmiBind toggleLocalCraftable = new EmiBind("key.emi.toggle_local_craftable", InputUtil.UNKNOWN_KEY.getCode());
+
 	@Comment("When on a stack with an associated recipe.\n"
 		+ "Move ingredients for a single result.")
 	@ConfigValue("binds.craft-one")
-	public static EmiBind craftOne = new EmiBind("key.emi.craft_one", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind craftOne = new EmiBind("key.emi.craft_one",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
 	@Comment("When on a stack with an associated recipe.\n"
 		+ "Move ingredients for as many results as possible.")
@@ -134,7 +151,7 @@ public class EmiConfig {
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
 
 	@Comment("Cheat in one of an item.")
-	@ConfigValue("binds.cheat-all")
+	@ConfigValue("binds.cheat-one")
 	public static EmiBind cheatOne = new EmiBind("key.emi.cheat_one", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiUtil.CONTROL_MASK));
 
@@ -147,6 +164,12 @@ public class EmiConfig {
 	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
+
+	@ConfigValue("persistent.craftable")
+	public static boolean craftable = false;
+
+	@ConfigValue("persistent.local-craftable")
+	public static boolean localCraftable = false;
 
 	public static void load() {
 		try {

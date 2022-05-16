@@ -7,16 +7,27 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiPlayerInventory;
 import dev.emi.emi.EmiStackList;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.screen.EmiScreenManager;
+import net.minecraft.client.MinecraftClient;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("([@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
 	private static volatile String query;
 	private static Thread thread;
-	public static volatile List<EmiStack> stacks = EmiStackList.stacks;
+	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
+	public static volatile EmiPlayerInventory inv;
+
+	public static void update() {
+		search(query);
+	}
 
 	public static synchronized void search(String query) {
+		inv = EmiScreenManager.lastPlayerInventory;
 		EmiSearch.query = query;
 		if (thread == null || !thread.isAlive()) {
 			thread = new Thread(new SearchWorker());
@@ -25,7 +36,7 @@ public class EmiSearch {
 		}
 	}
 
-	public static synchronized void apply(List<EmiStack> stacks) {
+	public static synchronized void apply(List<? extends EmiIngredient> stacks) {
 		EmiSearch.stacks = stacks;
 		thread = null;
 	}
@@ -34,7 +45,7 @@ public class EmiSearch {
 
 		@Override
 		public void run() {
-			List<EmiStack> stacks;
+			List<? extends EmiIngredient> stacks;
 			String query;
 			do {
 				query = EmiSearch.query;
@@ -47,13 +58,29 @@ public class EmiSearch {
 					addQuery(q.substring(type.prefix.length()), queries, regexQueries, type.queryConstructor, type.regexQueryConstructor);
 				}
 				queries.addAll(regexQueries);
+				List<? extends EmiIngredient> source;
+				if (EmiConfig.craftable) {
+					if (inv == null) {
+						MinecraftClient client = MinecraftClient.getInstance();
+						inv = new EmiPlayerInventory(client.player);
+					}
+					source = inv.getCraftables();
+				} else {
+					source = EmiStackList.stacks;
+				}
 				if (queries.isEmpty()) {
-					stacks = EmiStackList.stacks;
+					stacks = source;
 					continue;
 				}
-				stacks = EmiStackList.stacks.stream().filter(stack -> {
+				stacks = source.stream().filter(stack -> {
+					List<EmiStack> ess = stack.getEmiStacks();
+					// TODO properly support ingredients?
+					if (ess.size() != 1) {
+						return false;
+					}
+					EmiStack es = ess.get(0);
 					for (Query q : queries) {
-						if (!q.matches(stack)) {
+						if (!q.matches(es)) {
 							return false;
 						}
 					}

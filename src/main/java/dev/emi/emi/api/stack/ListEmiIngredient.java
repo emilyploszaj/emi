@@ -23,6 +23,19 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ListEmiIngredient other) {
+			return other.getEmiStacks().equals(this.getEmiStacks());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return fullList.hashCode();
+	}
+
+	@Override
 	public List<EmiStack> getEmiStacks() {
 		return fullList;
 	}

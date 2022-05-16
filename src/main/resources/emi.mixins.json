@@ -15,7 +15,9 @@
     "CreativeInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
-    "HoeItemMixin"
+    "HoeItemMixin",
+    "ItemStackMixin",
+    "ScreenMixin"
   ],
   "server": [],
   "injectors": {
