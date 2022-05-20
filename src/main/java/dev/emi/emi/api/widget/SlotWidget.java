@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRenderHelper;
@@ -117,6 +118,13 @@ public class SlotWidget extends Widget {
 				} else {
 					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 18, 18, 0, 0, 18, 18, 256, 256);
 				}
+			}
+		}
+		if (EmiClient.availableForCrafting.containsKey(getStack()) && !getStack().isEmpty()) {
+			if (EmiClient.availableForCrafting.get(getStack())) {
+				//DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x4400FF00);
+			} else {
+				DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
 			}
 		}
 		getStack().render(matrices, bounds.x() + off, bounds.y() + off, delta);

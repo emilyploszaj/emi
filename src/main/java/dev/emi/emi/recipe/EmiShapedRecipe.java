@@ -6,6 +6,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.VanillaPlugin;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -105,11 +106,11 @@ public class EmiShapedRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public boolean canFill(HandledScreen<?> hs) {
-		ScreenHandler sh = hs.getScreenHandler();
+	public boolean canCraft(EmiPlayerInventory inv, HandledScreen<?> screen) {
+		ScreenHandler sh = screen.getScreenHandler();
 		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
 			return recipe.getWidth() <= arsh.getCraftingWidth() && recipe.getHeight() <= arsh.getCraftingHeight()
-				&& EmiRecipe.super.canFill(hs);
+				&& EmiRecipe.super.canCraft(inv, screen);
 		}
 		return false;
 	}

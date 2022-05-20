@@ -124,18 +124,6 @@ public class EmiApi {
 		}
 	}
 
-	public static boolean canFill(EmiRecipe recipe) {
-		HandledScreen<?> hs;
-		if (client.currentScreen instanceof RecipeScreen rs) {
-			hs = rs.old;
-		} else if (client.currentScreen instanceof HandledScreen<?> s) {
-			hs = s;
-		} else {
-			return false;
-		}
-		return recipe.canFill(hs);
-	}
-
 	public static void performFill(EmiRecipe recipe, EmiFillAction action, boolean all) {
 		HandledScreen<?> hs;
 		if (client.currentScreen instanceof RecipeScreen rs) {

@@ -5,6 +5,7 @@ import java.util.List;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
@@ -24,7 +25,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 		} else if (client.currentScreen instanceof HandledScreen<?> s) {
 			hs = s;
 		}
-		canFill = hs != null && recipe.canFill(hs);
+		canFill = hs != null && recipe.canCraft(new EmiPlayerInventory(client.player), hs);
 	}
 
 	@Override

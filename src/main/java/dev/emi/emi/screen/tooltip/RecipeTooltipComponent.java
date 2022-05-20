@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.Widget;
@@ -64,9 +65,11 @@ public class RecipeTooltipComponent implements TooltipComponent {
 		view.translate(x + 4, y + 4, 0);
 		RenderSystem.applyModelViewMatrix();
 		recipe.addWidgets(holder);
+		EmiClient.getAvailable(recipe);
 		for (Widget widget : widgets) {
 			widget.render(matrices, -1000, -1000, MinecraftClient.getInstance().getTickDelta());
 		}
+		EmiClient.availableForCrafting.clear();
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
 	}

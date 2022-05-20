@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiConfig;
-import dev.emi.emi.EmiPlayerInventory;
 import dev.emi.emi.EmiStackList;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.EmiScreenManager;

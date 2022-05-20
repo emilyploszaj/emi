@@ -77,12 +77,8 @@ public interface EmiRecipe {
 		return !getInputs().isEmpty() && !getOutputs().isEmpty();
 	}
 
-	default boolean canFill(HandledScreen<?> hs) {
-		List<ItemStack> stacks = EmiRecipeFiller.fillRecipe(this, hs, true);
-		if (stacks != null) {
-			return true;
-		}
-		return false;
+	default boolean canCraft(EmiPlayerInventory inv, HandledScreen<?> screen) {
+		return inv.canCraft(this);
 	}
 
 	default List<ItemStack> getFill(HandledScreen<?> screen, boolean all) {

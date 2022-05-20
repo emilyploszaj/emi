@@ -18,13 +18,13 @@ import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiMain;
-import dev.emi.emi.EmiPlayerInventory;
 import dev.emi.emi.EmiReloadManager;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiStackProviders;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -387,17 +387,15 @@ public class EmiScreenManager {
 		favoriteRight.x = favoriteSpace.tx + favoriteSpace.tw * ENTRY_SIZE - 16;
 		favoriteRight.y = 2;
 
-		ScreenAccessor acc = (ScreenAccessor) screen;
-
-		acc.invokeAddDrawableChild(search);
-		acc.invokeAddDrawableChild(emi);
-		acc.invokeAddDrawableChild(tree);
-		acc.invokeAddDrawableChild(craftableButton);
-		acc.invokeAddDrawableChild(localCraftables);
-		acc.invokeAddDrawableChild(searchLeft);
-		acc.invokeAddDrawableChild(searchRight);
-		acc.invokeAddDrawableChild(favoriteLeft);
-		acc.invokeAddDrawableChild(favoriteRight);
+		screen.addDrawableChild(search);
+		screen.addDrawableChild(emi);
+		screen.addDrawableChild(tree);
+		screen.addDrawableChild(craftableButton);
+		screen.addDrawableChild(localCraftables);
+		screen.addDrawableChild(searchLeft);
+		screen.addDrawableChild(searchRight);
+		screen.addDrawableChild(favoriteLeft);
+		screen.addDrawableChild(favoriteRight);
 	}
 
 	public static void scrollSearch(int delta) {

@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.api.recipe;
 
 import java.util.List;
 import java.util.Map;
@@ -9,9 +9,16 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import org.apache.commons.compress.utils.Lists;
+
+import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiFavorite;
+import dev.emi.emi.EmiMain;
+import dev.emi.emi.EmiRecipeFiller;
+import dev.emi.emi.EmiRecipes;
+import dev.emi.emi.EmiStackList;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiRecipeHandler;
-import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -55,7 +62,7 @@ public class EmiPlayerInventory {
 
 	public Predicate<EmiRecipe> getPredicate() {
 		if (!EmiConfig.localCraftable) {
-			return r -> true;
+			return r -> this.canCraft(r);
 		}
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
 		ScreenHandler screenHandler = screen.getScreenHandler();
@@ -69,7 +76,8 @@ public class EmiPlayerInventory {
 			}
 			Set<EmiRecipeHandler<?>> empty = Set.of();
 			return r -> {
-				return EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), empty).contains(handler);
+				return EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), empty).contains(handler)
+					&& r.canCraft(this, screen);
 			};
 		}
 		return null;
@@ -84,12 +92,35 @@ public class EmiPlayerInventory {
 		for (EmiStack stack : inventory.keySet()) {
 			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), Map.of()).values().stream().flatMap(l -> l.stream()).toList());
 		}
-		return set.stream().filter(r -> predicate.test(r) && this.canCraft(r) && r.getOutputs().size() > 0)
+		return set.stream().filter(r -> predicate.test(r) && r.getOutputs().size() > 0)
 			.map(r -> new EmiFavorite(r.getOutputs().get(0), r))
 			.sorted((a, b) -> Integer.compare(
 				EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
 				EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE)
 			)).collect(Collectors.toList());
+	}
+
+	public List<Boolean> getCraftAvailability(EmiRecipe recipe) {
+		Object2IntMap<EmiStack> used = new Object2IntOpenHashMap<>();
+		List<Boolean> states = Lists.newArrayList();
+		outer:
+		for (EmiIngredient ingredient : recipe.getInputs()) {
+			for (EmiStack stack : ingredient.getEmiStacks()) {
+				int desired = stack.getAmount();
+				if (inventory.containsKey(stack)) {
+					EmiStack identity = inventory.get(stack);
+					int alreadyUsed = used.getOrDefault(identity, 0);
+					int available = identity.getAmount() - alreadyUsed;
+					if (available >= desired) {
+						used.put(identity, desired + alreadyUsed);
+						states.add(true);
+						continue outer;
+					}
+				}
+			}
+			states.add(false);
+		}
+		return states;
 	}
 
 	public boolean canCraft(EmiRecipe recipe) {
