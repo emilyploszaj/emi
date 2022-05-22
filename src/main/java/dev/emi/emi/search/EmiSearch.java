@@ -45,49 +45,54 @@ public class EmiSearch {
 
 		@Override
 		public void run() {
-			List<? extends EmiIngredient> stacks;
-			String query;
-			do {
-				query = EmiSearch.query;
-				List<Query> queries = Lists.newArrayList();
-				List<Query> regexQueries = Lists.newArrayList();
-				Matcher matcher = TOKENS.matcher(query);
-				while (matcher.find()) {
-					String q = matcher.group();
-					QueryType type = QueryType.fromString(q);
-					addQuery(q.substring(type.prefix.length()), queries, regexQueries, type.queryConstructor, type.regexQueryConstructor);
-				}
-				queries.addAll(regexQueries);
-				List<? extends EmiIngredient> source;
-				if (EmiConfig.craftable) {
-					if (inv == null) {
-						MinecraftClient client = MinecraftClient.getInstance();
-						inv = new EmiPlayerInventory(client.player);
+			try {
+				List<? extends EmiIngredient> stacks;
+				String query;
+				do {
+					query = EmiSearch.query;
+					List<Query> queries = Lists.newArrayList();
+					List<Query> regexQueries = Lists.newArrayList();
+					Matcher matcher = TOKENS.matcher(query);
+					while (matcher.find()) {
+						String q = matcher.group();
+						QueryType type = QueryType.fromString(q);
+						addQuery(q.substring(type.prefix.length()), queries, regexQueries, type.queryConstructor, type.regexQueryConstructor);
 					}
-					source = inv.getCraftables();
-				} else {
-					source = EmiStackList.stacks;
-				}
-				if (queries.isEmpty()) {
-					stacks = source;
-					continue;
-				}
-				stacks = source.stream().filter(stack -> {
-					List<EmiStack> ess = stack.getEmiStacks();
-					// TODO properly support ingredients?
-					if (ess.size() != 1) {
-						return false;
+					queries.addAll(regexQueries);
+					List<? extends EmiIngredient> source;
+					if (EmiConfig.craftable) {
+						if (inv == null) {
+							MinecraftClient client = MinecraftClient.getInstance();
+							inv = new EmiPlayerInventory(client.player);
+						}
+						source = inv.getCraftables();
+					} else {
+						source = EmiStackList.stacks;
 					}
-					EmiStack es = ess.get(0);
-					for (Query q : queries) {
-						if (!q.matches(es)) {
+					if (queries.isEmpty()) {
+						stacks = source;
+						continue;
+					}
+					stacks = source.stream().filter(stack -> {
+						List<EmiStack> ess = stack.getEmiStacks();
+						// TODO properly support ingredients?
+						if (ess.size() != 1) {
 							return false;
 						}
-					}
-					return true;
-				}).toList();
-			} while (query != EmiSearch.query);
-			apply(stacks);
+						EmiStack es = ess.get(0);
+						for (Query q : queries) {
+							if (!q.matches(es)) {
+								return false;
+							}
+						}
+						return true;
+					}).toList();
+				} while (query != EmiSearch.query);
+				apply(stacks);
+			} catch (Exception e) {
+				System.err.println("[emi] Error when attempting to search:");
+				e.printStackTrace();
+			}
 		}
 
 		private static void addQuery(String s, List<Query> queries, List<Query> regexQueries,

@@ -47,7 +47,14 @@ public class EmiStackList {
 		for (int i = 0; i < Registry.FLUID.size(); i++) {
 			Fluid fluid = Registry.FLUID.get(i);
 			if (fluid.isStill(fluid.getDefaultState())) {
-				stacks.add(new FluidEmiStack(FluidVariant.of(fluid)));
+				EmiStack fs = new FluidEmiStack(FluidVariant.of(fluid));
+				// Fix for Create fluids that NPE
+				try {
+					fs.getName();
+					fs.getTooltip();
+					stacks.add(fs);
+				} catch (Exception e) {
+				}
 			}
 		}
 		
