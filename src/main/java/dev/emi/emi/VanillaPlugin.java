@@ -12,6 +12,7 @@ import com.mojang.datafixers.util.Pair;
 
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -19,9 +20,9 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
+import dev.emi.emi.recipe.EmiAnvilRecipe;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.recipe.EmiCookingRecipe;
-import dev.emi.emi.recipe.EmiCraftingRecipe;
 import dev.emi.emi.recipe.EmiShapedRecipe;
 import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
@@ -47,12 +48,14 @@ import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.HoneycombItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
+import net.minecraft.item.ToolItem;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -74,37 +77,21 @@ import net.minecraft.recipe.SmokingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
+import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntryList;
 
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.*;
+
 public class VanillaPlugin implements EmiPlugin {
-	public static EmiRecipeCategory CRAFTING = new EmiRecipeCategory(new Identifier("minecraft:crafting"),
-		EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240));
-	public static EmiRecipeCategory SMELTING = new EmiRecipeCategory(new Identifier("minecraft:smelting"),
-		EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240));
-	public static EmiRecipeCategory BLASTING = new EmiRecipeCategory(new Identifier("minecraft:blasting"),
-		EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240));
-	public static EmiRecipeCategory SMOKING = new EmiRecipeCategory(new Identifier("minecraft:smoking"),
-		EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240));
-	public static EmiRecipeCategory CAMPFIRE_COOKING = new EmiRecipeCategory(new Identifier("minecraft:campfire_cooking"),
-		EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240));
-	public static EmiRecipeCategory STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
-		EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240));
-	public static EmiRecipeCategory SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
-		EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224));
-	public static EmiRecipeCategory BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
-		EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224));
-	public static EmiRecipeCategory WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("minecraft:world_interaction"),
-		EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224));
-	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("minecraft:tag"),
+	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
 		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208));
 
-	// composting, fuel, anvil repairing
+	// composting, fuel
 	
-	// Synthetic
 	public static EmiRecipeCategory INGREDIENT = new EmiRecipeCategory(new Identifier("emi:ingredient"),
 		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
 	public static EmiRecipeCategory RESOLUTION = new EmiRecipeCategory(new Identifier("emi:resolution"),
@@ -112,6 +99,26 @@ public class VanillaPlugin implements EmiPlugin {
 
 	@Override
 	public void register(EmiRegistry registry) {
+		CRAFTING = new EmiRecipeCategory(new Identifier("minecraft:crafting"),
+			EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240));
+		SMELTING = new EmiRecipeCategory(new Identifier("minecraft:smelting"),
+			EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240));
+		BLASTING = new EmiRecipeCategory(new Identifier("minecraft:blasting"),
+			EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240));
+		SMOKING = new EmiRecipeCategory(new Identifier("minecraft:smoking"),
+			EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240));
+		CAMPFIRE_COOKING = new EmiRecipeCategory(new Identifier("minecraft:campfire_cooking"),
+			EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240));
+		STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
+			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240));
+		SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
+			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224));
+		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
+			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224));
+		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
+			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224));
+		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
+			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224));
 		registry.addCategory(CRAFTING);
 		registry.addCategory(SMELTING);
 		registry.addCategory(BLASTING);
@@ -119,6 +126,7 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addCategory(CAMPFIRE_COOKING);
 		registry.addCategory(STONECUTTING);
 		registry.addCategory(SMITHING);
+		registry.addCategory(ANVIL_REPAIRING);
 		registry.addCategory(BREWING);
 		registry.addCategory(WORLD_INTERACTION);
 		registry.addCategory(TAG);
@@ -133,6 +141,9 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addWorkstation(CAMPFIRE_COOKING, EmiStack.of(Items.SOUL_CAMPFIRE));
 		registry.addWorkstation(STONECUTTING, EmiStack.of(Items.STONECUTTER));
 		registry.addWorkstation(SMITHING, EmiStack.of(Items.SMITHING_TABLE));
+		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.ANVIL));
+		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.CHIPPED_ANVIL));
+		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.DAMAGED_ANVIL));
 		registry.addWorkstation(BREWING, EmiStack.of(Items.BREWING_STAND));
 
 		registry.addRecipeHandler(CRAFTING, EmiMain.CRAFTING);
@@ -245,6 +256,16 @@ public class VanillaPlugin implements EmiPlugin {
 		for (StonecuttingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.STONECUTTING)) {
 			registry.addRecipe(new EmiStonecuttingRecipe(recipe));
 		}
+
+		for (Item i : Registry.ITEM) {
+			if (i instanceof ArmorItem ai) {
+				registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
+			} else if (i instanceof ToolItem ti) {
+				registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
+			}
+		}
+		registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
+		registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {

@@ -5,6 +5,7 @@ import java.util.List;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
 import dev.emi.emi.screen.widget.ListWidget.Entry;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -13,11 +14,13 @@ import net.minecraft.text.Text;
 
 public class EnumWidget extends Entry {
 	private final Text name;
+	private final Drawable tooltip;
 	private final Mutator<EmiConfig.ConfigEnum> mutator;
 	private ButtonWidget button;
 
-	public EnumWidget(Text name, Mutator<EmiConfig.ConfigEnum> mutator) {
+	public EnumWidget(Text name, Drawable tooltip, Mutator<EmiConfig.ConfigEnum> mutator) {
 		this.name = name;
+		this.tooltip = tooltip;
 		this.mutator = mutator;
 
 		button = new ButtonWidget(0, 0, 150, 20, getText(), button -> {
@@ -39,6 +42,11 @@ public class EnumWidget extends Entry {
 		button.x = x + width - button.getWidth();
 		button.y = y;
 		button.render(matrices, mouseX, mouseY, delta);
+	}
+
+	@Override
+	public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		tooltip.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Override

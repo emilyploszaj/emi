@@ -6,6 +6,7 @@
     "accessor.ScreenHandlerAccessor"
   ],
   "client": [
+    "accessor.CraftingResultSlotAccessor",
     "accessor.HandledScreenAccessor",
     "accessor.HoeItemAccessor",
     "accessor.ItemRendererAccessor",

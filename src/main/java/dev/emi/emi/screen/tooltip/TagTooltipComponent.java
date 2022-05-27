@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -24,7 +25,9 @@ public class TagTooltipComponent implements TooltipComponent {
 	}
 
 	public int getStackWidth() {
-		if (stacks.size() > 16) {
+		if (stacks.size() < 4) {
+			return stacks.size();
+		} else if (stacks.size() > 16) {
 			return 8;
 		} else {
 			return 4;
@@ -49,7 +52,7 @@ public class TagTooltipComponent implements TooltipComponent {
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
 		int sw = getStackWidth();
 		for (int i = 0; i < stacks.size() && i < MAX_DISPLAYED; i++) {
-			stacks.get(i).renderIcon(matrices, x + i % sw * 18, y + i / sw * 18, MinecraftClient.getInstance().getTickDelta());
+			stacks.get(i).render(matrices, x + i % sw * 18, y + i / sw * 18, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
 		}
 		if (stacks.size() > MAX_DISPLAYED) {
 			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);

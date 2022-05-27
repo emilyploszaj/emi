@@ -77,6 +77,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 					styles.add(new Pair<Integer, Style>(start, Style.EMPTY.withFormatting(Formatting.WHITE)));
 				}
 				String group = matcher.group();
+				if (group.startsWith("-")) {
+					styles.add(new Pair<Integer, Style>(start + 1, Style.EMPTY.withFormatting(Formatting.RED)));
+					start++;
+					group = group.substring(1);
+				}
 				QueryType type = QueryType.fromString(group);
 				int subStart = type.prefix.length();
 				if (group.length() > 1 + subStart && group.substring(subStart).startsWith("/") && group.endsWith("/")) {
@@ -113,9 +118,10 @@ public class EmiSearchWidget extends TextFieldWidget {
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		boolean b = super.mouseClicked(mouseX, mouseY, button);
+		boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
 		if (this.isFocused() && button == 1) {
 			this.setText("");
+			this.setTextFieldFocused(true);
 		}
 		return b;
 	}

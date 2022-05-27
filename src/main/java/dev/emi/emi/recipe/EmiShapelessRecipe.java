@@ -2,6 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.entity.player.PlayerEntity;

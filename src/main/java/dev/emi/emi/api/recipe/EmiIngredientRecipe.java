@@ -22,7 +22,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(new ListEmiIngredient(getStacks()));
+		return List.of(new ListEmiIngredient(getStacks(), 1));
 	}
 
 	@Override

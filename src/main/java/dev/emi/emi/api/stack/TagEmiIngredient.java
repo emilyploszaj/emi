@@ -30,21 +30,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tag.TagKey;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
 	public final TagKey<Item> key;
+	private final int amount;
 
-	public TagEmiIngredient(TagKey<Item> key) {
-		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList());
+	public TagEmiIngredient(TagKey<Item> key, int amount) {
+		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
 	}
 
-	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks) {
+	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks, int amount) {
 		this.id = key.id();
 		this.key = key;
 		this.stacks = stacks;
+		this.amount = amount;
 	}
 
 	@Override
@@ -63,49 +66,67 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta) {
+	public int getAmount() {
+		return amount;
+	}
+
+	@Override
+	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if (!EmiClient.MODELED_TAGS.contains(id)) {
-			if (stacks.size() > 0) {
-				stacks.get(0).renderIcon(matrices, x, y, delta);
-			}
-		} else {
-			BakedModel model = client.getBakedModelManager()
-				.getModel(new ModelIdentifier("emi:tags/" + id.getNamespace() + "/" + id.getPath() + "#inventory"));
+
+		if ((flags & RENDER_ICON) != 0) {
+			if (!EmiClient.MODELED_TAGS.contains(id)) {
+				if (stacks.size() > 0) {
+					stacks.get(0).render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
+				}
+			} else {
+				BakedModel model = client.getBakedModelManager()
+					.getModel(new ModelIdentifier("emi:tags/" + id.getNamespace() + "/" + id.getPath() + "#inventory"));
+					
+				MatrixStack vs = RenderSystem.getModelViewStack();
+				vs.push();
+				vs.translate(x, y, 100.0f);
+				vs.translate(8.0, 8.0, 0.0);
+				vs.scale(1.0f, -1.0f, 1.0f);
+				vs.scale(16.0f, 16.0f, 16.0f);
+				RenderSystem.applyModelViewMatrix();
 				
-			MatrixStack vs = RenderSystem.getModelViewStack();
-			vs.push();
-			vs.translate(x, y, 100.0f);
-			vs.translate(8.0, 8.0, 0.0);
-			vs.scale(1.0f, -1.0f, 1.0f);
-			vs.scale(16.0f, 16.0f, 16.0f);
-			RenderSystem.applyModelViewMatrix();
-			
-			MatrixStack ms = new MatrixStack();
-			model.getTransformation().getTransformation(ModelTransformation.Mode.GUI).apply(false, ms);
-			ms.translate(-0.5, -0.5, -0.5);
-			
-			if (!model.isSideLit()) {
-				DiffuseLighting.disableGuiDepthLighting();
-			}
-			VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
-			((ItemRendererAccessor) client.getItemRenderer())
-				.invokeRenderBakedItemModel(model,
-					ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, ms, 
-					ItemRenderer.getDirectItemGlintConsumer(immediate,
-					TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
-			immediate.draw();
+				MatrixStack ms = new MatrixStack();
+				model.getTransformation().getTransformation(ModelTransformation.Mode.GUI).apply(false, ms);
+				ms.translate(-0.5, -0.5, -0.5);
+				
+				if (!model.isSideLit()) {
+					DiffuseLighting.disableGuiDepthLighting();
+				}
+				VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
+				((ItemRendererAccessor) client.getItemRenderer())
+					.invokeRenderBakedItemModel(model,
+						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, ms, 
+						ItemRenderer.getDirectItemGlintConsumer(immediate,
+						TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
+				immediate.draw();
 
-			if (!model.isSideLit()) {
-				DiffuseLighting.enableGuiDepthLighting();
-			}
+				if (!model.isSideLit()) {
+					DiffuseLighting.enableGuiDepthLighting();
+				}
 
-			vs.pop();
-			RenderSystem.applyModelViewMatrix();
+				vs.pop();
+				RenderSystem.applyModelViewMatrix();
+			}
 		}
-
-		EmiRenderHelper.renderTag(this, matrices, x, y);
-		EmiRenderHelper.renderRemainder(this, matrices, x, y);
+		if ((flags & RENDER_AMOUNT) != 0) {
+			String count = "";
+			if (amount != 1) {
+				count += amount;
+			}
+			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stacks.get(0).getItemStack(), x, y, count);
+		}
+		if ((flags & RENDER_INGREDIENT) != 0) {
+			EmiRenderHelper.renderTag(this, matrices, x, y);
+		}
+		if ((flags & RENDER_REMAINDER) != 0) {
+			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+		}
 	}
 
 	@Override
@@ -117,6 +138,8 @@ public class TagEmiIngredient implements EmiIngredient {
 		} else {
 			list.add(TooltipComponent.of(new LiteralText("#" + id).asOrderedText()));
 		}
+		String mod = EmiUtil.getModName(id.getNamespace());
+		list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
 			if (!stack.getRemainder().isEmpty()) {

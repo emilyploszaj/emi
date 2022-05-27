@@ -76,19 +76,21 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public void renderIcon(MatrixStack matrices, int x, int y, float delta) {
+	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		client.getItemRenderer().renderInGui(stack, x, y);
-		String count = "";
-		if (amount != 1) {
-			count += amount;
+		if ((flags & RENDER_ICON) != 0) {
+			client.getItemRenderer().renderInGui(stack, x, y);
 		}
-		client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stack, x, y, count);
-	}
-
-	@Override
-	public void renderOverlay(MatrixStack matrices, int x, int y, float delta) {
-		EmiRenderHelper.renderRemainder(this, matrices, x, y);
+		if ((flags & RENDER_AMOUNT) != 0) {
+			String count = "";
+			if (amount != 1) {
+				count += amount;
+			}
+			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stack, x, y, count);
+		}
+		if ((flags & RENDER_REMAINDER) != 0) {
+			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+		}
 	}
 	
 	@Override

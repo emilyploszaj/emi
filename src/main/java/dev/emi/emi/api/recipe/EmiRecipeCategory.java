@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
@@ -21,7 +22,7 @@ public class EmiRecipeCategory {
 		this(id, new Renderer() {
 
 			public void render(MatrixStack matrices, int x, int y, float delta) {
-				icon.renderIcon(matrices, x, y, delta);
+				icon.render(matrices, x, y, delta, EmiIngredient.RENDER_ICON);
 			}
 		});
 	}
@@ -34,7 +35,7 @@ public class EmiRecipeCategory {
 		this(id, new Renderer() {
 
 			public void render(MatrixStack matrices, int x, int y, float delta) {
-				icon.renderIcon(matrices, x, y, delta);
+				icon.render(matrices, x, y, delta, EmiIngredient.RENDER_ICON);
 			}
 		}, simplified);
 	}

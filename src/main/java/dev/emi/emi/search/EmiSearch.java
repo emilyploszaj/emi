@@ -16,9 +16,9 @@ import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
 
 public class EmiSearch {
-	public static final Pattern TOKENS = Pattern.compile("([@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
+	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
 	private static volatile String query;
-	private static Thread thread;
+	public static Thread thread;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
 
@@ -51,14 +51,18 @@ public class EmiSearch {
 				do {
 					query = EmiSearch.query;
 					List<Query> queries = Lists.newArrayList();
-					List<Query> regexQueries = Lists.newArrayList();
+					List<Query> negatedQuerries = Lists.newArrayList();
 					Matcher matcher = TOKENS.matcher(query);
 					while (matcher.find()) {
 						String q = matcher.group();
+						boolean negated = q.startsWith("-");
+						if (negated) {
+							q = q.substring(1);
+						}
 						QueryType type = QueryType.fromString(q);
-						addQuery(q.substring(type.prefix.length()), queries, regexQueries, type.queryConstructor, type.regexQueryConstructor);
+						addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries,
+							type.queryConstructor, type.regexQueryConstructor);
 					}
-					queries.addAll(regexQueries);
 					List<? extends EmiIngredient> source;
 					if (EmiConfig.craftable) {
 						if (inv == null) {
@@ -69,7 +73,7 @@ public class EmiSearch {
 					} else {
 						source = EmiStackList.stacks;
 					}
-					if (queries.isEmpty()) {
+					if (queries.isEmpty() && negatedQuerries.isEmpty()) {
 						stacks = source;
 						continue;
 					}
@@ -80,8 +84,15 @@ public class EmiSearch {
 							return false;
 						}
 						EmiStack es = ess.get(0);
-						for (Query q : queries) {
+						for (int i = 0; i < queries.size(); i++) {
+							Query q = queries.get(i);
 							if (!q.matches(es)) {
+								return false;
+							}
+						}
+						for (int i = 0; i < negatedQuerries.size(); i++) {
+							Query q = negatedQuerries.get(i);
+							if (q.matches(es)) {
 								return false;
 							}
 						}
@@ -95,10 +106,9 @@ public class EmiSearch {
 			}
 		}
 
-		private static void addQuery(String s, List<Query> queries, List<Query> regexQueries,
-				Function<String, Query> normal, Function<String, Query> regex) {
+		private static void addQuery(String s, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
 			if (s.length() > 1 && s.startsWith("/") && s.endsWith("/")) {
-				regexQueries.add(regex.apply(s.substring(1, s.length() - 1)));
+				queries.add(regex.apply(s.substring(1, s.length() - 1)));
 			} else {
 				queries.add(normal.apply(s));
 			}

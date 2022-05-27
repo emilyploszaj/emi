@@ -53,8 +53,8 @@ public class RemainderTooltipComponent implements TooltipComponent {
 		RenderSystem.applyModelViewMatrix();
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
-			remainder.inputs.get(0).renderIcon(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
-			remainder.remainder.renderIcon(matrices, x + 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta());
+			remainder.inputs.get(0).render(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
+			remainder.remainder.render(matrices, x + 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
 		}
 		view.pop();
 		RenderSystem.applyModelViewMatrix();

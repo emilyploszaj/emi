@@ -95,6 +95,9 @@ public class EmiUtil {
 	}
 
 	public static String getModName(String namespace) {
+		if (namespace.equals("c")) {
+			return "Common";
+		}
 		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(namespace);
 		if (container.isPresent()) {
 			return container.get().getMetadata().getName();

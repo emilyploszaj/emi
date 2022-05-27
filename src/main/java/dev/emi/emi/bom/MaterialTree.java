@@ -52,32 +52,63 @@ public class MaterialTree {
 		}
 	}
 
-	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiRecipe, FlatMaterialCost> remainders, int amount, MaterialNode node) {
-		EmiRecipe recipe = node.recipe;
-		if (remainders.containsKey(recipe)) {
-			FlatMaterialCost remainder = remainders.get(recipe);
-			if (remainder.amount >= amount) {
-				remainder.amount -= amount;
-				if (remainder.amount == 0) {
-					remainders.remove(recipe);
-				}
-				return;
-			} else {
-				amount -= remainder.amount;
-				remainders.remove(recipe);
+	public static boolean isCatalyst(EmiIngredient ing) {
+		if (ing.getEmiStacks().size() == 1) {
+			EmiStack stack = ing.getEmiStacks().get(0);
+			if (stack.equals(stack.getRemainder())) {
+				return true;
 			}
 		}
-		
-		if (recipe != null) {
-			int minBatches = (int) Math.ceil(amount / (float) node.divisor);
-			int remainder = minBatches * node.divisor - amount;
-			if (remainder > 0) {
-				if (remainders.containsKey(recipe)) {
-					remainders.get(recipe).amount += remainder;
-				} else {
-					remainders.put(recipe, new FlatMaterialCost(node.ingredient, remainder));
-				}
+		return false;
+	}
+
+	private void addRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, EmiIngredient ingredient, int amount) {
+		if (amount > 0) {
+			if (remainders.containsKey(recipe)) {
+				remainders.get(recipe).amount += amount;
+			} else {
+				remainders.put(recipe, new FlatMaterialCost(ingredient, amount));
 			}
+		}
+	}
+
+	private int getRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, int desired, boolean catalyst) {
+		if (remainders.containsKey(recipe)) {
+			FlatMaterialCost remainder = remainders.get(recipe);
+			if (remainder.amount >= desired) {
+				remainder.amount -= desired;
+				if (remainder.amount == 0 && !catalyst) {
+					remainders.remove(recipe);
+				}
+				return desired;
+			} else {
+				if (!catalyst) {
+					remainders.remove(recipe);
+				}
+				return remainder.amount;
+			}
+		}
+		return 0;
+	}
+
+	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiRecipe, FlatMaterialCost> remainders, int amount, MaterialNode node) {
+		boolean catalyst = isCatalyst(node.ingredient);
+		if (catalyst) {
+			amount = node.amount;
+		}
+		EmiRecipe recipe = node.recipe;
+		amount -= getRemainder(remainders, recipe, amount, catalyst);
+		if (amount == 0) {
+			return;
+		}
+		
+		if (recipe != null && node.state != FoldState.COLLAPSED) {
+			int minBatches = (int) Math.ceil(amount / (float) node.divisor);
+			int remainder = minBatches * node.divisor;
+			if (!catalyst) {
+				remainder -= amount;
+			}
+			addRemainder(remainders, recipe, node.ingredient, remainder);
 
 			for (MaterialNode n : node.children) {
 				calculateFlatCost(costs, remainders, minBatches * n.amount, n);

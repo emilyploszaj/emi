@@ -4,6 +4,7 @@ import java.util.List;
 
 import dev.emi.emi.screen.ConfigScreen.Mutator;
 import dev.emi.emi.screen.widget.ListWidget.Entry;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -14,11 +15,13 @@ import net.minecraft.util.Formatting;
 
 public class BooleanWidget extends Entry {
 	private final Text name;
+	private final Drawable tooltip;
 	private final Mutator<Boolean> mutator;
 	private ButtonWidget button;
 
-	public BooleanWidget(Text name, Mutator<Boolean> mutator) {
+	public BooleanWidget(Text name, Drawable tooltip, Mutator<Boolean> mutator) {
 		this.name = name;
+		this.tooltip = tooltip;
 		this.mutator = mutator;
 
 		button = new ButtonWidget(0, 0, 150, 20, getText(), button -> {
@@ -44,6 +47,11 @@ public class BooleanWidget extends Entry {
 		button.x = x + width - button.getWidth();
 		button.y = y;
 		button.render(matrices, mouseX, mouseY, delta);
+	}
+
+	@Override
+	public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		tooltip.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Override

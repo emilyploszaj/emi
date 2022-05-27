@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -29,11 +29,16 @@ public class EmiWorldRecipe implements EmiRecipe {
 		this.catalyst = catalyst;
 		this.result = result;
 		this.id = id;
+		if (isCatalyst) {
+			for (EmiStack stack : catalyst.getEmiStacks()) {
+				stack.setRemainder(stack);
+			}
+		}
 	}
 
 	@Override
 	public EmiRecipeCategory getCategory() {
-		return VanillaPlugin.WORLD_INTERACTION;
+		return VanillaEmiRecipeCategories.WORLD_INTERACTION;
 	}
 
 	@Override
@@ -43,20 +48,7 @@ public class EmiWorldRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		if (isCatalyst) {
-			return List.of(input);
-		} else {
-			return List.of(input, catalyst);
-		}
-	}
-
-	@Override
-	public List<EmiIngredient> getCatalysts() {
-		if (isCatalyst) {
-			return List.of(catalyst);
-		} else {
-			return List.of();
-		}
+		return List.of(input, catalyst);
 	}
 
 	@Override

@@ -23,7 +23,7 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 	public EmiTagRecipe(TagKey<Item> key, List<EmiStack> stacks) {
 		this.key = key;
 		this.stacks = stacks;
-		this.ingredient = new TagEmiIngredient(key, stacks);
+		this.ingredient = new TagEmiIngredient(key, stacks, 1);
 	}
 
 	@Override

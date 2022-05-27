@@ -4,11 +4,11 @@ import java.util.List;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
-import dev.emi.emi.recipe.EmiCraftingRecipe;
 import net.minecraft.util.Identifier;
 
 public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {

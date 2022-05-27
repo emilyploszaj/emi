@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -21,9 +22,11 @@ public class ItemStackMixin {
 	
 	@Inject(at = @At("RETURN"), method = "getTooltip")
 	private void getTooltip(PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> info) {
-		List<Text> text = info.getReturnValue();
-		String namespace = Registry.ITEM.getId(((ItemStack) (Object) this).getItem()).getNamespace();
-		String mod = EmiUtil.getModName(namespace);
-		text.add(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC));
+		if (Thread.currentThread() != EmiSearch.thread) {
+			List<Text> text = info.getReturnValue();
+			String namespace = Registry.ITEM.getId(((ItemStack) (Object) this).getItem()).getNamespace();
+			String mod = EmiUtil.getModName(namespace);
+			text.add(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC));
+		}
 	}
 }

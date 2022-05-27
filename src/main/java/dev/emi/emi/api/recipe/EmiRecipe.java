@@ -24,23 +24,9 @@ public interface EmiRecipe {
 	/**
 	 * @return A list of ingredients required for the recipe.
 	 * 	Inputs will consider this recipe a use when exploring recipes.
-	 * 	In the recipe tree, these ingredients will be considered to be consumed per craft.
 	 * 
-	 * @see {@link EmiRecipe#getCatalysts()} for ingredients that are required that are not consumed.
 	 */
 	List<EmiIngredient> getInputs();
-
-	/**
-	 * @return A list of ingredients required for the recipe.
-	 * 	Catalysts will consider this recipe a use when exploring recipes.
-	 * 	In the recipe tree, these ingredients will be considered to remain per craft, and not be consumed.
-	 * 	The workstation a recipe is performed in should not be considered a catalyst under normal circumstances.
-	 * 
-	 * @see {@link EmiRecipe#getInputs()} for ingredients that are required that are consumed.
-	 */
-	default List<EmiIngredient> getCatalysts() {
-		return List.of();
-	}
 
 	/**
 	 * @return A list of stacks that are created after a craft.

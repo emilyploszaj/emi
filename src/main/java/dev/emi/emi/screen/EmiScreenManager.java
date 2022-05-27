@@ -25,9 +25,9 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
-import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
@@ -179,19 +179,17 @@ public class EmiScreenManager {
 		}
 	}
 
-	public static EmiIngredient getHoveredStack(int mouseX, int mouseY, boolean checkHandled) {
-		if (checkHandled) {
-			EmiIngredient stack = EmiStackProviders.getStackAt(client.currentScreen, mouseX, mouseY);
-			if (!stack.isEmpty()) {
-				return stack;
-			}
+	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick) {
+		EmiStackInteraction stack = EmiStackProviders.getStackAt(client.currentScreen, mouseX, mouseY, notClick);
+		if (!stack.isEmpty()) {
+			return stack;
 		}
 		if (searchSpace.contains(mouseX, mouseY) && mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
 			int x = (mouseX - searchSpace.tx) / ENTRY_SIZE;
 			int y = (mouseY - searchSpace.ty) / ENTRY_SIZE;
 			int n = searchSpace.getRawOffset(x, y);
 			if (n != -1 && (n = n + searchSpace.pageSize * searchPage) < stacks.size()) {
-				return stacks.get(n);
+				return of(stacks.get(n));
 			}
 		}
 		if (favoriteSpace.contains(mouseX, mouseY) && mouseX >= favoriteSpace.tx && mouseY >= favoriteSpace.ty) {
@@ -199,10 +197,17 @@ public class EmiScreenManager {
 			int y = (mouseY - favoriteSpace.ty) / ENTRY_SIZE;
 			int n = favoriteSpace.getRawOffset(x, y);
 			if (n != -1 && (n = n + favoriteSpace.pageSize * favoritePage) < EmiFavorites.favorites.size()) {
-				return EmiFavorites.favorites.get(n);
+				return of(EmiFavorites.favorites.get(n));
 			}
 		}
-		return EmiStack.EMPTY;
+		return EmiStackInteraction.EMPTY;
+	}
+
+	private static EmiStackInteraction of(EmiIngredient stack) {
+		if (stack instanceof EmiFavorite fav) {
+			return new EmiStackInteraction(stack, fav.getRecipe(), true);
+		}
+		return new EmiStackInteraction(stack);
 	}
 	
 	public static void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -300,7 +305,7 @@ public class EmiScreenManager {
 				view.push();
 				view.translate(0, 0, 200);
 				RenderSystem.applyModelViewMatrix();
-				draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta);
+				draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 				view.pop();
 				RenderSystem.applyModelViewMatrix();
 			} else {
@@ -309,7 +314,7 @@ public class EmiScreenManager {
 				view.push();
 				view.translate(0, 0, 200);
 				RenderSystem.applyModelViewMatrix();
-				EmiIngredient hov = getHoveredStack(mouseX, mouseY, false);
+				EmiIngredient hov = getHoveredStack(mouseX, mouseY, false).getStack();
 				if (mouseX >= searchSpace.xMin) {
 					EmiClient.shiftTooltipsLeft = true;
 				}
@@ -455,17 +460,7 @@ public class EmiScreenManager {
 			return false;
 		}
 		recalculate();
-		if (EmiConfig.cheatMode) {
-			if (client.currentScreen instanceof HandledScreen<?> handled) {
-				ItemStack cursor = handled.getScreenHandler().getCursorStack();
-				if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
-					handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
-					ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
-					return true;
-				}
-			}
-		}
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false);
+		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
 			return true;
@@ -479,27 +474,40 @@ public class EmiScreenManager {
 				return false;
 			}
 			recalculate();
-			if (!draggedStack.isEmpty()) {
-				int mx = (int) mouseX;
-				int my = (int) mouseY;
-				if (favoriteSpace.contains(mx, my)) {
-					int index = favoriteSpace.getClosestEdge(mx, my);
-					EmiFavorites.addFavoriteAt(draggedStack, index + favoriteSpace.pageSize * favoritePage);
-					favoriteBatcher.repopulate();
-					return true;
+			if (!pressedStack.isEmpty()) {
+				if (EmiConfig.cheatMode) {
+					if (client.currentScreen instanceof HandledScreen<?> handled) {
+						ItemStack cursor = handled.getScreenHandler().getCursorStack();
+						if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
+							handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
+							ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
+							// Returning false here makes the handled screen do something and removes a bug, oh well.
+							return false;
+						}
+					}
+				}
+				if (!draggedStack.isEmpty()) {
+					int mx = (int) mouseX;
+					int my = (int) mouseY;
+					if (favoriteSpace.contains(mx, my)) {
+						int index = favoriteSpace.getClosestEdge(mx, my);
+						EmiFavorites.addFavoriteAt(draggedStack, index + favoriteSpace.pageSize * favoritePage);
+						favoriteBatcher.repopulate();
+						return true;
+					} else {
+						if (EmiDragDropHandlers.dropStack(client.currentScreen, draggedStack, mx, my)) {
+							return true;
+						}
+					}
 				} else {
-					if (EmiDragDropHandlers.dropStack(client.currentScreen, draggedStack, mx, my)) {
+					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;
 					}
 				}
-			} else {
-				EmiIngredient hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
-				if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
+				if (genericInteraction(bind -> bind.matchesMouse(button))) {
 					return true;
 				}
-			}
-			if (genericInteraction(bind -> bind.matchesMouse(button))) {
-				return true;
 			}
 			return false;
 		} finally {
@@ -513,9 +521,14 @@ public class EmiScreenManager {
 			return false;
 		}
 		if (draggedStack.isEmpty()) {
+			if (client.currentScreen instanceof HandledScreen<?> handled) {
+				if (!handled.getScreenHandler().getCursorStack().isEmpty()) {
+					return false;
+				}
+			}
 			recalculate();
-			EmiIngredient hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
-			if (hovered != pressedStack) {
+			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+			if (hovered.getStack() != pressedStack) {
 				draggedStack = pressedStack;
 				pressedStack = EmiStack.EMPTY;
 			}
@@ -583,11 +596,8 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean stackInteraction(EmiIngredient ingredient, Function<EmiBind, Boolean> function) {
-		return stackInteraction(ingredient, null, function);
-	}
-
-	public static boolean stackInteraction(EmiIngredient ingredient, EmiRecipe recipe, Function<EmiBind, Boolean> function) {
+	public static boolean stackInteraction(EmiStackInteraction stack, Function<EmiBind, Boolean> function) {
+		EmiIngredient ingredient = stack.getStack();
 		if (!ingredient.isEmpty()) {
 			if (ingredient instanceof EmiFavorite fav && fav.getRecipe() != null) {
 				if (function.apply(EmiConfig.craftAllToInventory)) {
@@ -609,36 +619,45 @@ public class EmiScreenManager {
 			}
 			if (EmiConfig.cheatMode) {
 				if (ingredient.getEmiStacks().size() == 1) {
-					if (function.apply(EmiConfig.cheatOne)) {
-						return give(ingredient.getEmiStacks().get(0), 1);
-					} else if (function.apply(EmiConfig.cheatStack)) {
-						return give(ingredient.getEmiStacks().get(0), ingredient.getEmiStacks().get(0).getItemStack().getMaxCount());
+					if (function.apply(EmiConfig.cheatOneToInventory)) {
+						return give(ingredient.getEmiStacks().get(0), 1, 0);
+					} else if (function.apply(EmiConfig.cheatStackToInventory)) {
+						return give(ingredient.getEmiStacks().get(0), ingredient.getEmiStacks().get(0).getItemStack().getMaxCount(), 0);
+					} else if (function.apply(EmiConfig.cheatOneToCursor)) {
+						return give(ingredient.getEmiStacks().get(0), 1, 1);
+					} else if (function.apply(EmiConfig.cheatStackToCursor)) {
+						return give(ingredient.getEmiStacks().get(0), ingredient.getEmiStacks().get(0).getItemStack().getMaxCount(), 1);
 					}
 				}
 			}
 			if (function.apply(EmiConfig.viewRecipes)) {
 				EmiApi.displayRecipes(ingredient);
-				if (recipe != null) {
-					EmiApi.focusRecipe(recipe);
+				if (stack.getRecipeContext() != null) {
+					EmiApi.focusRecipe(stack.getRecipeContext());
 				}
 				return true;
 			} else if (function.apply(EmiConfig.viewUses)) {
 				EmiApi.displayUses(ingredient);
 				return true;
 			} else if (function.apply(EmiConfig.favorite)) {
-				EmiFavorites.addFavorite(ingredient, recipe);
+				EmiFavorites.addFavorite(ingredient, stack.getRecipeContext());
 				favoriteBatcher.repopulate();
+				return true;
+			} else if (function.apply(EmiConfig.viewStackTree) && stack.getRecipeContext() != null) {
+				BoM.setGoal(stack.getRecipeContext());
+				EmiApi.viewRecipeTree();
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private static boolean give(EmiStack stack, int amount) {
+	private static boolean give(EmiStack stack, int amount, int mode) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		if (stack.getItemStack().isEmpty()) {
 			return false;
 		}
+		buf.writeByte(mode);
 		ItemStack is = stack.getItemStack().copy();
 		is.setCount(amount);
 		buf.writeItemStack(is);

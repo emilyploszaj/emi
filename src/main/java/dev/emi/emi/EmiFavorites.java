@@ -88,9 +88,10 @@ public class EmiFavorites {
 	}
 
 	public static void addFavorite(EmiIngredient stack, EmiRecipe context) {
+		/*
 		if (context != null && !EmiRecipeFiller.RECIPE_HANDLERS.containsKey(context.getCategory())) {
 			context = null;
-		}
+		}*/
 		if (stack instanceof EmiFavorite f) {
 			if (!favorites.remove(f)) {
 				favorites.add(f);

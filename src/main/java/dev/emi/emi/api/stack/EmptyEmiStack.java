@@ -65,11 +65,7 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void renderIcon(MatrixStack matrices, int x, int y, float delta) {
-	}
-
-	@Override
-	public void renderOverlay(MatrixStack matrices, int x, int y, float delta) {
+	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 	}
 
 	@Override

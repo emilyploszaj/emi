@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -12,6 +13,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmiRenderHelper {
+	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
 
 	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
@@ -46,6 +48,23 @@ public class EmiRenderHelper {
 		return new LiteralText("E").setStyle(Style.EMPTY.withColor(0xeb7bfc))
 			.append(new LiteralText("M").setStyle(Style.EMPTY.withColor(0x7bfca2)))
 			.append(new LiteralText("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
+	}
+
+	public static int getAmountOverflow(Text amount) {
+		int width = CLIENT.textRenderer.getWidth(amount);
+		if (width > 10) {
+			return width - 10;
+		} else {
+			return 0;
+		}
+	}
+
+	public static void renderAmount(MatrixStack matrices, int x, int y, Text amount) {
+		matrices.push();
+		matrices.translate(0, 0, 200);
+		int tx = x + 18 - Math.min(10, CLIENT.textRenderer.getWidth(amount));
+		CLIENT.textRenderer.drawWithShadow(matrices, amount, tx, y + 9, -1);
+		matrices.pop();
 	}
 
 	public static void renderIngredient(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {

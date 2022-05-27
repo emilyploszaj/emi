@@ -7,12 +7,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
@@ -24,6 +24,8 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class SlotWidget extends Widget {
@@ -120,13 +122,14 @@ public class SlotWidget extends Widget {
 				}
 			}
 		}
-		if (EmiClient.availableForCrafting.containsKey(getStack()) && !getStack().isEmpty()) {
+		/*
+		if (getRecipe() == null && EmiClient.availableForCrafting.containsKey(getStack()) && !getStack().isEmpty()) {
 			if (EmiClient.availableForCrafting.get(getStack())) {
 				//DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x4400FF00);
 			} else {
 				DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
 			}
-		}
+		}*/
 		getStack().render(matrices, bounds.x() + off, bounds.y() + off, delta);
 		if (catalyst) {
 			EmiRenderHelper.renderCatalyst(getStack(), matrices, x + off, y + off);
@@ -141,6 +144,9 @@ public class SlotWidget extends Widget {
 			list.add(supplier.get());
 		}
 		if (getRecipe() != null) {
+			if (RecipeScreen.resolve != null) {
+				list.add(TooltipComponent.of(new TranslatableText("emi.resolve").formatted(Formatting.GREEN).asOrderedText()));
+			}
 			if (getRecipe().getId() != null && EmiConfig.devMode) {
 				list.add(TooltipComponent.of(new LiteralText(getRecipe().getId().toString()).asOrderedText()));
 			}
@@ -154,10 +160,11 @@ public class SlotWidget extends Widget {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0 && getRecipe() != null && RecipeScreen.resolve != null) {
-			BoM.addResolution(RecipeScreen.resolve.ingredient, getRecipe());
+			BoM.addResolution(RecipeScreen.resolve, getRecipe());
 			EmiHistory.pop();
 			return true;
-		} else if (EmiScreenManager.stackInteraction(getStack(), getRecipe(), bind -> bind.matchesMouse(button))) {
+		} else if (EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
+				bind -> bind.matchesMouse(button))) {
 			return true;
 		} else if (button == 2 && EmiConfig.devMode && getRecipe() != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
@@ -168,6 +175,7 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return EmiScreenManager.stackInteraction(getStack(), getRecipe(), bind -> bind.matchesKey(keyCode, scanCode));
+		return EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
+			bind -> bind.matchesKey(keyCode, scanCode));
 	}
 }

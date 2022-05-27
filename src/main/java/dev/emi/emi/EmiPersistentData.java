@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.bom.BoM;
 import net.minecraft.util.JsonHelper;
 
 public class EmiPersistentData {
@@ -14,14 +15,15 @@ public class EmiPersistentData {
 	public static final Gson GSON = new Gson().newBuilder().setPrettyPrinting().create();
 	
 	public static void save() {
-		JsonObject json = new JsonObject();
-		json.add("favorites", EmiFavorites.save());
 		try {
+			JsonObject json = new JsonObject();
+			json.add("favorites", EmiFavorites.save());
+			json.add("recipe_defaults", BoM.saveAdded());
 			FileWriter writer = new FileWriter(FILE);
 			GSON.toJson(json, writer);
 			writer.close();
 		} catch (Exception e) {
-			System.err.println("[emi] Failed to write config");
+			System.err.println("[emi] Failed to write persistent data");
 			e.printStackTrace();
 		}
 	}
@@ -35,8 +37,11 @@ public class EmiPersistentData {
 			if (JsonHelper.hasArray(json, "favorites")) {
 				EmiFavorites.load(JsonHelper.getArray(json, "favorites"));
 			}
+			if (JsonHelper.hasJsonObject(json, "recipe_defaults")) {
+				BoM.loadAdded(JsonHelper.getObject(json, "recipe_defaults"));
+			}
 		} catch (Exception e) {
-			System.err.println("[emi] Failed to parse config");
+			System.err.println("[emi] Failed to parse persistent data");
 			e.printStackTrace();
 		}
 	}

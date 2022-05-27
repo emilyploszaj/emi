@@ -2,9 +2,9 @@ package dev.emi.emi.recipe.world;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import net.minecraft.util.Identifier;
 
 public abstract class EmiCustomWorldRecipe implements EmiRecipe {
@@ -16,7 +16,7 @@ public abstract class EmiCustomWorldRecipe implements EmiRecipe {
 
 	@Override
 	public EmiRecipeCategory getCategory() {
-		return VanillaPlugin.WORLD_INTERACTION;
+		return VanillaEmiRecipeCategories.WORLD_INTERACTION;
 	}
 
 	@Override

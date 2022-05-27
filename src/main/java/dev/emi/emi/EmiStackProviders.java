@@ -7,12 +7,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.EmiStackProvider;
-import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiStackInteraction;
+import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 
 public class EmiStackProviders {
 	public static Map<Class<?>, List<EmiStackProvider<?>>> fromClass = Maps.newHashMap();
@@ -24,30 +31,46 @@ public class EmiStackProviders {
 	}
 	
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static EmiIngredient getStackAt(Screen screen, int x, int y) {
+	public static EmiStackInteraction getStackAt(Screen screen, int x, int y, boolean notClick) {
 		if (fromClass.containsKey(screen.getClass())) {
 			for (EmiStackProvider provider : fromClass.get(screen.getClass())) {
-				EmiIngredient stack = provider.getStackAt(screen, x, y);
-				if (!stack.isEmpty()) {
+				EmiStackInteraction stack = provider.getStackAt(screen, x, y);
+				if (!stack.isEmpty() && (notClick || stack.isClickable())) {
 					return stack;
 				}
 			}
 		}
 		for (EmiStackProvider handler : generic) {
-			EmiIngredient stack = handler.getStackAt(screen, x, y);
-			if (!stack.isEmpty()) {
+			EmiStackInteraction stack = handler.getStackAt(screen, x, y);
+			if (!stack.isEmpty() && (notClick || stack.isClickable())) {
 				return stack;
 			}
 		}
-		if (screen instanceof HandledScreenAccessor handled) {
+		if (notClick && screen instanceof HandledScreenAccessor handled) {
 			Slot s = handled.getFocusedSlot();
 			if (s != null) {
 				ItemStack stack = s.getStack();
 				if (!stack.isEmpty()) {
-					return EmiStack.of(stack);
+					if (s instanceof CraftingResultSlot craf) {
+						// Emi be making assumptions
+						try {
+							CraftingInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
+							MinecraftClient client = MinecraftClient.getInstance();
+							List<CraftingRecipe> list
+								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);
+							if (!list.isEmpty()) {
+								Identifier id = list.get(0).getId();
+								if (EmiRecipes.byId.containsKey(id)) {
+									return new EmiStackInteraction(EmiStack.of(stack), EmiRecipes.byId.get(id), false);
+								}
+							}
+						} catch (Exception e) {
+						}
+					}
+					return new EmiStackInteraction(EmiStack.of(stack));
 				}
 			}
 		}
-		return EmiStack.EMPTY;
+		return EmiStackInteraction.EMPTY;
 	}
 }

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -33,7 +33,7 @@ public class EmiBrewingRecipe implements EmiRecipe {
 
 	@Override
 	public EmiRecipeCategory getCategory() {
-		return VanillaPlugin.BREWING;
+		return VanillaEmiRecipeCategories.BREWING;
 	}
 
 	@Override

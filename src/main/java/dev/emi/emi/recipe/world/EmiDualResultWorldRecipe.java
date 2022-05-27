@@ -21,24 +21,16 @@ public class EmiDualResultWorldRecipe extends EmiCustomWorldRecipe {
 		this.catalyst = catalyst;
 		this.result1 = result1;
 		this.result2 = result2;
+		if (isCatalyst) {
+			for (EmiStack stack : catalyst.getEmiStacks()) {
+				stack.setRemainder(stack);
+			}
+		}
 	}
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		if (isCatalyst) {
-			return List.of(input);
-		} else {
-			return List.of(input, catalyst);
-		}
-	}
-
-	@Override
-	public List<EmiIngredient> getCatalysts() {
-		if (isCatalyst) {
-			return List.of(catalyst);
-		} else {
-			return List.of();
-		}
+		return List.of(input, catalyst);
 	}
 
 	@Override

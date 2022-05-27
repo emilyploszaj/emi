@@ -8,6 +8,7 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.ConfigScreen;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -21,11 +22,13 @@ import net.minecraft.util.Formatting;
 
 public class EmiBindWidget extends ListWidget.Entry {
 	private final ConfigScreen screen;
+	private final Drawable tooltip;
 	private final Text bindName;
 	private EmiBind bind;
 	private List<ButtonWidget> buttons = Lists.newArrayList();
 
-	public EmiBindWidget(ConfigScreen screen, EmiBind bind) {
+	public EmiBindWidget(ConfigScreen screen, Drawable tooltip, EmiBind bind) {
+		this.tooltip = tooltip;
 		this.screen = screen;
 		this.bindName = new TranslatableText(bind.translationKey);
 		this.bind = bind;
@@ -88,7 +91,11 @@ public class EmiBindWidget extends ListWidget.Entry {
 			button.render(matrices, mouseX, mouseY, delta);
 			h += 24;
 		}
-		
+	}
+
+	@Override
+	public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		tooltip.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Override

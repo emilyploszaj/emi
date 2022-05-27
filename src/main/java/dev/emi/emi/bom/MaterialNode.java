@@ -13,12 +13,13 @@ public class MaterialNode {
 	public EmiIngredient ingredient;
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
+	public FoldState state = FoldState.EXPANDED;
 	public int amount = 1;
 	public int divisor = 1;
 
 	public MaterialNode(EmiIngredient ingredient) {
+		this.amount = ingredient.getAmount();
 		if (ingredient instanceof EmiStack s) {
-			this.amount = s.getAmount();
 			ingredient = s.copy().setAmount(1);
 		}
 		this.ingredient = ingredient;
@@ -61,7 +62,7 @@ public class MaterialNode {
 		for (EmiIngredient i : recipe.getInputs()) {
 			for (MaterialNode node : children) {
 				if (EmiIngredient.areEqual(i, node.ingredient)) {
-					node.amount++;
+					node.amount += node.ingredient.getAmount();
 					continue outer;
 				}
 			}

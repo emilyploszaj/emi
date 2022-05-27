@@ -25,6 +25,11 @@ public class EmiFavorite implements EmiIngredient {
 		return stack;
 	}
 
+	@Override
+	public int getAmount() {
+		return 1;
+	}
+
 	public EmiRecipe getRecipe() {
 		return recipe;
 	}
@@ -35,8 +40,8 @@ public class EmiFavorite implements EmiIngredient {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta) {
-		stack.render(matrices, x, y, delta);
+	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		stack.render(matrices, x, y, delta, flags);
 	}
 
 	@Override

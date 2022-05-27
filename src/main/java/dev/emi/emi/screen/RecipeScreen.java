@@ -7,6 +7,7 @@ import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
@@ -20,7 +21,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
-import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
@@ -29,6 +29,7 @@ import dev.emi.emi.widget.RecipeFillButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
@@ -37,7 +38,7 @@ import net.minecraft.util.Identifier;
 public class RecipeScreen extends Screen implements EmiScreen {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
 	private static final int RECIPE_PADDING = 9;
-	public static MaterialNode resolve = null;
+	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
 	public HandledScreen<?> old;
 	private List<RecipeTab> tabs = Lists.newArrayList();
@@ -174,12 +175,17 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
+		outer:
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
 			for (Widget widget : group.widgets) {
 				if (widget.getBounds().contains(mx, my)) {
-					((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, widget.getTooltip(), mouseX, Math.max(16, mouseY));
+					List<TooltipComponent> tooltip = widget.getTooltip();
+					if (!tooltip.isEmpty()) {
+						((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, tooltip, mouseX, Math.max(16, mouseY));
+						break outer;
+					}
 				}
 			}
 		}
@@ -239,9 +245,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 		tabPage = tp;
 		if (tabPage >= (tabs.size() - 1) / tabPageSize + 1) {
-			tabPage = (tabs.size() - 1) / tabPageSize;
-		} else if (tabPage < 0) {
 			tabPage = 0;
+		} else if (tabPage < 0) {
+			tabPage = (tabs.size() - 1) / tabPageSize;
 		}
 		List<List<EmiRecipe>> recipes = tabs.get(tab).recipes;
 		page = p;
@@ -367,7 +373,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			return true;
 		} else if (mouseX > x && mouseX < x + backgroundWidth && mouseY < x + backgroundHeight) {
 			if (EmiUtil.isShiftDown()) {
-				setPage(tabPage, (int) (tab - amount), page);
+				setPage(tabPage, (int) (tab - amount), 0);
 			} else {
 				setPage(tabPage, tab, (int) (page - amount));
 			}
@@ -399,9 +405,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			}
 		}
 		if (keyCode == GLFW.GLFW_KEY_LEFT) {
-			setPage(tabPage - 1, tab, page);
+			setPage(tabPage, tab - 1, 0);
 		} else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
-			setPage(tabPage + 1, tab, page);
+			setPage(tabPage, tab + 1, 0);
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}

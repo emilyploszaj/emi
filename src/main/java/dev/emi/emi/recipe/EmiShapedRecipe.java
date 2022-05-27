@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -59,7 +59,7 @@ public class EmiShapedRecipe implements EmiRecipe {
 
 	@Override
 	public EmiRecipeCategory getCategory() {
-		return VanillaPlugin.CRAFTING;
+		return VanillaEmiRecipeCategories.CRAFTING;
 	}
 
 	@Override

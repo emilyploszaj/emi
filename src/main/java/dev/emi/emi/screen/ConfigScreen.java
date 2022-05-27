@@ -1,10 +1,16 @@
 package dev.emi.emi.screen;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiConfig.Comment;
 import dev.emi.emi.EmiConfig.ConfigEnum;
 import dev.emi.emi.EmiConfig.ConfigValue;
 import dev.emi.emi.EmiUtil;
@@ -12,14 +18,18 @@ import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.widget.BooleanWidget;
 import dev.emi.emi.screen.widget.EmiBindWidget;
+import dev.emi.emi.screen.widget.EmiNameWidget;
 import dev.emi.emi.screen.widget.EnumWidget;
 import dev.emi.emi.screen.widget.GroupNameWidget;
+import dev.emi.emi.screen.widget.IntWidget;
 import dev.emi.emi.screen.widget.ListWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
@@ -49,10 +59,34 @@ public class ConfigScreen extends Screen {
 		MinecraftClient.getInstance().setScreen(last);
 	}
 
+	@SuppressWarnings("unchecked")
+	public Drawable getTooltipRenderer(Field field) {
+		List<Text> text;
+		ConfigValue annot = field.getAnnotation(ConfigValue.class);
+		String key = "config.emi.tooltip." + annot.value().replace('-', '_');
+		System.out.println(key);
+		Comment comment = field.getAnnotation(Comment.class);
+		if (I18n.hasTranslation(key)) {
+			text = (List<Text>) (Object) Arrays.stream(I18n.translate(key).split("\n")).map(LiteralText::new).toList();
+		} else if (comment != null) {
+			text = (List<Text>) (Object) Arrays.stream(comment.value().split("\n")).map(LiteralText::new).toList();
+		} else {
+			text = null;
+		}
+		return (matrices, mouseX, mouseY, delta) -> {
+			if (text != null) {
+				RenderSystem.enableDepthTest();
+				renderTooltip(matrices, text,
+					Optional.empty(), mouseX, mouseY);
+			}
+		};
+	}
+
 	@Override
 	protected void init() {
 		super.init();
 		list = new ListWidget(client, width, height, 0, height);
+		list.addEntry(new EmiNameWidget());
 		try {
 			String lastGroup = "";
 			for (Field field : EmiConfig.class.getFields()) {
@@ -68,7 +102,7 @@ public class ConfigScreen extends Screen {
 					}
 					Text translation = new TranslatableText("config.emi." + annot.value().replace('-', '_'));
 					if (field.getType() == boolean.class) {
-						list.addEntry(new BooleanWidget(translation, new Mutator<Boolean>() {
+						list.addEntry(new BooleanWidget(translation, getTooltipRenderer(field), new Mutator<Boolean>() {
 
 							public Boolean get() {
 								try {
@@ -83,10 +117,26 @@ public class ConfigScreen extends Screen {
 								} catch (Exception e) {}
 							}						
 						}));
+					} else if (field.getType() == int.class) {
+						list.addEntry(new IntWidget(translation, getTooltipRenderer(field), new Mutator<Integer>() {
+
+							public Integer get() {
+								try {
+									return field.getInt(null);
+								} catch(Exception e) {}
+								return -1;
+							}
+
+							public void set(Integer value) {
+								try {
+									field.setInt(null, value);
+								} catch (Exception e) {}
+							}						
+						}));
 					} else if (field.getType() == EmiBind.class) {
-						list.addEntry(new EmiBindWidget(this, (EmiBind) field.get(null)));
+						list.addEntry(new EmiBindWidget(this, getTooltipRenderer(field), (EmiBind) field.get(null)));
 					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {
-						list.addEntry(new EnumWidget(translation, new Mutator<ConfigEnum>() {
+						list.addEntry(new EnumWidget(translation, getTooltipRenderer(field), new Mutator<ConfigEnum>() {
 
 							public ConfigEnum get() {
 								try {
@@ -118,6 +168,9 @@ public class ConfigScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackgroundTexture(-100);
 		list.render(matrices, mouseX, mouseY, delta);
+		if (list.getHoveredEntry() != null) {
+			list.getHoveredEntry().renderTooltip(matrices, mouseX, mouseY, delta);
+		}
 	}
 	
 	@Override
@@ -176,9 +229,6 @@ public class ConfigScreen extends Screen {
 		}
 		return super.keyReleased(keyCode, scanCode, modifiers);
 	}
-
-	public static abstract class Entry extends ElementListWidget.Entry<Entry> {
-    }
 
 	public static interface Mutator<T> {
 		T get();

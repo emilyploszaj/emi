@@ -32,21 +32,46 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class EmiPlayerInventory {
-	public Map<EmiStack, EmiStack> inventory;
+	private final Comparison none = Comparison.builder().amount(false).nbt(false).build();
+	private final Comparison nbt = Comparison.builder().amount(false).nbt(true).build();
+	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
 	public EmiPlayerInventory(PlayerEntity entity) {
-		inventory = Maps.newHashMap();
-		Comparison none = Comparison.builder().amount(false).nbt(false).build();
-		Comparison nbt = Comparison.builder().amount(false).nbt(true).build();
+
+		HandledScreen<?> screen = EmiApi.getHandledScreen();
+		if (screen != null) {
+			ScreenHandler screenHandler = screen.getScreenHandler();
+			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
+			if ((type == null && screenHandler instanceof PlayerScreenHandler) || (type != null && EmiMain.handlers.containsKey(type))) {
+				EmiRecipeHandler<?> handler;
+				if (type == null) {
+					handler = (EmiRecipeHandler<?>) EmiMain.INVENTORY;
+				} else {
+					handler = (EmiRecipeHandler<?>) EmiMain.handlers.get(type);
+				}
+				List<Slot> slots = ((EmiRecipeHandler) handler).getInputSources(screenHandler);
+				for (Slot slot : slots) {
+					if (slot.canTakeItems(entity)) {
+						addStack(slot.getStack());
+					}
+				}
+				return;
+			}
+		}
+
 		PlayerInventory pInv = entity.getInventory();
 		for (int i = 0; i < pInv.main.size(); i++) {
-			ItemStack is = pInv.main.get(i);
-			EmiStack stack = EmiStack.of(is).comparison(c -> none);
-			if (stack.isEmpty()) {
-				continue;
-			}
+			addStack(pInv.main.get(i));
+		}
+	}
+
+	private void addStack(ItemStack is) {
+		EmiStack stack = EmiStack.of(is).comparison(c -> none);
+		if (!stack.isEmpty()) {
 			if (inventory.containsKey(stack)) {
 				for (EmiStack other : inventory.keySet()) {
 					if (other.isEqual(stack, nbt)) {
@@ -127,6 +152,9 @@ public class EmiPlayerInventory {
 		Object2IntMap<EmiStack> used = new Object2IntOpenHashMap<>();
 		outer:
 		for (EmiIngredient ingredient : recipe.getInputs()) {
+			if (ingredient.isEmpty()) {
+				continue;
+			}
 			for (EmiStack stack : ingredient.getEmiStacks()) {
 				int desired = stack.getAmount();
 				if (inventory.containsKey(stack)) {

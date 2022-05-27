@@ -1,5 +1,18 @@
 {
   "exclusions": [
-    "minecraft:occludes_vibration_signals"
+    "minecraft:occludes_vibration_signals",
+    "c:sand",
+    "c:glass_pane",
+    "c:beacon_payment",
+    "c:fences",
+    "c:fences/wooden",
+    "c:ores/coal",
+    "c:ores/copper",
+    "c:ores/iron",
+    "c:ores/gold",
+    "c:ores/redstone",
+    "c:ores/lapis",
+    "c:ores/emerald",
+    "c:ores/diamond"
   ]
 }

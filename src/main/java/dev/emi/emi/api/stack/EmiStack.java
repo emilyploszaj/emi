@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import dev.emi.emi.EmiComparisonDefaults;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -117,16 +116,6 @@ public abstract class EmiStack implements EmiIngredient {
 		}
 		return true;
 	}
-
-	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta) {
-		renderIcon(matrices, x, y, delta);
-		renderOverlay(matrices, x, y, delta);
-	}
-
-	public abstract void renderIcon(MatrixStack matrices, int x, int y, float delta);
-
-	public abstract void renderOverlay(MatrixStack matrices, int x, int y, float delta);
 
 	public abstract List<Text> getTooltipText();
 

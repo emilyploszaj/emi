@@ -23,7 +23,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
@@ -77,37 +76,42 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void renderIcon(MatrixStack matrices, int x, int y, float delta) {
-		Sprite sprite = FluidVariantRendering.getSprite(fluid);
-		if (sprite == null) {
-			return;
+	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		if ((flags & RENDER_ICON) != 0) {
+			Sprite sprite = FluidVariantRendering.getSprite(fluid);
+			if (sprite == null) {
+				return;
+			}
+			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+			RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+			
+			int color = FluidVariantRendering.getColor(fluid);
+			float r = ((color >> 16) & 255) / 256f;
+			float g = ((color >> 8) & 255) / 256f;
+			float b = (color & 255) / 256f;
+			
+			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+			bufferBuilder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+			float xMin = (float) x;
+			float yMin = (float) y;
+			float xMax = xMin + 16;
+			float yMax = yMin + 16;
+			float uMin = sprite.getMinU();
+			float vMin = sprite.getMinV();
+			float uMax = sprite.getMaxU();
+			float vMax = sprite.getMaxV();
+			Matrix4f model = matrices.peek().getPositionMatrix();
+			bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
+			bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
+			bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
+			bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
+			bufferBuilder.end();
+			BufferRenderer.draw(bufferBuilder);
 		}
-		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
-		
-		int color = FluidVariantRendering.getColor(fluid);
-		float r = ((color >> 16) & 255) / 256f;
-		float g = ((color >> 8) & 255) / 256f;
-		float b = (color & 255) / 256f;
-		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-		float xMin = (float) x;
-		float yMin = (float) y;
-		float xMax = xMin + 16;
-		float yMax = yMin + 16;
-		float uMin = sprite.getMinU();
-		float vMin = sprite.getMinV();
-		float uMax = sprite.getMaxU();
-		float vMax = sprite.getMaxV();
-		Matrix4f model = matrices.peek().getPositionMatrix();
-		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
-		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
-		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
-		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		if ((flags & RENDER_REMAINDER) != 0) {
+			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+		}
 
 		/*
 		matrices.push();
@@ -127,11 +131,6 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void renderOverlay(MatrixStack matrices, int x, int y, float delta) {
-		EmiRenderHelper.renderRemainder(this, matrices, x, y);
-	}
-
-	@Override
 	public List<Text> getTooltipText() {
 		return FluidVariantRendering.getTooltip(fluid);
 	}
@@ -140,8 +139,8 @@ public class FluidEmiStack extends EmiStack {
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = getTooltipText().stream().map(Text::asOrderedText).map(TooltipComponent::of)
 			.collect(Collectors.toList());
-		if (amount != 0) {
-			list.add(TooltipComponent.of(getTranslatedAmount().asOrderedText()));
+		if (amount > 1) {
+			list.add(TooltipComponent.of(getAmountText(amount).asOrderedText()));
 		}
 		String namespace = Registry.FLUID.getId(fluid.getFluid()).getNamespace();
 		String mod = EmiUtil.getModName(namespace);
@@ -152,14 +151,10 @@ public class FluidEmiStack extends EmiStack {
 		return list;
 	}
 
-	private Text getTranslatedAmount() {
+	@Override
+	public Text getAmountText(float amount) {
 		if (amount != 0) {
-			int liters = amount / 81;
-			if (EmiConfig.fluidUnit == EmiConfig.FluidUnit.MILLIBUCKETS) {
-				return new TranslatableText("emi.fluid.amount.millibuckets", liters);
-			} else {
-				return new TranslatableText("emi.fluid.amount.liters", liters);
-			}
+			return EmiConfig.fluidUnit.translate(amount);
 		}
 		return new LiteralText("");
 	}

@@ -66,8 +66,6 @@ public class EmiRecipes {
 			}
 			getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
-			getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
-				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
 			getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
 		}

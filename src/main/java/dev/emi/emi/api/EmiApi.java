@@ -18,6 +18,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
@@ -43,7 +44,7 @@ public class EmiApi {
 	 * @param includeStandard Whether to include the EmiIngredient representation of
 	 * 	standard stacks in slots or otherwise provided to EMI.
 	 */
-	public static EmiIngredient getHoveredStack(int mouseX, int mouseY, boolean includeStandard) {
+	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean includeStandard) {
 		return EmiScreenManager.getHoveredStack(mouseX, mouseY, includeStandard);
 	}
 
@@ -162,8 +163,7 @@ public class EmiApi {
 			EmiIngredient context) {
 		return map.entrySet().stream().map(e -> {
 			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
-				r.getInputs().stream().anyMatch(i -> containsAll(i, context))
-				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context))).toList());
+				r.getInputs().stream().anyMatch(i -> containsAll(i, context))).toList());
 		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 

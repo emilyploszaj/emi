@@ -12,6 +12,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiLog;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -95,7 +96,7 @@ public class StackBatcher {
 				b.setUnbatchable();
 			}
 		} else {
-			stack.renderIcon(matrices, x, y, delta);
+			stack.render(matrices, x, y, delta, EmiIngredient.RENDER_ICON);
 		}
 	}
 

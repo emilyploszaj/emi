@@ -1,12 +1,8 @@
-package dev.emi.emi.recipe;
+package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.VanillaPlugin;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
-import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -35,7 +31,7 @@ public class EmiCraftingRecipe implements EmiRecipe {
 
 	@Override
 	public EmiRecipeCategory getCategory() {
-		return VanillaPlugin.CRAFTING;
+		return VanillaEmiRecipeCategories.CRAFTING;
 	}
 
 	@Override

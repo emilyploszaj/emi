@@ -372,7 +372,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				RenderSystem.enableTexture();
 			}
 			p = this.getRowLeft();
-			((Entry)entry).render(matrices, j, k, p, o, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
+			((Entry)entry).render(matrices, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
 		}
 	}
 
@@ -412,7 +412,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	@Nullable
-	protected Entry getHoveredEntry() {
+	public Entry getHoveredEntry() {
 		return this.hoveredEntry;
 	}
 
@@ -452,6 +452,9 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		@Override
 		public boolean isMouseOver(double mouseX, double mouseY) {
 			return Objects.equals(this.parentList.getEntryAtPosition(mouseX, mouseY), this);
+		}
+
+		public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		}
 
 		public abstract int getHeight();

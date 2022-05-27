@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
+import it.unimi.dsi.fastutil.floats.Float2ObjectFunction;
 import joptsimple.internal.Strings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.util.InputUtil;
@@ -41,15 +42,15 @@ public class EmiConfig {
 	public static boolean cheatMode = false;
 
 	// UI
-	@Comment("Whether to move status effects to the left of the screen.")
+	@Comment("Whether to move status effects to the\nleft of the screen.")
 	@ConfigValue("ui.move-effects")
 	public static boolean moveEffects = true;
 
-	@Comment("Whether to have the search bar in the center of the screen, instead of to the side.")
+	@Comment("Whether to have the search bar in the\ncenter of the screen, instead of to the side.")
 	@ConfigValue("ui.center-search-bar")
 	public static boolean centerSearchBar = true;
 
-	@Comment("The amount of vertical padding to give in the recipe screen.")
+	@Comment("The amount of vertical padding to\ngive in the recipe screen.")
 	@ConfigValue("ui.vertical-padding")
 	public static int verticalPadding = 20;
 
@@ -61,28 +62,28 @@ public class EmiConfig {
 	@ConfigValue("ui.fluid-unit")
 	public static FluidUnit fluidUnit = FluidUnit.LITERS;
 
-	@Comment("Whether recipes should have a button to favorite the result.")
+	@Comment("Whether recipes should have a button to\nfavorite the result.")
 	@ConfigValue("ui.recipe-favorite-button")
 	public static boolean recipeFavoriteButton = true;
 
-	@Comment("Whether recipes should have a button to set as default.")
+	@Comment("Whether recipes should have a button to\nset as default.")
 	@ConfigValue("ui.recipe-default-button")
 	public static boolean recipeDefaultButton = true;
 
-	@Comment("Whether recipes should have a button to show the recipe tree.")
+	@Comment("Whether recipes should have a button to\nshow the recipe tree.")
 	@ConfigValue("ui.recipe-tree-button")
 	public static boolean recipeTreeButton = true;
 
-	@Comment("Whether recipes should have a button to fill the ingredients in a handler.")
+	@Comment("Whether recipes should have a button to\nfill the ingredients in a handler.")
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
 
 	// Binds
-	@Comment("Toggles the visibility of EMI.")
+	@Comment("Toggle the visibility of EMI.")
 	@ConfigValue("binds.toggle-visibility")
 	public static EmiBind toggleVisibility = new EmiBind("key.emi.toggle_visibility", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_O);
 
-	@Comment("Focuses the search bar.")
+	@Comment("Focuse the search bar.")
 	@ConfigValue("binds.focus-search")
 	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_F);
 
@@ -92,79 +93,89 @@ public class EmiConfig {
 		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_R), 0),
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
-	@Comment("Display the recipes that can be created using an item.")
+	@Comment("Display the recipes that can be created\nusing an item.")
 	@ConfigValue("binds.view-uses")
 	public static EmiBind viewUses = new EmiBind("key.emi.view_uses",
 		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_U), 0),
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), 0));
 
-	@Comment("Favorite the item to display on the side of the screen opposite of recipies for quick access.")
+	@Comment("Favorite the item to display on the\nside of the screen opposite of\nrecipies for quick access.")
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
 
-	@Comment("Define a recipe's output as the default way to obtain it.\nUsed for constructing recipe trees.")
-	@ConfigValue("binds.set-default")
-	public static EmiBind setDefault = new EmiBind("key.emi.set_default", InputUtil.UNKNOWN_KEY.getCode());
-
 	@Comment("Display the recipe tree for a given item.")
+	@ConfigValue("binds.view-stack-tree")
+	public static EmiBind viewStackTree = new EmiBind("key.emi.view_stack_tree", InputUtil.UNKNOWN_KEY.getCode());
+
+	@Comment("Display the recipe tree.")
 	@ConfigValue("binds.view-tree")
 	public static EmiBind viewTree = new EmiBind("key.emi.view_tree", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("Returns to the previous page in EMI.")
+	@Comment("Return to the previous page in EMI.")
 	@ConfigValue("binds.back")
 	public static EmiBind back = new EmiBind("key.emi.back", GLFW.GLFW_KEY_BACKSPACE);
 
-	@Comment("Toggles between index and craftable search modes.")
+	@Comment("Toggle between index and craftable\nsearch modes.")
 	@ConfigValue("binds.toggle-craftable")
 	public static EmiBind toggleCraftable = new EmiBind("key.emi.toggle_craftable", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("Toggles craftable filter between all recipes and current workstation.")
+	@Comment("Toggle craftable filter between\nall recipes and current workstation.")
 	@ConfigValue("binds.toggle-local-craftable")
 	public static EmiBind toggleLocalCraftable = new EmiBind("key.emi.toggle_local_craftable", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("When on a stack with an associated recipe.\n"
+	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result.")
 	@ConfigValue("binds.craft-one")
 	public static EmiBind craftOne = new EmiBind("key.emi.craft_one",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
-	@Comment("When on a stack with an associated recipe.\n"
+	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for as many results as possible.")
 	@ConfigValue("binds.craft-all")
 	public static EmiBind craftAll = new EmiBind("key.emi.craft_all", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.SHIFT_MASK));
 
-	@Comment("When on a stack with an associated recipe.\n"
-		+ "Move ingredients for a single result and put in inventory if possible.")
+	@Comment("When on a stack with an associated recipe:\n"
+		+ "Move ingredients for a single result\nand put in inventory if possible.")
 	@ConfigValue("binds.craft-one-to-inventory")
 	public static EmiBind craftOneToInventory = new EmiBind("key.emi.craft_one_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("When on a stack with an associated recipe.\n"
-		+ "Move ingredients for as many results as possible and put in inventory if possible.")
+	@Comment("When on a stack with an associated recipe:\n"
+		+ "Move ingredients for as many results as possible\nand put in inventory if possible.")
 	@ConfigValue("binds.craft-all-to-inventory")
 	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("When on a stack with an associated recipe.\n"
-		+ "Move ingredients for a single result and put in cursor if possible.")
+	@Comment("When on a stack with an associated recipe:\n"
+		+ "Move ingredients for a single result\nand put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
 
-	@Comment("Cheat in one of an item.")
-	@ConfigValue("binds.cheat-one")
-	public static EmiBind cheatOne = new EmiBind("key.emi.cheat_one", 
+	@Comment("Cheat in one of an item into the inventory.")
+	@ConfigValue("binds.cheat-one-to-inventory")
+	public static EmiBind cheatOneToInventory = new EmiBind("key.emi.cheat_one_to_inventory",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiUtil.CONTROL_MASK));
 
-	@Comment("Cheat in a stack of an item.")
-	@ConfigValue("binds.cheat-stack")
-	public static EmiBind cheatStack = new EmiBind("key.emi.cheat_stack", 
+	@Comment("Cheat in a stack of an item into the inventory.")
+	@ConfigValue("binds.cheat-stack-to-inventory")
+	public static EmiBind cheatStackToInventory = new EmiBind("key.emi.cheat_stack_to_inventory",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+	
+	@Comment("Cheat in one of an item into the cursor.")
+	@ConfigValue("binds.cheat-one-cursor")
+	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiUtil.CONTROL_MASK));
+	
+	@Comment("Cheat in a stack of an item into the cursor.")
+	@ConfigValue("binds.cheat-stack-cursor")
+	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
 	
 	// Dev
 	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
 
+	// Persistent
 	@ConfigValue("persistent.craftable")
 	public static boolean craftable = false;
 
@@ -362,16 +373,19 @@ public class EmiConfig {
 	}
 
 	public static enum FluidUnit implements ConfigEnum {
-		LITERS("liters"),
-		MILLIBUCKETS("millibuckets"),
+		LITERS("liters", a -> new TranslatableText("emi.fluid.amount.liters", (int) (a / 81))),
+		MILLIBUCKETS("millibuckets", a -> new TranslatableText("emi.fluid.amount.millibuckets", (int) (a / 81))),
+		DROPLETS("droplets", a -> new TranslatableText("emi.fluid.amount.droplets", (int) a)),
 		;
 
 		private final String name;
 		private final Text translation;
+		private final Float2ObjectFunction<Text> translator;
 
-		private FluidUnit(String name) {
+		private FluidUnit(String name, Float2ObjectFunction<Text> translator) {
 			this.name = name;
 			translation = new TranslatableText("emi.unit." + name);
+			this.translator = translator;
 		}
 
 		@Override
@@ -382,6 +396,10 @@ public class EmiConfig {
 		@Override
 		public String getName() {
 			return name;
+		}
+
+		public Text translate(float amount) {
+			return translator.apply(Float.valueOf(amount));
 		}
 
 		@Override
