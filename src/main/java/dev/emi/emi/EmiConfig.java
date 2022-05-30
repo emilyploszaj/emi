@@ -50,9 +50,9 @@ public class EmiConfig {
 	@ConfigValue("ui.center-search-bar")
 	public static boolean centerSearchBar = true;
 
-	@Comment("The amount of vertical padding to\ngive in the recipe screen.")
-	@ConfigValue("ui.vertical-padding")
-	public static int verticalPadding = 20;
+	@Comment("The amount of vertical margin to\ngive in the recipe screen.")
+	@ConfigValue("ui.vertical-margin")
+	public static int verticalMargin = 20;
 
 	//@Comment("Maximum columns")
 	//@ConfigValue("ui.max-columns")
@@ -174,6 +174,14 @@ public class EmiConfig {
 	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
+
+	@Comment("Whether hovering the output of a recipe should show\nthe recipe's EMI ID.")
+	@ConfigValue("dev.show-recipe-ids")
+	public static boolean showRecipeIds = false;
+
+	@Comment("Whether stacks in the index should display a highlight\nif they have a recipe default.")
+	@ConfigValue("dev.highlight-defaulted")
+	public static boolean highlightDefaulted = false;
 
 	// Persistent
 	@ConfigValue("persistent.craftable")

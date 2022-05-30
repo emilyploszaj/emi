@@ -24,12 +24,12 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.view_tree").asOrderedText()));
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		BoM.setGoal(recipe);
 		this.playButtonSound();
 		EmiApi.viewRecipeTree();

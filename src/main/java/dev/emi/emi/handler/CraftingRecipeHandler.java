@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
@@ -37,5 +39,10 @@ public class CraftingRecipeHandler implements EmiRecipeHandler<CraftingScreenHan
 	@Override
 	public @Nullable Slot getOutputSlot(CraftingScreenHandler handler) {
 		return handler.slots.get(0);
+	}
+
+	@Override
+	public boolean supportsRecipe(EmiRecipe recipe) {
+		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING;
 	}
 }

@@ -8,17 +8,18 @@ import com.google.common.collect.Maps;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
+import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
+import dev.emi.emi.EmiStackList;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
+import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
@@ -29,10 +30,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.item.ItemStack;
 
 public class EmiApi {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+
+	public static List<EmiStack> getIndexStacks() {
+		return EmiStackList.stacks;
+	}
 
 	public static boolean isCheatMode() {
 		return EmiConfig.cheatMode;
@@ -125,20 +129,12 @@ public class EmiApi {
 		}
 	}
 
-	public static void performFill(EmiRecipe recipe, EmiFillAction action, boolean all) {
-		HandledScreen<?> hs;
-		if (client.currentScreen instanceof RecipeScreen rs) {
-			hs = rs.old;
-		} else if (client.currentScreen instanceof HandledScreen<?> s) {
-			hs = s;
-		} else {
-			return;
+	public static boolean performFill(EmiRecipe recipe, EmiFillAction action, int amount) {
+		HandledScreen<?> hs = getHandledScreen();
+		if (hs != null) {
+			return EmiRecipeFiller.performFill(recipe, hs, action, amount);
 		}
-		List<ItemStack> stacks = recipe.getFill(hs, all);
-		if (stacks != null) {
-			client.setScreen(hs);
-			EmiClient.sendFillRecipe(hs.getScreenHandler().syncId, action.id, stacks);
-		}
+		return false;
 	}
 
 	private static void push() {
@@ -163,7 +159,9 @@ public class EmiApi {
 			EmiIngredient context) {
 		return map.entrySet().stream().map(e -> {
 			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
-				r.getInputs().stream().anyMatch(i -> containsAll(i, context))).toList());
+					r.getInputs().stream().anyMatch(i -> containsAll(i, context))
+					|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context))
+				).toList());
 		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 

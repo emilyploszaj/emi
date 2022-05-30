@@ -4,30 +4,20 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
-import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.Identifier;
 
-public class EmiShapedRecipe implements EmiRecipe {
-	private final List<EmiIngredient> input;
-	private final EmiStack output;
-	private final ShapedRecipe recipe;
-	
+public class EmiShapedRecipe extends EmiCraftingRecipe {
+
 	public EmiShapedRecipe(ShapedRecipe recipe) {
-		input = recipe.getIngredients().stream().map(i -> EmiIngredient.of(i)).toList();
+		super(padIngredients(recipe), EmiStack.of(recipe.getOutput()),
+			recipe.getId(), false);
 		for (int i = 0; i < input.size(); i++) {
 			CraftingInventory inv = new CraftingInventory(new ScreenHandler(null, -1) {
 
@@ -35,7 +25,7 @@ public class EmiShapedRecipe implements EmiRecipe {
 				public boolean canUse(PlayerEntity player) {
 					return false;
 				}
-			}, recipe.getWidth(), recipe.getHeight());
+			}, 3, 3);
 			for (int j = 0; j < input.size(); j++) {
 				if (j == i) {
 					continue;
@@ -53,90 +43,19 @@ public class EmiShapedRecipe implements EmiRecipe {
 				}
 			}
 		}
-		output = EmiStack.of(recipe.getOutput());
-		this.recipe = recipe;
 	}
 
-	@Override
-	public EmiRecipeCategory getCategory() {
-		return VanillaEmiRecipeCategories.CRAFTING;
-	}
-
-	@Override
-	public Identifier getId() {
-		return recipe.getId();
-	}
-
-	@Override
-	public List<EmiIngredient> getInputs() {
-		return input;
-	}
-
-	@Override
-	public List<EmiStack> getOutputs() {
-		return List.of(output);
-	}
-
-	@Override
-	public int getDisplayWidth() {
-		return 118;
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 54;
-	}
-
-	@Override
-	public void addWidgets(WidgetHolder widgets) {
-		int w = recipe.getWidth();
-		int h = recipe.getHeight();
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
-		for (int i = 0; i < input.size(); i++) {
-			widgets.addSlot(input.get(i), i % w * 18, i / w * 18);
-		}
-		for (int sx = 0; sx < 3; sx++) {
-			for (int sy = 0; sy < 3; sy++) {
-				if (sx >= w || sy >= h) {
-					widgets.addSlot(EmiStack.of(ItemStack.EMPTY), sx * 18, sy * 18);
+	private static List<EmiIngredient> padIngredients(ShapedRecipe recipe) {
+		List<EmiIngredient> list = Lists.newArrayList();
+		int i = 0;
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 3; x++) {
+				if (x >= recipe.getWidth() || y >= recipe.getHeight()) {
+					list.add(EmiStack.EMPTY);
+				} else {
+					list.add(EmiIngredient.of(recipe.getIngredients().get(i++)));
 				}
 			}
-		}
-		widgets.addSlot(output, 92, 14).output(true).recipeContext(this);
-	}
-
-	@Override
-	public boolean canCraft(EmiPlayerInventory inv, HandledScreen<?> screen) {
-		ScreenHandler sh = screen.getScreenHandler();
-		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
-			return recipe.getWidth() <= arsh.getCraftingWidth() && recipe.getHeight() <= arsh.getCraftingHeight()
-				&& EmiRecipe.super.canCraft(inv, screen);
-		}
-		return false;
-	}
-
-	@Override
-	public List<ItemStack> getFill(HandledScreen<?> hs, boolean all) {
-		List<ItemStack> list = EmiRecipe.super.getFill(hs, all);
-
-		ScreenHandler sh = hs.getScreenHandler();
-		if (list != null && sh instanceof AbstractRecipeScreenHandler<?> arsh) {
-			int w = recipe.getWidth();
-			int h = recipe.getHeight();
-			
-			List<ItemStack> mut = Lists.newArrayList();
-	
-			int i = 0;
-			for (int sy = 0; sy < arsh.getCraftingHeight(); sy++) {
-				for (int sx = 0; sx < arsh.getCraftingWidth(); sx++) {
-					if (sx >= w || sy >= h) {
-						mut.add(ItemStack.EMPTY);
-					} else {
-						mut.add(list.get(i++));
-					}
-				}
-			}
-			return mut;
 		}
 		return list;
 	}

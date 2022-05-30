@@ -1,7 +1,7 @@
 {
   "parent": "emi:item/half_item",
   "textures": {
-    "left": "minecraft:item/music_disc_cat",
-    "right": "minecraft:item/music_disc_pigstep"
+    "first": "minecraft:item/music_disc_cat",
+    "second": "minecraft:item/music_disc_pigstep"
   }
 }

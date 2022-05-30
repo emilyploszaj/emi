@@ -66,16 +66,15 @@ public class EmiFavorites {
 				favorites.remove(original);
 			}
 			favorite = fav;
-		} else if (stack instanceof EmiStack es) {
+		} else {
+			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
 			for (int i = 0; i < favorites.size(); i++) {
 				EmiFavorite fav = favorites.get(i);
-				if (fav.getRecipe() == null && fav.getStack().isEqual(es)) {
+				if (fav.getRecipe() == null && fav.getStack().equals(stack)) {
 					favorites.remove(i--);
 				}
 			}
-			favorite = new EmiFavorite(es, null);
-		} else {
-			return;
+			favorite = new EmiFavorite(stack, null);
 		}
 		if (offset < 0) {
 			offset = 0;
@@ -85,30 +84,41 @@ public class EmiFavorites {
 		} else {
 			favorites.add(offset, favorite);
 		}
+		EmiPersistentData.save();
 	}
 
 	public static void addFavorite(EmiIngredient stack, EmiRecipe context) {
-		/*
-		if (context != null && !EmiRecipeFiller.RECIPE_HANDLERS.containsKey(context.getCategory())) {
-			context = null;
-		}*/
 		if (stack instanceof EmiFavorite f) {
 			if (!favorites.remove(f)) {
 				favorites.add(f);
 			}
-		} else if (stack instanceof EmiStack es) {
-			es = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
-			if (context == null && es instanceof ItemEmiStack ies) {
-				ies.getItemStack().setCount(1);
-			}
-			if (!es.isEmpty()) {
+		} else {
+			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
+			if (stack instanceof EmiStack es) {
+				es = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
+				if (context == null && es instanceof ItemEmiStack ies) {
+					ies.getItemStack().setCount(1);
+				}
+				if (!es.isEmpty()) {
+					for (int i = 0; i < favorites.size(); i++) {
+						EmiFavorite fav = favorites.get(i);
+						if (fav.getRecipe() == context && fav.getStack().equals(es)) {
+							return;
+						}
+					}
+					favorites.add(new EmiFavorite(es, context));
+				}
+			} else {
+				if (stack.isEmpty()) {
+					return;
+				}
 				for (int i = 0; i < favorites.size(); i++) {
 					EmiFavorite fav = favorites.get(i);
-					if (fav.getRecipe() == context && fav.getStack().isEqual(es)) {
+					if (fav.getRecipe() == null && fav.getStack().equals(stack)) {
 						return;
 					}
 				}
-				favorites.add(new EmiFavorite(es, context));
+				favorites.add(new EmiFavorite(stack, null));
 			}
 		}
 		EmiPersistentData.save();

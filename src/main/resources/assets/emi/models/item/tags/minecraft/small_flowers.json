@@ -1,7 +1,7 @@
 {
   "parent": "emi:item/half_item",
   "textures": {
-    "left": "minecraft:block/lily_of_the_valley",
-    "right": "minecraft:block/blue_orchid"
+    "first": "minecraft:block/lily_of_the_valley",
+    "second": "minecraft:block/blue_orchid"
   }
 }

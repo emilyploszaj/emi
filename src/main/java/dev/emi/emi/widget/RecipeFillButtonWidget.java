@@ -2,30 +2,39 @@ package dev.emi.emi.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
+import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
 public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	private final boolean canFill;
+	private Text invalid;
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public RecipeFillButtonWidget(int x, int y, EmiRecipe recipe) {
 		super(x, y, 24, 64, recipe);
 		MinecraftClient client = MinecraftClient.getInstance();
-		HandledScreen<?> hs = null;
-		if (client.currentScreen instanceof RecipeScreen rs) {
-			hs = rs.old;
-		} else if (client.currentScreen instanceof HandledScreen<?> s) {
-			hs = s;
+		HandledScreen hs = EmiApi.getHandledScreen();
+		EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
+		EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
+		boolean applicable = handler != null && handler.supportsRecipe(recipe);
+		canFill = applicable && handler.canCraft(recipe, inv, hs);
+		if (!canFill) {
+			if (!applicable) {
+				invalid = new TranslatableText("emi.inapplicable");
+			} else {
+				invalid = handler.getInvalidReason(recipe, inv, hs);
+			}
 		}
-		canFill = hs != null && recipe.canCraft(new EmiPlayerInventory(client.player), hs);
 	}
 
 	@Override
@@ -37,15 +46,19 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.fill_recipe").asOrderedText()));
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+		if (canFill) {
+			return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.fill_recipe").asOrderedText()));
+		} else {
+			return List.of(TooltipComponent.of(invalid.asOrderedText()));
+		}
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (canFill) {
 			this.playButtonSound();
-			EmiApi.performFill(recipe, EmiFillAction.FILL, EmiUtil.isShiftDown());
+			EmiApi.performFill(recipe, EmiFillAction.FILL, EmiUtil.isShiftDown() ? Integer.MAX_VALUE : 1);
 			return true;
 		}
 		return false;

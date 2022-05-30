@@ -39,7 +39,7 @@ public class RecipeButtonWidget extends Widget {
 
 	@Override
 	public Bounds getBounds() {
-		return new Bounds(x, y, 11, 11);
+		return new Bounds(x, y, 12, 12);
 	}
 
 	@Override

@@ -12,11 +12,11 @@ public abstract class Widget implements Drawable {
 	
 	public abstract void render(MatrixStack matrices, int mouseX, int mouseY, float delta);
 
-	public List<TooltipComponent> getTooltip() {
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return List.of();
 	}
 	
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		return false;
 	}
 

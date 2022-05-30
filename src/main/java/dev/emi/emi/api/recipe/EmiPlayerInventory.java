@@ -13,7 +13,6 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
-import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiStackList;
@@ -22,16 +21,12 @@ import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.mixin.accessor.ScreenHandlerAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -41,19 +36,12 @@ public class EmiPlayerInventory {
 	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
 	public EmiPlayerInventory(PlayerEntity entity) {
-
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
 		if (screen != null) {
-			ScreenHandler screenHandler = screen.getScreenHandler();
-			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
-			if ((type == null && screenHandler instanceof PlayerScreenHandler) || (type != null && EmiMain.handlers.containsKey(type))) {
-				EmiRecipeHandler<?> handler;
-				if (type == null) {
-					handler = (EmiRecipeHandler<?>) EmiMain.INVENTORY;
-				} else {
-					handler = (EmiRecipeHandler<?>) EmiMain.handlers.get(type);
-				}
-				List<Slot> slots = ((EmiRecipeHandler) handler).getInputSources(screenHandler);
+			List<EmiRecipeHandler<?>> handlers = (List) EmiRecipeFiller.getAllHandlers(screen);
+			if (!handlers.isEmpty()) {
+				// TODO this only supports slots from the first one
+				List<Slot> slots = ((EmiRecipeHandler) handlers.get(0)).getInputSources(screen.getScreenHandler());
 				for (Slot slot : slots) {
 					if (slot.canTakeItems(entity)) {
 						addStack(slot.getStack());
@@ -89,20 +77,17 @@ public class EmiPlayerInventory {
 		if (!EmiConfig.localCraftable) {
 			return r -> this.canCraft(r);
 		}
-		HandledScreen<?> screen = EmiApi.getHandledScreen();
-		ScreenHandler screenHandler = screen.getScreenHandler();
-		ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
-		if ((type == null && screenHandler instanceof PlayerScreenHandler) || (type != null && EmiMain.handlers.containsKey(type))) {
-			EmiRecipeHandler<?> handler;
-			if (type == null) {
-				handler = (EmiRecipeHandler<?>) EmiMain.INVENTORY;
-			} else {
-				handler = (EmiRecipeHandler<?>) EmiMain.handlers.get(type);
-			}
-			Set<EmiRecipeHandler<?>> empty = Set.of();
+		HandledScreen screen = EmiApi.getHandledScreen();
+		List<EmiRecipeHandler> handlers = EmiRecipeFiller.getAllHandlers(screen);
+		if (!handlers.isEmpty()) {
 			return r -> {
-				return EmiRecipeFiller.RECIPE_HANDLERS.getOrDefault(r.getCategory(), empty).contains(handler)
-					&& r.canCraft(this, screen);
+				for (int i = 0; i < handlers.size(); i++) {
+					EmiRecipeHandler handler = handlers.get(i);
+					if (handler.supportsRecipe(r)) {
+						return handler.canCraft(r, EmiPlayerInventory.this, screen);
+					}
+				}
+				return false;
 			};
 		}
 		return null;

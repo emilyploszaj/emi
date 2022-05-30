@@ -48,7 +48,6 @@ public class EmiStackList {
 			Fluid fluid = Registry.FLUID.get(i);
 			if (fluid.isStill(fluid.getDefaultState())) {
 				EmiStack fs = new FluidEmiStack(FluidVariant.of(fluid));
-				// Fix for Create fluids that NPE
 				try {
 					fs.getName();
 					fs.getTooltip();

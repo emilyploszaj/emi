@@ -16,7 +16,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class IntWidget extends Entry {
-	private static final Pattern NUMBER = Pattern.compile("^-?[0-9]+$");
+	private static final Pattern NUMBER = Pattern.compile("^-?[0-9]*$");
 	private final Text name;
 	private final Drawable tooltip;
 	private TextFieldWidget text;

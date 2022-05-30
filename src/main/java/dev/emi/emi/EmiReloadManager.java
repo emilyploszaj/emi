@@ -3,9 +3,11 @@ package dev.emi.emi;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.fabricmc.loader.api.FabricLoader;
@@ -66,7 +68,7 @@ public class EmiReloadManager {
 					.filter(key -> !EmiClient.excludedTags.contains(key.id()))
 					.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 					.toList();
-				EmiRecipeFiller.RECIPE_HANDLERS.clear();
+				EmiRecipeFiller.handlers.clear();
 				EmiComparisonDefaults.comparisons = new HashMap<>();
 				EmiStackList.reload();
 				if (restart) {
@@ -102,6 +104,10 @@ public class EmiReloadManager {
 					continue;
 				}
 				EmiStackList.bake();
+				Consumer<EmiRecipe> registerLateRecipe = registry::addRecipe;
+				for (Consumer<Consumer<EmiRecipe>> consumer : EmiRecipes.lateRecipes) {
+					consumer.accept(registerLateRecipe);
+				}
 				EmiRecipes.bake();
 				BoM.reload();
 				EmiLog.bake();

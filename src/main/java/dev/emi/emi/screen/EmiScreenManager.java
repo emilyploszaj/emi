@@ -111,7 +111,7 @@ public class EmiScreenManager {
 		return EmiReloadManager.isReloading() || !EmiConfig.enabled;
 	}
 
-	private static void recalculate() {
+	public static void recalculate() {
 		if (EmiConfig.craftable) {
 			EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
 			if (!inv.isEqual(lastPlayerInventory)) {
@@ -146,8 +146,8 @@ public class EmiScreenManager {
 		lastHeight = screen.height;
 		lastExclusion = exclusion;
 		if (screen instanceof EmiScreen emi) {
-			left = emi.emi$getLeft();
-			right = emi.emi$getRight();
+			left = Math.max(ENTRY_SIZE * 2, emi.emi$getLeft());
+			right = Math.min(screen.width - ENTRY_SIZE * 2, emi.emi$getRight());
 			int xMin = right;
 			int xMax = screen.width - 1;
 			int yMin = 18;
@@ -215,6 +215,15 @@ public class EmiScreenManager {
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		Screen screen = client.currentScreen;
+		boolean visible = !isDisabled();
+		emi.visible = visible;
+		tree.visible = visible;
+		craftableButton.visible = visible;
+		localCraftables.visible = visible;
+		searchLeft.visible = visible;
+		searchRight.visible = visible;
+		favoriteLeft.visible = visible;
+		favoriteRight.visible = visible;
 		if (isDisabled()) {
 			if (EmiReloadManager.isReloading()) {
 				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 48, screen.height - 16, -1);
@@ -253,8 +262,8 @@ public class EmiScreenManager {
 					int cx = searchSpace.getX(xo, yo);
 					int cy = searchSpace.getY(xo, yo);
 					EmiIngredient stack = stacks.get(i++);
-					searchBatcher.render(stack.getEmiStacks().get(0), matrices, cx + 1, cy + 1, delta);
-					if (EmiConfig.devMode) {
+					searchBatcher.render(stack, matrices, cx + 1, cy + 1, delta);
+					if (EmiConfig.highlightDefaulted) {
 						if (BoM.getRecipe(stack) != null) {
 							RenderSystem.enableDepthTest();
 							DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
@@ -287,7 +296,7 @@ public class EmiScreenManager {
 					}
 					int cx = favoriteSpace.getX(xo, yo);
 					int cy = favoriteSpace.getY(xo, yo);
-					favoriteBatcher.render(EmiFavorites.favorites.get(i++).getStack(), matrices, cx + 1, cy + 1, delta);
+					favoriteBatcher.render(EmiFavorites.favorites.get(i++), matrices, cx + 1, cy + 1, delta);
 				}
 			}
 			favoriteBatcher.draw();
@@ -474,18 +483,18 @@ public class EmiScreenManager {
 				return false;
 			}
 			recalculate();
-			if (!pressedStack.isEmpty()) {
-				if (EmiConfig.cheatMode) {
-					if (client.currentScreen instanceof HandledScreen<?> handled) {
-						ItemStack cursor = handled.getScreenHandler().getCursorStack();
-						if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
-							handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
-							ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
-							// Returning false here makes the handled screen do something and removes a bug, oh well.
-							return false;
-						}
+			if (EmiConfig.cheatMode) {
+				if (client.currentScreen instanceof HandledScreen<?> handled) {
+					ItemStack cursor = handled.getScreenHandler().getCursorStack();
+					if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
+						handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
+						ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
+						// Returning false here makes the handled screen do something and removes a bug, oh well.
+						return false;
 					}
 				}
+			}
+			if (!pressedStack.isEmpty()) {
 				if (!draggedStack.isEmpty()) {
 					int mx = (int) mouseX;
 					int my = (int) mouseY;
@@ -530,7 +539,6 @@ public class EmiScreenManager {
 			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
 			if (hovered.getStack() != pressedStack) {
 				draggedStack = pressedStack;
-				pressedStack = EmiStack.EMPTY;
 			}
 		}
 		return false;
@@ -600,21 +608,25 @@ public class EmiScreenManager {
 		EmiIngredient ingredient = stack.getStack();
 		if (!ingredient.isEmpty()) {
 			if (ingredient instanceof EmiFavorite fav && fav.getRecipe() != null) {
+				EmiFillAction action = null;
+				boolean all = false;
 				if (function.apply(EmiConfig.craftAllToInventory)) {
-					EmiApi.performFill(fav.getRecipe(), EmiFillAction.QUICK_MOVE, true);
-					return true;
+					action = EmiFillAction.QUICK_MOVE;
+					all = true;
 				} else if (function.apply(EmiConfig.craftOneToInventory)) {
-					EmiApi.performFill(fav.getRecipe(), EmiFillAction.QUICK_MOVE, false);
-					return true;
+					action = EmiFillAction.QUICK_MOVE;
 				} else if (function.apply(EmiConfig.craftOneToCursor)) {
-					EmiApi.performFill(fav.getRecipe(), EmiFillAction.CURSOR, false);
-					return true;
+					action = EmiFillAction.CURSOR;
 				} else if (function.apply(EmiConfig.craftAll)) {
-					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, true);
-					return true;
+					action = EmiFillAction.FILL;
+					all = true;
 				} else if (function.apply(EmiConfig.craftOne)) {
-					EmiApi.performFill(fav.getRecipe(), EmiFillAction.FILL, false);
-					return true;
+					action = EmiFillAction.FILL;
+				}
+				if (action != null) {
+					if (EmiApi.performFill(fav.getRecipe(), action, all ? Integer.MAX_VALUE : 1)) {
+						return true;
+					}
 				}
 			}
 			if (EmiConfig.cheatMode) {

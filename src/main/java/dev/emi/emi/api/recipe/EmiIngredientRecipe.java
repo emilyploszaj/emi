@@ -41,6 +41,11 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 	}
 
 	@Override
+	public boolean supportsRecipeTree() {
+		return false;
+	}
+
+	@Override
 	public void addWidgets(WidgetHolder widgets) {
 		List<EmiStack> stacks = getStacks();
 		widgets.addSlot(getIngredient(), 63, 0);

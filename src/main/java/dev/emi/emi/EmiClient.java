@@ -9,7 +9,10 @@ import java.util.function.Consumer;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import org.apache.commons.compress.utils.Lists;
+
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -22,12 +25,15 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 
@@ -91,11 +97,49 @@ public class EmiClient implements ClientModInitializer {
 		});
 	}
 	
+	private static void writeCompressedSlots(List<Slot> slots, PacketByteBuf buf) {
+		List<Integer> list = slots.stream()
+			.map(s -> s.id)
+			.sorted()
+			.distinct()
+			.toList();
+		List<Consumer<PacketByteBuf>> postWrite = Lists.newArrayList();
+		int groups = 0;
+		int i = 0;
+		while (i < list.size()) {
+			groups++;
+			int start = i;
+			int startValue = list.get(start);
+			while (i < list.size() && i - start == list.get(i) - startValue) {
+				i++;
+			}
+			int end = i - 1;
+			postWrite.add(b -> {
+				b.writeVarInt(startValue);
+				b.writeVarInt(list.get(end));
+			});
+		}
+		buf.writeVarInt(groups);
+		for (Consumer<PacketByteBuf> consumer : postWrite) {
+			consumer.accept(buf);
+		}
+	}
 	
-	public static void sendFillRecipe(int syncId, int action, List<ItemStack> stacks) {
+	public static <T extends ScreenHandler> void sendFillRecipe(EmiRecipeHandler<T> handler, HandledScreen<T> screen,
+			int syncId, int action, List<ItemStack> stacks) {
+		T screenHandler = screen.getScreenHandler();
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeInt(syncId);
 		buf.writeByte(action);
+		writeCompressedSlots(handler.getInputSources(screenHandler), buf);
+		writeCompressedSlots(handler.getCraftingSlots(screenHandler), buf);
+		Slot output = handler.getOutputSlot(screenHandler);
+		if (output != null) {
+			buf.writeBoolean(true);
+			buf.writeVarInt(output.id);
+		} else {
+			buf.writeBoolean(false);
+		}
 		buf.writeVarInt(stacks.size());
 		for (ItemStack stack : stacks) {
 			buf.writeItemStack(stack);

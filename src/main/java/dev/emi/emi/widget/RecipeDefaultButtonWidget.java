@@ -24,12 +24,12 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.set_default").asOrderedText()));
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (BoM.isRecipeEnabled(recipe)) {
 			BoM.removeRecipe(recipe);
 		} else {

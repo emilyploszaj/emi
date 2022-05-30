@@ -1,5 +1,6 @@
 package dev.emi.emi.api;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -10,6 +11,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
 public interface EmiRegistry {
@@ -46,6 +49,12 @@ public interface EmiRegistry {
 	default void removeRecipes(Identifier id) {
 		removeRecipes(r -> id.equals(r.getId()));
 	}
+
+	/**
+	 * Add recipes that are reliant on a majority of EMI metadata is populated.
+	 * The passed consumer will be run after all EMI plugins have executed.
+	 */
+	void addDeferredRecipes(Consumer<Consumer<EmiRecipe>> consumer);
 
 	/**
 	 * Adds an EmiStack to the sidebar.
@@ -130,5 +139,9 @@ public interface EmiRegistry {
 		setDefaultComparison(stack.getKey(), comparison);
 	}
 
-	void addRecipeHandler(EmiRecipeCategory category, EmiRecipeHandler<?> handler);
+	/**
+	 * Adds a recipe handler to a specified type of screen handler.
+	 * Recipe handlers are responsible for filling recipes automatically.
+	 */
+	<T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, EmiRecipeHandler<T> handler);
 }

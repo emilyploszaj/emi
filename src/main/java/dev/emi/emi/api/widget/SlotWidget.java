@@ -11,13 +11,13 @@ import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.GameRenderer;
@@ -137,7 +137,7 @@ public class SlotWidget extends Widget {
 	}
 	
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		List<TooltipComponent> list = Lists.newArrayList();
 		list.addAll(getStack().getTooltip());
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
@@ -147,10 +147,10 @@ public class SlotWidget extends Widget {
 			if (RecipeScreen.resolve != null) {
 				list.add(TooltipComponent.of(new TranslatableText("emi.resolve").formatted(Formatting.GREEN).asOrderedText()));
 			}
-			if (getRecipe().getId() != null && EmiConfig.devMode) {
+			if (getRecipe().getId() != null && EmiConfig.showRecipeIds) {
 				list.add(TooltipComponent.of(new LiteralText(getRecipe().getId().toString()).asOrderedText()));
 			}
-			if (getRecipe().supportsRecipeTree()) {
+			if (getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
 				list.add(new RecipeCostTooltipComponent(getRecipe()));
 			}
 		}
@@ -158,7 +158,7 @@ public class SlotWidget extends Widget {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (button == 0 && getRecipe() != null && RecipeScreen.resolve != null) {
 			BoM.addResolution(RecipeScreen.resolve, getRecipe());
 			EmiHistory.pop();
@@ -166,10 +166,7 @@ public class SlotWidget extends Widget {
 		} else if (EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
 				bind -> bind.matchesMouse(button))) {
 			return true;
-		} else if (button == 2 && EmiConfig.devMode && getRecipe() != null) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			client.keyboard.setClipboard("\n    \"" + getRecipe().getId().toString() + "\",");
-		} 
+		}
 		return false;
 	}
 

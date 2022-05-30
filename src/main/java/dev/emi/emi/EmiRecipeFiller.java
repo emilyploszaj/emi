@@ -2,19 +2,20 @@ package dev.emi.emi;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.Maps;
 
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.mixin.accessor.ScreenHandlerAccessor;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -23,24 +24,55 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
 public class EmiRecipeFiller {
-	private static final Set<EmiRecipeHandler<?>> EMPTY_SET = Set.of();
-	public static final Map<EmiRecipeCategory, Set<EmiRecipeHandler<?>>> RECIPE_HANDLERS = Maps.newHashMap();
-	
+	public static Map<ScreenHandlerType<?>, List<EmiRecipeHandler<?>>> handlers = Maps.newHashMap();
+
+	public static boolean isSupported(EmiRecipe recipe) {
+		for (List<EmiRecipeHandler<?>> list : handlers.values()) {
+			for (EmiRecipeHandler<?> handler : list) {
+				if (handler.supportsRecipe(recipe)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
-	public static <T extends ScreenHandler> @Nullable List<ItemStack> fillRecipe(EmiRecipe recipe, HandledScreen<T> screen, boolean all) {
+	public static <T extends ScreenHandler> List<EmiRecipeHandler<T>> getAllHandlers(HandledScreen<T> screen) {
+		T screenHandler = screen.getScreenHandler();
+		ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
+		if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
+			return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
+		}
+		return List.of();
+	}
+
+	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, HandledScreen<T> screen) {
+		for (EmiRecipeHandler<T> handler : getAllHandlers(screen)) {
+			if (handler.supportsRecipe(recipe)) {
+				return handler;
+			}
+		}
+		return null;
+	}
+
+	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen, EmiFillAction action, int amount) {
+		EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
+		if (handler != null && handler.supportsRecipe(recipe)) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
+			if (handler.canCraft(recipe, inv, screen)) {
+				return handler.performFill(recipe, screen, action, amount);
+			}
+		}
+		return false;
+	}
+	
+	public static <T extends ScreenHandler> @Nullable List<ItemStack> getStacks(EmiRecipe recipe, HandledScreen<T> screen, int amount) {
 		try {
 			T screenHandler = screen.getScreenHandler();
-			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
-			if ((type == null && screenHandler instanceof PlayerScreenHandler) || (type != null && EmiMain.handlers.containsKey(type))) {
-				EmiRecipeHandler<T> handler;
-				if (type == null) {
-					handler = (EmiRecipeHandler<T>) EmiMain.INVENTORY;
-				} else {
-					handler = (EmiRecipeHandler<T>) EmiMain.handlers.get(type);
-				}
-				if (!RECIPE_HANDLERS.getOrDefault(recipe.getCategory(), EMPTY_SET).contains(handler)) {
-					return null;
-				}
+			EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
+			if (handler != null) {
 				List<Slot> slots = handler.getInputSources(screenHandler);
 				List<EmiIngredient> ingredients = recipe.getInputs();
 				List<DiscoveredItem> discovered = Lists.newArrayList();
@@ -95,9 +127,7 @@ public class EmiRecipeFiller {
 					maxAmount = Math.min(maxAmount, ui.amount / ui.consumed);
 					maxAmount = Math.min(maxAmount, ui.stack.getMaxCount());
 				}
-				if (!all) {
-					maxAmount = Math.min(maxAmount, 1);
-				}
+				maxAmount = Math.min(maxAmount, amount);
 
 				if (maxAmount == 0) {
 					return null;
@@ -108,8 +138,8 @@ public class EmiRecipeFiller {
 					DiscoveredItem di = discovered.get(i);
 					if (di != null) {
 						ItemStack is = di.stack.copy();
-						int amount = di.consumed * maxAmount;
-						is.setCount(amount);
+						int a = di.consumed * maxAmount;
+						is.setCount(a);
 						desired.add(is);
 					} else {
 						desired.add(ItemStack.EMPTY);

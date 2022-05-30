@@ -1,10 +1,10 @@
 package dev.emi.emi.screen.tooltip;
 
-import java.text.DecimalFormat;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.bom.FractionalMaterialCost;
 import dev.emi.emi.bom.MaterialTree;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -13,6 +13,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Matrix4f;
 
@@ -32,7 +33,21 @@ public class RecipeCostTooltipComponent implements TooltipComponent {
 
 	@Override
 	public int getWidth(TextRenderer textRenderer) {
-		return Math.max(textRenderer.getWidth(COST), Math.min(4, tree.fractionalCosts.size()) * 24);
+		int max = textRenderer.getWidth(COST);
+		int c = 0;
+		int cx = 0;
+		for (int i = 0; i < tree.fractionalCosts.size(); i++) {
+			FractionalMaterialCost cost = tree.fractionalCosts.get(i);
+			Text amount = cost.ingredient.getAmountText(cost.amount);
+			int ew = EmiRenderHelper.getAmountOverflow(amount);
+			if (c++ > 3) {
+				c = 0;
+				cx = 0;
+			}
+			cx += ew + 24;
+			max = Math.max(max, cx - 6);
+		}
+		return max;
 	}
 	
 	@Override
@@ -41,19 +56,27 @@ public class RecipeCostTooltipComponent implements TooltipComponent {
 		view.push();
 		view.translate(0, 0, z);
 		RenderSystem.applyModelViewMatrix();
-		DecimalFormat format = new DecimalFormat("0.##");
+		int c = 0;
+		int cx = 0;
+		int cy = 10;
 		for (int i = 0; i < tree.fractionalCosts.size(); i++) {
-			int ix = x + i % 4 * 24;
-			int iy = y + 10 + i / 4 * 18;
-			tree.fractionalCosts.get(i).ingredient.render(matrices, ix, iy, MinecraftClient.getInstance().getTickDelta());
+			FractionalMaterialCost cost = tree.fractionalCosts.get(i);
+			Text amount = cost.ingredient.getAmountText(cost.amount);
+			int ew = EmiRenderHelper.getAmountOverflow(amount);
+			if (c++ > 3) {
+				c = 0;
+				cx = 0;
+				cy += 18;
+			}
+			int ix = x + cx;
+			int iy = y + cy;
+			cost.ingredient.render(matrices, ix, iy, MinecraftClient.getInstance().getTickDelta());
 			matrices.push();
 			// This terrifies me, I'd like to do something else
-			matrices.translate(0, 0, 590);
-			RenderSystem.disableDepthTest();
-			float amount = tree.fractionalCosts.get(i).amount;
-			String s = format.format(amount);
-			textRenderer.drawWithShadow(matrices, s, ix + 17 - Math.min(10, textRenderer.getWidth(s)), iy + 9, -1);
+			matrices.translate(0, 0, 390);
+			EmiRenderHelper.renderAmount(matrices, ix, iy, amount);
 			matrices.pop();
+			cx += 24 + ew;
 		}
 		view.pop();
 		RenderSystem.applyModelViewMatrix();

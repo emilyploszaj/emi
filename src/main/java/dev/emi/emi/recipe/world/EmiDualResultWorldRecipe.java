@@ -30,7 +30,20 @@ public class EmiDualResultWorldRecipe extends EmiCustomWorldRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(input, catalyst);
+		if (isCatalyst) {
+			return List.of(input);
+		} else {
+			return List.of(input, catalyst);
+		}
+	}
+
+	@Override
+	public List<EmiIngredient> getCatalysts() {
+		if (isCatalyst) {
+			return List.of(catalyst);
+		} else {
+			return super.getCatalysts();
+		}
 	}
 
 	@Override

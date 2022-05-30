@@ -42,6 +42,8 @@
   "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
 
   "config.emi.dev.dev_mode": "Dev Mode",
+  "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
+  "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
 
   "emi.unit.liters": "Liters",
   "emi.unit.millibuckets": "Millibuckets",
@@ -50,11 +52,15 @@
   "emi.fluid.amount.millibuckets": "%s mB",
   "emi.fluid.amount.droplets": "%s d",
 
+  "emi.inapplicable": "Current workstation does not support recipe",
+  "emi.not_enough_ingredients": "Not enough ingredients to craft",
+  "emi.too_small": "Crafting grid too small to fit ingredients",
   "emi.resolve": "Resolve recipe for this recipe tree",
   "emi.page": "Page %s of %s",
   "emi.total_cost": "Total Cost",
-  "emi.cost_per": "Cost Each",
+  "emi.cost_per": "Cost Per Batch",
   "emi.leftovers": "Leftovers",
+  "emi.view_all_recipes": "View All Recipes",
   "emi.tree_welcome": "Welcome to %s",
   "emi.no_tree": "You haven't set a recipe tree to view yet...",
   "emi.random_tree": "Perhaps you'd like to see a random one?",
@@ -121,7 +127,6 @@
   "tag.minecraft.buttons": "Buttons",
   "tag.minecraft.candles": "Candles",
   "tag.minecraft.carpets": "Carpets",
-  "tag.minecraft.cluster_max_harvestables": "Cluster Max Harvestables",
   "tag.minecraft.coals": "Coals",
   "tag.minecraft.creeper_drop_music_discs": "Creeper Drop Music Discs",
   "tag.minecraft.dirt": "Dirt",

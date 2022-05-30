@@ -39,7 +39,11 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		matrices.translate(0, 0, z);
+		MatrixStack view = RenderSystem.getModelViewStack();
+		itemRenderer.zOffset -= z;
+		view.push();
+		view.translate(0, 0, z);
+		RenderSystem.applyModelViewMatrix();
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, TEXTURE);
@@ -60,8 +64,6 @@ public class RecipeTooltipComponent implements TooltipComponent {
 				return widget;
 			}
 		};
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
 		view.translate(x + 4, y + 4, 0);
 		RenderSystem.applyModelViewMatrix();
 		recipe.addWidgets(holder);
@@ -72,5 +74,6 @@ public class RecipeTooltipComponent implements TooltipComponent {
 		EmiClient.availableForCrafting.clear();
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
+		itemRenderer.zOffset += z;
 	}
 }

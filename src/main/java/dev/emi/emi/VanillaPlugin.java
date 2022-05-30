@@ -1,5 +1,16 @@
 package dev.emi.emi;
 
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.ANVIL_REPAIRING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BLASTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BREWING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.CAMPFIRE_COOKING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.CRAFTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMELTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMITHING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMOKING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.STONECUTTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.WORLD_INTERACTION;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +29,9 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.handler.CookingRecipeHandler;
+import dev.emi.emi.handler.CraftingRecipeHandler;
+import dev.emi.emi.handler.InventoryRecipeHandler;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
@@ -77,14 +91,16 @@ import net.minecraft.recipe.SmokingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
+import net.minecraft.screen.BlastFurnaceScreenHandler;
+import net.minecraft.screen.FurnaceScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.SmokerScreenHandler;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntryList;
-
-import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.*;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
@@ -146,11 +162,11 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.DAMAGED_ANVIL));
 		registry.addWorkstation(BREWING, EmiStack.of(Items.BREWING_STAND));
 
-		registry.addRecipeHandler(CRAFTING, EmiMain.CRAFTING);
-		registry.addRecipeHandler(CRAFTING, EmiMain.INVENTORY);
-		registry.addRecipeHandler(SMELTING, EmiMain.COOKING);
-		registry.addRecipeHandler(BLASTING, EmiMain.COOKING);
-		registry.addRecipeHandler(SMOKING, EmiMain.COOKING);
+		registry.addRecipeHandler(null, new InventoryRecipeHandler());
+		registry.addRecipeHandler(ScreenHandlerType.CRAFTING, new CraftingRecipeHandler());
+		registry.addRecipeHandler(ScreenHandlerType.FURNACE, new CookingRecipeHandler<FurnaceScreenHandler>(SMELTING));
+		registry.addRecipeHandler(ScreenHandlerType.BLAST_FURNACE, new CookingRecipeHandler<BlastFurnaceScreenHandler>(BLASTING));
+		registry.addRecipeHandler(ScreenHandlerType.SMOKER, new CookingRecipeHandler<SmokerScreenHandler>(SMOKING));
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
 			if (screen instanceof AbstractInventoryScreen<?> inv) {

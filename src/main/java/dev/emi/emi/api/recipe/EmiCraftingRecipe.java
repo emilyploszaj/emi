@@ -6,10 +6,7 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Identifier;
 
 public class EmiCraftingRecipe implements EmiRecipe {
@@ -59,13 +56,18 @@ public class EmiCraftingRecipe implements EmiRecipe {
 		return 54;
 	}
 
-	@Override
-	public boolean canCraft(EmiPlayerInventory inv, HandledScreen<?> screen) {
-		ScreenHandler sh = screen.getScreenHandler();
-		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
-			return getInputs().size() <= arsh.getCraftingWidth() * arsh.getCraftingHeight() && EmiRecipe.super.canCraft(inv, screen);
+	public boolean canFit(int width, int height) {
+		if (input.size() > 9) {
+			return false;
 		}
-		return false;
+		for (int i = 0; i < input.size(); i++) {
+			int x = i % 3;
+			int y = i / 3;
+			if (!input.get(i).isEmpty() && (x >= width || y >= height)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

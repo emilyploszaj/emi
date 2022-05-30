@@ -1,7 +1,7 @@
 {
   "parent": "emi:item/half_item",
   "textures": {
-    "left": "minecraft:block/azure_bluet",
-    "right": "minecraft:block/lilac_top"
+    "first": "minecraft:block/azure_bluet",
+    "second": "minecraft:block/lilac_top"
   }
 }

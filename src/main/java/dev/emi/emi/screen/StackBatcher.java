@@ -11,9 +11,7 @@ import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
-import dev.emi.emi.EmiLog;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -83,20 +81,20 @@ public class StackBatcher {
 		}
 	}
 
-	public void render(EmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
 		if (stack instanceof Batchable b && !b.isUnbatchable()) {
 			if (populated) return;
 			try {
 				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
 			} catch (Throwable t) {
 				if (EmiConfig.devMode) {
-					EmiLog.warn("Item "+stack.getItemStack()+" threw exception during batched rendering. See log for info");
+					System.err.println("[emi] Stack threw exception during batched rendering. See log for info");
 					t.printStackTrace();
 				}
 				b.setUnbatchable();
 			}
 		} else {
-			stack.render(matrices, x, y, delta, EmiIngredient.RENDER_ICON);
+			stack.render(matrices, x, y, delta, -1 ^ EmiIngredient.RENDER_AMOUNT);
 		}
 	}
 

@@ -9,6 +9,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
@@ -45,6 +46,7 @@ public class BoMScreen extends Screen {
 	public HandledScreen<?> old;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
+	private int lastMouseX, lastMouseY;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(new TranslatableText("screen.emi.bom"));
@@ -78,7 +80,9 @@ public class BoMScreen extends Screen {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
+		this.renderBackgroundTexture(0);
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
 		float scale = getScale();
 		int scaledWidth = (int) (width / scale);
 		int scaledHeight = (int) (height / scale);
@@ -269,6 +273,12 @@ public class BoMScreen extends Screen {
 		if (function.apply(EmiConfig.back)) {
 			EmiHistory.pop();
 			return true;
+		}
+		Hover hover = getHoveredStack(lastMouseX, lastMouseY);
+		if (hover != null && !hover.stack.isEmpty()) {
+			if (function.apply(EmiConfig.favorite)) {
+				EmiFavorites.addFavorite(hover.stack, hover.node == null ? null : hover.node.recipe);
+			}
 		}
 		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_R) {
 			if (EmiRecipes.recipes.size() > 0) {

@@ -48,7 +48,20 @@ public class EmiWorldRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(input, catalyst);
+		if (isCatalyst) {
+			return List.of(input);
+		} else {
+			return List.of(input, catalyst);
+		}
+	}
+
+	@Override
+	public List<EmiIngredient> getCatalysts() {
+		if (isCatalyst) {
+			return List.of(catalyst);
+		} else {
+			return List.of();
+		}
 	}
 
 	@Override

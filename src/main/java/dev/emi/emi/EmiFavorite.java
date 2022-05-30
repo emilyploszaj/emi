@@ -8,26 +8,29 @@ import org.jetbrains.annotations.Nullable;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class EmiFavorite implements EmiIngredient {
-	private final EmiStack stack;
+public class EmiFavorite implements EmiIngredient, Batchable {
+	private final EmiIngredient stack;
 	private final @Nullable EmiRecipe recipe;
 
-	public EmiFavorite(EmiStack stack, @Nullable EmiRecipe recipe) {
+	public EmiFavorite(EmiIngredient stack, @Nullable EmiRecipe recipe) {
+		
 		this.stack = stack;
 		this.recipe = recipe;
 	}
 
-	public EmiStack getStack() {
+	public EmiIngredient getStack() {
 		return stack;
 	}
 
 	@Override
 	public int getAmount() {
-		return 1;
+		return stack.getAmount();
 	}
 
 	public EmiRecipe getRecipe() {
@@ -36,7 +39,7 @@ public class EmiFavorite implements EmiIngredient {
 
 	@Override
 	public List<EmiStack> getEmiStacks() {
-		return List.of(getStack());
+		return stack.getEmiStacks();
 	}
 
 	@Override
@@ -52,5 +55,29 @@ public class EmiFavorite implements EmiIngredient {
 			list.add(new RecipeTooltipComponent(recipe));
 		}
 		return list;
+	}
+
+	@Override
+	public boolean isSideLit() {
+		return stack instanceof Batchable b && b.isSideLit();
+	}
+
+	@Override
+	public boolean isUnbatchable() {
+		return !(stack instanceof Batchable b) || b.isUnbatchable();
+	}
+
+	@Override
+	public void setUnbatchable() {
+		if (stack instanceof Batchable b) {
+			b.setUnbatchable();
+		}
+	}
+
+	@Override
+	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+		if (stack instanceof Batchable b) {
+			b.renderForBatch(vcp, matrices, x, y, z, delta);
+		}
 	}
 }

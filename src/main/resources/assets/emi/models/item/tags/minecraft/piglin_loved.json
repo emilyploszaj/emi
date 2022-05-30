@@ -1,0 +1,7 @@
+{
+  "parent": "emi:item/half_item",
+  "textures": {
+    "first": "minecraft:item/glistering_melon_slice",
+    "second": "minecraft:item/clock_00"
+  }
+}

@@ -49,6 +49,7 @@ public class RemainderTooltipComponent implements TooltipComponent {
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
 		MatrixStack view = RenderSystem.getModelViewStack();
 		view.push();
+		itemRenderer.zOffset -= z;
 		view.translate(0, 0, z);
 		RenderSystem.applyModelViewMatrix();
 		for (int i = 0; i < remainders.size(); i++) {
@@ -57,6 +58,7 @@ public class RemainderTooltipComponent implements TooltipComponent {
 			remainder.remainder.render(matrices, x + 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
 		}
 		view.pop();
+		itemRenderer.zOffset += z;
 		RenderSystem.applyModelViewMatrix();
 	}
 

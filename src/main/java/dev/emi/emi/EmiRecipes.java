@@ -3,6 +3,7 @@ package dev.emi.emi;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
+	public static List<Consumer<Consumer<EmiRecipe>>> lateRecipes = Lists.newArrayList();
 	public static List<Predicate<EmiRecipe>> invalidators = Lists.newArrayList();
 
 	public static List<EmiRecipeCategory> categories = Lists.newArrayList();
@@ -65,6 +67,8 @@ public class EmiRecipes {
 				byId.put(id, recipe);
 			}
 			getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
+				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+			getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
 			getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
 				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));

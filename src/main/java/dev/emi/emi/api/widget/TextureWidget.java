@@ -1,7 +1,7 @@
 package dev.emi.emi.api.widget;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -18,7 +18,7 @@ public class TextureWidget extends Widget {
 	protected final int u, v;
 	protected final int regionWidth, regionHeight;
 	protected final int textureWidth, textureHeight;
-	private Supplier<List<TooltipComponent>> tooltipSupplier = () -> List.of();
+	private BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
 	public TextureWidget(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
@@ -39,7 +39,7 @@ public class TextureWidget extends Widget {
 		this(texture, x, y, width, height, u, v, width, height, 256, 256);
 	}
 
-	public TextureWidget tooltip(Supplier<List<TooltipComponent>> tooltipSupplier) {
+	public TextureWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;
 	}
@@ -50,8 +50,8 @@ public class TextureWidget extends Widget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		return tooltipSupplier.get();
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+		return tooltipSupplier.apply(mouseX, mouseY);
 	}
 
 	@Override

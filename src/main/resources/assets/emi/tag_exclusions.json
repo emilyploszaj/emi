@@ -1,6 +1,7 @@
 {
   "exclusions": [
     "minecraft:occludes_vibration_signals",
+    "minecraft:cluster_max_harvestables",
     "c:sand",
     "c:glass_pane",
     "c:beacon_payment",

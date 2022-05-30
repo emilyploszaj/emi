@@ -38,6 +38,11 @@ public class EmiArmorWashingRecipe extends EmiCustomWorldRecipe {
 	}
 
 	@Override
+	public List<EmiIngredient> getCatalysts() {
+		return List.of(CAULDRON);
+	}
+
+	@Override
 	public List<EmiStack> getOutputs() {
 		return List.of(emiArmor);
 	}

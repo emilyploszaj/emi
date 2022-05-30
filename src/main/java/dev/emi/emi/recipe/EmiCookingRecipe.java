@@ -64,7 +64,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addFillingArrow(24, 5, 50 * recipe.getCookTime()).tooltip(() -> {
+		widgets.addFillingArrow(24, 5, 50 * recipe.getCookTime()).tooltip((mx, my) -> {
 			return List.of(TooltipComponent.of(new TranslatableText("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
 		});
 		if (infiniBurn) {

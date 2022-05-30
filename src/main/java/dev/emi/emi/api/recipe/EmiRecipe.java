@@ -4,12 +4,9 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public interface EmiRecipe {
@@ -24,9 +21,17 @@ public interface EmiRecipe {
 	/**
 	 * @return A list of ingredients required for the recipe.
 	 * 	Inputs will consider this recipe a use when exploring recipes.
-	 * 
 	 */
 	List<EmiIngredient> getInputs();
+	
+	/**
+	 * @return A list of ingredients associated with the creation of the recipe.
+	 * 	Catalysts are considered the same as workstations in the recipe, not broken down as a requirement.
+	 * 	However, catalysts will consider this recipe a use when exploring recipes.
+	 */
+	default List<EmiIngredient> getCatalysts() {
+		return List.of();
+	}
 
 	/**
 	 * @return A list of stacks that are created after a craft.
@@ -37,6 +42,9 @@ public interface EmiRecipe {
 	/**
 	 * @return The width taken up by the recipe's widgets
 	 *  EMI will grow to accomodate requested width.
+	 *  To fit within the default width, recipes should request a width of 134.
+	 *  If a recipe does not support the recipe tree or recipe filling, EMI
+	 * 	will not need to add buttons, and it will have space for a width of 160.
 	 */
 	int getDisplayWidth();
 
@@ -51,6 +59,10 @@ public interface EmiRecipe {
 	/**
 	 * Called to add widgets that display the recipe.
 	 * Can be used in several places, including the main recipe screen, and tooltips.
+	 * It is worth noting that EMI cannot grow vertically, so recipes with large heights
+	 * may be provided less space than requested if they span more than the entire vertical
+	 * space available in the recipe scren.
+	 * In the case of very large heights, recipes should respect {@link WidgetHolder#getHeight()}.
 	 */
 	void addWidgets(WidgetHolder widgets);
 
@@ -61,13 +73,5 @@ public interface EmiRecipe {
 	 */
 	default boolean supportsRecipeTree() {
 		return !getInputs().isEmpty() && !getOutputs().isEmpty();
-	}
-
-	default boolean canCraft(EmiPlayerInventory inv, HandledScreen<?> screen) {
-		return inv.canCraft(this);
-	}
-
-	default List<ItemStack> getFill(HandledScreen<?> screen, boolean all) {
-		return EmiRecipeFiller.fillRecipe(this, screen, all);
 	}
 }

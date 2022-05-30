@@ -1,7 +1,7 @@
 {
   "parent": "emi:item/half_item",
   "textures": {
-    "left": "minecraft:item/coal",
-    "right": "minecraft:item/charcoal"
+    "first": "minecraft:item/coal",
+    "second": "minecraft:item/charcoal"
   }
 }

@@ -3,7 +3,6 @@ package dev.emi.emi.api.stack;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -82,11 +81,18 @@ public interface EmiIngredient {
 	}
 	
 	public static EmiIngredient of(Ingredient ingredient, int amount) {
-		List<Item> items = Arrays.stream(ingredient.getMatchingStacks()).map(i -> i.getItem()).collect(Collectors.toList());
+		if (ingredient == null) {
+			return EmiStack.EMPTY;
+		}
+		List<Item> items = Arrays.stream(ingredient.getMatchingStacks())
+			.filter(s -> !s.isEmpty())
+			.map(i -> i.getItem())
+			.distinct()
+			.toList();
 		if (items.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (items.size() == 1) {
-			return EmiStack.of(items.get(0));
+			return EmiStack.of(ingredient.getMatchingStacks()[0]);
 		}
 		List<TagKey<Item>> keys = Lists.newArrayList();
 		for (TagKey<Item> key : EmiClient.itemTags) {

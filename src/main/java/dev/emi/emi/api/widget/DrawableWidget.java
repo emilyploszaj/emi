@@ -1,11 +1,16 @@
 package dev.emi.emi.api.widget;
 
+import java.util.List;
+import java.util.function.BiFunction;
+
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class DrawableWidget extends Widget {
 	private final DrawableWidgetConsumer consumer;
 	private final Bounds bounds;
 	private final int x, y;
+	private BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
 	public DrawableWidget(int x, int y, int w, int h, DrawableWidgetConsumer consumer) {
 		this.x = x;
@@ -14,9 +19,19 @@ public class DrawableWidget extends Widget {
 		this.consumer = consumer;
 	}
 
+	public DrawableWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
+		this.tooltipSupplier = tooltipSupplier;
+		return this;
+	}
+
 	@Override
 	public Bounds getBounds() {
 		return bounds;
+	}
+
+	@Override
+	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+		return tooltipSupplier.apply(mouseX, mouseY);
 	}
 
 	@Override

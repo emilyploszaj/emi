@@ -1,9 +1,8 @@
 package dev.emi.emi;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import com.google.common.collect.Sets;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -20,6 +19,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
 
 public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -47,6 +48,11 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void removeRecipes(Predicate<EmiRecipe> predicate) {
 		EmiRecipes.invalidators.add(predicate);
+	}
+
+	@Override
+	public void addDeferredRecipes(Consumer<Consumer<EmiRecipe>> consumer) {
+		EmiRecipes.lateRecipes.add(consumer);
 	}
 
 	@Override
@@ -100,8 +106,8 @@ public class EmiRegistryImpl implements EmiRegistry {
 	}
 	
 	@Override
-	public void addRecipeHandler(EmiRecipeCategory category, EmiRecipeHandler<?> handler) {
-		EmiRecipeFiller.RECIPE_HANDLERS.computeIfAbsent(category, (c) -> Sets.newHashSet()).add(handler);
+	public <T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, EmiRecipeHandler<T> handler) {
+		EmiRecipeFiller.handlers.computeIfAbsent(type, (c) -> Lists.newArrayList()).add(handler);
 	}
 
 	@Override
