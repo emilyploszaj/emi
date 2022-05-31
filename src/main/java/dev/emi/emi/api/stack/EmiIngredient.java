@@ -3,6 +3,7 @@ package dev.emi.emi.api.stack;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -88,7 +89,7 @@ public interface EmiIngredient {
 			.filter(s -> !s.isEmpty())
 			.map(i -> i.getItem())
 			.distinct()
-			.toList();
+			.collect(Collectors.toList());
 		if (items.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (items.size() == 1) {
