@@ -11,6 +11,7 @@ import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -131,7 +132,7 @@ public class SlotWidget extends Widget {
 		}*/
 		getStack().render(matrices, bounds.x() + off, bounds.y() + off, delta);
 		if (catalyst) {
-			EmiRenderHelper.renderCatalyst(getStack(), matrices, x + off, y + off);
+			EmiRender.renderCatalystIcon(getStack(), matrices, x + off, y + off);
 		}
 	}
 	

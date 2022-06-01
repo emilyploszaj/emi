@@ -8,8 +8,8 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
@@ -121,10 +121,10 @@ public class TagEmiIngredient implements EmiIngredient {
 			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stacks.get(0).getItemStack(), x, y, count);
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
-			EmiRenderHelper.renderTag(this, matrices, x, y);
+			EmiRender.renderTagIcon(this, matrices, x, y);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, matrices, x, y);
 		}
 	}
 

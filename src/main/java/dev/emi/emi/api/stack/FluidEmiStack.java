@@ -7,8 +7,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -43,7 +43,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new FluidEmiStack(fluid);
+		EmiStack e = new FluidEmiStack(fluid, amount);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
 		return e;
@@ -108,7 +108,7 @@ public class FluidEmiStack extends EmiStack {
 			EmiPort.draw(bufferBuilder);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, matrices, x, y);
 		}
 
 		/*

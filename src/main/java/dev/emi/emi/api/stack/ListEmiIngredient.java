@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -63,7 +63,7 @@ public class ListEmiIngredient implements EmiIngredient {
 			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, fullList.get(0).getItemStack(), x, y, count);
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
-			EmiRenderHelper.renderIngredient(this, matrices, x, y);
+			EmiRender.renderIngredientIcon(this, matrices, x, y);
 		}
 	}
 

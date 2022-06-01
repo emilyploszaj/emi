@@ -2,7 +2,7 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
-import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -95,7 +95,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stack, x, y, count);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRenderHelper.renderRemainder(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, matrices, x, y);
 		}
 	}
 	

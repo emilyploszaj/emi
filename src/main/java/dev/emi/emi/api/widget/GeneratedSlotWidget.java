@@ -3,7 +3,7 @@ package dev.emi.emi.api.widget;
 import java.util.Random;
 import java.util.function.Function;
 
-import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiRender;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,7 +29,7 @@ public class GeneratedSlotWidget extends SlotWidget {
 			if (output) {
 				off = 5;
 			}
-			EmiRenderHelper.renderIngredient(getStack(), matrices, x + off, y + off);
+			EmiRender.renderIngredientIcon(getStack(), matrices, x + off, y + off);
 		}
 	}
 	
