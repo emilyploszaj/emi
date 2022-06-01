@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,12 +16,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public interface EmiIngredient {
 	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
-	public static final Text EMPTY_TEXT = new LiteralText("");
+	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final int RENDER_ICON = 1;
 	public static final int RENDER_AMOUNT = 2;
 	public static final int RENDER_INGREDIENT = 4;
@@ -37,7 +37,7 @@ public interface EmiIngredient {
 		return true;
 	}
 
-	int getAmount();
+	long getAmount();
 
 	default void render(MatrixStack matrices, int x, int y, float delta) {
 		render(matrices, x, y, delta, -1);
@@ -49,7 +49,7 @@ public interface EmiIngredient {
 		if (amount == 0) {
 			return EMPTY_TEXT;
 		} else {
-			return new LiteralText(TEXT_FORMAT.format(amount));
+			return EmiPort.literal(TEXT_FORMAT.format(amount));
 		}
 	}
 
@@ -73,7 +73,7 @@ public interface EmiIngredient {
 		return of(key, 1);
 	}
 	
-	public static EmiIngredient of(TagKey<Item> key, int amount) {
+	public static EmiIngredient of(TagKey<Item> key, long amount) {
 		return new TagEmiIngredient(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
 	}
 
@@ -81,7 +81,7 @@ public interface EmiIngredient {
 		return of(ingredient, 1);
 	}
 	
-	public static EmiIngredient of(Ingredient ingredient, int amount) {
+	public static EmiIngredient of(Ingredient ingredient, long amount) {
 		if (ingredient == null) {
 			return EmiStack.EMPTY;
 		}
@@ -129,7 +129,7 @@ public interface EmiIngredient {
 		return of(list, 1);
 	}
 
-	public static EmiIngredient of(List<? extends EmiIngredient> list, int amount) {
+	public static EmiIngredient of(List<? extends EmiIngredient> list, long amount) {
 		if (list.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (list.size() == 1) {

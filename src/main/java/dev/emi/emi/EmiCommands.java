@@ -1,26 +1,25 @@
 package dev.emi.emi;
 
-import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
-
 import java.util.List;
 
 import com.mojang.brigadier.Command;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+
+import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
+import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.server.command.CommandManager.literal;
 
 public class EmiCommands {
 	public static final byte VIEW_RECIPE = 0x01;
 	public static final byte VIEW_TREE = 0x02;
 	
 	public static void init() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+		EmiPort.registerCommand((dispatcher) -> {
 			dispatcher.register(literal("emi")
 				.requires(source -> source.hasPermissionLevel(2))
 				.then(

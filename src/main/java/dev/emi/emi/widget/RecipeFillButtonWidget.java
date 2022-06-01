@@ -2,6 +2,8 @@ package dev.emi.emi.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
@@ -13,7 +15,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	private final boolean canFill;
@@ -27,10 +28,10 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 		EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 		EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
 		boolean applicable = handler != null && handler.supportsRecipe(recipe);
-		canFill = applicable && handler.canCraft(recipe, inv, hs);
+		canFill = EmiClient.onServer && applicable && handler.canCraft(recipe, inv, hs);
 		if (!canFill) {
 			if (!applicable) {
-				invalid = new TranslatableText("emi.inapplicable");
+				invalid = EmiPort.translatable("emi.inapplicable");
 			} else {
 				invalid = handler.getInvalidReason(recipe, inv, hs);
 			}
@@ -47,8 +48,11 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+		if (!EmiClient.onServer) {
+			return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.fill_recipe_no_server").asOrderedText()));
+		}
 		if (canFill) {
-			return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.fill_recipe").asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.fill_recipe").asOrderedText()));
 		} else {
 			return List.of(TooltipComponent.of(invalid.asOrderedText()));
 		}
@@ -56,6 +60,9 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
+		if (!EmiClient.onServer) {
+			return false;
+		}
 		if (canFill) {
 			this.playButtonSound();
 			EmiApi.performFill(recipe, EmiFillAction.FILL, EmiUtil.isShiftDown() ? Integer.MAX_VALUE : 1);

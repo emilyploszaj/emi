@@ -3,6 +3,7 @@ package dev.emi.emi.screen.widget;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
 import dev.emi.emi.screen.widget.ListWidget.Entry;
 import net.minecraft.client.MinecraftClient;
@@ -12,7 +13,6 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class IntWidget extends Entry {
@@ -26,7 +26,7 @@ public class IntWidget extends Entry {
 		this.name = name;
 		this.tooltip = tooltip;
 		MinecraftClient client = MinecraftClient.getInstance();
-		text = new TextFieldWidget(client.textRenderer, 0, 0, 136, 18, new LiteralText(""));
+		text = new TextFieldWidget(client.textRenderer, 0, 0, 136, 18, EmiPort.literal(""));
 		text.setText("" + mutator.get());
 		text.setChangedListener(string -> {
 			try {

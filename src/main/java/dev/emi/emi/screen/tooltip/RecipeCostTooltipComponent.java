@@ -2,6 +2,7 @@ package dev.emi.emi.screen.tooltip;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.FractionalMaterialCost;
@@ -14,11 +15,10 @@ import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Matrix4f;
 
 public class RecipeCostTooltipComponent implements TooltipComponent {
-	private static final TranslatableText COST = new TranslatableText("emi.cost_per");
+	private static final Text COST = EmiPort.translatable("emi.cost_per");
 	private final MaterialTree tree;
 
 	public RecipeCostTooltipComponent(EmiRecipe recipe) {

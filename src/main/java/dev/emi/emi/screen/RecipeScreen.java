@@ -2,6 +2,7 @@ package dev.emi.emi.screen;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
@@ -18,6 +20,7 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -35,7 +38,6 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen implements EmiScreen {
@@ -56,7 +58,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	int y = (this.height - backgroundHeight) / 2;
 
 	public RecipeScreen(HandledScreen<?> old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
-		super(new TranslatableText("screen.emi.recipe"));
+		super(EmiPort.translatable("screen.emi.recipe"));
 		this.old = old;
 		arrows = List.of(
 			new SizedButtonWidget(x + 2, y - 18, 12, 12, 0, 64,
@@ -157,9 +159,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
-		drawCenteredText(matrices, textRenderer, new TranslatableText(EmiUtil.translateId("emi.category.", tab.category.getId())),
+		drawCenteredText(matrices, textRenderer, EmiPort.translatable(EmiUtil.translateId("emi.category.", tab.category.getId())),
 			x + backgroundWidth / 2, y + 7, categoryNameColor);
-		drawCenteredText(matrices, textRenderer, new TranslatableText("emi.page", this.page + 1, tab.recipes.size()),
+		drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.page", this.page + 1, tab.recipes.size()),
 			x + backgroundWidth / 2, y + 20, 0xffffff);
 
 		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
@@ -184,7 +186,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (categoryHovered) {
-			this.renderTooltip(matrices, new TranslatableText("emi.view_all_recipes"), mouseX, mouseY);
+			this.renderTooltip(matrices, EmiPort.translatable("emi.view_all_recipes"), mouseX, mouseY);
 		}
 		outer:
 		for (WidgetGroup group : currentPage) {
@@ -436,9 +438,21 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		return false;
 	}
 
+	public void getExclusion(Consumer<Bounds> consumer) {
+		if (this.tab < tabs.size()) {
+			RecipeTab tab = tabs.get(this.tab);
+			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
+			if (!workstations.isEmpty()) {
+				int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18);
+				RenderSystem.setShaderTexture(0, TEXTURE);
+				consumer.accept(new Bounds(x - 21, y + 7, 24, 6 + 18 * size));
+			}
+		}
+	}
+
 	@Override
 	public int emi$getLeft() {
-		return x - 20;
+		return x;
 	}
 
 	@Override

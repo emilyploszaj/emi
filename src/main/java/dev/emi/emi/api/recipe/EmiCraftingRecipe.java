@@ -13,7 +13,7 @@ public class EmiCraftingRecipe implements EmiRecipe {
 	protected final Identifier id;
 	protected final List<EmiIngredient> input;
 	protected final EmiStack output;
-	protected final boolean shapeless;
+	public final boolean shapeless;
 
 	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
 		this(input, output, id, true);

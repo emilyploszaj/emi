@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
@@ -33,7 +34,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 
 public class BoMScreen extends Screen {
@@ -49,7 +49,7 @@ public class BoMScreen extends Screen {
 	private int lastMouseX, lastMouseY;
 
 	public BoMScreen(HandledScreen<?> old) {
-		super(new TranslatableText("screen.emi.bom"));
+		super(EmiPort.translatable("screen.emi.bom"));
 		this.old = old;
 	}
 
@@ -108,7 +108,7 @@ public class BoMScreen extends Screen {
 			BoM.tree.calculateCost(false);
 			int cx = (BoM.tree.costs.size() * 40) / -2 + 10;
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2 + 10;
-			DrawableHelper.drawCenteredText(matrices, textRenderer, new TranslatableText("emi.total_cost"), 0, cy - 16, -1);
+			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
 			for (FlatMaterialCost cost : BoM.tree.costs) {
 				cost.ingredient.render(matrices, cx, cy, 0);
 				EmiRenderHelper.renderAmount(matrices, cx, cy, cost.ingredient.getAmountText(cost.amount));
@@ -117,7 +117,7 @@ public class BoMScreen extends Screen {
 			if (!BoM.tree.remainders.isEmpty()) {
 				cx = (BoM.tree.remainders.size() * 40) / -2 + 10;
 				cy += 40;
-				DrawableHelper.drawCenteredText(matrices, textRenderer, new TranslatableText("emi.leftovers"), 0, cy - 16, -1);
+				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16, -1);
 				for (FlatMaterialCost cost : BoM.tree.remainders.values()) {
 					cost.ingredient.render(matrices, cx, cy, 0);
 					EmiRenderHelper.renderAmount(matrices, cx, cy, cost.ingredient.getAmountText(cost.amount));
@@ -129,10 +129,10 @@ public class BoMScreen extends Screen {
 				node.render(matrices, mx, my, delta);
 			}
 		} else {
-			drawCenteredText(matrices, textRenderer, new TranslatableText("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
-			drawCenteredText(matrices, textRenderer, new TranslatableText("emi.no_tree"), 0, -48, -1);
-			drawCenteredText(matrices, textRenderer, new TranslatableText("emi.random_tree"), 0, -24, -1);
-			drawCenteredText(matrices, textRenderer, new TranslatableText("emi.random_tree_input"), 0, 0, -1);
+			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
+			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
+			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
+			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
 		}
 
 		viewMatrices.pop();
@@ -190,7 +190,7 @@ public class BoMScreen extends Screen {
 		return 1;
 	}
 
-	public TreeVolume addNewNodes(MaterialNode node, int multiplier, int divisor, int depth) {
+	public TreeVolume addNewNodes(MaterialNode node, long multiplier, long divisor, int depth) {
 		if (MaterialTree.isCatalyst(node.ingredient)) {
 			multiplier = node.amount;
 		} else {
@@ -402,11 +402,11 @@ public class BoMScreen extends Screen {
 		public Node parent = null;
 		public MaterialNode resolution = null;
 		public MaterialNode node;
-		public int width;
-		public int amount, x, y;
+		public int width, x, y;
+		public long amount;
 		public boolean leaf = false;
 
-		public Node(MaterialNode node, int amount, int x, int y) {
+		public Node(MaterialNode node, long amount, int x, int y) {
 			this.node = node;
 			if (node.recipe != null) {
 				width = 36;
@@ -501,7 +501,7 @@ public class BoMScreen extends Screen {
 		public List<Width> widths = Lists.newArrayList();
 		public List<Node> nodes = Lists.newArrayList();
 
-		public TreeVolume(MaterialNode node, int amount, int y) {
+		public TreeVolume(MaterialNode node, long amount, int y) {
 			Node head = new Node(node, amount, 0, y);
 			int l = head.width / 2;
 			widths.add(new Width(-l, head.width - l));
@@ -509,7 +509,7 @@ public class BoMScreen extends Screen {
 			nodes.add(head);
 		}
 
-		public void addHead(MaterialNode node, int amount, int y) {
+		public void addHead(MaterialNode node, long amount, int y) {
 			int x = (getLeft(0) + getRight(0)) / 2;
 			Node newNode = new Node(node, amount, x, y);
 			for (Node n : nodes) {

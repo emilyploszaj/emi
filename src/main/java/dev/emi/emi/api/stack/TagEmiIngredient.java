@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
@@ -28,8 +29,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tag.TagKey;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -37,13 +36,13 @@ public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
 	public final TagKey<Item> key;
-	private final int amount;
+	private final long amount;
 
-	public TagEmiIngredient(TagKey<Item> key, int amount) {
+	public TagEmiIngredient(TagKey<Item> key, long amount) {
 		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
 	}
 
-	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks, int amount) {
+	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks, long amount) {
 		this.id = key.id();
 		this.key = key;
 		this.stacks = stacks;
@@ -66,7 +65,7 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public int getAmount() {
+	public long getAmount() {
 		return amount;
 	}
 
@@ -134,12 +133,12 @@ public class TagEmiIngredient implements EmiIngredient {
 		String translation = EmiUtil.translateId("tag.", id);
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (I18n.hasTranslation(translation)) {
-			list.add(TooltipComponent.of(new TranslatableText(translation).asOrderedText()));
+			list.add(TooltipComponent.of(EmiPort.translatable(translation).asOrderedText()));
 		} else {
-			list.add(TooltipComponent.of(new LiteralText("#" + id).asOrderedText()));
+			list.add(TooltipComponent.of(EmiPort.literal("#" + id).asOrderedText()));
 		}
 		String mod = EmiUtil.getModName(id.getNamespace());
-		list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
 			if (!stack.getRemainder().isEmpty()) {

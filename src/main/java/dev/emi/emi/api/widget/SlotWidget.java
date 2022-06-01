@@ -9,6 +9,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
@@ -22,9 +23,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -145,12 +144,12 @@ public class SlotWidget extends Widget {
 		}
 		if (getRecipe() != null) {
 			if (RecipeScreen.resolve != null) {
-				list.add(TooltipComponent.of(new TranslatableText("emi.resolve").formatted(Formatting.GREEN).asOrderedText()));
+				list.add(TooltipComponent.of(EmiPort.translatable("emi.resolve").formatted(Formatting.GREEN).asOrderedText()));
 			}
 			if (getRecipe().getId() != null && EmiConfig.showRecipeIds) {
-				list.add(TooltipComponent.of(new LiteralText(getRecipe().getId().toString()).asOrderedText()));
+				list.add(TooltipComponent.of(EmiPort.literal(getRecipe().getId().toString()).asOrderedText()));
 			}
-			if (getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
+			if (EmiConfig.showCostPerBatch && getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
 				list.add(new RecipeCostTooltipComponent(getRecipe()));
 			}
 		}

@@ -2,11 +2,13 @@ package dev.emi.emi.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiHistory;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.TranslatableText;
 
 public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 
@@ -25,7 +27,7 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		return List.of(TooltipComponent.of(new TranslatableText("tooltip.emi.set_default").asOrderedText()));
+		return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.set_default").asOrderedText()));
 	}
 
 	@Override
@@ -38,6 +40,9 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 			}
 		}
 		this.playButtonSound();
+		if (RecipeScreen.resolve != null) {
+			EmiHistory.pop();
+		}
 		return true;
 	}
 }

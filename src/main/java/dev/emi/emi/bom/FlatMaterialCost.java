@@ -4,9 +4,9 @@ import dev.emi.emi.api.stack.EmiIngredient;
 
 public class FlatMaterialCost {
 	public EmiIngredient ingredient;
-	public int amount;
+	public long amount;
 
-	public FlatMaterialCost(EmiIngredient ingredient, int amount) {
+	public FlatMaterialCost(EmiIngredient ingredient, long amount) {
 		this.ingredient = ingredient;
 		this.amount = amount;
 	}

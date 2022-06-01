@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -13,7 +14,6 @@ import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat.DrawMode;
@@ -21,7 +21,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -36,7 +35,7 @@ public class FluidEmiStack extends EmiStack {
 		this(fluid, 0);
 	}
 
-	public FluidEmiStack(FluidVariant fluid, int amount) {
+	public FluidEmiStack(FluidVariant fluid, long amount) {
 		entry = new FluidEntry(fluid);
 		this.fluid = fluid;
 		this.amount = amount;
@@ -106,8 +105,7 @@ public class FluidEmiStack extends EmiStack {
 			bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
 			bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
 			bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
-			bufferBuilder.end();
-			BufferRenderer.draw(bufferBuilder);
+			EmiPort.draw(bufferBuilder);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRenderHelper.renderRemainder(this, matrices, x, y);
@@ -144,7 +142,7 @@ public class FluidEmiStack extends EmiStack {
 		}
 		String namespace = Registry.FLUID.getId(fluid.getFluid()).getNamespace();
 		String mod = EmiUtil.getModName(namespace);
-		list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
 		if (!getRemainder().isEmpty()) {
 			list.add(new RemainderTooltipComponent(this));
 		}
@@ -156,12 +154,12 @@ public class FluidEmiStack extends EmiStack {
 		if (amount != 0) {
 			return EmiConfig.fluidUnit.translate(amount);
 		}
-		return new LiteralText("");
+		return EmiPort.literal("");
 	}
 
 	@Override
 	public Text getName() {
-		return FluidVariantRendering.getName(fluid);
+		return EmiPort.fluidName(fluid);
 	}
 
 	public static class FluidEntry extends Entry<FluidVariant> {

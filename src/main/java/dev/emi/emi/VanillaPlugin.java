@@ -49,6 +49,7 @@ import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.recipe.world.EmiArmorWashingRecipe;
 import dev.emi.emi.recipe.world.EmiDualResultWorldRecipe;
+import dev.emi.emi.screen.RecipeScreen;
 import net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor;
 import net.fabricmc.fabric.mixin.content.registry.ShovelItemAccessor;
 import net.minecraft.block.Block;
@@ -167,6 +168,8 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addRecipeHandler(ScreenHandlerType.FURNACE, new CookingRecipeHandler<FurnaceScreenHandler>(SMELTING));
 		registry.addRecipeHandler(ScreenHandlerType.BLAST_FURNACE, new CookingRecipeHandler<BlastFurnaceScreenHandler>(BLASTING));
 		registry.addRecipeHandler(ScreenHandlerType.SMOKER, new CookingRecipeHandler<SmokerScreenHandler>(SMOKING));
+
+		registry.addExclusionArea(RecipeScreen.class, RecipeScreen::getExclusion);
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
 			if (screen instanceof AbstractInventoryScreen<?> inv) {

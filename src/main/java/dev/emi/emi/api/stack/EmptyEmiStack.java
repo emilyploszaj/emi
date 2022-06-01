@@ -2,11 +2,11 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -80,7 +80,7 @@ public class EmptyEmiStack extends EmiStack {
 
 	@Override
 	public Text getName() {
-		return new LiteralText("");
+		return EmiPort.literal("");
 	}
 
 	public static class EmptyEntry extends Entry<ItemStack> {

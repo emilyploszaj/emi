@@ -21,8 +21,8 @@ import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -111,16 +111,16 @@ public class EmiPlayerInventory {
 	}
 
 	public List<Boolean> getCraftAvailability(EmiRecipe recipe) {
-		Object2IntMap<EmiStack> used = new Object2IntOpenHashMap<>();
+		Object2LongMap<EmiStack> used = new Object2LongOpenHashMap<>();
 		List<Boolean> states = Lists.newArrayList();
 		outer:
 		for (EmiIngredient ingredient : recipe.getInputs()) {
 			for (EmiStack stack : ingredient.getEmiStacks()) {
-				int desired = stack.getAmount();
+				long desired = stack.getAmount();
 				if (inventory.containsKey(stack)) {
 					EmiStack identity = inventory.get(stack);
-					int alreadyUsed = used.getOrDefault(identity, 0);
-					int available = identity.getAmount() - alreadyUsed;
+					long alreadyUsed = used.getOrDefault(identity, 0);
+					long available = identity.getAmount() - alreadyUsed;
 					if (available >= desired) {
 						used.put(identity, desired + alreadyUsed);
 						states.add(true);
@@ -134,18 +134,18 @@ public class EmiPlayerInventory {
 	}
 
 	public boolean canCraft(EmiRecipe recipe) {
-		Object2IntMap<EmiStack> used = new Object2IntOpenHashMap<>();
+		Object2LongMap<EmiStack> used = new Object2LongOpenHashMap<>();
 		outer:
 		for (EmiIngredient ingredient : recipe.getInputs()) {
 			if (ingredient.isEmpty()) {
 				continue;
 			}
 			for (EmiStack stack : ingredient.getEmiStacks()) {
-				int desired = stack.getAmount();
+				long desired = stack.getAmount();
 				if (inventory.containsKey(stack)) {
 					EmiStack identity = inventory.get(stack);
-					int alreadyUsed = used.getOrDefault(identity, 0);
-					int available = identity.getAmount() - alreadyUsed;
+					long alreadyUsed = used.getOrDefault(identity, 0);
+					long available = identity.getAmount() - alreadyUsed;
 					if (available >= desired) {
 						used.put(identity, desired + alreadyUsed);
 						continue outer;

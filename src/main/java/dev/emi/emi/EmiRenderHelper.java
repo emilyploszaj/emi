@@ -7,7 +7,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -45,9 +44,9 @@ public class EmiRenderHelper {
 	}
 
 	public static Text getEmiText() {
-		return new LiteralText("E").setStyle(Style.EMPTY.withColor(0xeb7bfc))
-			.append(new LiteralText("M").setStyle(Style.EMPTY.withColor(0x7bfca2)))
-			.append(new LiteralText("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
+		return EmiPort.literal("E").setStyle(Style.EMPTY.withColor(0xeb7bfc))
+			.append(EmiPort.literal("M").setStyle(Style.EMPTY.withColor(0x7bfca2)))
+			.append(EmiPort.literal("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
 	}
 
 	public static int getAmountOverflow(Text amount) {

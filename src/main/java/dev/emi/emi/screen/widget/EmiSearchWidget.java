@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
@@ -23,7 +23,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	private static List<Pair<Integer, Style>> styles;
 
 	public EmiSearchWidget(TextRenderer textRenderer, int x, int y, int width, int height) {
-		super(textRenderer, x, y, width, height, new LiteralText(""));
+		super(textRenderer, x, y, width, height, EmiPort.literal(""));
 		this.setFocusUnlocked(true);
 		this.setEditableColor(-1);
 		this.setUneditableColor(-1);
@@ -38,12 +38,12 @@ public class EmiSearchWidget extends TextFieldWidget {
 				int end = style.getLeft();
 				if (end > stringStart) {
 					if (end - stringStart >= string.length()) {
-						text = new LiteralText(string.substring(0, string.length())).setStyle(style.getRight());
+						text = EmiPort.literal(string.substring(0, string.length())).setStyle(style.getRight());
 						// Skip second loop
 						s = styles.size();
 						break;
 					}
-					text = new LiteralText(string.substring(0, end - stringStart)).setStyle(style.getRight());
+					text = EmiPort.literal(string.substring(0, end - stringStart)).setStyle(style.getRight());
 					last = end - stringStart;
 					s++;
 					break;
@@ -53,10 +53,10 @@ public class EmiSearchWidget extends TextFieldWidget {
 				Pair<Integer, Style> style = styles.get(s);
 				int end = style.getLeft();
 				if (end - stringStart >= string.length()) {
-					text.append(new LiteralText(string.substring(last, string.length())).setStyle(style.getRight()));
+					text.append(EmiPort.literal(string.substring(last, string.length())).setStyle(style.getRight()));
 					break;
 				}
-				text.append(new LiteralText(string.substring(last, end - stringStart)).setStyle(style.getRight()));
+				text.append(EmiPort.literal(string.substring(last, end - stringStart)).setStyle(style.getRight()));
 				last = end - stringStart;
 			}
 			return text.asOrderedText();

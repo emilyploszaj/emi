@@ -2,6 +2,7 @@ package dev.emi.emi.screen.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
 import dev.emi.emi.screen.widget.ListWidget.Entry;
 import net.minecraft.client.gui.Drawable;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -32,9 +32,9 @@ public class BooleanWidget extends Entry {
 
 	public Text getText() {
 		if (mutator.get()) {
-			return new LiteralText("true").formatted(Formatting.GREEN);
+			return EmiPort.literal("true").formatted(Formatting.GREEN);
 		} else {
-			return new LiteralText("false").formatted(Formatting.RED);
+			return EmiPort.literal("false").formatted(Formatting.RED);
 		}
 	}
 

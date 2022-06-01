@@ -2,6 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -10,7 +11,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.recipe.AbstractCookingRecipe;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class EmiCookingRecipe implements EmiRecipe {
@@ -65,7 +65,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
 		widgets.addFillingArrow(24, 5, 50 * recipe.getCookTime()).tooltip((mx, my) -> {
-			return List.of(TooltipComponent.of(new TranslatableText("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.translatable("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
 		});
 		if (infiniBurn) {
 			widgets.addTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14);
@@ -74,7 +74,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 			widgets.addAnimatedTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14, 4000 / fuelMultiplier,
 				false, true, true);
 		}
-		widgets.addText(new TranslatableText("emi.cooking.experience", recipe.getExperience()).asOrderedText(), 26, 28, -1, true);
+		widgets.addText(EmiPort.translatable("emi.cooking.experience", recipe.getExperience()).asOrderedText(), 26, 28, -1, true);
 		widgets.addSlot(input, 0, 4);
 		widgets.addSlot(output, 56, 0).output(true).recipeContext(this);
 	}

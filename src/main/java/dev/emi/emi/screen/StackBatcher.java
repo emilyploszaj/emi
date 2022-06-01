@@ -11,6 +11,7 @@ import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -43,6 +44,7 @@ public class StackBatcher {
 	private int x;
 	private int y;
 	private int z;
+	private boolean enabled = true;
 
 	public StackBatcher() {
 		Map<RenderLayer, BufferBuilder> buffers = new HashMap<>();
@@ -82,7 +84,7 @@ public class StackBatcher {
 	}
 
 	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
-		if (stack instanceof Batchable b && !b.isUnbatchable()) {
+		if (stack instanceof Batchable b && !b.isUnbatchable() && enabled) {
 			if (populated) return;
 			try {
 				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
@@ -99,6 +101,9 @@ public class StackBatcher {
 	}
 
 	public void draw() {
+		if (!enabled) {
+			return;
+		}
 		if (!populated) {
 			bake();
 			populated = true;
@@ -128,8 +133,7 @@ public class StackBatcher {
 		BufferBuilder bldr = imm.getBufferInternal(layer);
 		if (!imm.getActiveConsumers().remove(bldr)) return;
 		VertexBuffer vb = new VertexBuffer();
-		bldr.end();
-		vb.upload(bldr);
+		EmiPort.upload(vb, bldr);
 		buffers.put(layer, vb);
 		bldr.reset();
 	}

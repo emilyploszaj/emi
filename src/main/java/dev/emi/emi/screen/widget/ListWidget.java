@@ -11,6 +11,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.EmiPort;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -27,7 +28,6 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 
 /**
@@ -424,7 +424,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		int i;
 		List<Entry> list = this.children();
 		if (list.size() > 1 && (i = list.indexOf(entry)) != -1) {
-			builder.put(NarrationPart.POSITION, (Text)new TranslatableText("narrator.position.list", i + 1, list.size()));
+			builder.put(NarrationPart.POSITION, (Text)EmiPort.translatable("narrator.position.list", i + 1, list.size()));
 		}
 	}
 

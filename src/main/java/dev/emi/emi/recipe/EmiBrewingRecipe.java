@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -12,7 +13,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.Items;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class EmiBrewingRecipe implements EmiRecipe {
@@ -65,7 +65,7 @@ public class EmiBrewingRecipe implements EmiRecipe {
 	public void addWidgets(WidgetHolder widgets) {
 		widgets.addTexture(BACKGROUND, 0, 0, 103, 61, 16, 14);
 		widgets.addAnimatedTexture(BACKGROUND, 81, 2, 9, 28, 176, 0, 1000 * 20, false, false, false).tooltip((mx, my) -> {
-			return List.of(TooltipComponent.of(new TranslatableText("emi.cooking.time", 20).asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.translatable("emi.cooking.time", 20).asOrderedText()));
 		});
 		widgets.addAnimatedTexture(BACKGROUND, 47, 0, 12, 29, 185, 0, 700, false, true, false);
 		widgets.addTexture(BACKGROUND, 44, 30, 18, 4, 176, 29);

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -14,7 +15,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 
 public class EmiNameWidget extends ListWidget.Entry {
@@ -115,11 +115,11 @@ public class EmiNameWidget extends ListWidget.Entry {
 		int mid = x + width / 2;
 
 		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer,
-			new LiteralText(parts[0]).setStyle(Style.EMPTY.withColor(0xeb7bfc))
+			EmiPort.literal(parts[0]).setStyle(Style.EMPTY.withColor(0xeb7bfc))
 			.append("  ")
-			.append(new LiteralText(parts[1]).setStyle(Style.EMPTY.withColor(0x7bfca2)))
+			.append(EmiPort.literal(parts[1]).setStyle(Style.EMPTY.withColor(0x7bfca2)))
 			.append("  ")
-			.append(new LiteralText(parts[2]).setStyle(Style.EMPTY.withColor(0x7bebfc))).asOrderedText(), mid, y + 30, -1);
+			.append(EmiPort.literal(parts[2]).setStyle(Style.EMPTY.withColor(0x7bebfc))).asOrderedText(), mid, y + 30, -1);
 	}
 
 	public int getHeight() {

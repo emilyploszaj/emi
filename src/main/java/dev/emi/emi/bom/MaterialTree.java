@@ -62,7 +62,7 @@ public class MaterialTree {
 		return false;
 	}
 
-	private void addRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, EmiIngredient ingredient, int amount) {
+	private void addRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, EmiIngredient ingredient, long amount) {
 		if (amount > 0) {
 			if (remainders.containsKey(recipe)) {
 				remainders.get(recipe).amount += amount;
@@ -72,7 +72,7 @@ public class MaterialTree {
 		}
 	}
 
-	private int getRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, int desired, boolean catalyst) {
+	private long getRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, long desired, boolean catalyst) {
 		if (remainders.containsKey(recipe)) {
 			FlatMaterialCost remainder = remainders.get(recipe);
 			if (remainder.amount >= desired) {
@@ -91,7 +91,7 @@ public class MaterialTree {
 		return 0;
 	}
 
-	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiRecipe, FlatMaterialCost> remainders, int amount, MaterialNode node) {
+	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiRecipe, FlatMaterialCost> remainders, long amount, MaterialNode node) {
 		boolean catalyst = isCatalyst(node.ingredient);
 		if (catalyst) {
 			amount = node.amount;
@@ -103,8 +103,8 @@ public class MaterialTree {
 		}
 		
 		if (recipe != null && node.state != FoldState.COLLAPSED) {
-			int minBatches = (int) Math.ceil(amount / (float) node.divisor);
-			int remainder = minBatches * node.divisor;
+			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
+			long remainder = minBatches * node.divisor;
 			if (!catalyst) {
 				remainder -= amount;
 			}

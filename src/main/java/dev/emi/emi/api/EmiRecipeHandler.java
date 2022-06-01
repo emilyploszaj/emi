@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -14,10 +15,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public interface EmiRecipeHandler<T extends ScreenHandler> {
-	public static final Text NOT_ENOUGH_INGREDIENTS = new TranslatableText("emi.not_enough_ingredients");
+	public static final Text NOT_ENOUGH_INGREDIENTS = EmiPort.translatable("emi.not_enough_ingredients");
 	
 	/**
 	 * @return The slots for the recipe handler to source ingredients from.

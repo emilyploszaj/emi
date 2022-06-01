@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
@@ -14,10 +15,8 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class EmiBindWidget extends ListWidget.Entry {
@@ -30,7 +29,7 @@ public class EmiBindWidget extends ListWidget.Entry {
 	public EmiBindWidget(ConfigScreen screen, Drawable tooltip, EmiBind bind) {
 		this.tooltip = tooltip;
 		this.screen = screen;
-		this.bindName = new TranslatableText(bind.translationKey);
+		this.bindName = EmiPort.translatable(bind.translationKey);
 		this.bind = bind;
 		updateButtons();
 	}
@@ -46,9 +45,9 @@ public class EmiBindWidget extends ListWidget.Entry {
 				@Override
 				protected MutableText getNarrationMessage() {
 					if (j < bind.boundKeys.size() && bind.boundKeys.get(j).isUnbound()) {
-						return new TranslatableText("narrator.controls.unbound", bindName);
+						return EmiPort.translatable("narrator.controls.unbound", bindName);
 					}
-					return new TranslatableText("narrator.controls.bound", bindName, super.getNarrationMessage());
+					return EmiPort.translatable("narrator.controls.bound", bindName, super.getNarrationMessage());
 				}
 			};
 			buttons.add(widget);
@@ -73,7 +72,7 @@ public class EmiBindWidget extends ListWidget.Entry {
 				button.setWidth(200);
 				button.x = x + width - 224;
 				if (screen.lastModifier == 0) {
-					button.setMessage(new LiteralText("...").formatted(Formatting.YELLOW));
+					button.setMessage(EmiPort.literal("...").formatted(Formatting.YELLOW));
 				} else {
 					button.setMessage(getKeyText(new ModifiedKey(InputUtil.Type.KEYSYM
 						.createFromCode(screen.lastModifier), screen.activeModifiers)).formatted(Formatting.YELLOW));
@@ -83,7 +82,7 @@ public class EmiBindWidget extends ListWidget.Entry {
 					button.setWidth(20);
 					button.x = x + width - 20;
 					button.y = y;
-					button.setMessage(new LiteralText("+").formatted(Formatting.AQUA));
+					button.setMessage(EmiPort.literal("+").formatted(Formatting.AQUA));
 				} else {
 					button.setMessage(getKeyText(bind.boundKeys.get(i)));
 				}
@@ -109,7 +108,7 @@ public class EmiBindWidget extends ListWidget.Entry {
 	}
 
 	private MutableText getKeyText(ModifiedKey key) {
-		LiteralText text = new LiteralText("");
+		MutableText text = EmiPort.literal("");
 		appendModifiers(text, key.modifiers());
 		text.append(key.key().getLocalizedText());
 		return text;
@@ -117,16 +116,16 @@ public class EmiBindWidget extends ListWidget.Entry {
 
 	private void appendModifiers(MutableText text, int modifiers) {
 		if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
-			text.append(new TranslatableText("key.keyboard.control"));
-			text.append(new LiteralText(" + "));
+			text.append(EmiPort.translatable("key.keyboard.control"));
+			text.append(EmiPort.literal(" + "));
 		}
 		if ((modifiers & EmiUtil.ALT_MASK) > 0) {
-			text.append(new TranslatableText("key.keyboard.alt"));
-			text.append(new LiteralText(" + "));
+			text.append(EmiPort.translatable("key.keyboard.alt"));
+			text.append(EmiPort.literal(" + "));
 		}
 		if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
-			text.append(new TranslatableText("key.keyboard.shift"));
-			text.append(new LiteralText(" + "));
+			text.append(EmiPort.translatable("key.keyboard.shift"));
+			text.append(EmiPort.literal(" + "));
 		}
 	}
 

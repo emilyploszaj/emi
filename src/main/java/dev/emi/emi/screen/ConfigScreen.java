@@ -13,6 +13,7 @@ import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiConfig.Comment;
 import dev.emi.emi.EmiConfig.ConfigEnum;
 import dev.emi.emi.EmiConfig.ConfigValue;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
@@ -29,9 +30,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class ConfigScreen extends Screen {
 	private Screen last;
@@ -42,7 +41,7 @@ public class ConfigScreen extends Screen {
 	public int lastModifier;
 
 	public ConfigScreen(Screen last) {
-		super(new TranslatableText("screen.emi.config"));
+		super(EmiPort.translatable("screen.emi.config"));
 		this.last = last;
 	}
 
@@ -67,9 +66,9 @@ public class ConfigScreen extends Screen {
 		System.out.println(key);
 		Comment comment = field.getAnnotation(Comment.class);
 		if (I18n.hasTranslation(key)) {
-			text = (List<Text>) (Object) Arrays.stream(I18n.translate(key).split("\n")).map(LiteralText::new).toList();
+			text = (List<Text>) (Object) Arrays.stream(I18n.translate(key).split("\n")).map(EmiPort::literal).toList();
 		} else if (comment != null) {
-			text = (List<Text>) (Object) Arrays.stream(comment.value().split("\n")).map(LiteralText::new).toList();
+			text = (List<Text>) (Object) Arrays.stream(comment.value().split("\n")).map(EmiPort::literal).toList();
 		} else {
 			text = null;
 		}
@@ -98,9 +97,9 @@ public class ConfigScreen extends Screen {
 					}
 					if (!group.equals(lastGroup)) {
 						lastGroup = group;
-						list.addEntry(new GroupNameWidget(new TranslatableText("config.emi.group." + group)));
+						list.addEntry(new GroupNameWidget(EmiPort.translatable("config.emi.group." + group)));
 					}
-					Text translation = new TranslatableText("config.emi." + annot.value().replace('-', '_'));
+					Text translation = EmiPort.translatable("config.emi." + annot.value().replace('-', '_'));
 					if (field.getType() == boolean.class) {
 						list.addEntry(new BooleanWidget(translation, getTooltipRenderer(field), new Mutator<Boolean>() {
 

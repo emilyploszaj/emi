@@ -24,7 +24,6 @@ import joptsimple.internal.Strings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class EmiConfig {
 	private static Map<Class<?>, Setter> SETTERS = Maps.newHashMap();
@@ -61,6 +60,10 @@ public class EmiConfig {
 	@Comment("The unit to display fluids as.")
 	@ConfigValue("ui.fluid-unit")
 	public static FluidUnit fluidUnit = FluidUnit.LITERS;
+
+	@Comment("Display cost per batch when hovering\na recipe output")
+	@ConfigValue("ui.show-cost-per-batch")
+	public static boolean showCostPerBatch = true;
 
 	@Comment("Whether recipes should have a button to\nfavorite the result.")
 	@ConfigValue("ui.recipe-favorite-button")
@@ -381,9 +384,9 @@ public class EmiConfig {
 	}
 
 	public static enum FluidUnit implements ConfigEnum {
-		LITERS("liters", a -> new TranslatableText("emi.fluid.amount.liters", (int) (a / 81))),
-		MILLIBUCKETS("millibuckets", a -> new TranslatableText("emi.fluid.amount.millibuckets", (int) (a / 81))),
-		DROPLETS("droplets", a -> new TranslatableText("emi.fluid.amount.droplets", (int) a)),
+		LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters", (int) (a / 81))),
+		MILLIBUCKETS("millibuckets", a -> EmiPort.translatable("emi.fluid.amount.millibuckets", (int) (a / 81))),
+		DROPLETS("droplets", a -> EmiPort.translatable("emi.fluid.amount.droplets", (int) a)),
 		;
 
 		private final String name;
@@ -392,7 +395,7 @@ public class EmiConfig {
 
 		private FluidUnit(String name, Float2ObjectFunction<Text> translator) {
 			this.name = name;
-			translation = new TranslatableText("emi.unit." + name);
+			translation = EmiPort.translatable("emi.unit." + name);
 			this.translator = translator;
 		}
 

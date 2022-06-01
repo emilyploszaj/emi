@@ -14,8 +14,8 @@ public class MaterialNode {
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
 	public FoldState state = FoldState.EXPANDED;
-	public int amount = 1;
-	public int divisor = 1;
+	public long amount = 1;
+	public long divisor = 1;
 
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();

@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
@@ -17,7 +18,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
@@ -64,8 +64,7 @@ public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
 		int patterns = 1 + Math.max(random.nextInt(5), random.nextInt(3));
 		BannerPattern.Patterns pattern = new BannerPattern.Patterns();
 		for (int i = 0; i < patterns; i++) {
-			pattern = pattern.add(BannerPattern.values()[random.nextInt(BannerPattern.values().length)],
-				DyeColor.values()[random.nextInt(DyeColor.values().length)]);
+			pattern = EmiPort.addRandomBanner(pattern, random);
 		}
 		NbtCompound tag = new NbtCompound();
 		tag.put("Patterns", pattern.toNbt());

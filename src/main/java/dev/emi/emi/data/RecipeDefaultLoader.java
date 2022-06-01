@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -30,7 +31,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 	@Override
 	protected List<RecipeDefault> prepare(ResourceManager manager, Profiler profiler) {
 		List<RecipeDefault> defaults = Lists.newArrayList();
-		for (Identifier id : manager.findResources("recipe/defaults/", i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "recipe/defaults/", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}

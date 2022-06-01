@@ -16,6 +16,7 @@ import dev.emi.emi.EmiExclusionAreas;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiReloadManager;
@@ -44,8 +45,9 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmiScreenManager {
 	private static final int PADDING_SIZE = 1;
@@ -69,10 +71,10 @@ public class EmiScreenManager {
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);
 	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 64,
 		() -> true, (w) -> client.setScreen(new ConfigScreen(client.currentScreen)),
-		List.of(new TranslatableText("tooltip.emi.config", EmiRenderHelper.getEmiText())));
+		List.of(EmiPort.translatable("tooltip.emi.config", EmiRenderHelper.getEmiText())));
 	public static SizedButtonWidget tree = new SizedButtonWidget(0, 0, 20, 20, 184, 64,
 		() -> true, (w) -> EmiApi.viewRecipeTree(),
-		List.of(new TranslatableText("tooltip.emi.recipe_tree")));
+		List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 	public static SizedButtonWidget craftableButton = new SizedButtonWidget(0, 0, 20, 20, 164, 64, () -> true, (w) -> {
 		EmiConfig.craftable = !EmiConfig.craftable;
 		EmiConfig.writeConfig();
@@ -80,16 +82,16 @@ public class EmiScreenManager {
 		lastPlayerInventory = null;
 		recalculate();
 	}, () -> EmiConfig.craftable ? 60 : 0,
-		() -> List.of(EmiConfig.craftable ? new TranslatableText("tooltip.emi.craftable_toggle_craftable")
-			: new TranslatableText("tooltip.emi.craftable_toggle_index")));
+		() -> List.of(EmiConfig.craftable ? EmiPort.translatable("tooltip.emi.craftable_toggle_craftable")
+			: EmiPort.translatable("tooltip.emi.craftable_toggle_index")));
 	public static SizedButtonWidget localCraftables = new SizedButtonWidget(0, 0, 20, 20, 144, 64, () -> EmiConfig.craftable, (w) -> {
 		EmiConfig.localCraftable = !EmiConfig.localCraftable;
 		EmiConfig.writeConfig();
 		lastPlayerInventory = null;
 		recalculate();
 	}, () -> EmiConfig.localCraftable ? 60 : 0,
-	() -> List.of(EmiConfig.localCraftable ? new TranslatableText("tooltip.emi.local_craftable_toggle_on")
-		: new TranslatableText("tooltip.emi.local_craftable_toggle_off")));
+	() -> List.of(EmiConfig.localCraftable ? EmiPort.translatable("tooltip.emi.local_craftable_toggle_on")
+		: EmiPort.translatable("tooltip.emi.local_craftable_toggle_off")));
 	public static SizedButtonWidget searchLeft = new SizedButtonWidget(0, 0, 16, 16, 224, 64,
 		EmiScreenManager::hasMultipleSearchPages, (w) -> scrollSearch(-1));
 	public static SizedButtonWidget searchRight = new SizedButtonWidget(0, 0, 16, 16, 240, 64,
@@ -184,7 +186,8 @@ public class EmiScreenManager {
 		if (!stack.isEmpty()) {
 			return stack;
 		}
-		if (searchSpace.contains(mouseX, mouseY) && mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
+		if (searchSpace.pageSize > 0 && searchSpace.contains(mouseX, mouseY)
+				&& mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
 			int x = (mouseX - searchSpace.tx) / ENTRY_SIZE;
 			int y = (mouseY - searchSpace.ty) / ENTRY_SIZE;
 			int n = searchSpace.getRawOffset(x, y);
@@ -192,7 +195,8 @@ public class EmiScreenManager {
 				return of(stacks.get(n));
 			}
 		}
-		if (favoriteSpace.contains(mouseX, mouseY) && mouseX >= favoriteSpace.tx && mouseY >= favoriteSpace.ty) {
+		if (favoriteSpace.pageSize > 0 && favoriteSpace.contains(mouseX, mouseY)
+				&& mouseX >= favoriteSpace.tx && mouseY >= favoriteSpace.ty) {
 			int x = (mouseX - favoriteSpace.tx) / ENTRY_SIZE;
 			int y = (mouseY - favoriteSpace.ty) / ENTRY_SIZE;
 			int n = favoriteSpace.getRawOffset(x, y);
@@ -240,66 +244,70 @@ public class EmiScreenManager {
 	
 			client.getProfiler().swap("search");
 			int searchPageSize = searchSpace.pageSize;
-			int totalSearchPages = (stacks.size() - 1) / searchPageSize + 1;
-			if (searchPage >= totalSearchPages) {
-				searchPage = 0;
-				searchBatcher.repopulate();
-			} else if (searchPage < 0) {
-				searchPage = totalSearchPages - 1;
-				searchBatcher.repopulate();
-			}
-			// Do not ask for whom the offsets toll, for it is you
-			searchBatcher.begin(searchSpace.tx + PADDING_SIZE - 2, searchSpace.ty + PADDING_SIZE - 3, 0);
-			DrawableHelper.drawCenteredText(matrices, client.textRenderer, new TranslatableText("emi.page", searchPage + 1, totalSearchPages),
-				searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
-			int i = searchPageSize * searchPage;
-			outer:
-			for (int yo = 0; yo < searchSpace.th; yo++) {
-				for (int xo = 0; xo < searchSpace.getWidth(yo); xo++) {
-					if (i >= stacks.size()) {
-						break outer;
-					}
-					int cx = searchSpace.getX(xo, yo);
-					int cy = searchSpace.getY(xo, yo);
-					EmiIngredient stack = stacks.get(i++);
-					searchBatcher.render(stack, matrices, cx + 1, cy + 1, delta);
-					if (EmiConfig.highlightDefaulted) {
-						if (BoM.getRecipe(stack) != null) {
-							RenderSystem.enableDepthTest();
-							DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
+			if (searchPageSize > 0) {
+				int totalSearchPages = (stacks.size() - 1) / searchPageSize + 1;
+				if (searchPage >= totalSearchPages) {
+					searchPage = 0;
+					searchBatcher.repopulate();
+				} else if (searchPage < 0) {
+					searchPage = totalSearchPages - 1;
+					searchBatcher.repopulate();
+				}
+				// Do not ask for whom the offsets toll, for it is you
+				searchBatcher.begin(searchSpace.tx + PADDING_SIZE - 2, searchSpace.ty + PADDING_SIZE - 3, 0);
+				DrawableHelper.drawCenteredText(matrices, client.textRenderer, EmiPort.translatable("emi.page", searchPage + 1, totalSearchPages),
+					searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
+				int i = searchPageSize * searchPage;
+				outer:
+				for (int yo = 0; yo < searchSpace.th; yo++) {
+					for (int xo = 0; xo < searchSpace.getWidth(yo); xo++) {
+						if (i >= stacks.size()) {
+							break outer;
+						}
+						int cx = searchSpace.getX(xo, yo);
+						int cy = searchSpace.getY(xo, yo);
+						EmiIngredient stack = stacks.get(i++);
+						searchBatcher.render(stack, matrices, cx + 1, cy + 1, delta);
+						if (EmiConfig.highlightDefaulted) {
+							if (BoM.getRecipe(stack) != null) {
+								RenderSystem.enableDepthTest();
+								DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
+							}
 						}
 					}
 				}
+				searchBatcher.draw();
 			}
-			searchBatcher.draw();
 
 			client.getProfiler().swap("favorite");
 			int favoritePageSize = favoriteSpace.pageSize;
-			int totalFavoritePages = (EmiFavorites.favorites.size() - 1) / favoritePageSize + 1;
-			if (favoritePage >= totalFavoritePages) {
-				favoritePage = 0;
-				favoriteBatcher.repopulate();
-			} else if (favoritePage < 0) {
-				favoritePage = totalFavoritePages - 1;
-				favoriteBatcher.repopulate();
-			}
-			favoriteBatcher.begin(favoriteSpace.tx + PADDING_SIZE - 2, favoriteSpace.ty + PADDING_SIZE - 3, 0);
-			DrawableHelper.drawCenteredText(matrices, client.textRenderer,
-				new TranslatableText("emi.page", favoritePage + 1, totalFavoritePages),
-				favoriteSpace.xMin + (favoriteSpace.xMax - favoriteSpace.xMin) / 2, 5, 0xFFFFFF);
-			i = favoritePageSize * favoritePage;
-			outer:
-			for (int yo = 0; yo < favoriteSpace.th; yo++) {
-				for (int xo = 0; xo < favoriteSpace.getWidth(yo); xo++) {
-					if (i >= EmiFavorites.favorites.size()) {
-						break outer;
-					}
-					int cx = favoriteSpace.getX(xo, yo);
-					int cy = favoriteSpace.getY(xo, yo);
-					favoriteBatcher.render(EmiFavorites.favorites.get(i++), matrices, cx + 1, cy + 1, delta);
+			if (favoritePageSize > 0) {
+				int totalFavoritePages = (EmiFavorites.favorites.size() - 1) / favoritePageSize + 1;
+				if (favoritePage >= totalFavoritePages) {
+					favoritePage = 0;
+					favoriteBatcher.repopulate();
+				} else if (favoritePage < 0) {
+					favoritePage = totalFavoritePages - 1;
+					favoriteBatcher.repopulate();
 				}
+				favoriteBatcher.begin(favoriteSpace.tx + PADDING_SIZE - 2, favoriteSpace.ty + PADDING_SIZE - 3, 0);
+				DrawableHelper.drawCenteredText(matrices, client.textRenderer,
+					EmiPort.translatable("emi.page", favoritePage + 1, totalFavoritePages),
+					favoriteSpace.xMin + (favoriteSpace.xMax - favoriteSpace.xMin) / 2, 5, 0xFFFFFF);
+				int i = favoritePageSize * favoritePage;
+				outer:
+				for (int yo = 0; yo < favoriteSpace.th; yo++) {
+					for (int xo = 0; xo < favoriteSpace.getWidth(yo); xo++) {
+						if (i >= EmiFavorites.favorites.size()) {
+							break outer;
+						}
+						int cx = favoriteSpace.getX(xo, yo);
+						int cy = favoriteSpace.getY(xo, yo);
+						favoriteBatcher.render(EmiFavorites.favorites.get(i++), matrices, cx + 1, cy + 1, delta);
+					}
+				}
+				favoriteBatcher.draw();
 			}
-			favoriteBatcher.draw();
 			if (!draggedStack.isEmpty()) {
 				if (favoriteSpace.contains(mouseX, mouseY)) {
 					int index = favoriteSpace.getClosestEdge(mouseX, mouseY);
@@ -352,7 +360,7 @@ public class EmiScreenManager {
 							if (a.length() > 10 && client.textRenderer.getWidth(a) > screen.width - 20) {
 								a = client.textRenderer.trimToWidth(a, screen.width - 30) + "...";
 							}
-							return new LiteralText(a);
+							return EmiPort.literal(a);
 						})
 						.collect(Collectors.toList()), 0, 20);
 				}
@@ -413,6 +421,9 @@ public class EmiScreenManager {
 	}
 
 	public static void scrollSearch(int delta) {
+		if (searchSpace.pageSize == 0) {
+			return;
+		}
 		searchPage += delta;
 		int pageSize = searchSpace.pageSize;
 		int totalPages = (stacks.size() - 1) / pageSize + 1;
@@ -428,6 +439,9 @@ public class EmiScreenManager {
 	}
 
 	public static void scrollFavorite(int delta) {
+		if (favoriteSpace.pageSize == 0) {
+			return;
+		}
 		favoritePage += delta;
 		int pageSize = favoriteSpace.pageSize;
 		int totalPages = (EmiFavorites.favorites.size() - 1) / pageSize + 1;
@@ -665,31 +679,33 @@ public class EmiScreenManager {
 	}
 
 	private static boolean give(EmiStack stack, int amount, int mode) {
-		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		if (stack.getItemStack().isEmpty()) {
+		if (EmiClient.onServer) {
+			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			if (stack.getItemStack().isEmpty()) {
+				return false;
+			}
+			buf.writeByte(mode);
+			ItemStack is = stack.getItemStack().copy();
+			is.setCount(amount);
+			buf.writeItemStack(is);
+			ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
+			return true;
+		} else {
+			ItemStack is = stack.getItemStack();
+			if (!is.isEmpty()) {
+				Identifier id = Registry.ITEM.getId(is.getItem());
+				String command = "/give @s " + id;
+				if (is.hasNbt()) {
+					command += is.getNbt().toString();
+				}
+				command += " " + amount;
+				if (command.length() < 256) {
+					client.world.sendPacket(new ChatMessageC2SPacket(command));
+					return true;
+				}
+			}
 			return false;
 		}
-		buf.writeByte(mode);
-		ItemStack is = stack.getItemStack().copy();
-		is.setCount(amount);
-		buf.writeItemStack(is);
-		ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
-		return true;
-		/* Client only backup
-		ItemStack is = stack.getItemStack();
-		if (!is.isEmpty()) {
-			Identifier id = Registry.ITEM.getId(is.getItem());
-			String command = "/give @s " + id;
-			if (is.hasNbt()) {
-				command += is.getNbt().toString();
-			}
-			command += " " + amount;
-			if (command.length() < 256) {
-				client.world.sendPacket(new ChatMessageC2SPacket(command));
-				return true;
-			}
-		}
-		return false;*/
 	}
 
 	private static class ScreenSpace {

@@ -26,10 +26,13 @@ public class TextWidget extends Widget {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		matrices.push();
+		matrices.translate(0, 0, 300);
 		if (shadow) {
 			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, color);
 		} else {
 			CLIENT.textRenderer.draw(matrices, text, x, y, color);
 		}
+		matrices.pop();
 	}
 }

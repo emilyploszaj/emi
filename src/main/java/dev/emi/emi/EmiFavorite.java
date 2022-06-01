@@ -19,7 +19,6 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	private final @Nullable EmiRecipe recipe;
 
 	public EmiFavorite(EmiIngredient stack, @Nullable EmiRecipe recipe) {
-		
 		this.stack = stack;
 		this.recipe = recipe;
 	}
@@ -29,7 +28,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public int getAmount() {
+	public long getAmount() {
 		return stack.getAmount();
 	}
 

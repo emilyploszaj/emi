@@ -6,6 +6,7 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -16,35 +17,39 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
-	private final ItemStackEntry entry;
-	public final ItemStack stack;
+	private final ItemEntry entry;
+	public final ItemVariant item;
 	private boolean unbatchable;
 
 	public ItemEmiStack(ItemStack stack) {
 		this(stack, stack.getCount());
 	}
 
-	public ItemEmiStack(ItemStack stack, int amount) {
-		this.stack = stack.copy();
-		this.stack.setCount(1);
-		entry = new ItemStackEntry(this.stack);
+	public ItemEmiStack(ItemStack stack, long amount) {
+		this(ItemVariant.of(stack), amount);
+	}
+	
+	public ItemEmiStack(ItemVariant item, long amount) {
+		this.item = item;
+		entry = new ItemEntry(this.item);
 		this.amount = amount;
 	}
 
 	@Override
 	public ItemStack getItemStack() {
-		return stack;
+		return item.toStack((int) amount);
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(stack.copy());
+		EmiStack e = new ItemEmiStack(item, amount);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
 		return e;
@@ -52,17 +57,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public boolean isEmpty() {
-		return stack.isEmpty();
+		return amount == 0 || item.getItem() == Items.AIR;
 	}
 
 	@Override
 	public NbtCompound getNbt() {
-		return stack.getNbt();
+		return item.getNbt();
 	}
 
 	@Override
 	public Object getKey() {
-		return stack.getItem();
+		return item;
 	}
 
 	@Override
@@ -72,12 +77,13 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Identifier getId() {
-		return Registry.ITEM.getId(stack.getItem());
+		return Registry.ITEM.getId(item.getItem());
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		MinecraftClient client = MinecraftClient.getInstance();
+		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
 			client.getItemRenderer().renderInGui(stack, x, y);
 		}
@@ -95,11 +101,12 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public boolean isSideLit() {
-		return MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0).isSideLit();
+		return MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isSideLit();
 	}
 	
 	@Override
 	public boolean isUnbatchable() {
+		ItemStack stack = getItemStack();
 		return unbatchable || stack.hasGlint() || MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0).isBuiltin();
 	}
 	
@@ -110,6 +117,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+		ItemStack stack = getItemStack();
 		ItemRenderer ir = MinecraftClient.getInstance().getItemRenderer();
 		BakedModel model = ir.getModel(stack, null, null, 0);
 		matrices.push();
@@ -125,16 +133,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return FakeScreen.INSTANCE.getTooltipFromItem(stack);
+		return FakeScreen.INSTANCE.getTooltipFromItem(getItemStack());
 	}
 
 	@Override
 	public List<TooltipComponent> getTooltip() {
-		if (!stack.isEmpty()) {
+		ItemStack stack = getItemStack();
+		if (!isEmpty()) {
 			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
 			//String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
-			//list.add(TooltipComponent.of(new LiteralText(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+			//list.add(TooltipComponent.of(EmiLang.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
 			if (!getRemainder().isEmpty()) {
 				list.add(new RemainderTooltipComponent(this));
 			}
@@ -146,23 +155,23 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Text getName() {
-		return stack.getName();
+		return getItemStack().getName();
 	}
 
-	public static class ItemStackEntry extends Entry<ItemStack> {
+	public static class ItemEntry extends Entry<ItemVariant> {
 
-		public ItemStackEntry(ItemStack stack) {
-			super(stack);
+		public ItemEntry(ItemVariant variant) {
+			super(variant);
 		}
 
 		@Override
-		Class<ItemStack> getType() {
-			return ItemStack.class;
+		Class<ItemVariant> getType() {
+			return ItemVariant.class;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof ItemStackEntry e && getValue().isItemEqual(e.getValue());
+			return obj instanceof ItemEntry e && getValue().equals(e.getValue());
 		}
 	}
 }

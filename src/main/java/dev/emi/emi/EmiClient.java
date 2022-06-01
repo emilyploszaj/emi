@@ -22,6 +22,7 @@ import dev.emi.emi.data.RecipeDefaultLoader;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
@@ -40,6 +41,7 @@ import net.minecraft.util.Identifier;
 public class EmiClient implements ClientModInitializer {
 	public static final Map<Consumer<ItemUsageContext>, List<EmiStack>> HOE_ACTIONS = Maps.newHashMap();
 	public static final Set<Identifier> MODELED_TAGS = Sets.newHashSet();
+	public static boolean onServer = false;
 	public static Set<Identifier> excludedTags = Sets.newHashSet();
 	public static List<TagKey<Item>> itemTags = List.of();
 	// Flag used by a mixin
@@ -66,7 +68,7 @@ public class EmiClient implements ClientModInitializer {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
 			MODELED_TAGS.clear();
-			for (Identifier id : manager.findResources("models/item/tags", s -> s.endsWith(".json"))) {
+			for (Identifier id : EmiPort.findResources(manager, "models/item/tags", s -> s.endsWith(".json"))) {
 				String path = id.getPath();
 				path = path.substring(0, path.length() - 5);
 				String[] parts = path.substring(17).split("/");
@@ -77,6 +79,15 @@ public class EmiClient implements ClientModInitializer {
 					}
 				}
 			}
+		});
+
+
+		ClientPlayConnectionEvents.INIT.register((handler, client) -> {
+			onServer = false;
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(EmiMain.PING, (client, handler, buf, sender) -> {
+			onServer = true;
 		});
 
 		ClientPlayNetworking.registerGlobalReceiver(EmiMain.COMMAND, (client, handler, buf, sender) -> {

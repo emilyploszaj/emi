@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiComparisonDefaults;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemConvertible;
@@ -23,7 +24,7 @@ public abstract class EmiStack implements EmiIngredient {
 	public static final EmiStack EMPTY = new EmptyEmiStack();
 	private EmiStack remainder = EMPTY;
 	protected Comparison comparison = Comparison.DEFAULT_COMPARISON;
-	protected int amount = 1;
+	protected long amount = 1;
 
 	@Override
 	public List<EmiStack> getEmiStacks() {
@@ -51,11 +52,11 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract boolean isEmpty();
 
-	public int getAmount() {
+	public long getAmount() {
 		return amount;
 	}
 	
-	public EmiStack setAmount(int amount) {
+	public EmiStack setAmount(long amount) {
 		this.amount = amount;
 		return this;
 	}
@@ -138,14 +139,26 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(ItemConvertible item) {
-		return of(new ItemStack(item));
+		return of(ItemVariant.of(item), 1);
+	}
+
+	public static EmiStack of(ItemConvertible item, long amount) {
+		return of(ItemVariant.of(item), amount);
+	}
+
+	public static EmiStack of(ItemVariant item) {
+		return new ItemEmiStack(item, 1);
+	}
+
+	public static EmiStack of(ItemVariant item, long amount) {
+		return new ItemEmiStack(item, amount);
 	}
 
 	public static EmiStack of(FluidVariant fluid) {
 		return new FluidEmiStack(fluid);
 	}
 
-	public static EmiStack of(FluidVariant fluid, int amount) {
+	public static EmiStack of(FluidVariant fluid, long amount) {
 		return new FluidEmiStack(fluid, amount);
 	}
 
@@ -153,7 +166,7 @@ public abstract class EmiStack implements EmiIngredient {
 		return of(FluidVariant.of(fluid));
 	}
 
-	public static EmiStack of(Fluid fluid, int amount) {
+	public static EmiStack of(Fluid fluid, long amount) {
 		return of(FluidVariant.of(fluid), amount);
 	}
 

@@ -23,6 +23,11 @@ public class EmiShapelessRecipe extends EmiCraftingRecipe {
 				public boolean canUse(PlayerEntity player) {
 					return false;
 				}
+
+				@Override
+				public ItemStack transferSlot(PlayerEntity player, int index) {
+					return null;
+				}
 			}, 1, input.size());
 			for (int j = 0; j < input.size(); j++) {
 				if (j == i) {
@@ -41,5 +46,10 @@ public class EmiShapelessRecipe extends EmiCraftingRecipe {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean canFit(int width, int height) {
+		return input.size() <= width * height;
 	}
 }

@@ -4,13 +4,12 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -60,8 +59,8 @@ public class EmiRecipeCategory {
 
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
-		list.add(TooltipComponent.of(new TranslatableText(EmiUtil.translateId("emi.category.", getId())).asOrderedText()));
-		list.add(TooltipComponent.of(new LiteralText(EmiUtil.getModName(getId().getNamespace()))
+		list.add(TooltipComponent.of(EmiPort.translatable(EmiUtil.translateId("emi.category.", getId())).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()))
 			.formatted(Formatting.BLUE).formatted(Formatting.ITALIC).asOrderedText()));
 		return list;
 	}

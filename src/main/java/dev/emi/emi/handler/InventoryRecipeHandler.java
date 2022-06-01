@@ -6,11 +6,13 @@ import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.recipe.EmiShapelessRecipe;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
@@ -18,10 +20,9 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHandler> {
-	public static final Text TOO_SMALL = new TranslatableText("emi.too_small");
+	public static final Text TOO_SMALL = EmiPort.translatable("emi.too_small");
 
 	@Override
 	public List<Slot> getInputSources(PlayerScreenHandler handler) {
@@ -82,6 +83,12 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 
 	@Override
 	public List<ItemStack> mutateFill(EmiRecipe recipe, HandledScreen<PlayerScreenHandler> screen, List<ItemStack> stacks) {
+		if (recipe instanceof EmiCraftingRecipe crafting && crafting.shapeless) {
+			return stacks;
+		}
+		if (recipe instanceof EmiShapelessRecipe) {
+			return stacks;
+		}
 		List<ItemStack> out = Lists.newArrayList();
 		int width = screen.getScreenHandler().getCraftingWidth();
 		int height = screen.getScreenHandler().getCraftingHeight();

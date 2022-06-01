@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -23,6 +25,7 @@ public class EmiMain implements ModInitializer {
 	public static final Identifier CREATE_ITEM = new Identifier("emi:create_item");
 	public static final Identifier DESTROY_HELD = new Identifier("emi:destroy_held");
 	public static final Identifier COMMAND = new Identifier("emi:command");
+	public static final Identifier PING = new Identifier("emi:ping");
 
 	private static List<Slot> parseCompressedSlots(ScreenHandler handler, PacketByteBuf buf) {
 		List<Slot> list = Lists.newArrayList();
@@ -47,6 +50,11 @@ public class EmiMain implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		EmiCommands.init();
+
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			sender.sendPacket(PING, new PacketByteBuf(Unpooled.EMPTY_BUFFER));
+		});
+
 		ServerPlayNetworking.registerGlobalReceiver(FILL_RECIPE, (server, player, networkHandler, buf, sender) -> {
 			int syncId = buf.readInt();
 			int action = buf.readByte();

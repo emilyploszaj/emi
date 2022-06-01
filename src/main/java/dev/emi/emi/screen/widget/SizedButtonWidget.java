@@ -7,12 +7,12 @@ import java.util.function.Supplier;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 public class SizedButtonWidget extends ButtonWidget {
@@ -37,7 +37,7 @@ public class SizedButtonWidget extends ButtonWidget {
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
 			IntSupplier vOffset, Supplier<List<Text>> text) {
-		super(x, y, width, height, LiteralText.EMPTY, action);
+		super(x, y, width, height, EmiPort.literal(""), action);
 		this.u = u;
 		this.v = v;
 		this.isActive = isActive;

@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.mixin.accessor.ScreenHandlerAccessor;
@@ -83,7 +84,7 @@ public class EmiRecipeFiller {
 					for (int e = 0; e < emiStacks.size(); e++) {
 						EmiStack stack = emiStacks.get(e);
 						ItemStack item = stack.getItemStack();
-						DiscoveredItem di = new DiscoveredItem(item, 0, item.getCount());
+						DiscoveredItem di = new DiscoveredItem(stack, item, 0, item.getCount());
 						for (Slot s : slots) {
 							if (ItemStack.canCombine(item, s.getStack())) {
 								di.amount += s.getStack().getCount();
@@ -120,12 +121,14 @@ public class EmiRecipeFiller {
 							continue outer;
 						}
 					}
-					unique.add(new DiscoveredItem(di.stack, di.amount, di.consumed));
+					unique.add(new DiscoveredItem(di.ingredient, di.stack, di.amount, di.consumed));
 				}
-				int maxAmount = unique.get(0).amount / unique.get(0).consumed;
+				int maxAmount = Integer.MAX_VALUE;
 				for (DiscoveredItem ui : unique) {
-					maxAmount = Math.min(maxAmount, ui.amount / ui.consumed);
-					maxAmount = Math.min(maxAmount, ui.stack.getMaxCount());
+					if (!ui.catalyst()) {
+						maxAmount = Math.min(maxAmount, ui.amount / ui.consumed);
+						maxAmount = Math.min(maxAmount, ui.stack.getMaxCount());
+					}
 				}
 				maxAmount = Math.min(maxAmount, amount);
 
@@ -138,7 +141,7 @@ public class EmiRecipeFiller {
 					DiscoveredItem di = discovered.get(i);
 					if (di != null) {
 						ItemStack is = di.stack.copy();
-						int a = di.consumed * maxAmount;
+						int a = di.catalyst() ? di.consumed : di.consumed * maxAmount;
 						is.setCount(a);
 						desired.add(is);
 					} else {
@@ -154,14 +157,21 @@ public class EmiRecipeFiller {
 	}
 
 	private static class DiscoveredItem {
+		private static final Comparison COMPARISON = Comparison.builder().nbt(false).amount(false).build();
+		public EmiStack ingredient;
 		public ItemStack stack;
 		public int consumed;
 		public int amount;
 
-		public DiscoveredItem(ItemStack stack, int amount, int consumed) {
+		public DiscoveredItem(EmiStack ingredient, ItemStack stack, int amount, int consumed) {
+			this.ingredient = ingredient;
 			this.stack = stack.copy();
 			this.amount = amount;
 			this.consumed = consumed;
+		}
+
+		public boolean catalyst() {
+			return ingredient.getRemainder().isEqual(ingredient, COMPARISON);
 		}
 	}
 }
