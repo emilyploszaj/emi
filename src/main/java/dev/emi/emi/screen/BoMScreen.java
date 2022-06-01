@@ -275,7 +275,7 @@ public class BoMScreen extends Screen {
 			return true;
 		}
 		Hover hover = getHoveredStack(lastMouseX, lastMouseY);
-		if (hover != null && !hover.stack.isEmpty()) {
+		if (hover != null && hover.stack != null && !hover.stack.isEmpty()) {
 			if (function.apply(EmiConfig.favorite)) {
 				EmiFavorites.addFavorite(hover.stack, hover.node == null ? null : hover.node.recipe);
 			}
