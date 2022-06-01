@@ -90,7 +90,7 @@ public class EmptyEmiStack extends EmiStack {
 		}
 
 		@Override
-		Class<ItemStack> getType() {
+		public Class<ItemStack> getType() {
 			return ItemStack.class;
 		}
 	}

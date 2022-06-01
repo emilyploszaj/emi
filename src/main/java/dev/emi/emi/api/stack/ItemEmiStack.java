@@ -165,7 +165,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		}
 
 		@Override
-		Class<ItemVariant> getType() {
+		public Class<ItemVariant> getType() {
 			return ItemVariant.class;
 		}
 

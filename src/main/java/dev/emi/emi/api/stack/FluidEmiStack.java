@@ -169,7 +169,7 @@ public class FluidEmiStack extends EmiStack {
 		}
 
 		@Override
-		Class<FluidVariant> getType() {
+		public Class<FluidVariant> getType() {
 			return FluidVariant.class;
 		}
 
