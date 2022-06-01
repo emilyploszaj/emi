@@ -181,6 +181,6 @@ public abstract class EmiStack implements EmiIngredient {
 			return value;
 		}
 
-		abstract Class<? extends T> getType();
+		public abstract Class<? extends T> getType();
 	}
 }
