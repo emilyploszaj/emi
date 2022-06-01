@@ -132,14 +132,10 @@ public class SlotWidget extends Widget {
 	public Bounds getBounds() {
 		if (custom) {
 			return new Bounds(x, y, customWidth, customHeight);
-		} else if (drawBack) {
-			if (output) {
-				return new Bounds(x, y, 26, 26);
-			} else {
-				return new Bounds(x, y, 18, 18);
-			}
+		} else if (output) {
+			return new Bounds(x, y, 26, 26);
 		} else {
-			return new Bounds(x, y, 16, 16);
+			return new Bounds(x, y, 18, 18);
 		}
 	}
 
