@@ -14,7 +14,7 @@ public class MaterialTree {
 	public MaterialNode goal;
 	public List<FractionalMaterialCost> fractionalCosts = Lists.newArrayList();
 	public List<FlatMaterialCost> costs = Lists.newArrayList();
-	public Map<EmiRecipe, FlatMaterialCost> remainders = Maps.newHashMap();
+	public Map<EmiStack, FlatMaterialCost> remainders = Maps.newHashMap();
 	public Map<EmiIngredient, EmiRecipe> resolutions = Maps.newHashMap();
 
 	public MaterialTree(EmiRecipe recipe) {
@@ -62,28 +62,28 @@ public class MaterialTree {
 		return false;
 	}
 
-	private void addRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, EmiIngredient ingredient, long amount) {
+	private void addRemainder(Map<EmiStack, FlatMaterialCost> remainders, EmiStack stack, long amount) {
 		if (amount > 0) {
-			if (remainders.containsKey(recipe)) {
-				remainders.get(recipe).amount += amount;
+			if (remainders.containsKey(stack)) {
+				remainders.get(stack).amount += amount;
 			} else {
-				remainders.put(recipe, new FlatMaterialCost(ingredient, amount));
+				remainders.put(stack, new FlatMaterialCost(stack, amount));
 			}
 		}
 	}
 
-	private long getRemainder(Map<EmiRecipe, FlatMaterialCost> remainders, EmiRecipe recipe, long desired, boolean catalyst) {
-		if (remainders.containsKey(recipe)) {
-			FlatMaterialCost remainder = remainders.get(recipe);
+	private long getRemainder(Map<EmiStack, FlatMaterialCost> remainders, EmiStack stack, long desired, boolean catalyst) {
+		if (remainders.containsKey(stack)) {
+			FlatMaterialCost remainder = remainders.get(stack);
 			if (remainder.amount >= desired) {
 				remainder.amount -= desired;
 				if (remainder.amount == 0 && !catalyst) {
-					remainders.remove(recipe);
+					remainders.remove(stack);
 				}
 				return desired;
 			} else {
 				if (!catalyst) {
-					remainders.remove(recipe);
+					remainders.remove(stack);
 				}
 				return remainder.amount;
 			}
@@ -91,13 +91,14 @@ public class MaterialTree {
 		return 0;
 	}
 
-	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiRecipe, FlatMaterialCost> remainders, long amount, MaterialNode node) {
+	// TODO clean up the whole remainder thing, I feel like it's gonna break
+	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiStack, FlatMaterialCost> remainders, long amount, MaterialNode node) {
 		boolean catalyst = isCatalyst(node.ingredient);
 		if (catalyst) {
 			amount = node.amount;
 		}
 		EmiRecipe recipe = node.recipe;
-		amount -= getRemainder(remainders, recipe, amount, catalyst);
+		amount -= getRemainder(remainders, node.ingredient.getEmiStacks().get(0), amount, catalyst);
 		if (amount == 0) {
 			return;
 		}
@@ -108,10 +109,17 @@ public class MaterialTree {
 			if (!catalyst) {
 				remainder -= amount;
 			}
-			addRemainder(remainders, recipe, node.ingredient, remainder);
+			EmiStack stack = node.ingredient.getEmiStacks().get(0);
+			addRemainder(remainders, stack, remainder);
 
 			for (MaterialNode n : node.children) {
 				calculateFlatCost(costs, remainders, minBatches * n.amount, n);
+				if (n.ingredient.getEmiStacks().size() == 1) {
+					EmiStack r = n.ingredient.getEmiStacks().get(0).getRemainder();
+					if (!r.isEmpty()) {
+						addRemainder(remainders, r, minBatches * r.getAmount() * n.amount);
+					}
+				}
 			}
 		} else {
 			for (FlatMaterialCost cost : costs) {
