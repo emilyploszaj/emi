@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
