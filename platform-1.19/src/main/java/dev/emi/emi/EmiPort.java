@@ -1,4 +1,4 @@
-/*package dev.emi.emi;
+package dev.emi.emi;
 
 import java.util.Random;
 import java.util.Set;
@@ -22,55 +22,48 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class EmiPort1_19 extends EmiPort.Impl {
+public final class EmiPort {
 	
-	public static void init() {
-		EmiPort.impl = new EmiPort1_19();
-	}
+	// for visibility in decompilation, and also to tell you the reader which version this file
+	// is for in case you're confused because your IDE just says "EmiPort.java" in the tab bar
+	@SuppressWarnings("unused")
+	private static final String MARKER = "1.19";
 
-	@Override
-	public MutableText literal(String s) {
+	public static MutableText literal(String s) {
 		return Text.literal(s);
 	}
 	
-	@Override
-	public MutableText translatable(String s) {
+	public static MutableText translatable(String s) {
 		return Text.translatable(s);
 	}
 	
-	@Override
-	public MutableText translatable(String s, Object... objects) {
+	public static MutableText translatable(String s, Object... objects) {
 		return Text.translatable(s, objects);
 	}
 
-	@Override
-	public Text fluidName(FluidVariant fluid) {
+	public static Text fluidName(FluidVariant fluid) {
 		return FluidVariantAttributes.getName(fluid);
 	}
 
-	@Override
-	public Set<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
+	public static Set<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
 		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
 	}
 
-	@Override
-	public void registerCommand(Consumer<CommandDispatcher<ServerCommandSource>> consumer) {
+	public static void registerCommand(Consumer<CommandDispatcher<ServerCommandSource>> consumer) {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> consumer.accept(dispatcher));
 	}
 
-	@Override
-	public BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
+	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
 		return patterns.add(Registry.BANNER_PATTERN.getEntry(random.nextInt(Registry.BANNER_PATTERN.size())).get(),
 			DyeColor.values()[random.nextInt(DyeColor.values().length)]);
 	}
 
-	@Override
-	public void upload(VertexBuffer vb, BufferBuilder bldr) {
+	public static void upload(VertexBuffer vb, BufferBuilder bldr) {
 		vb.upload(bldr.end());
 	}
 
-	@Override
-	public void draw(BufferBuilder bufferBuilder) {
+	public static void draw(BufferBuilder bufferBuilder) {
 		BufferRenderer.drawWithoutShader(bufferBuilder.end());
 	}
-}*/
+	
+}

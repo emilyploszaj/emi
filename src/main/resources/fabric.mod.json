@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "emi",
-  "version": "${version}",
+  "version": "${version}+${platform}",
   "name": "EMI",
   "description": "Featureful and accessible item and recipe viewer",
   "authors": [
@@ -27,7 +27,7 @@
   "mixins": [
     "emi.mixins.json"
   ],
-  "accessWidener" : "emi.accesswidener",
+  "${accessWidener}" : "emi.accesswidener",
   "depends": {
     "fabricloader": ">=0.13.1",
     "fabric": "*"

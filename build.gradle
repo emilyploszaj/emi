@@ -27,7 +27,9 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": project.version,
+				"platform": project.minecraft_version,
+				"accessWidener": 'accessWidener'
 	}
 }
 
@@ -49,6 +51,13 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 jar {
 	from "LICENSE"
 }
+
+task makePlatformJars(type: Exec) {
+	dependsOn remapJar
+	commandLine './make-platform-jars.sh', remapJar.archiveFile.get().toString(), project.minecraft_version
+}
+
+tasks.build.dependsOn makePlatformJars
 
 // configure the maven publication
 publishing {
