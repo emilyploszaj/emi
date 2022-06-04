@@ -56,7 +56,7 @@ public class EmiDualResultWorldRecipe extends EmiCustomWorldRecipe {
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 22, 3, 13, 13, 82, 0);
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 61, 1, 24, 17, 44, 0);
 		widgets.addSlot(input, 0, 0);
-		widgets.addSlot(catalyst, 40, 0).catalyst(isCatalyst);
+		widgets.addSlot(catalyst, 40, 0);
 		widgets.addSlot(result1, 89, 0).recipeContext(this);
 		widgets.addSlot(result2, 107, 0).recipeContext(this);
 	}	

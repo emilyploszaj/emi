@@ -6,8 +6,11 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
+import org.lwjgl.glfw.GLFW;
+
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
@@ -20,7 +23,8 @@ import net.minecraft.util.Pair;
 
 public class EmiSearchWidget extends TextFieldWidget {
 	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
-	private static List<Pair<Integer, Style>> styles;
+	private List<Pair<Integer, Style>> styles;
+	private String last = "";
 
 	public EmiSearchWidget(TextRenderer textRenderer, int x, int y, int width, int height) {
 		super(textRenderer, x, y, width, height, EmiPort.literal(""));
@@ -64,8 +68,14 @@ public class EmiSearchWidget extends TextFieldWidget {
 		this.setChangedListener(string -> {
 			if (string.isEmpty()) {
 				this.setSuggestion("Search EMI...");
+				if (EmiConfig.emptySearchCraftable && !EmiConfig.craftable) {
+					EmiScreenManager.swapCraftables();
+				}
 			} else {
 				this.setSuggestion("");
+				if (EmiConfig.emptySearchCraftable && EmiConfig.craftable) {
+					EmiScreenManager.swapCraftables();
+				}
 			}
 			Matcher matcher = EmiSearch.TOKENS.matcher(string);
 			List<Pair<Integer, Style>> styles = Lists.newArrayList();
@@ -111,9 +121,23 @@ public class EmiSearchWidget extends TextFieldWidget {
 			if (last < string.length()) {
 				styles.add(new Pair<Integer, Style>(string.length(), Style.EMPTY.withFormatting(Formatting.WHITE)));
 			}
-			EmiSearchWidget.styles = styles;
+			this.styles = styles;
 			EmiSearch.search(string);
 		});
+	}
+
+	public void swap() {
+		if (EmiConfig.emptySearchCraftable) {
+			return;
+		}
+		String last = this.getText();
+		this.setText(this.last);
+		this.last = last;
+	}
+
+	@Override
+	public void setTextFieldFocused(boolean focused) {
+		super.setTextFieldFocused(focused);
 	}
 	
 	@Override
@@ -124,6 +148,16 @@ public class EmiSearchWidget extends TextFieldWidget {
 			this.setTextFieldFocused(true);
 		}
 		return b;
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (this.isFocused() && (EmiConfig.focusSearch.matchesKey(keyCode, scanCode) || keyCode == GLFW.GLFW_KEY_ENTER)) {
+			this.setTextFieldFocused(false);
+			this.setFocused(false);
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override

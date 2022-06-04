@@ -11,6 +11,10 @@ import net.minecraft.util.Identifier;
 
 public interface EmiRecipe {
 
+	/**
+	 * @return The recipe category this recipe should be displayed under.
+	 *  This is used for grouping in the recipe screen, as well as category display in the recipe tree.
+	 */
 	EmiRecipeCategory getCategory();
 
 	/**
@@ -73,5 +77,13 @@ public interface EmiRecipe {
 	 */
 	default boolean supportsRecipeTree() {
 		return !getInputs().isEmpty() && !getOutputs().isEmpty();
+	}
+
+	/**
+	 * @return Whether the recipe should be hidden from the craftable menu.
+	 *  This is desirable behavior for recipes that are reimplementations of vanilla recipes in other workstations.
+	 */
+	default boolean hideCraftable() {
+		return false;
 	}
 }

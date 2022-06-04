@@ -59,8 +59,11 @@ public class SizedButtonWidget extends ButtonWidget {
 		RenderSystem.enableDepthTest();
 		drawTexture(matrices, this.x, this.y, this.u, v, this.width, this.height, 256, 256);
 		if (this.isHovered() && text != null && this.active) {
+			matrices.push();
+			RenderSystem.disableDepthTest();
 			MinecraftClient client = MinecraftClient.getInstance();
 			client.currentScreen.renderTooltip(matrices, text.get(), mouseX, mouseY);
+			matrices.pop();
 		}
 	}
 }

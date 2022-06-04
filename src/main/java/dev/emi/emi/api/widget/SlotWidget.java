@@ -198,7 +198,7 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
-		if (button == 0 && getRecipe() != null && RecipeScreen.resolve != null) {
+		if (button == 0 && getRecipe() != null && getRecipe().supportsRecipeTree() && RecipeScreen.resolve != null) {
 			BoM.addResolution(RecipeScreen.resolve, getRecipe());
 			EmiHistory.pop();
 			return true;

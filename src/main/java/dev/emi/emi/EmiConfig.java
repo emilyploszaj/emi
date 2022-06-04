@@ -49,9 +49,17 @@ public class EmiConfig {
 	@ConfigValue("ui.center-search-bar")
 	public static boolean centerSearchBar = true;
 
+	@Comment("Whether an empty search should display\ncraftable recipes, instead of the index.")
+	@ConfigValue("ui.empty-search-craftable")
+	public static boolean emptySearchCraftable = false;
+
 	@Comment("The amount of vertical margin to\ngive in the recipe screen.")
 	@ConfigValue("ui.vertical-margin")
 	public static int verticalMargin = 20;
+
+	@Comment("Prevents recipes being quick crafted\nfrom shifting around under the cursor.")
+	@ConfigValue("ui.miscraft-prevention")
+	public static boolean miscraftPrevention = true;
 
 	//@Comment("Maximum columns")
 	//@ConfigValue("ui.max-columns")
@@ -64,10 +72,6 @@ public class EmiConfig {
 	@Comment("Display cost per batch when hovering\na recipe output")
 	@ConfigValue("ui.show-cost-per-batch")
 	public static boolean showCostPerBatch = true;
-
-	@Comment("Whether recipes should have a button to\nfavorite the result.")
-	@ConfigValue("ui.recipe-favorite-button")
-	public static boolean recipeFavoriteButton = true;
 
 	@Comment("Whether recipes should have a button to\nset as default.")
 	@ConfigValue("ui.recipe-default-button")
@@ -177,6 +181,10 @@ public class EmiConfig {
 	@Comment("Whether certain development functions should be enabled.\nNot recommended for general play.")
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
+
+	@Comment("Whether to log untranslated tags as warnings.")
+	@ConfigValue("dev.log-untranslated-tags")
+	public static boolean logUntranslatedTags = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	@Comment("Whether hovering the output of a recipe should show\nthe recipe's EMI ID.")
 	@ConfigValue("dev.show-recipe-ids")

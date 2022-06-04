@@ -67,6 +67,12 @@ public class EmiScreenManager {
 	// The stack that was clicked on, for determining when a drag properly starts
 	private static EmiIngredient pressedStack = EmiStack.EMPTY;
 	private static EmiIngredient draggedStack = EmiStack.EMPTY;
+	// Prevent users from clicking on the wrong thing as their index changes under them
+	private static EmiStackInteraction lastHoveredCraftable = null;
+	// Whether the craftable has been used multiple times, indicating it shouldn't disappear
+	// Even if the recipe it was focusing becomes invalid
+	private static boolean lastHoveredCraftableSturdy = false;
+	private static int lastHoveredCraftableOffset = -1;
 
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);
 	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 64,
@@ -76,11 +82,7 @@ public class EmiScreenManager {
 		() -> true, (w) -> EmiApi.viewRecipeTree(),
 		List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 	public static SizedButtonWidget craftableButton = new SizedButtonWidget(0, 0, 20, 20, 164, 64, () -> true, (w) -> {
-		EmiConfig.craftable = !EmiConfig.craftable;
-		EmiConfig.writeConfig();
-		EmiSearch.update();
-		lastPlayerInventory = null;
-		recalculate();
+		swapCraftables();
 	}, () -> EmiConfig.craftable ? 60 : 0,
 		() -> List.of(EmiConfig.craftable ? EmiPort.translatable("tooltip.emi.craftable_toggle_craftable")
 			: EmiPort.translatable("tooltip.emi.craftable_toggle_index")));
@@ -182,9 +184,24 @@ public class EmiScreenManager {
 	}
 
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick) {
+		return getHoveredStack(mouseX, mouseY, notClick, false);
+	}
+
+	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick, boolean ignoreLastHoveredCraftable) {
 		EmiStackInteraction stack = EmiStackProviders.getStackAt(client.currentScreen, mouseX, mouseY, notClick);
 		if (!stack.isEmpty()) {
 			return stack;
+		}
+		if (!ignoreLastHoveredCraftable) {
+			if (lastHoveredCraftable != null) {
+				EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
+				if (lastHoveredCraftable.getRecipeContext() == null
+						|| (!lastHoveredCraftableSturdy && !inv.canCraft(lastHoveredCraftable.getRecipeContext()))) {
+					lastHoveredCraftable = null;
+				} else {
+					return lastHoveredCraftable;
+				}
+			}
 		}
 		if (searchSpace.pageSize > 0 && searchSpace.contains(mouseX, mouseY)
 				&& mouseX >= searchSpace.tx && mouseY >= searchSpace.ty) {
@@ -213,11 +230,21 @@ public class EmiScreenManager {
 		}
 		return new EmiStackInteraction(stack);
 	}
+
+	private static void updateMouse(int mouseX, int mouseY) {
+		if (lastHoveredCraftable != null) {
+			int offset = searchSpace.getRawOffsetFromMouse(mouseX, mouseY);
+			if (offset != lastHoveredCraftableOffset) {
+				lastHoveredCraftable = null;
+			}
+		}
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
+	}
 	
 	public static void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		client.getProfiler().push("emi");
-		lastMouseX = mouseX;
-		lastMouseY = mouseY;
+		updateMouse(mouseX, mouseY);
 		Screen screen = client.currentScreen;
 		boolean visible = !isDisabled();
 		emi.visible = visible;
@@ -233,13 +260,12 @@ public class EmiScreenManager {
 				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 48, screen.height - 16, -1);
 			}
 			client.getProfiler().pop();
+			lastHoveredCraftable = null;
 			return;
 		}
 		client.getProfiler().push("sidebars");
 		if (screen instanceof EmiScreen emi) {
 			client.getProfiler().push("prep");
-			EmiScreenManager.search.setZOffset(0);
-			EmiScreenManager.search.render(matrices, mouseX, mouseY, delta);
 			recalculate();
 	
 			client.getProfiler().swap("search");
@@ -307,6 +333,21 @@ public class EmiScreenManager {
 					}
 				}
 				favoriteBatcher.draw();
+			}
+			if (lastHoveredCraftable != null && lastHoveredCraftableOffset != -1) {
+				EmiStackInteraction cur = getHoveredStack(mouseX, mouseY, false, true);
+				if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
+					MatrixStack view = RenderSystem.getModelViewStack();
+					view.push();
+					view.translate(0, 0, 200);
+					RenderSystem.applyModelViewMatrix();
+					int lhx = searchSpace.getRawX(lastHoveredCraftableOffset);
+					int lhy = searchSpace.getRawY(lastHoveredCraftableOffset);
+					DrawableHelper.fill(matrices, lhx, lhy, lhx + 18, lhy + 18, 0x44AA00FF);
+					lastHoveredCraftable.getStack().render(matrices, lhx + 1, lhy + 1, delta, EmiIngredient.RENDER_ICON);
+					view.pop();
+					RenderSystem.applyModelViewMatrix();
+				}
 			}
 			if (!draggedStack.isEmpty()) {
 				if (favoriteSpace.contains(mouseX, mouseY)) {
@@ -418,6 +459,15 @@ public class EmiScreenManager {
 		screen.addDrawableChild(searchRight);
 		screen.addDrawableChild(favoriteLeft);
 		screen.addDrawableChild(favoriteRight);
+	}
+
+	public static void swapCraftables() {
+		EmiConfig.craftable = !EmiConfig.craftable;
+		EmiConfig.writeConfig();
+		search.swap();
+		EmiSearch.update();
+		lastPlayerInventory = null;
+		recalculate();
 	}
 
 	public static void scrollSearch(int delta) {
@@ -602,11 +652,7 @@ public class EmiScreenManager {
 			EmiHistory.pop();
 			return true;
 		} else if (function.apply(EmiConfig.toggleCraftable)) {
-			EmiConfig.craftable = !EmiConfig.craftable;
-			EmiConfig.writeConfig();
-			EmiSearch.update();
-			lastPlayerInventory = null;
-			recalculate();
+			swapCraftables();
 			return true;
 		} else if (function.apply(EmiConfig.toggleLocalCraftable) && EmiConfig.craftable) {
 			EmiConfig.localCraftable = !EmiConfig.localCraftable;
@@ -638,6 +684,13 @@ public class EmiScreenManager {
 					action = EmiFillAction.FILL;
 				}
 				if (action != null) {
+					if (EmiConfig.miscraftPrevention) {
+						lastHoveredCraftableOffset = searchSpace.getRawOffsetFromMouse(lastMouseX, lastMouseY);
+						if (lastHoveredCraftableOffset != -1) {
+							lastHoveredCraftableSturdy = lastHoveredCraftable != null;
+							lastHoveredCraftable = stack;
+						}
+					}
 					if (EmiApi.performFill(fav.getRecipe(), action, all ? Integer.MAX_VALUE : 1)) {
 						return true;
 					}
@@ -779,6 +832,24 @@ public class EmiScreenManager {
 			return ty + y * ENTRY_SIZE;
 		}
 
+		public int getRawX(int off) {
+			int t = 0;
+			int y = 0;
+			while (y < th && t + getWidth(y) <= off) {
+				t += getWidth(y++);
+			}
+			return getX(off - t, y);
+		}
+
+		public int getRawY(int off) {
+			int t = 0;
+			int y = 0;
+			while (y < th && t + getWidth(y) <= off) {
+				t += getWidth(y++);
+			}
+			return ty + y * ENTRY_SIZE;
+		}
+
 		public int getClosestEdge(int x, int y) {
 			if (y < ty) {
 				return 0;
@@ -810,6 +881,13 @@ public class EmiScreenManager {
 				}
 				return off;
 			}
+		}
+
+		public int getRawOffsetFromMouse(int mouseX, int mouseY) {
+			if (mouseX < tx || mouseY < ty) {
+				return -1;
+			}
+			return getRawOffset((mouseX - tx) / ENTRY_SIZE, (mouseY - ty) / ENTRY_SIZE);
 		}
 
 		public int getRawOffset(int x, int y) {

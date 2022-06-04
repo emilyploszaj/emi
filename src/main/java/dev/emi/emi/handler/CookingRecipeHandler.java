@@ -35,6 +35,6 @@ public class CookingRecipeHandler<T extends AbstractFurnaceScreenHandler> implem
 
 	@Override
 	public boolean supportsRecipe(EmiRecipe recipe) {
-		return recipe.getCategory() == category;
+		return recipe.getCategory() == category && recipe.supportsRecipeTree();
 	}
 }

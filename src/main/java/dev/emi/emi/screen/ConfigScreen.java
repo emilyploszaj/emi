@@ -63,7 +63,6 @@ public class ConfigScreen extends Screen {
 		List<Text> text;
 		ConfigValue annot = field.getAnnotation(ConfigValue.class);
 		String key = "config.emi.tooltip." + annot.value().replace('-', '_');
-		System.out.println(key);
 		Comment comment = field.getAnnotation(Comment.class);
 		if (I18n.hasTranslation(key)) {
 			text = (List<Text>) (Object) Arrays.stream(I18n.translate(key).split("\n")).map(EmiPort::literal).toList();

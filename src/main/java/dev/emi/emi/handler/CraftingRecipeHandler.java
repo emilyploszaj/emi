@@ -43,6 +43,6 @@ public class CraftingRecipeHandler implements EmiRecipeHandler<CraftingScreenHan
 
 	@Override
 	public boolean supportsRecipe(EmiRecipe recipe) {
-		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING;
+		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree();
 	}
 }

@@ -40,10 +40,12 @@ public class EmiRecipeFiller {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends ScreenHandler> List<EmiRecipeHandler<T>> getAllHandlers(HandledScreen<T> screen) {
-		T screenHandler = screen.getScreenHandler();
-		ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
-		if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
-			return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
+		if (screen != null) {
+			T screenHandler = screen.getScreenHandler();
+			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
+			if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
+				return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
+			}
 		}
 		return List.of();
 	}

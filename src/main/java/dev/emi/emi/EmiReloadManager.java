@@ -12,6 +12,9 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.item.Item;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.registry.Registry;
 
 public class EmiReloadManager {
@@ -68,6 +71,20 @@ public class EmiReloadManager {
 					.filter(key -> !EmiClient.excludedTags.contains(key.id()))
 					.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 					.toList();
+				if (EmiConfig.logUntranslatedTags) {
+					boolean warned = false;
+					for (TagKey<Item> tag : EmiClient.itemTags) {
+						String translation = EmiUtil.translateId("tag.", tag.id());
+						if (!I18n.hasTranslation(translation)) {
+							warned = true;
+							EmiLog.warn("No translation for tag #" + tag.id());
+						}
+					}
+					if (warned) {
+						EmiLog.warn("Tag warning can be disabled in the config");
+						EmiLog.warn("EMI docs describe how to add a translation or exclude tags.");
+					}
+				}
 				EmiRecipeFiller.handlers.clear();
 				EmiComparisonDefaults.comparisons = new HashMap<>();
 				EmiStackList.reload();

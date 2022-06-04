@@ -84,7 +84,7 @@ public class EmiWorldRecipe implements EmiRecipe {
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 27, 3, 13, 13, 82, 0);
 		widgets.addTexture(EmiRenderHelper.WIDGETS, 75, 1, 24, 17, 44, 0);
 		widgets.addSlot(input, 0, 0);
-		widgets.addSlot(catalyst, 49, 0).catalyst(isCatalyst);
+		widgets.addSlot(catalyst, 49, 0);
 		widgets.addSlot(result, 107, 0).recipeContext(this);
 	}	
 }
