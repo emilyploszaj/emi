@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.api.EmiRender;
+import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;

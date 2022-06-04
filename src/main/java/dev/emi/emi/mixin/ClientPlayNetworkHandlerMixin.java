@@ -28,7 +28,7 @@ public class ClientPlayNetworkHandlerMixin {
 	}
 
 	@Inject(at = @At("RETURN"), method = "onSynchronizeRecipes")
-	public void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
+	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
 		infoMask |= 1;
 		if (infoMask == 3) {
 			infoMask = 0;
@@ -37,7 +37,7 @@ public class ClientPlayNetworkHandlerMixin {
 	}
 
 	@Inject(at = @At("RETURN"), method = "onSynchronizeTags")
-	public void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
+	private void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
 		infoMask |= 2;
 		if (infoMask == 3) {
 			infoMask = 0;

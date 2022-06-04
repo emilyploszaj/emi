@@ -56,7 +56,13 @@ public class MaterialNode {
 
 	public void defineRecipe(EmiRecipe recipe) {
 		this.recipe = recipe;
-		divisor = recipe.getOutputs().get(0).getAmount();
+		divisor = 1;
+		for (EmiStack stack : recipe.getOutputs()) {
+			if (stack.equals(ingredient)) {
+				divisor = stack.getAmount();
+				break;
+			}
+		}
 		this.children = Lists.newArrayList();
 		outer:
 		for (EmiIngredient i : recipe.getInputs()) {

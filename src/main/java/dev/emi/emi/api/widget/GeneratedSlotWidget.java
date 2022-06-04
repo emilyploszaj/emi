@@ -3,7 +3,7 @@ package dev.emi.emi.api.widget;
 import java.util.Random;
 import java.util.function.Function;
 
-import dev.emi.emi.api.EmiRender;
+import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.util.math.MatrixStack;

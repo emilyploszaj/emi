@@ -2,7 +2,7 @@ package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
-import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -72,9 +72,9 @@ public class EmiCraftingRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 60, 18, 24, 17, 44, 0);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 60, 18);
 		if (shapeless) {
-			widgets.addTexture(EmiRenderHelper.WIDGETS, 97, 0, 16, 14, 95, 0);
+			widgets.addTexture(EmiTexture.SHAPELESS, 97, 0);
 		}
 		for (int i = 0; i < 9; i++) {
 			if (i < input.size()) {

@@ -44,7 +44,7 @@ public class StackBatcher {
 	private int x;
 	private int y;
 	private int z;
-	private boolean enabled = true;
+	public static boolean enabled = true;
 
 	public StackBatcher() {
 		Map<RenderLayer, BufferBuilder> buffers = new HashMap<>();

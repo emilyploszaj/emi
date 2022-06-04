@@ -110,7 +110,7 @@ public class BoMScreen extends Screen {
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2 + 10;
 			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
 			for (FlatMaterialCost cost : BoM.tree.costs) {
-				cost.ingredient.render(matrices, cx, cy, 0);
+				cost.ingredient.render(matrices, cx, cy, 0, ~EmiIngredient.RENDER_AMOUNT);
 				EmiRenderHelper.renderAmount(matrices, cx, cy, cost.ingredient.getAmountText(cost.amount));
 				cx += 40;
 			}
@@ -119,7 +119,7 @@ public class BoMScreen extends Screen {
 				cy += 40;
 				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16, -1);
 				for (FlatMaterialCost cost : BoM.tree.remainders.values()) {
-					cost.ingredient.render(matrices, cx, cy, 0);
+					cost.ingredient.render(matrices, cx, cy, 0, ~EmiIngredient.RENDER_AMOUNT);
 					EmiRenderHelper.renderAmount(matrices, cx, cy, cost.ingredient.getAmountText(cost.amount));
 					cx += 40;
 				}

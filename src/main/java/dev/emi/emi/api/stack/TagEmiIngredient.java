@@ -9,7 +9,7 @@ import org.apache.commons.compress.utils.Lists;
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
-import dev.emi.emi.api.EmiRender;
+import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;

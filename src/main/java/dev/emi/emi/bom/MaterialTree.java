@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 
@@ -93,11 +94,15 @@ public class MaterialTree {
 
 	// TODO clean up the whole remainder thing, I feel like it's gonna break
 	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiStack, FlatMaterialCost> remainders, long amount, MaterialNode node) {
+		EmiRecipe recipe = node.recipe;
+		if (recipe instanceof EmiResolutionRecipe) {
+			calculateFlatCost(costs, remainders, amount, node.children.get(0));
+			return;
+		}
 		boolean catalyst = isCatalyst(node.ingredient);
 		if (catalyst) {
 			amount = node.amount;
 		}
-		EmiRecipe recipe = node.recipe;
 		amount -= getRemainder(remainders, node.ingredient.getEmiStacks().get(0), amount, catalyst);
 		if (amount == 0) {
 			return;
@@ -119,6 +124,11 @@ public class MaterialTree {
 					if (!r.isEmpty()) {
 						addRemainder(remainders, r, minBatches * r.getAmount() * n.amount);
 					}
+				}
+			}
+			for (EmiStack es : recipe.getOutputs()) {
+				if (!stack.equals(es)) {
+					addRemainder(remainders, es, minBatches * es.getAmount());
 				}
 			}
 		} else {

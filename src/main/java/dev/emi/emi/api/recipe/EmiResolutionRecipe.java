@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.VanillaPlugin;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -52,7 +52,7 @@ public class EmiResolutionRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 22, 1, 24, 17, 44, 0);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 22, 1);
 		widgets.addSlot(stack, 0, 0);
 		widgets.addSlot(ingredient, 50, 0);
 	}

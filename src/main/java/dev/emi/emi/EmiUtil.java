@@ -10,6 +10,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -26,8 +27,7 @@ public class EmiUtil {
 	public static final int SHIFT_MASK = 4;
 
 	public static boolean isControlDown() {
-		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)
-			|| InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+		return Screen.hasControlDown();
 	}
 
 	public static boolean isAltDown() {
@@ -41,6 +41,11 @@ public class EmiUtil {
 	}
 
 	public static int maskFromCode(int keyCode) {
+		if (MinecraftClient.IS_SYSTEM_MAC) {
+			if (keyCode == GLFW.GLFW_KEY_LEFT_SUPER || keyCode == GLFW.GLFW_KEY_RIGHT_SUPER) {
+				return EmiUtil.CONTROL_MASK;
+			}
+		}
 		if (keyCode == GLFW.GLFW_KEY_LEFT_CONTROL || keyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
 			return EmiUtil.CONTROL_MASK;
 		} else if (keyCode == GLFW.GLFW_KEY_LEFT_ALT || keyCode == GLFW.GLFW_KEY_RIGHT_ALT) {

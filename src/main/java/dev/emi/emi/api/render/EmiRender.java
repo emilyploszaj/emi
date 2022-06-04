@@ -1,4 +1,4 @@
-package dev.emi.emi.api;
+package dev.emi.emi.api.render;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;

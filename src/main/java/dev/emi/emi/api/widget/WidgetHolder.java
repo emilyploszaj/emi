@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.DrawableWidget.DrawableWidgetConsumer;
@@ -36,6 +37,11 @@ public interface WidgetHolder {
 			regionWidth, regionHeight, textureWidth, textureHeight));
 	}
 
+	default TextureWidget addTexture(EmiTexture texture, int x, int y) {
+		return addTexture(texture.texture, x, y, texture.width, texture.height, texture.u, texture.v,
+			texture.regionWidth, texture.regionHeight, texture.textureWidth, texture.textureHeight);
+	}
+
 	default DrawableWidget addDrawable(int x, int y, int width, int height, DrawableWidgetConsumer consumer) {
 		return add(new DrawableWidget(x, y, width, height, consumer));
 	}
@@ -65,6 +71,13 @@ public interface WidgetHolder {
 		return add(new AnimatedTextureWidget(texture, x, y, width, height, u, v,
 			regionWidth, regionHeight, textureWidth, textureHeight,
 			time, horizontal, endToStart, fullToEmpty));
+	}
+
+	default AnimatedTextureWidget addAnimatedTexture(EmiTexture texture, int x, int y, int time,
+			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
+		return addAnimatedTexture(texture.texture, x, y, texture.width, texture.height, texture.u, texture.v,
+			texture.regionWidth, texture.regionHeight, texture.textureWidth, texture.textureHeight,
+			time, horizontal, endToStart, fullToEmpty);
 	}
 
 	default GeneratedSlotWidget addGeneratedSlot(Function<Random, EmiIngredient> stackSupplier, int unique, int x, int y) {

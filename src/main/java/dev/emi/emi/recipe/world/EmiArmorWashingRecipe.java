@@ -2,8 +2,8 @@ package dev.emi.emi.recipe.world;
 
 import java.util.List;
 
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -49,8 +49,8 @@ public class EmiArmorWashingRecipe extends EmiCustomWorldRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 23, 3, 13, 13, 82, 0);
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 79, 1, 24, 17, 44, 0);
+		widgets.addTexture(EmiTexture.PLUS, 23, 3);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 79, 1);
 		widgets.addGeneratedSlot(r -> {
 			ItemStack stack = new ItemStack(armor);
 			((DyeableItem) armor).setColor(stack, r.nextInt(0xFFFFFF + 1));

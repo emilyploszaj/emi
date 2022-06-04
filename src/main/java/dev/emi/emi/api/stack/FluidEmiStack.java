@@ -8,7 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
-import dev.emi.emi.api.EmiRender;
+import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;

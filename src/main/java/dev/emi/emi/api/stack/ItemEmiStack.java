@@ -2,7 +2,7 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
-import dev.emi.emi.api.EmiRender;
+import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;

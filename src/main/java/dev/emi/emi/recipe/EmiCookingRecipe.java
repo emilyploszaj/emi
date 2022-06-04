@@ -3,9 +3,9 @@ package dev.emi.emi.recipe;
 import java.util.List;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -68,11 +68,10 @@ public class EmiCookingRecipe implements EmiRecipe {
 			return List.of(TooltipComponent.of(EmiPort.translatable("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
 		});
 		if (infiniBurn) {
-			widgets.addTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14);
+			widgets.addTexture(EmiTexture.FULL_FLAME, 1, 24);
 		} else {
-			widgets.addTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 0);
-			widgets.addAnimatedTexture(EmiRenderHelper.WIDGETS, 1, 24, 14, 14, 68, 14, 4000 / fuelMultiplier,
-				false, true, true);
+			widgets.addTexture(EmiTexture.EMPTY_FLAME, 1, 24);
+			widgets.addAnimatedTexture(EmiTexture.FULL_FLAME, 1, 24, 4000 / fuelMultiplier, false, true, true);
 		}
 		widgets.addText(EmiPort.translatable("emi.cooking.experience", recipe.getExperience()).asOrderedText(), 26, 28, -1, true);
 		widgets.addSlot(input, 0, 4);

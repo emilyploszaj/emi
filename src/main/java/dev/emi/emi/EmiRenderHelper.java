@@ -61,7 +61,7 @@ public class EmiRenderHelper {
 	public static void renderAmount(MatrixStack matrices, int x, int y, Text amount) {
 		matrices.push();
 		matrices.translate(0, 0, 200);
-		int tx = x + 18 - Math.min(10, CLIENT.textRenderer.getWidth(amount));
+		int tx = x + 17 - Math.min(14, CLIENT.textRenderer.getWidth(amount));
 		CLIENT.textRenderer.drawWithShadow(matrices, amount, tx, y + 9, -1);
 		matrices.pop();
 	}

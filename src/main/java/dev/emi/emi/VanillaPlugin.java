@@ -25,6 +25,7 @@ import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -359,6 +360,10 @@ public class VanillaPlugin implements EmiPlugin {
 			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		
+		EmiIngredient shears = EmiStack.of(Items.SHEARS);
+		registry.addRecipe(new EmiDualResultWorldRecipe(EmiStack.of(Items.PUMPKIN), shears,
+			EmiStack.of(Items.PUMPKIN_SEEDS, 4), EmiStack.of(Items.CARVED_PUMPKIN),
+			new Identifier("emi", "shearing/minecraft/pumpkin"), true));
 		EmiIngredient hoes = EmiStack.of(Items.IRON_HOE);
 		for (Map.Entry<Block, Pair<Predicate<ItemUsageContext>, Consumer<ItemUsageContext>>> entry
 				: HoeItemAccessor.getTillingActions().entrySet()) {
@@ -421,7 +426,7 @@ public class VanillaPlugin implements EmiPlugin {
 		});
 	}
 
-	private static EmiRecipeCategory.Renderer simplifiedRenderer(int u, int v) {
+	private static EmiRenderable simplifiedRenderer(int u, int v) {
 		return (matrices, x, y, delta) -> {
 			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 			DrawableHelper.drawTexture(matrices, x, y, u, v, 16, 16, 256, 256);

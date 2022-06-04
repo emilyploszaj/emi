@@ -3,11 +3,11 @@ package dev.emi.emi.recipe;
 import java.util.List;
 import java.util.Random;
 
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -61,8 +61,8 @@ public class EmiAnvilRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 27, 3, 13, 13, 82, 0);
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 75, 1, 24, 17, 44, 0);
+		widgets.addTexture(EmiTexture.PLUS, 27, 3);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 75, 1);
 		widgets.addGeneratedSlot(r -> getTool(r, false), uniq, 0, 0);
 		widgets.addSlot(resource, 49, 0);
 		widgets.addGeneratedSlot(r -> getTool(r, true), uniq, 107, 0).recipeContext(this);

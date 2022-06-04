@@ -2,10 +2,10 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -55,7 +55,7 @@ public class EmiStonecuttingRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiRenderHelper.WIDGETS, 26, 1, 24, 17, 44, 0);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 26, 1);
 		widgets.addSlot(input, 0, 0);
 		widgets.addSlot(output, 58, 0).recipeContext(this);
 	}

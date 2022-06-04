@@ -10,6 +10,7 @@ import org.apache.commons.compress.utils.Lists;
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.render.EmiRenderable;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
@@ -18,7 +19,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
 
-public interface EmiIngredient {
+public interface EmiIngredient extends EmiRenderable {
 	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
 	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final int RENDER_ICON = 1;
@@ -39,6 +40,7 @@ public interface EmiIngredient {
 
 	long getAmount();
 
+	@Override
 	default void render(MatrixStack matrices, int x, int y, float delta) {
 		render(matrices, x, y, delta, -1);
 	}
