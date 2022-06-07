@@ -53,8 +53,8 @@ jar {
 }
 
 task makePlatformJars(type: Exec) {
-	dependsOn remapJar
-	commandLine './make-platform-jars.sh', remapJar.archiveFile.get().toString(), project.minecraft_version
+	dependsOn remapJar, remapSourcesJar
+	commandLine './make-platform-jars.sh', remapJar.archiveFile.get().toString(), remapSourcesJar.archiveFile.get().toString(), project.minecraft_version
 }
 
 tasks.build.dependsOn makePlatformJars
@@ -62,16 +62,27 @@ tasks.build.dependsOn makePlatformJars
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(jar) {
-				builtBy remapJar
+		def versions = [project.minecraft_version]
+
+		file('.').list().each {
+			if (it.startsWith("platform-")) {
+				versions.add(it.substring(9))
 			}
-			artifact("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}.jar"){
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
+		}
+
+		versions.each { plat ->
+			create(plat, MavenPublication) {
+				group project.group
+				artifactId project.archivesBaseName
+				version "${project.version}+${plat}"
+				artifact(file("build/libs/${project.archivesBaseName}-${project.version}+${plat}.jar")) {
+					classifier ''
+					builtBy makePlatformJars
+				}
+				artifact(file("build/libs/${project.archivesBaseName}-${project.version}+${plat}-sources.jar")) {
+					classifier 'sources'
+					builtBy makePlatformJars
+				}
 			}
 		}
 	}
