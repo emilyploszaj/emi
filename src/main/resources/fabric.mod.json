@@ -3,7 +3,7 @@
   "id": "emi",
   "version": "${version}+${platform}",
   "name": "EMI",
-  "description": "Featureful and accessible item and recipe viewer",
+  "description": "A featureful and accessible item and recipe viewer",
   "authors": [
     "Emi"
   ],
