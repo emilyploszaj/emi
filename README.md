@@ -1,6 +1,8 @@
 # EMI
 EMI is a featureful and accessible item and recipe viewer for Minecraft.
 
+![EMI Interface](https://i.imgur.com/Ctqbzkf.png)
+
 ## Developers
 To add EMI to your project as a dependency you need to add the following to your `build.gradle`:
 ```
