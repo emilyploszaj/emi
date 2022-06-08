@@ -183,6 +183,8 @@
   "tag.c.glass.silica": "Silica Glass",
   "tag.c.quartz_blocks": "Quartz Blocks",
   "tag.c.glass_panes": "Glass Panes",
+	"tag.c.glass.tinted": "Tinted Glass",
+	"tag.c.glass_panes.colorless": "Colorless Glass Panes",
   "tag.c.raw_materials": "Raw Materials",
   "tag.c.rods": "Rods",
   "tag.c.ores": "Ores",
@@ -249,6 +251,10 @@
   "tag.c.storage_blocks.gold": "Gold Storage Blocks",
   "tag.c.storage_blocks.raw_gold": "Raw Gold Storage Blocks",
 
+  "tag.c.gems.amethyst": "Amethysts",
+  "tag.c.amethyst_dusts": "Amethyst Dusts",
+  "tag.c.storage_blocks.amethyst": "Amethyst Storage Blocks",
+
   "tag.c.storage_blocks.diamond": "Diamond Storage Blocks",
   "tag.c.storage_blocks.emerald": "Emerald Storage Blocks",
   "tag.c.storage_blocks.lapis": "Lapis Storage Blocks",
@@ -282,6 +288,7 @@
   "tag.c.ores.netherite_scrap": "Netherite Scrap Ores",
   "tag.c.ores.quartz": "Quartz Ores",
 
+  "tag.c.spears": "Spears",
   "tag.c.axes": "Axes",
   "tag.c.barrels": "Barrels",
   "tag.c.barrels.wooden": "Wooden Barrels",

@@ -10,6 +10,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
@@ -173,6 +174,14 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
+			for (Widget widget : group.widgets) {
+				if (widget instanceof RecipeFillButtonWidget) {
+					if (widget.getBounds().contains(mx, my)) {
+						EmiClient.getAvailable(group.recipe());
+						break;
+					}
+				}
+			}
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
 			view.translate(group.x(), group.y(), 0);
@@ -182,6 +191,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			}
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
+			EmiClient.availableForCrafting.clear();
 		}
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
@@ -322,7 +332,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					}
 				}
 				off += recipeHeight + RECIPE_PADDING;
-				currentPage.add(new WidgetGroup(widgets, wx, wy));
+				currentPage.add(new WidgetGroup(r, widgets, wx, wy));
 			}
 			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tabs.get(tab).category, List.of());
 			if (!workstations.isEmpty()) {
@@ -330,7 +340,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				for (int i = 0; i < workstations.size() && i < (backgroundHeight - 30) / 18; i++) {
 					widgets.add(new SlotWidget(workstations.get(i), x - 18, y + 10 + i * 18));
 				}
-				currentPage.add(new WidgetGroup(widgets, 0, 0));
+				currentPage.add(new WidgetGroup(null, widgets, 0, 0));
 			}
 		}
 	}
@@ -490,6 +500,6 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 	}
 
-	private static record WidgetGroup(List<Widget> widgets, int x, int y) {
+	private static record WidgetGroup(EmiRecipe recipe, List<Widget> widgets, int x, int y) {
 	}
 }

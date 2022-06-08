@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Maps;
-
 import org.apache.commons.compress.utils.Lists;
+
+import com.google.common.collect.Maps;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
@@ -43,13 +43,22 @@ public class EmiApi {
 	}
 
 	/**
-	 * Gets the currently hovered EmiIngredient at the privded screen coordinates,
+	 * Gets the currently hovered EmiIngredient at the provided screen coordinates,
 	 * or {@link EmiStack#EMPTY} if none.
 	 * @param includeStandard Whether to include the EmiIngredient representation of
 	 * 	standard stacks in slots or otherwise provided to EMI.
 	 */
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean includeStandard) {
 		return EmiScreenManager.getHoveredStack(mouseX, mouseY, includeStandard);
+	}
+
+	/**
+	 * Gets the currently hovered EmiIngredient at the mouse or {@link EmiStack#EMPTY} if none.
+	 * @param includeStandard Whether to include the EmiIngredient representation of
+	 * 	standard stacks in slots or otherwise provided to EMI.
+	 */
+	public static EmiStackInteraction getHoveredStack(boolean includeStandard) {
+		return EmiScreenManager.getHoveredStack(EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, includeStandard);
 	}
 
 	public static HandledScreen<?> getHandledScreen() {

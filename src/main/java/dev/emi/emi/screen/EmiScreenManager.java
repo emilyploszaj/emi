@@ -523,7 +523,9 @@ public class EmiScreenManager {
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
 		// TODO This makes sure focus always goes away, but might double fire, is that a problem?
-		EmiScreenManager.search.mouseClicked(mouseX, mouseY, button);
+		if (!search.isMouseOver(mouseX, mouseY)) {
+			EmiScreenManager.search.mouseClicked(mouseX, mouseY, button);
+		}
 		if (isDisabled()) {
 			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
 				EmiConfig.enabled = !EmiConfig.enabled;

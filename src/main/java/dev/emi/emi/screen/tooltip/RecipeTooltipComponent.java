@@ -67,7 +67,7 @@ public class RecipeTooltipComponent implements TooltipComponent {
 		view.translate(x + 4, y + 4, 0);
 		RenderSystem.applyModelViewMatrix();
 		recipe.addWidgets(holder);
-		EmiClient.getAvailable(recipe);
+		//EmiClient.getAvailable(recipe);
 		for (Widget widget : widgets) {
 			widget.render(matrices, -1000, -1000, MinecraftClient.getInstance().getTickDelta());
 		}

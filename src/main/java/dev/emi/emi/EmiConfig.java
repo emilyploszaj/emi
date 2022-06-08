@@ -85,6 +85,12 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
 
+	@Comment("Whether to use the batched render system.\nBatching is faster, but may have incompatibilities"
+		+ "\nwith shaders or other mods.")
+	@ConfigValue("ui.use-batched-renderer")
+	public static boolean useBatchedRenderer = true;
+
+
 	// Binds
 	@Comment("Toggle the visibility of EMI.")
 	@ConfigValue("binds.toggle-visibility")
@@ -199,7 +205,7 @@ public class EmiConfig {
 	public static boolean craftable = false;
 
 	@ConfigValue("persistent.local-craftable")
-	public static boolean localCraftable = false;
+	public static boolean localCraftable = true;
 
 	public static void load() {
 		try {

@@ -30,15 +30,19 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 
 	@Override
 	protected List<RecipeDefault> prepare(ResourceManager manager, Profiler profiler) {
-		List<RecipeDefault> defaults = Lists.newArrayList();
+		List<RecipeDefault> allDefaults = Lists.newArrayList();
 		for (Identifier id : EmiPort.findResources(manager, "recipe/defaults/", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
+			List<RecipeDefault> defaults = Lists.newArrayList();
 			try {
 				for (Resource resource : manager.getAllResources(id)) {
 					InputStreamReader reader = new InputStreamReader(resource.getInputStream());
 					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
+					if (JsonHelper.getBoolean(json, "replace", false)) {
+						defaults.clear();
+					}
 					for (Entry<String, JsonElement> type : json.entrySet()) {
 						String key = type.getKey();
 						JsonElement el = type.getValue();
@@ -65,8 +69,9 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 				System.err.println("[emi] Error loading recipe default file " + id);
 				e.printStackTrace();
 			}
+			allDefaults.addAll(defaults);
 		}
-		return defaults;
+		return allDefaults;
 	}
 
 	@Override

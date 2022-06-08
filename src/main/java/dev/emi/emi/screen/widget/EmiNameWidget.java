@@ -24,6 +24,7 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Exhaustively Many Items".split(" "),
 		"Explicitly Mandated Items".split(" "),
 		"Endless Material Information".split(" "),
+		"Evidently, Many Ingredients".split(" "),
 		"Earnestly Made Imitation".split(" "),
 		"Even More Items".split(" "),
 		"Eminence, My Inception".split(" "),
@@ -36,7 +37,8 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Eventually Made Impressive".split(" "),
 		"Exceptionally Motionless Interface".split(" "),
 		"Emi's Magic Inventory".split(" "),
-		"Exploring Modified: Iridescent".split(" ")
+		"Exploring Modified: Iridescent".split(" "),
+		"E M I".split(" ")
 	);
 
 	public IntSet pruneSet(Random rand, int bound, int portion) {

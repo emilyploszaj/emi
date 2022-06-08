@@ -24,11 +24,7 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class EmiPort {
-	
-	// for visibility in decompilation, and also to tell you the reader which version this file
-	// is for in case you're confused because your IDE just says "EmiPort.java" in the tab bar
-	@SuppressWarnings("unused")
-	private static final String MARKER = "1.18.2";
+	public static final String VERSION = "1.18.2";
 
 	public static MutableText literal(String s) {
 		return new LiteralText(s);

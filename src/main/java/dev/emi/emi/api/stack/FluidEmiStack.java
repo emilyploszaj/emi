@@ -61,7 +61,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public Object getKey() {
-		return fluid;
+		return fluid.getFluid();
 	}
 	
 	@Override

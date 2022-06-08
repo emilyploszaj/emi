@@ -138,6 +138,10 @@ public abstract class EmiStack implements EmiIngredient {
 		return new ItemEmiStack(stack);
 	}
 
+	public static EmiStack of(ItemStack stack, long amount) {
+		return new ItemEmiStack(stack, amount);
+	}
+
 	public static EmiStack of(ItemConvertible item) {
 		return of(ItemVariant.of(item), 1);
 	}

@@ -17,7 +17,7 @@ import net.minecraft.client.MinecraftClient;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
-	private static volatile String query;
+	private static volatile String query = "";
 	public static Thread thread;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
@@ -41,6 +41,54 @@ public class EmiSearch {
 		thread = null;
 	}
 
+	public static class CompiledQuery {
+		public final List<Query> queries, negatedQuerries;
+
+		public CompiledQuery(String query) {
+			queries = Lists.newArrayList();
+			negatedQuerries = Lists.newArrayList();
+			Matcher matcher = TOKENS.matcher(query);
+			while (matcher.find()) {
+				String q = matcher.group();
+				boolean negated = q.startsWith("-");
+				if (negated) {
+					q = q.substring(1);
+				}
+				QueryType type = QueryType.fromString(q);
+				addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries,
+					type.queryConstructor, type.regexQueryConstructor);
+			}
+		}
+
+		public boolean isEmpty() {
+			return queries.isEmpty() && negatedQuerries.isEmpty();
+		}
+
+		public boolean test(EmiStack stack) {
+			for (int i = 0; i < queries.size(); i++) {
+				Query q = queries.get(i);
+				if (!q.matches(stack)) {
+					return false;
+				}
+			}
+			for (int i = 0; i < negatedQuerries.size(); i++) {
+				Query q = negatedQuerries.get(i);
+				if (q.matches(stack)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private static void addQuery(String s, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
+			if (s.length() > 1 && s.startsWith("/") && s.endsWith("/")) {
+				queries.add(regex.apply(s.substring(1, s.length() - 1)));
+			} else {
+				queries.add(normal.apply(s));
+			}
+		}
+	}
+
 	private static class SearchWorker implements Runnable {
 
 		@Override
@@ -50,19 +98,7 @@ public class EmiSearch {
 				String query;
 				do {
 					query = EmiSearch.query;
-					List<Query> queries = Lists.newArrayList();
-					List<Query> negatedQuerries = Lists.newArrayList();
-					Matcher matcher = TOKENS.matcher(query);
-					while (matcher.find()) {
-						String q = matcher.group();
-						boolean negated = q.startsWith("-");
-						if (negated) {
-							q = q.substring(1);
-						}
-						QueryType type = QueryType.fromString(q);
-						addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries,
-							type.queryConstructor, type.regexQueryConstructor);
-					}
+					CompiledQuery compiled = new CompiledQuery(query);
 					List<? extends EmiIngredient> source;
 					if (EmiConfig.craftable) {
 						if (inv == null) {
@@ -73,7 +109,7 @@ public class EmiSearch {
 					} else {
 						source = EmiStackList.stacks;
 					}
-					if (queries.isEmpty() && negatedQuerries.isEmpty()) {
+					if (compiled.isEmpty()) {
 						stacks = source;
 						continue;
 					}
@@ -84,33 +120,13 @@ public class EmiSearch {
 							return false;
 						}
 						EmiStack es = ess.get(0);
-						for (int i = 0; i < queries.size(); i++) {
-							Query q = queries.get(i);
-							if (!q.matches(es)) {
-								return false;
-							}
-						}
-						for (int i = 0; i < negatedQuerries.size(); i++) {
-							Query q = negatedQuerries.get(i);
-							if (q.matches(es)) {
-								return false;
-							}
-						}
-						return true;
+						return compiled.test(es);
 					}).toList();
 				} while (query != EmiSearch.query);
 				apply(stacks);
 			} catch (Exception e) {
 				System.err.println("[emi] Error when attempting to search:");
 				e.printStackTrace();
-			}
-		}
-
-		private static void addQuery(String s, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
-			if (s.length() > 1 && s.startsWith("/") && s.endsWith("/")) {
-				queries.add(regex.apply(s.substring(1, s.length() - 1)));
-			} else {
-				queries.add(normal.apply(s));
 			}
 		}
 	}

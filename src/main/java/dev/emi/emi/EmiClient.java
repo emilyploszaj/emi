@@ -46,7 +46,7 @@ public class EmiClient implements ClientModInitializer {
 	public static List<TagKey<Item>> itemTags = List.of();
 	// Flag used by a mixin
 	public static boolean shiftTooltipsLeft = false;
-	public static Map<EmiIngredient, Boolean> availableForCrafting = Map.of();
+	public static Map<EmiIngredient, Boolean> availableForCrafting = Maps.newHashMap();
 
 	public static void getAvailable(EmiRecipe recipe) {
 		availableForCrafting = new IdentityHashMap<>();

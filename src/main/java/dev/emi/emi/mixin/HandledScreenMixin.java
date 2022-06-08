@@ -10,13 +10,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.emi.search.EmiSearch.CompiledQuery;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.Slot;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin extends Screen implements EmiScreen {
@@ -43,6 +47,19 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		viewStack.pop();
 		RenderSystem.applyModelViewMatrix();
+	}
+
+	@Inject(at = @At("TAIL"), method = "drawSlot")
+	private void drawSlot(MatrixStack matrices, Slot slot, CallbackInfo info) {
+		if (EmiScreenManager.search.highlight) {
+			CompiledQuery query = new CompiledQuery(EmiScreenManager.search.getText());
+			if (!query.test(EmiStack.of(slot.getStack()))) {
+				matrices.push();
+				matrices.translate(0, 0, 300);
+				DrawableHelper.fill(matrices, slot.x - 1, slot.y - 1, slot.x + 17, slot.y + 17, 0x77000000);
+				matrices.pop();
+			}
+		}
 	}
 
 	@Intrinsic @Override

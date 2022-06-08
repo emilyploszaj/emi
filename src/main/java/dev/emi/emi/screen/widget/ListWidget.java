@@ -231,6 +231,14 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		this.updateScrollingState(mouseX, mouseY, button);
+		/*
+		for (Entry entry : this.children()) {
+			if (entry.mouseClicked(mouseX, mouseY, button)) {
+				this.setFocused((Element)entry);
+				this.setDragging(true);
+				return true;
+			}
+		}*/
 		if (!this.isMouseOver(mouseX, mouseY)) {
 			return false;
 		}

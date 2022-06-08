@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiPort;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -25,31 +26,38 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 
 	@Override
 	public Set<Identifier> prepare(ResourceManager manager, Profiler profiler) {
-		Set<Identifier> exclusions = Sets.newHashSet();
-		try {
-			for (Resource resource : manager.getAllResources(new Identifier("emi:tag_exclusions.json"))) {
-				InputStreamReader reader = new InputStreamReader(resource.getInputStream());
-				JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
-				try {
-					if (JsonHelper.getBoolean(json, "replace", false)) {
-						exclusions.clear();
-					}
-					if (JsonHelper.hasArray(json, "exclusions")) {
-						JsonArray arr = JsonHelper.getArray(json, "exclusions");
-						for (JsonElement el : arr) {
-							exclusions.add(new Identifier(el.getAsString()));
-						}
-					}
-				} catch (Exception e) {
-					System.err.println("[emi] Error loading tag exclusions");
-					e.printStackTrace();
-				}
+		Set<Identifier> allExclusions = Sets.newHashSet();
+		for (Identifier id : EmiPort.findResources(manager, "tag/exclusions/", i -> i.endsWith(".json"))) {
+			if (!id.getNamespace().equals("emi")) {
+				continue;
 			}
-		} catch (Exception e) {
-			System.err.println("[emi] Error loading tag exclusions");
-			e.printStackTrace();
+			Set<Identifier> exclusions = Sets.newHashSet();
+			try {
+				for (Resource resource : manager.getAllResources(id)) {
+					InputStreamReader reader = new InputStreamReader(resource.getInputStream());
+					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
+					try {
+						if (JsonHelper.getBoolean(json, "replace", false)) {
+							exclusions.clear();
+						}
+						if (JsonHelper.hasArray(json, "exclusions")) {
+							JsonArray arr = JsonHelper.getArray(json, "exclusions");
+							for (JsonElement el : arr) {
+								exclusions.add(new Identifier(el.getAsString()));
+							}
+						}
+					} catch (Exception e) {
+						System.err.println("[emi] Error loading tag exclusions");
+						e.printStackTrace();
+					}
+				}
+			} catch (Exception e) {
+				System.err.println("[emi] Error loading tag exclusions");
+				e.printStackTrace();
+			}
+			allExclusions.addAll(exclusions);
 		}
-		return exclusions;
+		return allExclusions;
 	}
 
 	@Override

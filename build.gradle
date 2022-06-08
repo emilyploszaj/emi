@@ -64,11 +64,12 @@ publishing {
 	publications {
 		def versions = [project.minecraft_version]
 
+		/*
 		file('.').list().each {
 			if (it.startsWith("platform-")) {
 				versions.add(it.substring(9))
 			}
-		}
+		}*/
 
 		versions.each { plat ->
 			create(plat, MavenPublication) {

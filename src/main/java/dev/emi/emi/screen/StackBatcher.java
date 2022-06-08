@@ -44,7 +44,11 @@ public class StackBatcher {
 	private int x;
 	private int y;
 	private int z;
-	public static boolean enabled = true;
+	private static boolean enabled = EmiPort.VERSION.equals("1.18.2");
+
+	private static boolean isEnabled() {
+		return enabled && EmiConfig.useBatchedRenderer;
+	}
 
 	public StackBatcher() {
 		Map<RenderLayer, BufferBuilder> buffers = new HashMap<>();
@@ -84,7 +88,7 @@ public class StackBatcher {
 	}
 
 	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
-		if (stack instanceof Batchable b && !b.isUnbatchable() && enabled) {
+		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled()) {
 			if (populated) return;
 			try {
 				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
@@ -101,7 +105,7 @@ public class StackBatcher {
 	}
 
 	public void draw() {
-		if (!enabled) {
+		if (!isEnabled()) {
 			return;
 		}
 		if (!populated) {

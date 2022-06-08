@@ -401,6 +401,18 @@ public class VanillaPlugin implements EmiPlugin {
 			registry.addRecipe(new EmiArmorWashingRecipe(i, null));
 		}
 
+		water = EmiStack.of(Fluids.WATER, 81_000);
+		EmiStack lava = EmiStack.of(Fluids.LAVA, 81_000);
+		EmiStack waterCatalyst = water.copy().setRemainder(water);
+		EmiStack lavaCatalyst = lava.copy().setRemainder(lava);
+
+		registry.addRecipe(new EmiWorldRecipe(waterCatalyst, lavaCatalyst, EmiStack.of(Items.COBBLESTONE),
+			new Identifier("emi", "emi/fluid_interaction/cobblestone"), false));
+		registry.addRecipe(new EmiWorldRecipe(EmiStack.of(Fluids.WATER, 81_000), lavaCatalyst, EmiStack.of(Items.STONE),
+			new Identifier("emi", "emi/fluid_interaction/stone"), false));
+		registry.addRecipe(new EmiWorldRecipe(lava, waterCatalyst, EmiStack.of(Items.OBSIDIAN),
+			new Identifier("emi", "emi/fluid_interaction/obsidian"), false));
+
 		Registry.FLUID.streamEntries().forEach(entry -> {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();

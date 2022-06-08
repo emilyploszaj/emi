@@ -95,7 +95,7 @@ public interface EmiIngredient extends EmiRenderable {
 		if (items.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (items.size() == 1) {
-			return EmiStack.of(ingredient.getMatchingStacks()[0]);
+			return EmiStack.of(ingredient.getMatchingStacks()[0], amount);
 		}
 		List<TagKey<Item>> keys = Lists.newArrayList();
 		for (TagKey<Item> key : EmiClient.itemTags) {

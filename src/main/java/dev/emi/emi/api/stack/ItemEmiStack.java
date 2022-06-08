@@ -2,10 +2,14 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -14,6 +18,7 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -24,6 +29,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
+	private static final Object2BooleanMap<BakedModel> IS_VALID = new Object2BooleanOpenHashMap<>();
 	private final ItemEntry entry;
 	public final ItemVariant item;
 	private boolean unbatchable;
@@ -67,7 +73,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Object getKey() {
-		return item;
+		return item.getItem();
 	}
 
 	@Override
@@ -107,7 +113,19 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0).isBuiltin();
+		return unbatchable || stack.hasGlint()
+			|| !IS_VALID.computeIfAbsent(MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0), m -> {
+				BakedModel model = (BakedModel) m;
+				if (model.isBuiltin()) {
+					return false;
+				}
+				for (BakedQuad q : model.getQuads(null, null, EmiUtil.RANDOM)) {
+					if (q.hasColor()) {
+						return false;
+					}
+				}
+				return true;
+		});
 	}
 	
 	@Override
@@ -155,6 +173,9 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Text getName() {
+		if (isEmpty()) {
+			return EmiPort.literal("");
+		}
 		return getItemStack().getName();
 	}
 

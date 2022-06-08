@@ -107,6 +107,13 @@ public class MaterialTree {
 		if (amount == 0) {
 			return;
 		}
+
+		if (node.ingredient.getEmiStacks().size() == 1) {
+			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
+			if (!r.isEmpty()) {
+				addRemainder(remainders, r, amount);
+			}
+		}
 		
 		if (recipe != null && node.state != FoldState.COLLAPSED) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
@@ -119,16 +126,10 @@ public class MaterialTree {
 
 			for (MaterialNode n : node.children) {
 				calculateFlatCost(costs, remainders, minBatches * n.amount, n);
-				if (n.ingredient.getEmiStacks().size() == 1) {
-					EmiStack r = n.ingredient.getEmiStacks().get(0).getRemainder();
-					if (!r.isEmpty()) {
-						addRemainder(remainders, r, minBatches * r.getAmount() * n.amount);
-					}
-				}
 			}
 			for (EmiStack es : recipe.getOutputs()) {
 				if (!stack.equals(es)) {
-					addRemainder(remainders, es, minBatches * es.getAmount());
+					addRemainder(remainders, es, minBatches * node.amount);
 				}
 			}
 		} else {

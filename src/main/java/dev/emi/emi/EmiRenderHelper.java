@@ -51,8 +51,8 @@ public class EmiRenderHelper {
 
 	public static int getAmountOverflow(Text amount) {
 		int width = CLIENT.textRenderer.getWidth(amount);
-		if (width > 10) {
-			return width - 10;
+		if (width > 14) {
+			return width - 14;
 		} else {
 			return 0;
 		}

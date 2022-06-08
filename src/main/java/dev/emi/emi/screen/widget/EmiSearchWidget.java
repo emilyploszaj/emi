@@ -24,14 +24,15 @@ import net.minecraft.util.Pair;
 public class EmiSearchWidget extends TextFieldWidget {
 	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
 	private List<Pair<Integer, Style>> styles;
+	private long lastClick = 0;
 	private String last = "";
+	public boolean highlight = false;
 
 	public EmiSearchWidget(TextRenderer textRenderer, int x, int y, int width, int height) {
 		super(textRenderer, x, y, width, height, EmiPort.literal(""));
 		this.setFocusUnlocked(true);
 		this.setEditableColor(-1);
 		this.setUneditableColor(-1);
-		this.setDrawsBackground(true);
 		this.setMaxLength(256);
 		this.setRenderTextProvider((string, stringStart) -> {
 			MutableText text = null;
@@ -143,9 +144,18 @@ public class EmiSearchWidget extends TextFieldWidget {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
-		if (this.isFocused() && button == 1) {
-			this.setText("");
-			this.setTextFieldFocused(true);
+		if (this.isFocused()) {
+			if (button == 0) {
+				if (System.currentTimeMillis() - lastClick < 500) {
+					highlight = !highlight;
+					lastClick = 0;
+				} else {
+					lastClick = System.currentTimeMillis();
+				}
+			} else if (button == 1) {
+				this.setText("");
+				this.setTextFieldFocused(true);
+			}
 		}
 		return b;
 	}
@@ -165,6 +175,13 @@ public class EmiSearchWidget extends TextFieldWidget {
 		this.setEditable(EmiConfig.enabled);
 		if (EmiConfig.enabled) {
 			super.render(matrices, mouseX, mouseY, delta);
+			if (highlight) {
+				int border = 0xffeeee00;
+				TextFieldWidget.fill(matrices, this.x - 1, this.y - 1, this.x + this.width + 1, this.y, border);
+				TextFieldWidget.fill(matrices, this.x - 1, this.y + this.height, this.x + this.width + 1, this.y + this.height + 1, border);
+				TextFieldWidget.fill(matrices, this.x - 1, this.y - 1, this.x, this.y + this.height + 1, border);
+				TextFieldWidget.fill(matrices, this.x + this.width, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, border);
+			}
 		}
 	}
 }

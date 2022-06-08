@@ -23,6 +23,13 @@ public abstract class CreativeInventoryScreenMixin {
 		}
 	}
 
+	@Inject(at = @At("HEAD"), method = "keyPressed", cancellable = true)
+    public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> info) {
+		if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {
+			info.setReturnValue(true);
+		}
+	}
+
 	@Inject(at = @At("HEAD"), method = "charTyped", cancellable = true)
 	private void charTyped(char chr, int modifiers, CallbackInfoReturnable<Boolean> info) {
 		if (EmiScreenManager.search.charTyped(chr, modifiers)) {

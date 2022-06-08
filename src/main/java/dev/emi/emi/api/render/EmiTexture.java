@@ -41,7 +41,6 @@ public class EmiTexture implements EmiRenderable {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, texture);
 		DrawableHelper.drawTexture(matrices, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}

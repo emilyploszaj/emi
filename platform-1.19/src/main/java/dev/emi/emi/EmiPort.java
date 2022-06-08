@@ -1,5 +1,6 @@
 package dev.emi.emi;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -23,11 +24,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public final class EmiPort {
-	
-	// for visibility in decompilation, and also to tell you the reader which version this file
-	// is for in case you're confused because your IDE just says "EmiPort.java" in the tab bar
-	@SuppressWarnings("unused")
-	private static final String MARKER = "1.19";
+	public static final String VERSION = "1.19";
 
 	public static MutableText literal(String s) {
 		return Text.literal(s);
@@ -45,7 +42,7 @@ public final class EmiPort {
 		return FluidVariantAttributes.getName(fluid);
 	}
 
-	public static Set<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
+	public static Collection<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
 		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
 	}
 
