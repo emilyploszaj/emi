@@ -17,6 +17,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class EmiCommands {
 	public static final byte VIEW_RECIPE = 0x01;
 	public static final byte VIEW_TREE = 0x02;
+	public static final byte TREE_GOAL = 0x11;
+	public static final byte TREE_RESOLUTION = 0x12;
 	
 	public static void init() {
 		EmiPort.registerCommand((dispatcher) -> {
@@ -40,6 +42,29 @@ public class EmiCommands {
 							send(context.getSource().getPlayer(), VIEW_TREE, List.of());
 							return Command.SINGLE_SUCCESS;
 						})
+					)
+				)
+				.then(
+					literal("tree")
+					.then(
+						literal("goal")
+						.then(
+							argument("id", identifier())
+							.executes(context -> {
+								send(context.getSource().getPlayer(), TREE_GOAL, List.of(context.getArgument("id", Identifier.class)));
+								return Command.SINGLE_SUCCESS;
+							})
+						)
+					)
+					.then(
+						literal("resolution")
+						.then(
+							argument("id", identifier())
+							.executes(context -> {
+								send(context.getSource().getPlayer(), TREE_RESOLUTION, List.of(context.getArgument("id", Identifier.class)));
+								return Command.SINGLE_SUCCESS;
+							})
+						)
 					)
 				)
 			);

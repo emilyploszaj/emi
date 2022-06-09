@@ -37,6 +37,7 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Eventually Made Impressive".split(" "),
 		"Exceptionally Motionless Interface".split(" "),
 		"Emi's Magic Inventory".split(" "),
+		"Egad, My Items!".split(" "),
 		"Exploring Modified: Iridescent".split(" "),
 		"E M I".split(" ")
 	);

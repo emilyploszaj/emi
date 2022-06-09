@@ -34,6 +34,8 @@
 
   "config.emi.ui.move_effects": "Move Effects",
   "config.emi.ui.center_search_bar": "Center Search Bar",
+  "config.emi.ui.show_hover_overlay": "Show Hover Overlay",
+  "config.emi.ui.append_item_mod_id": "Append Item Mod ID",
   "config.emi.ui.empty_search_craftable": "Show Craftable With Empty Search",
   "config.emi.ui.vertical_margin": "Vertical Margin",
   "config.emi.ui.miscraft_prevention": "Miscraft Prevention",
@@ -42,6 +44,7 @@
   "config.emi.ui.recipe_default_button": "Recipe Default Button",
   "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
   "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+  "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
 
   "config.emi.dev.dev_mode": "Dev Mode",
   "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",

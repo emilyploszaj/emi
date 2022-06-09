@@ -112,20 +112,28 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public boolean isUnbatchable() {
-		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint()
-			|| !IS_VALID.computeIfAbsent(MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0), m -> {
-				BakedModel model = (BakedModel) m;
-				if (model.isBuiltin()) {
-					return false;
-				}
-				for (BakedQuad q : model.getQuads(null, null, EmiUtil.RANDOM)) {
-					if (q.hasColor()) {
+		try {
+			ItemStack stack = getItemStack();
+			return unbatchable || stack.hasGlint()
+				|| !IS_VALID.computeIfAbsent(MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0), m -> {
+					BakedModel model = (BakedModel) m;
+					if (model.isBuiltin()) {
 						return false;
 					}
-				}
-				return true;
-		});
+					List<BakedQuad> list = model.getQuads(null, null, EmiUtil.RANDOM);
+					if (list != null) {
+						for (BakedQuad q : list) {
+							if (q.hasColor()) {
+								return false;
+							}
+						}
+					}
+					return true;
+			});
+		} catch (Exception e) {
+			unbatchable = true;
+			return false;
+		}
 	}
 	
 	@Override
@@ -192,7 +200,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof ItemEntry e && getValue().equals(e.getValue());
+			return obj instanceof ItemEntry e && getValue().getItem().equals(e.getValue().getItem());
 		}
 	}
 }

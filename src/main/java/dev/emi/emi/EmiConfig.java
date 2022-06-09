@@ -49,6 +49,14 @@ public class EmiConfig {
 	@ConfigValue("ui.center-search-bar")
 	public static boolean centerSearchBar = true;
 
+	@Comment("Whether to display a gray overlay when\nhovering over a stack.")
+	@ConfigValue("ui.show-hover-overlay")
+	public static boolean showHoverOverlay = false;
+
+	@Comment("Whether to add mod name to item tooltips")
+	@ConfigValue("ui.append-item-mod-id")
+	public static boolean appendItemModId = true;
+
 	@Comment("Whether an empty search should display\ncraftable recipes, instead of the index.")
 	@ConfigValue("ui.empty-search-craftable")
 	public static boolean emptySearchCraftable = false;

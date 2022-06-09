@@ -49,6 +49,17 @@ public class EmiRenderHelper {
 			.append(EmiPort.literal("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
 	}
 
+	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {
+		matrices.push();
+		matrices.translate(0, 0, 100);
+        RenderSystem.disableDepthTest();
+        RenderSystem.colorMask(true, true, true, false);
+		DrawableHelper.fill(matrices, x, y, x + w, y + h, -2130706433);
+        RenderSystem.colorMask(true, true, true, true);
+        RenderSystem.enableDepthTest();
+		matrices.pop();
+	}
+
 	public static int getAmountOverflow(Text amount) {
 		int width = CLIENT.textRenderer.getWidth(amount);
 		if (width > 14) {

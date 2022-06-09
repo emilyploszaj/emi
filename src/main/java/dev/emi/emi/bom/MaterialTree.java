@@ -108,7 +108,7 @@ public class MaterialTree {
 			return;
 		}
 
-		if (node.ingredient.getEmiStacks().size() == 1) {
+		if (recipe == null && node.ingredient.getEmiStacks().size() == 1) {
 			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
 			if (!r.isEmpty()) {
 				addRemainder(remainders, r, amount);

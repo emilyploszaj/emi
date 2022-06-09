@@ -95,8 +95,9 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		}
 	}
 
-	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/client/option/KeyBinding.matchesKey(II)Z", ordinal = 0),
-		method = "keyPressed(III)Z", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "keyPressed(III)Z", cancellable = true)
+	//@Inject(at = @At(value = "INVOKE", target = "net/minecraft/client/option/KeyBinding.matchesKey(II)Z", ordinal = 0),
+	//	method = "keyPressed(III)Z", cancellable = true)
 	public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> info) {
 		if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {
 			info.setReturnValue(true);

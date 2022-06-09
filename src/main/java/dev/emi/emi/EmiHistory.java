@@ -12,6 +12,10 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 public class EmiHistory {
 	private static final List<Screen> HISTORIES = Lists.newArrayList();
 	
+	public static boolean isEmpty() {
+		return HISTORIES.isEmpty();
+	}
+
 	public static void push(Screen history) {
 		HISTORIES.add(history);
 	}

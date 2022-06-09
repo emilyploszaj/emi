@@ -267,10 +267,11 @@ public class EmiScreenManager {
 		if (screen instanceof EmiScreen emi) {
 			client.getProfiler().push("prep");
 			recalculate();
-	
+			
 			client.getProfiler().swap("search");
 			int searchPageSize = searchSpace.pageSize;
 			if (searchPageSize > 0) {
+				int hx = -1, hy = -1;
 				int totalSearchPages = (stacks.size() - 1) / searchPageSize + 1;
 				if (searchPage >= totalSearchPages) {
 					searchPage = 0;
@@ -300,14 +301,23 @@ public class EmiScreenManager {
 								DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
 							}
 						}
+						if (EmiConfig.showHoverOverlay
+								&& mouseX >= cx && mouseY >= cy && mouseX < cx + ENTRY_SIZE && mouseY < cy + ENTRY_SIZE) {
+							hx = cx;
+							hy = cy;
+						}
 					}
 				}
 				searchBatcher.draw();
+				if (hx != -1 && hx != -1) {
+					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
+				}
 			}
 
 			client.getProfiler().swap("favorite");
 			int favoritePageSize = favoriteSpace.pageSize;
 			if (favoritePageSize > 0) {
+				int hx = -1, hy = -1;
 				int totalFavoritePages = (EmiFavorites.favorites.size() - 1) / favoritePageSize + 1;
 				if (favoritePage >= totalFavoritePages) {
 					favoritePage = 0;
@@ -330,9 +340,17 @@ public class EmiScreenManager {
 						int cx = favoriteSpace.getX(xo, yo);
 						int cy = favoriteSpace.getY(xo, yo);
 						favoriteBatcher.render(EmiFavorites.favorites.get(i++), matrices, cx + 1, cy + 1, delta);
+						if (EmiConfig.showHoverOverlay
+								&& mouseX >= cx && mouseY >= cy && mouseX < cx + ENTRY_SIZE && mouseY < cy + ENTRY_SIZE) {
+							hx = cx;
+							hy = cy;
+						}
 					}
 				}
 				favoriteBatcher.draw();
+				if (hx != -1 && hx != -1) {
+					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
+				}
 			}
 			if (lastHoveredCraftable != null && lastHoveredCraftableOffset != -1) {
 				EmiStackInteraction cur = getHoveredStack(mouseX, mouseY, false, true);
@@ -651,8 +669,10 @@ public class EmiScreenManager {
 			EmiApi.viewRecipeTree();
 			return true;
 		} else if (function.apply(EmiConfig.back)) {
-			EmiHistory.pop();
-			return true;
+			if (!EmiHistory.isEmpty()) {
+				EmiHistory.pop();
+				return true;
+			}
 		} else if (function.apply(EmiConfig.toggleCraftable)) {
 			swapCraftables();
 			return true;

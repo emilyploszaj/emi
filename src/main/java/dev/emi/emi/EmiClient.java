@@ -17,6 +17,7 @@ import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.bom.BoM;
 import dev.emi.emi.data.EmiTagExclusionsLoader;
 import dev.emi.emi.data.RecipeDefaultLoader;
 import io.netty.buffer.Unpooled;
@@ -103,6 +104,24 @@ public class EmiClient implements ClientModInitializer {
 			} else if (type == EmiCommands.VIEW_TREE) {
 				client.execute(() -> {
 					EmiApi.viewRecipeTree();
+				});
+			} else if (type == EmiCommands.TREE_GOAL) {
+				Identifier id = buf.readIdentifier();
+				client.execute(() -> {
+					EmiRecipe recipe = EmiRecipes.byId.get(id);
+					if (recipe != null) {
+						BoM.setGoal(recipe);
+					}
+				});
+			} else if (type == EmiCommands.TREE_RESOLUTION) {
+				Identifier id = buf.readIdentifier();
+				client.execute(() -> {
+					EmiRecipe recipe = EmiRecipes.byId.get(id);
+					if (recipe != null && BoM.tree != null) {
+						for (EmiStack stack : recipe.getOutputs()) {
+							BoM.tree.addResolution(stack, recipe);
+						}
+					}
 				});
 			}
 		});

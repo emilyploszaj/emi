@@ -2,7 +2,7 @@ package dev.emi.emi;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;

@@ -174,6 +174,10 @@ public class SlotWidget extends Widget {
 		if (catalyst) {
 			EmiRender.renderCatalystIcon(getStack(), matrices, x + xOff, y + yOff);
 		}
+
+		if (EmiConfig.showHoverOverlay && bounds.contains(mouseX, mouseY)) {
+			EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
+		}
 	}
 	
 	@Override

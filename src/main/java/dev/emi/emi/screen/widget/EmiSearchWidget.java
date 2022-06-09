@@ -162,7 +162,8 @@ public class EmiSearchWidget extends TextFieldWidget {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (this.isFocused() && (EmiConfig.focusSearch.matchesKey(keyCode, scanCode) || keyCode == GLFW.GLFW_KEY_ENTER)) {
+		if (this.isFocused() && (EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
+				|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {
 			this.setTextFieldFocused(false);
 			this.setFocused(false);
 			return true;
