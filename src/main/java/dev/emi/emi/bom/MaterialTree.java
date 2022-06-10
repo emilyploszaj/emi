@@ -129,7 +129,7 @@ public class MaterialTree {
 			}
 			for (EmiStack es : recipe.getOutputs()) {
 				if (!stack.equals(es)) {
-					addRemainder(remainders, es, minBatches * node.amount);
+					addRemainder(remainders, es, minBatches * es.getAmount());
 				}
 			}
 		} else {

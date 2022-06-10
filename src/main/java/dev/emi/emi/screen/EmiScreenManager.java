@@ -129,6 +129,9 @@ public class EmiScreenManager {
 		stacks = EmiSearch.stacks;
 
 		Screen screen = client.currentScreen;
+		if (screen == null) {
+			return;
+		}
 		List<Bounds> exclusion = EmiExclusionAreas.getExclusion(screen);
 		if (lastWidth == screen.width && lastHeight == screen.height && exclusion.size() == lastExclusion.size()) {
 			boolean same = true;
@@ -188,6 +191,9 @@ public class EmiScreenManager {
 	}
 
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick, boolean ignoreLastHoveredCraftable) {
+		if (client.currentScreen == null) {
+			return EmiStackInteraction.EMPTY;
+		}
 		EmiStackInteraction stack = EmiStackProviders.getStackAt(client.currentScreen, mouseX, mouseY, notClick);
 		if (!stack.isEmpty()) {
 			return stack;
@@ -246,6 +252,9 @@ public class EmiScreenManager {
 		client.getProfiler().push("emi");
 		updateMouse(mouseX, mouseY);
 		Screen screen = client.currentScreen;
+		if (screen == null) {
+			return;
+		}
 		boolean visible = !isDisabled();
 		emi.visible = visible;
 		tree.visible = visible;
@@ -587,7 +596,7 @@ public class EmiScreenManager {
 						EmiFavorites.addFavoriteAt(draggedStack, index + favoriteSpace.pageSize * favoritePage);
 						favoriteBatcher.repopulate();
 						return true;
-					} else {
+					} else if (client.currentScreen != null) {
 						if (EmiDragDropHandlers.dropStack(client.currentScreen, draggedStack, mx, my)) {
 							return true;
 						}

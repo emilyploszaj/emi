@@ -150,7 +150,7 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public Text getAmountText(float amount) {
+	public Text getAmountText(double amount) {
 		if (amount != 0) {
 			return EmiConfig.fluidUnit.translate(amount);
 		}

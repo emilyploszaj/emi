@@ -47,7 +47,7 @@ public interface EmiIngredient extends EmiRenderable {
 
 	void render(MatrixStack matrices, int x, int y, float delta, int flags);
 
-	default Text getAmountText(float amount) {
+	default Text getAmountText(double amount) {
 		if (amount == 0) {
 			return EMPTY_TEXT;
 		} else {

@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.lwjgl.glfw.GLFW;
-
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
-import it.unimi.dsi.fastutil.floats.Float2ObjectFunction;
+import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
 import joptsimple.internal.Strings;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.util.InputUtil;
@@ -413,9 +413,9 @@ public class EmiConfig {
 
 		private final String name;
 		private final Text translation;
-		private final Float2ObjectFunction<Text> translator;
+		private final Double2ObjectFunction<Text> translator;
 
-		private FluidUnit(String name, Float2ObjectFunction<Text> translator) {
+		private FluidUnit(String name, Double2ObjectFunction<Text> translator) {
 			this.name = name;
 			translation = EmiPort.translatable("emi.unit." + name);
 			this.translator = translator;
@@ -431,8 +431,8 @@ public class EmiConfig {
 			return name;
 		}
 
-		public Text translate(float amount) {
-			return translator.apply(Float.valueOf(amount));
+		public Text translate(double amount) {
+			return translator.apply(Double.valueOf(amount));
 		}
 
 		@Override
