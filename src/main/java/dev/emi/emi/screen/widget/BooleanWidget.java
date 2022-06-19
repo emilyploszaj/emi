@@ -32,9 +32,9 @@ public class BooleanWidget extends Entry {
 
 	public Text getText() {
 		if (mutator.get()) {
-			return EmiPort.literal("true").formatted(Formatting.GREEN);
+			return EmiPort.literal("true", Formatting.GREEN);
 		} else {
-			return EmiPort.literal("false").formatted(Formatting.RED);
+			return EmiPort.literal("false", Formatting.RED);
 		}
 	}
 

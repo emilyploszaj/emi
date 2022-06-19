@@ -133,15 +133,16 @@ public class TagEmiIngredient implements EmiIngredient {
 		String translation = EmiUtil.translateId("tag.", id);
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (I18n.hasTranslation(translation)) {
-			list.add(TooltipComponent.of(EmiPort.translatable(translation).asOrderedText()));
-			if (MinecraftClient.getInstance().options.advancedItemTooltips) {
-				list.add(TooltipComponent.of(EmiPort.literal("#" + id).formatted(Formatting.DARK_GRAY).asOrderedText()));
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable(translation))));
+			MinecraftClient client = MinecraftClient.getInstance();
+			if (client.options.advancedItemTooltips) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
 			}
 		} else {
-			list.add(TooltipComponent.of(EmiPort.literal("#" + id).asOrderedText()));
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id))));
 		}
 		String mod = EmiUtil.getModName(id.getNamespace());
-		list.add(TooltipComponent.of(EmiPort.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
 			if (!stack.getRemainder().isEmpty()) {

@@ -91,7 +91,7 @@ public class SlotWidget extends Widget {
 	 * Provides a shorthand for appending text to the slot's tooltip.
 	 */
 	public SlotWidget appendTooltip(Text text) {
-		tooltipSuppliers.add(() -> TooltipComponent.of(text.asOrderedText()));
+		tooltipSuppliers.add(() -> TooltipComponent.of(EmiPort.ordered(text)));
 		return this;
 	}
 
@@ -189,10 +189,10 @@ public class SlotWidget extends Widget {
 		}
 		if (getRecipe() != null) {
 			if (RecipeScreen.resolve != null) {
-				list.add(TooltipComponent.of(EmiPort.translatable("emi.resolve").formatted(Formatting.GREEN).asOrderedText()));
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve", Formatting.GREEN))));
 			}
 			if (getRecipe().getId() != null && EmiConfig.showRecipeIds) {
-				list.add(TooltipComponent.of(EmiPort.literal(getRecipe().getId().toString()).asOrderedText()));
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(getRecipe().getId().toString()))));
 			}
 			if (EmiConfig.showCostPerBatch && getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
 				list.add(new RecipeCostTooltipComponent(getRecipe()));

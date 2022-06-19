@@ -25,7 +25,7 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.view_tree").asOrderedText()));
+		return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.view_tree"))));
 	}
 
 	@Override

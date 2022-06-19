@@ -1,11 +1,13 @@
 package dev.emi.emi;
 
+import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -15,27 +17,59 @@ import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.registry.Registry;
 
 public final class EmiPort {
+	private static final net.minecraft.util.math.random.Random RANDOM = net.minecraft.util.math.random.Random.create();
 	public static final String VERSION = "1.19";
 
 	public static MutableText literal(String s) {
 		return Text.literal(s);
+	}
+
+	public static MutableText literal(String s, Formatting formatting) {
+		return Text.literal(s).formatted(formatting);
+	}
+
+	public static MutableText literal(String s, Formatting... formatting) {
+		return Text.literal(s).formatted(formatting);
+	}
+
+	public static MutableText literal(String s, Style style) {
+		return Text.literal(s).setStyle(style);
 	}
 	
 	public static MutableText translatable(String s) {
 		return Text.translatable(s);
 	}
 	
+	public static MutableText translatable(String s, Formatting formatting) {
+		return Text.translatable(s).formatted(formatting);
+	}
+	
 	public static MutableText translatable(String s, Object... objects) {
 		return Text.translatable(s, objects);
+	}
+
+	public static MutableText append(MutableText text, Text appended) {
+		return text.append(appended);
+	}
+
+	public static OrderedText ordered(Text text) {
+		return text.asOrderedText();
 	}
 
 	public static Text fluidName(FluidVariant fluid) {
@@ -44,6 +78,14 @@ public final class EmiPort {
 
 	public static Collection<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
 		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
+	}
+
+	public static InputStream getInputStream(Resource resource) {
+		try {
+			return resource.getInputStream();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static void registerCommand(Consumer<CommandDispatcher<ServerCommandSource>> consumer) {
@@ -56,11 +98,20 @@ public final class EmiPort {
 	}
 
 	public static void upload(VertexBuffer vb, BufferBuilder bldr) {
+		vb.bind();
 		vb.upload(bldr.end());
 	}
 
-	public static void draw(BufferBuilder bufferBuilder) {
-		BufferRenderer.drawWithoutShader(bufferBuilder.end());
+	public static void setShader(VertexBuffer buf, Matrix4f mat) {
+		buf.bind();
+		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
 	}
-	
+
+	public static List<BakedQuad> getQuads(BakedModel model) {
+		return model.getQuads(null, null, RANDOM);
+	}
+
+	public static void draw(BufferBuilder bufferBuilder) {
+		BufferRenderer.drawWithShader(bufferBuilder.end());
+	}
 }

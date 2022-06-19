@@ -372,7 +372,7 @@ public class BoMScreen extends Screen {
 		}
 
 		public void render(MatrixStack matrices) {
-			cost.ingredient.render(matrices, x, y, 0, ~EmiIngredient.RENDER_AMOUNT);
+			cost.ingredient.render(matrices, x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
 			EmiRenderHelper.renderAmount(matrices, x, y, cost.ingredient.getAmountText(cost.amount));
 		}
 	}

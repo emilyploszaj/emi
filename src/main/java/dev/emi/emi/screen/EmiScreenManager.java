@@ -45,7 +45,6 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -155,22 +154,24 @@ public class EmiScreenManager {
 		if (screen instanceof EmiScreen emi) {
 			left = Math.max(ENTRY_SIZE * 2, emi.emi$getLeft());
 			right = Math.min(screen.width - ENTRY_SIZE * 2, emi.emi$getRight());
+			int horizontalPadding = 5;
+
 			int xMin = right;
-			int xMax = screen.width - 1;
+			int xMax = screen.width - horizontalPadding;
 			int yMin = 18;
 			int yMax = screen.height - 22;
-			int tx = xMin + (xMax - xMin) % ENTRY_SIZE / 2;
+			int tw = Math.min((xMax - xMin) / ENTRY_SIZE, EmiConfig.maxIndexColumns);
+			int tx = xMax - tw * ENTRY_SIZE;
 			int ty = yMin;
-			int tw = (xMax - xMin) / ENTRY_SIZE;
 			int th = (yMax - yMin) / ENTRY_SIZE;
 			searchSpace = new ScreenSpace(xMin, xMax, yMin, yMax, tx, ty, tw, th, true, exclusion);
-			int fxMin = 1;
+			int fxMin = horizontalPadding;
 			int fxMax = left;
 			int fyMin = 18;
 			int fyMax = screen.height - 22;
-			int ftx = fxMin + (fxMax - fxMin) % ENTRY_SIZE / 2;
+			int ftw = Math.min((fxMax - fxMin) / ENTRY_SIZE, EmiConfig.maxFavoriteColumns);
+			int ftx = fxMin;
 			int fty = fyMin;
-			int ftw = (fxMax - fxMin) / ENTRY_SIZE;
 			int fth = (fyMax - fyMin) / ENTRY_SIZE;
 			favoriteSpace = new ScreenSpace(fxMin, fxMax, fyMin, fyMax, ftx, fty, ftw, fth, false, exclusion);
 
@@ -256,14 +257,16 @@ public class EmiScreenManager {
 			return;
 		}
 		boolean visible = !isDisabled();
+		boolean searchVisible = searchSpace.pageSize > 0;
+		boolean favoriteVisible = favoriteSpace.pageSize > 0;
 		emi.visible = visible;
 		tree.visible = visible;
-		craftableButton.visible = visible;
-		localCraftables.visible = visible;
-		searchLeft.visible = visible;
-		searchRight.visible = visible;
-		favoriteLeft.visible = visible;
-		favoriteRight.visible = visible;
+		craftableButton.visible = visible && searchVisible;
+		localCraftables.visible = visible && searchVisible;
+		searchLeft.visible = visible && searchVisible;
+		searchRight.visible = visible && searchVisible;
+		favoriteLeft.visible = visible && favoriteVisible;
+		favoriteRight.visible = visible && favoriteVisible;
 		if (isDisabled()) {
 			if (EmiReloadManager.isReloading()) {
 				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 48, screen.height - 16, -1);
@@ -291,8 +294,9 @@ public class EmiScreenManager {
 				}
 				// Do not ask for whom the offsets toll, for it is you
 				searchBatcher.begin(searchSpace.tx + PADDING_SIZE - 2, searchSpace.ty + PADDING_SIZE - 3, 0);
-				DrawableHelper.drawCenteredText(matrices, client.textRenderer, EmiPort.translatable("emi.page", searchPage + 1, totalSearchPages),
-					searchSpace.xMin + (searchSpace.xMax - searchSpace.xMin) / 2, 5, 0xFFFFFF);
+				DrawableHelper.drawCenteredText(matrices, client.textRenderer,
+					EmiRenderHelper.getPageText(searchPage + 1, totalSearchPages, (searchSpace.tw - 2) * ENTRY_SIZE),
+					searchSpace.tx + (searchSpace.tw * ENTRY_SIZE) / 2, 5, 0xFFFFFF);
 				int i = searchPageSize * searchPage;
 				outer:
 				for (int yo = 0; yo < searchSpace.th; yo++) {
@@ -337,8 +341,8 @@ public class EmiScreenManager {
 				}
 				favoriteBatcher.begin(favoriteSpace.tx + PADDING_SIZE - 2, favoriteSpace.ty + PADDING_SIZE - 3, 0);
 				DrawableHelper.drawCenteredText(matrices, client.textRenderer,
-					EmiPort.translatable("emi.page", favoritePage + 1, totalFavoritePages),
-					favoriteSpace.xMin + (favoriteSpace.xMax - favoriteSpace.xMin) / 2, 5, 0xFFFFFF);
+					EmiRenderHelper.getPageText(favoritePage + 1, totalFavoritePages, (favoriteSpace.tw - 2) * ENTRY_SIZE),
+					favoriteSpace.tx + (favoriteSpace.tw * ENTRY_SIZE) / 2, 5, 0xFFFFFF);
 				int i = favoritePageSize * favoritePage;
 				outer:
 				for (int yo = 0; yo < favoriteSpace.th; yo++) {
@@ -451,7 +455,7 @@ public class EmiScreenManager {
 		} else {
 			search.x = searchSpace.tx;
 			search.y = screen.height - 21;
-			search.setWidth(searchSpace.xMax - searchSpace.xMin - 54);
+			search.setWidth(searchSpace.xMax - searchSpace.xMin - 44);
 		}
 		search.setTextFieldFocused(false);
 
@@ -784,7 +788,7 @@ public class EmiScreenManager {
 				}
 				command += " " + amount;
 				if (command.length() < 256) {
-					client.world.sendPacket(new ChatMessageC2SPacket(command));
+					//client.world.sendPacket(new ChatMessageC2SPacket(command));
 					return true;
 				}
 			}

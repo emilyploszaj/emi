@@ -64,6 +64,7 @@ public class MaterialTree {
 	}
 
 	private void addRemainder(Map<EmiStack, FlatMaterialCost> remainders, EmiStack stack, long amount) {
+		stack = stack.copy().setAmount(1);
 		if (amount > 0) {
 			if (remainders.containsKey(stack)) {
 				remainders.get(stack).amount += amount;
@@ -77,9 +78,11 @@ public class MaterialTree {
 		if (remainders.containsKey(stack)) {
 			FlatMaterialCost remainder = remainders.get(stack);
 			if (remainder.amount >= desired) {
-				remainder.amount -= desired;
-				if (remainder.amount == 0 && !catalyst) {
-					remainders.remove(stack);
+				if (!catalyst) {
+					remainder.amount -= desired;
+					if (remainder.amount == 0) {
+						remainders.remove(stack);
+					}
 				}
 				return desired;
 			} else {
@@ -108,7 +111,7 @@ public class MaterialTree {
 			return;
 		}
 
-		if (recipe == null && node.ingredient.getEmiStacks().size() == 1) {
+		if (node.ingredient.getEmiStacks().size() == 1) {
 			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
 			if (!r.isEmpty()) {
 				addRemainder(remainders, r, amount);
@@ -118,9 +121,7 @@ public class MaterialTree {
 		if (recipe != null && node.state != FoldState.COLLAPSED) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
 			long remainder = minBatches * node.divisor;
-			if (!catalyst) {
-				remainder -= amount;
-			}
+			remainder -= amount;
 			EmiStack stack = node.ingredient.getEmiStacks().get(0);
 			addRemainder(remainders, stack, remainder);
 

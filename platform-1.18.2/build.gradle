@@ -1,0 +1,40 @@
+plugins {
+	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'maven-publish'
+}
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+def props = new Properties()
+props.load(file('../gradle.properties').newReader())
+
+archivesBaseName = props.getProperty("archives_base_name")+"-platform-"+project.minecraft_version
+version = props.getProperty("mod_version")
+group = props.getProperty("maven_group")
+
+dependencies {
+	//to change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+processResources {
+	inputs.property "version", props.getProperty("mod_version")
+	inputs.property "platform", project.minecraft_version
+
+	from("../src/main/resources/fabric.mod.json") {
+		expand "version": props.getProperty("mod_version"),
+				"platform": project.minecraft_version,
+				"accessWidener": 'accessSchmidener'
+	}
+}

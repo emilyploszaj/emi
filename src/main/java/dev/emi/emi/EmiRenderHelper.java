@@ -44,9 +44,26 @@ public class EmiRenderHelper {
 	}
 
 	public static Text getEmiText() {
-		return EmiPort.literal("E").setStyle(Style.EMPTY.withColor(0xeb7bfc))
-			.append(EmiPort.literal("M").setStyle(Style.EMPTY.withColor(0x7bfca2)))
-			.append(EmiPort.literal("I").setStyle(Style.EMPTY.withColor(0x7bebfc)));
+		return
+			EmiPort.append(
+				EmiPort.append(
+					EmiPort.literal("E", Style.EMPTY.withColor(0xeb7bfc)),
+					EmiPort.literal("M", Style.EMPTY.withColor(0x7bfca2))),
+				EmiPort.literal("I", Style.EMPTY.withColor(0x7bebfc)));
+	}
+
+	public static Text getPageText(int page, int total, int maxWidth) {
+		Text text = EmiPort.translatable("emi.page", page, total);
+		if (CLIENT.textRenderer.getWidth(text) > maxWidth) {
+			text = EmiPort.translatable("emi.page.short", page, total);
+			if (CLIENT.textRenderer.getWidth(text) > maxWidth) {
+				text = EmiPort.literal("" + page);
+				if (CLIENT.textRenderer.getWidth(text) > maxWidth) {
+					text = EmiPort.literal("");
+				}
+			}
+		}
+		return text;
 	}
 
 	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {

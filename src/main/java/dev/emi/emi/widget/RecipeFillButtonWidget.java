@@ -49,12 +49,12 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		if (!EmiClient.onServer) {
-			return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.fill_recipe_no_server").asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.fill_recipe_no_server"))));
 		}
 		if (canFill) {
-			return List.of(TooltipComponent.of(EmiPort.translatable("tooltip.emi.fill_recipe").asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.fill_recipe"))));
 		} else {
-			return List.of(TooltipComponent.of(invalid.asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.ordered(invalid)));
 		}
 	}
 

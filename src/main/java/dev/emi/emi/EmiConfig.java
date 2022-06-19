@@ -61,6 +61,14 @@ public class EmiConfig {
 	@ConfigValue("ui.empty-search-craftable")
 	public static boolean emptySearchCraftable = false;
 
+	@Comment("The amount of columns to display\non the favorites sidebar.\nA value of zero will disable it.")
+	@ConfigValue("ui.max-favorite-columns")
+	public static int maxFavoriteColumns = 999;
+	
+	@Comment("The amount of columns to display\non the index sidebar.\nA value of zero will disable it.")
+	@ConfigValue("ui.max-index-columns")
+	public static int maxIndexColumns = 999;
+
 	@Comment("The amount of vertical margin to\ngive in the recipe screen.")
 	@ConfigValue("ui.vertical-margin")
 	public static int verticalMargin = 20;
@@ -68,10 +76,6 @@ public class EmiConfig {
 	@Comment("Prevents recipes being quick crafted\nfrom shifting around under the cursor.")
 	@ConfigValue("ui.miscraft-prevention")
 	public static boolean miscraftPrevention = true;
-
-	//@Comment("Maximum columns")
-	//@ConfigValue("ui.max-columns")
-	//public static int maxColumns = 9;
 
 	@Comment("The unit to display fluids as.")
 	@ConfigValue("ui.fluid-unit")
@@ -183,12 +187,12 @@ public class EmiConfig {
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
 	
 	@Comment("Cheat in one of an item into the cursor.")
-	@ConfigValue("binds.cheat-one-cursor")
+	@ConfigValue("binds.cheat-one-to-cursor")
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiUtil.CONTROL_MASK));
 	
 	@Comment("Cheat in a stack of an item into the cursor.")
-	@ConfigValue("binds.cheat-stack-cursor")
+	@ConfigValue("binds.cheat-stack-to-cursor")
 	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
 	
 	// Dev

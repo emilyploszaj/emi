@@ -50,9 +50,9 @@ public class EmiRecipeCategory implements EmiRenderable {
 
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
-		list.add(TooltipComponent.of(EmiPort.translatable(EmiUtil.translateId("emi.category.", getId())).asOrderedText()));
-		list.add(TooltipComponent.of(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()))
-			.formatted(Formatting.BLUE).formatted(Formatting.ITALIC).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable(EmiUtil.translateId("emi.category.", getId())))));
+		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
+			Formatting.BLUE, Formatting.ITALIC))));
 		return list;
 	}
 }

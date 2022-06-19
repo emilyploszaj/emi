@@ -24,12 +24,15 @@ import com.mojang.datafixers.util.Pair;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.handler.CookingRecipeHandler;
 import dev.emi.emi.handler.CraftingRecipeHandler;
 import dev.emi.emi.handler.InventoryRecipeHandler;
@@ -43,14 +46,12 @@ import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
 import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
-import dev.emi.emi.recipe.EmiWorldRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
 import dev.emi.emi.recipe.special.EmiBannerShieldRecipe;
 import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
-import dev.emi.emi.recipe.world.EmiArmorWashingRecipe;
-import dev.emi.emi.recipe.world.EmiDualResultWorldRecipe;
 import dev.emi.emi.screen.RecipeScreen;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor;
 import net.fabricmc.fabric.mixin.content.registry.ShovelItemAccessor;
 import net.minecraft.block.Block;
@@ -66,6 +67,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.DyeItem;
+import net.minecraft.item.DyeableItem;
 import net.minecraft.item.HoneycombItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -100,6 +102,7 @@ import net.minecraft.screen.SmokerScreenHandler;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntryList;
@@ -347,23 +350,27 @@ public class VanillaPlugin implements EmiPlugin {
 		for (Map.Entry<Block, Block> entry : AxeItemAccessor.getStrippedBlocks().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		for (Map.Entry<Block, Block> entry : Oxidizable.OXIDATION_LEVEL_DECREASES.get().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		for (Map.Entry<Block, Block> entry : HoneycombItem.WAXED_TO_UNWAXED_BLOCKS.get().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		
 		EmiIngredient shears = EmiStack.of(Items.SHEARS);
-		registry.addRecipe(new EmiDualResultWorldRecipe(EmiStack.of(Items.PUMPKIN), shears,
-			EmiStack.of(Items.PUMPKIN_SEEDS, 4), EmiStack.of(Items.CARVED_PUMPKIN),
-			new Identifier("emi", "shearing/minecraft/pumpkin"), true));
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "shearing/minecraft/pumpkin"))
+			.leftInput(EmiStack.of(Items.PUMPKIN))
+			.rightInput(shears, true)
+			.output(EmiStack.of(Items.PUMPKIN_SEEDS, 4))
+			.output(EmiStack.of(Items.CARVED_PUMPKIN))
+			.build());
 		EmiIngredient hoes = EmiStack.of(Items.IRON_HOE);
 		for (Map.Entry<Block, Pair<Predicate<ItemUsageContext>, Consumer<ItemUsageContext>>> entry
 				: HoeItemAccessor.getTillingActions().entrySet()) {
@@ -373,9 +380,15 @@ public class VanillaPlugin implements EmiPlugin {
 				Identifier id = new Identifier("emi", "tilling/" + EmiUtil.subId(b));
 				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer);
 				if (list.size() == 1) {
-					registry.addRecipe(new EmiWorldRecipe(EmiStack.of(b), hoes, list.get(0), id));
+					registry.addRecipe(basicWorld(EmiStack.of(b), hoes, list.get(0), id));
 				} else if (list.size() == 2) {
-					registry.addRecipe(new EmiDualResultWorldRecipe(EmiStack.of(b), hoes, list.get(0), list.get(1), id, true));
+					registry.addRecipe(EmiWorldInteractionRecipe.builder()
+						.id(id)
+						.leftInput(EmiStack.of(b))
+						.rightInput(hoes, true)
+						.output(list.get(0))
+						.output(list.get(1))
+						.build());
 				} else {
 					EmiLog.warn("Encountered hoe action of peculiar size " + list.size() + ", skipping.");
 				}
@@ -387,18 +400,29 @@ public class VanillaPlugin implements EmiPlugin {
 			Block result = entry.getValue().getBlock();
 			Identifier id = new Identifier("emi", "flattening/" + EmiUtil.subId(result)
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), shovels, EmiStack.of(result), id));
+			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), shovels, EmiStack.of(result), id));
 		}
 
 		EmiIngredient honeycomb = EmiStack.of(Items.HONEYCOMB);
 		for (Map.Entry<Block, Block> entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
 			Identifier id = new Identifier("emi", "waxing/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(new EmiWorldRecipe(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
+			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
 		}
 
 		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
-			registry.addRecipe(new EmiArmorWashingRecipe(i, null));
+			EmiStack cauldron = EmiStack.of(Items.CAULDRON);
+			EmiStack waterThird = EmiStack.of(FluidVariant.of(Fluids.WATER), 81_000 / 3);
+			registry.addRecipe(EmiWorldInteractionRecipe.builder()
+				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
+					ItemStack stack = new ItemStack(i);
+					((DyeableItem) i).setColor(stack, r.nextInt(0xFFFFFF + 1));
+					return EmiStack.of(stack);
+				}, EmiUtil.RANDOM.nextInt(), s.getBounds().x(), s.getBounds().y()))
+				.rightInput(cauldron, true)
+				.rightInput(waterThird, false)
+				.output(EmiStack.of(i))
+				.build());
 		}
 
 		water = EmiStack.of(Fluids.WATER, 81_000);
@@ -406,23 +430,56 @@ public class VanillaPlugin implements EmiPlugin {
 		EmiStack waterCatalyst = water.copy().setRemainder(water);
 		EmiStack lavaCatalyst = lava.copy().setRemainder(lava);
 
-		registry.addRecipe(new EmiWorldRecipe(waterCatalyst, lavaCatalyst, EmiStack.of(Items.COBBLESTONE),
-			new Identifier("emi", "emi/fluid_interaction/cobblestone"), false));
-		registry.addRecipe(new EmiWorldRecipe(EmiStack.of(Fluids.WATER, 81_000), lavaCatalyst, EmiStack.of(Items.STONE),
-			new Identifier("emi", "emi/fluid_interaction/stone"), false));
-		registry.addRecipe(new EmiWorldRecipe(lava, waterCatalyst, EmiStack.of(Items.OBSIDIAN),
-			new Identifier("emi", "emi/fluid_interaction/obsidian"), false));
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "emi/fluid_spring/water"))
+			.leftInput(waterCatalyst)
+			.rightInput(waterCatalyst, false)
+			.output(EmiStack.of(Fluids.WATER, 81_000))
+			.build());
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "emi/fluid_interaction/cobblestone"))
+			.leftInput(waterCatalyst)
+			.rightInput(lavaCatalyst, false)
+			.output(EmiStack.of(Items.COBBLESTONE))
+			.build());
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "emi/fluid_interaction/stone"))
+			.leftInput(waterCatalyst)
+			.rightInput(lavaCatalyst, false)
+			.output(EmiStack.of(Items.STONE))
+			.build());
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "emi/fluid_interaction/obsidian"))
+			.leftInput(lava)
+			.rightInput(waterCatalyst, false)
+			.output(EmiStack.of(Items.OBSIDIAN))
+			.build());
+	
+		EmiStack soulSoil = EmiStack.of(Items.SOUL_SOIL);
+		soulSoil.setRemainder(soulSoil);
+		EmiStack blueIce = EmiStack.of(Items.BLUE_ICE);
+		blueIce.setRemainder(blueIce);
+
+		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			.id(new Identifier("emi", "emi/fluid_interaction/basalt"))
+			.leftInput(lavaCatalyst)
+			.rightInput(soulSoil, false, s -> s.appendTooltip(EmiPort
+				.translatable("tooltip.emi.fluid_interaction.basalt.soul_soil", Formatting.GREEN)))
+			.rightInput(blueIce, false, s -> s.appendTooltip(EmiPort
+				.translatable("tooltip.emi.fluid_interaction.basalt.blue_ice", Formatting.GREEN)))
+			.output(EmiStack.of(Items.BASALT))
+			.build());
 
 		Registry.FLUID.streamEntries().forEach(entry -> {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
 			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR) {
-				registry.addRecipe(new EmiWorldRecipe(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
+				registry.addRecipe(basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
 					new Identifier("emi", "fill_bucket/" + EmiUtil.subId(fluid)), false));
 			}
 		});
 
-		registry.addRecipe(new EmiWorldRecipe(EmiStack.of(Items.GLASS_BOTTLE), water,
+		registry.addRecipe(basicWorld(EmiStack.of(Items.GLASS_BOTTLE), water,
 			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			new Identifier("emi", "fill_water_bottle")));
 
@@ -436,6 +493,14 @@ public class VanillaPlugin implements EmiPlugin {
 				registry.addRecipe(new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
 			}
 		});
+
+		if (!EmiPort.VERSION.equals("1.18.2")) {
+			EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
+				.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
+			EmiStack mud = EmiStack.of(Registry.ITEM.get(new Identifier("minecraft:mud")));
+			registry.addRecipe(basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud,
+				new Identifier("emi:emi/mud"), false));
+		}
 	}
 
 	private static EmiRenderable simplifiedRenderer(int u, int v) {
@@ -446,7 +511,20 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private void addConcreteRecipe(EmiRegistry registry, Block powder, EmiStack water, Block result) {
-		registry.addRecipe(new EmiWorldRecipe(EmiStack.of(powder), water, EmiStack.of(result),
+		registry.addRecipe(basicWorld(EmiStack.of(powder), water, EmiStack.of(result),
 			new Identifier("emi", "concrete/" + EmiUtil.subId(result))));
+	}
+
+	private EmiRecipe basicWorld(EmiIngredient left, EmiIngredient right, EmiStack output, Identifier id) {
+		return basicWorld(left, right, output, id, true);
+	}
+
+	private EmiRecipe basicWorld(EmiIngredient left, EmiIngredient right, EmiStack output, Identifier id, boolean catalyst) {
+		return EmiWorldInteractionRecipe.builder()
+			.id(id)
+			.leftInput(left)
+			.rightInput(right, catalyst)
+			.output(output)
+			.build();
 	}
 }

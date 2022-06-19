@@ -38,7 +38,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 			List<RecipeDefault> defaults = Lists.newArrayList();
 			try {
 				for (Resource resource : manager.getAllResources(id)) {
-					InputStreamReader reader = new InputStreamReader(resource.getInputStream());
+					InputStreamReader reader = new InputStreamReader(EmiPort.getInputStream(resource));
 					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
 					if (JsonHelper.getBoolean(json, "replace", false)) {
 						defaults.clear();

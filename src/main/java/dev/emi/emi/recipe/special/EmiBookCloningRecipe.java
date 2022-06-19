@@ -38,7 +38,7 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 	).stream(), NOUN.stream()).toList();
 	private static final List<String> ADJECTIVE = List.of(
 		"Cool", "Introductory", "Diffused", "Wooden", "Slimey", "Dark", "Antimemetic", "Fun", "Fuzzy", "Tall",
-		"Rotund", "Jovial", ""
+		"Rotund", "Jovial", "" // Lol blank adjective, leaving it
 	);
 	private static final List<String> IMPERATIVE = List.of(
 		"A Guide to", "Introduction to", "Discussing", "The Making of"

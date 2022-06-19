@@ -70,7 +70,7 @@ public class ListEmiIngredient implements EmiIngredient {
 	@Override
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> tooltip = Lists.newArrayList();
-		tooltip.add(TooltipComponent.of(EmiPort.literal("Accepts:").asOrderedText()));
+		tooltip.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("Accepts:"))));
 		tooltip.add(new IngredientTooltipComponent(ingredients));
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
 		tooltip.addAll(ingredients.get(item).getTooltip());

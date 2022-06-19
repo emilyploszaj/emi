@@ -3,13 +3,11 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
-import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -18,7 +16,6 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -29,7 +26,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
-	private static final Object2BooleanMap<BakedModel> IS_VALID = new Object2BooleanOpenHashMap<>();
 	private final ItemEntry entry;
 	public final ItemVariant item;
 	private boolean unbatchable;
@@ -112,28 +108,9 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public boolean isUnbatchable() {
-		try {
-			ItemStack stack = getItemStack();
-			return unbatchable || stack.hasGlint()
-				|| !IS_VALID.computeIfAbsent(MinecraftClient.getInstance().getItemRenderer().getModel(stack, null, null, 0), m -> {
-					BakedModel model = (BakedModel) m;
-					if (model.isBuiltin()) {
-						return false;
-					}
-					List<BakedQuad> list = model.getQuads(null, null, EmiUtil.RANDOM);
-					if (list != null) {
-						for (BakedQuad q : list) {
-							if (q.hasColor()) {
-								return false;
-							}
-						}
-					}
-					return true;
-			});
-		} catch (Exception e) {
-			unbatchable = true;
-			return false;
-		}
+		ItemStack stack = getItemStack();
+		return unbatchable || stack.hasGlint() || ColorProviderRegistry.ITEM.get(item.getItem()) != null
+			|| MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	
 	@Override
@@ -169,7 +146,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
 			//String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
-			//list.add(TooltipComponent.of(EmiLang.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+			//list.add(TooltipComponent.of(EmiLang.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC)));
 			if (!getRemainder().isEmpty()) {
 				list.add(new RemainderTooltipComponent(this));
 			}

@@ -34,7 +34,7 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 			Set<Identifier> exclusions = Sets.newHashSet();
 			try {
 				for (Resource resource : manager.getAllResources(id)) {
-					InputStreamReader reader = new InputStreamReader(resource.getInputStream());
+					InputStreamReader reader = new InputStreamReader(EmiPort.getInputStream(resource));
 					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
 					try {
 						if (JsonHelper.getBoolean(json, "replace", false)) {

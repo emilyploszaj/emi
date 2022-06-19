@@ -110,22 +110,6 @@ public class FluidEmiStack extends EmiStack {
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRender.renderRemainderIcon(this, matrices, x, y);
 		}
-
-		/*
-		matrices.push();
-		MinecraftClient client = MinecraftClient.getInstance();
-		
-		float scale = (float) client.getWindow().getScaleFactor();
-		float invScale = 1 / scale;
-		int s = (int) scale;
-		int size = s * 16;
-		matrices.scale(invScale, invScale, 1);
-		matrices.translate(0, 0, 300);
-
-		Text text = getTranslatedAmount();
-		client.textRenderer.draw(matrices, text, x * s + size - client.textRenderer.getWidth(text) - 2,
-			y * s + size - client.textRenderer.fontHeight - 2, -1);
-		matrices.pop();*/
 	}
 
 	@Override
@@ -135,14 +119,14 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = getTooltipText().stream().map(Text::asOrderedText).map(TooltipComponent::of)
+		List<TooltipComponent> list = getTooltipText().stream().map(EmiPort::ordered).map(TooltipComponent::of)
 			.collect(Collectors.toList());
 		if (amount > 1) {
-			list.add(TooltipComponent.of(getAmountText(amount).asOrderedText()));
+			list.add(TooltipComponent.of(EmiPort.ordered(getAmountText(amount))));
 		}
 		String namespace = Registry.FLUID.getId(fluid.getFluid()).getNamespace();
 		String mod = EmiUtil.getModName(namespace);
-		list.add(TooltipComponent.of(EmiPort.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC).asOrderedText()));
+		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
 		if (!getRemainder().isEmpty()) {
 			list.add(new RemainderTooltipComponent(this));
 		}

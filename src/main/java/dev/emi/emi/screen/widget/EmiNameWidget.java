@@ -24,6 +24,7 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Exhaustively Many Items".split(" "),
 		"Explicitly Mandated Items".split(" "),
 		"Endless Material Information".split(" "),
+		"Evolving Manufacturing Index".split(" "),
 		"Evidently, Many Ingredients".split(" "),
 		"Earnestly Made Imitation".split(" "),
 		"Even More Items".split(" "),
@@ -118,11 +119,15 @@ public class EmiNameWidget extends ListWidget.Entry {
 		int mid = x + width / 2;
 
 		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer,
-			EmiPort.literal(parts[0]).setStyle(Style.EMPTY.withColor(0xeb7bfc))
-			.append("  ")
-			.append(EmiPort.literal(parts[1]).setStyle(Style.EMPTY.withColor(0x7bfca2)))
-			.append("  ")
-			.append(EmiPort.literal(parts[2]).setStyle(Style.EMPTY.withColor(0x7bebfc))).asOrderedText(), mid, y + 30, -1);
+			EmiPort.ordered(EmiPort.append(
+				EmiPort.append(
+					EmiPort.append(
+						EmiPort.append(
+							EmiPort.literal(parts[0], Style.EMPTY.withColor(0xeb7bfc)),
+							EmiPort.literal("  ")),
+						EmiPort.literal(parts[1], Style.EMPTY.withColor(0x7bfca2))),
+					EmiPort.literal("  ")),
+				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc)))), mid, y + 30, -1);
 	}
 
 	public int getHeight() {

@@ -43,12 +43,12 @@ public class EmiSearchWidget extends TextFieldWidget {
 				int end = style.getLeft();
 				if (end > stringStart) {
 					if (end - stringStart >= string.length()) {
-						text = EmiPort.literal(string.substring(0, string.length())).setStyle(style.getRight());
+						text = EmiPort.literal(string.substring(0, string.length()), style.getRight());
 						// Skip second loop
 						s = styles.size();
 						break;
 					}
-					text = EmiPort.literal(string.substring(0, end - stringStart)).setStyle(style.getRight());
+					text = EmiPort.literal(string.substring(0, end - stringStart), style.getRight());
 					last = end - stringStart;
 					s++;
 					break;
@@ -58,13 +58,13 @@ public class EmiSearchWidget extends TextFieldWidget {
 				Pair<Integer, Style> style = styles.get(s);
 				int end = style.getLeft();
 				if (end - stringStart >= string.length()) {
-					text.append(EmiPort.literal(string.substring(last, string.length())).setStyle(style.getRight()));
+					EmiPort.append(text, EmiPort.literal(string.substring(last, string.length()), style.getRight()));
 					break;
 				}
-				text.append(EmiPort.literal(string.substring(last, end - stringStart)).setStyle(style.getRight()));
+				EmiPort.append(text, EmiPort.literal(string.substring(last, end - stringStart), style.getRight()));
 				last = end - stringStart;
 			}
-			return text.asOrderedText();
+			return EmiPort.ordered(text);
 		});
 		this.setChangedListener(string -> {
 			if (string.isEmpty()) {

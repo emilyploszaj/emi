@@ -14,7 +14,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipData;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 
 public class FakeScreen extends Screen {
 	private static MethodHandle handle;
@@ -40,7 +39,7 @@ public class FakeScreen extends Screen {
 
 	public List<TooltipComponent> getTooltipComponentListFromItem(ItemStack stack) {
 		List<TooltipComponent> list = this.getTooltipFromItem(stack)
-			.stream().map(Text::asOrderedText).map(TooltipComponent::of).collect(Collectors.toList());
+			.stream().map(EmiPort::ordered).map(TooltipComponent::of).collect(Collectors.toList());
 		Optional<TooltipData> data = stack.getTooltipData();
 		if (data.isPresent()) {
 			try {

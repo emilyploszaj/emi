@@ -14,16 +14,18 @@ basename=$(basename "$abs" .jar)
 
 absSrc=$(readlink -f "$2")
 
-zip -d "$absSrc" dev/emi/emi/EmiPort.java
+#zip -d "$absSrc" dev/emi/emi/EmiPort.java
+
+./setup-platforms.sh
 
 for p in platform-*; do
 	ver=${p##*-}
 	(
 		cd $p
-		./gradlew clean build
+		#./gradlew clean build
 		mkdir -p build/jarContents
 		cd build/jarContents
-		unzip ../libs/*
+		unzip ../libs/emi*.jar
 		out="$dirname/$basename+$ver.jar"
 		cp "$abs" "$out"
 		sed -i 's/accessSchmidener/accessWidener/' fabric.mod.json
@@ -33,5 +35,5 @@ for p in platform-*; do
 	cp "$absSrc" "$outSrc"
 done
 wait
-mv "$abs" "$dirname/$basename+$3.jar"
-mv "$absSrc" "$dirname/$basename+$3-sources.jar"
+#mv "$abs" "$dirname/$basename+$3.jar"
+#mv "$absSrc" "$dirname/$basename+$3-sources.jar"

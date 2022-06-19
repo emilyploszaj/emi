@@ -27,7 +27,7 @@ public class ItemStackMixin {
 			List<Text> text = info.getReturnValue();
 			String namespace = Registry.ITEM.getId(((ItemStack) (Object) this).getItem()).getNamespace();
 			String mod = EmiUtil.getModName(namespace);
-			text.add(EmiPort.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC));
+			text.add(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC));
 		}
 	}
 }

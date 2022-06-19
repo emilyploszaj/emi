@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
@@ -36,7 +38,7 @@ public class StackBatcher {
 		void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta);
 	}
 
-	private final AccessibleImmediateVertexConsumerProvider imm;
+	private final BatcherVertexConsumerProvider imm;
 	private final VertexConsumerProvider unlitFacade;
 	private final Map<RenderLayer, VertexBuffer> buffers = new LinkedHashMap<>();
 	private boolean populated = false;
@@ -44,10 +46,9 @@ public class StackBatcher {
 	private int x;
 	private int y;
 	private int z;
-	private static boolean enabled = EmiPort.VERSION.equals("1.18.2");
 
 	private static boolean isEnabled() {
-		return enabled && EmiConfig.useBatchedRenderer;
+		return EmiConfig.useBatchedRenderer;
 	}
 
 	public StackBatcher() {
@@ -61,7 +62,7 @@ public class StackBatcher {
 		assign(buffers, RenderLayer.getGlint());
 		assign(buffers, RenderLayer.getDirectGlint());
 		assign(buffers, RenderLayer.getEntityGlint());
-		imm = new AccessibleImmediateVertexConsumerProvider(new BufferBuilder(256), buffers);
+		imm = new BatcherVertexConsumerProvider(new BufferBuilder(256), buffers);
 		unlitFacade = new UnlitFacade(imm);
 	}
 
@@ -118,7 +119,7 @@ public class StackBatcher {
 		mat.multiplyByTranslation(x, 0, 0);
 		for (Map.Entry<RenderLayer, VertexBuffer> en : buffers.entrySet()) {
 			en.getKey().startDrawing();
-			en.getValue().setShader(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+			EmiPort.setShader(en.getValue(), mat);
 			en.getKey().endDrawing();
 		}
 		BufferRenderer.unbindAll();
@@ -142,27 +143,65 @@ public class StackBatcher {
 		bldr.reset();
 	}
 
-	@SuppressWarnings("unused")
-	private static class AccessibleImmediateVertexConsumerProvider extends VertexConsumerProvider.Immediate {
+	/*
+	 * This class is mostly a copy of a 1.18.2 implementation of VertexConsumerProvider.Immediate
+	 * The reimplementation allows compatibility with shader mods, as well as less hackery.
+	 */
+	private static class BatcherVertexConsumerProvider implements VertexConsumerProvider {
+		protected final BufferBuilder fallbackBuffer;
+		protected final Map<RenderLayer, BufferBuilder> layerBuffers;
+		protected Optional<RenderLayer> currentLayer = Optional.empty();
+		protected final Set<BufferBuilder> activeConsumers = Sets.newHashSet();
 
-		protected AccessibleImmediateVertexConsumerProvider(BufferBuilder fallbackBuffer, Map<RenderLayer, BufferBuilder> layerBuffers) {
-			super(fallbackBuffer, layerBuffers);
+		protected BatcherVertexConsumerProvider(BufferBuilder fallbackBuffer, Map<RenderLayer, BufferBuilder> layerBuffers) {
+			this.fallbackBuffer = fallbackBuffer;
+			this.layerBuffers = layerBuffers;
 		}
-		
-		public BufferBuilder getBufferInternal(RenderLayer layer) {
+
+		@Override
+		public VertexConsumer getBuffer(RenderLayer renderLayer) {
+			Optional<RenderLayer> optional = renderLayer.asOptional();
+			BufferBuilder bufferBuilder = this.getBufferInternal(renderLayer);
+			if (!Objects.equals(this.currentLayer, optional)) {
+				RenderLayer renderLayer2;
+				if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(renderLayer2 = this.currentLayer.get())) {
+					this.draw(renderLayer2);
+				}
+				if (this.activeConsumers.add(bufferBuilder)) {
+					bufferBuilder.begin(renderLayer.getDrawMode(), renderLayer.getVertexFormat());
+				}
+				this.currentLayer = optional;
+			}
+			return bufferBuilder;
+		}
+
+		private BufferBuilder getBufferInternal(RenderLayer layer) {
 			return this.layerBuffers.getOrDefault(layer, this.fallbackBuffer);
 		}
-		
-		public Optional<RenderLayer> getCurrentLayer() {
-			return currentLayer;
+
+		public void drawCurrentLayer() {
+			if (this.currentLayer.isPresent()) {
+				RenderLayer renderLayer = this.currentLayer.get();
+				if (!this.layerBuffers.containsKey(renderLayer)) {
+					this.draw(renderLayer);
+				}
+				this.currentLayer = Optional.empty();
+			}
 		}
-		
-		public void setCurrentLayer(Optional<RenderLayer> layer) {
-			this.currentLayer = layer;
-		}
-		
-		public BufferBuilder getFallbackBuffer() {
-			return fallbackBuffer;
+
+		public void draw(RenderLayer layer) {
+			BufferBuilder bufferBuilder = this.getBufferInternal(layer);
+			boolean bl = Objects.equals(this.currentLayer, layer.asOptional());
+			if (!bl && bufferBuilder == this.fallbackBuffer) {
+				return;
+			}
+			if (!this.activeConsumers.remove(bufferBuilder)) {
+				return;
+			}
+			layer.draw(bufferBuilder, 0, 0, 0);
+			if (bl) {
+				this.currentLayer = Optional.empty();
+			}
 		}
 		
 		public Map<RenderLayer, BufferBuilder> getLayerBuffers() {
@@ -172,7 +211,6 @@ public class StackBatcher {
 		public Set<BufferBuilder> getActiveConsumers() {
 			return activeConsumers;
 		}
-
 	}
 
 	private static class UnlitFacade implements VertexConsumerProvider {

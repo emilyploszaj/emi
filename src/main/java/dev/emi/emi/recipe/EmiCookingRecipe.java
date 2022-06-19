@@ -65,7 +65,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
 		widgets.addFillingArrow(24, 5, 50 * recipe.getCookTime()).tooltip((mx, my) -> {
-			return List.of(TooltipComponent.of(EmiPort.translatable("emi.cooking.time", recipe.getCookTime() / 20f).asOrderedText()));
+			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.cooking.time", recipe.getCookTime() / 20f))));
 		});
 		if (infiniBurn) {
 			widgets.addTexture(EmiTexture.FULL_FLAME, 1, 24);
@@ -73,7 +73,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 			widgets.addTexture(EmiTexture.EMPTY_FLAME, 1, 24);
 			widgets.addAnimatedTexture(EmiTexture.FULL_FLAME, 1, 24, 4000 / fuelMultiplier, false, true, true);
 		}
-		widgets.addText(EmiPort.translatable("emi.cooking.experience", recipe.getExperience()).asOrderedText(), 26, 28, -1, true);
+		widgets.addText(EmiPort.ordered(EmiPort.translatable("emi.cooking.experience", recipe.getExperience())), 26, 28, -1, true);
 		widgets.addSlot(input, 0, 4);
 		widgets.addSlot(output, 56, 0).output(true).recipeContext(this);
 	}

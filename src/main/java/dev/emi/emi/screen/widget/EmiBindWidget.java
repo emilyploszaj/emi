@@ -110,22 +110,22 @@ public class EmiBindWidget extends ListWidget.Entry {
 	private MutableText getKeyText(ModifiedKey key) {
 		MutableText text = EmiPort.literal("");
 		appendModifiers(text, key.modifiers());
-		text.append(key.key().getLocalizedText());
+		EmiPort.append(text, key.key().getLocalizedText());
 		return text;
 	}
 
 	private void appendModifiers(MutableText text, int modifiers) {
 		if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
-			text.append(EmiPort.translatable("key.keyboard.control"));
-			text.append(EmiPort.literal(" + "));
+			EmiPort.append(text, EmiPort.translatable("key.keyboard.control"));
+			EmiPort.append(text, EmiPort.literal(" + "));
 		}
 		if ((modifiers & EmiUtil.ALT_MASK) > 0) {
-			text.append(EmiPort.translatable("key.keyboard.alt"));
-			text.append(EmiPort.literal(" + "));
+			EmiPort.append(text, EmiPort.translatable("key.keyboard.alt"));
+			EmiPort.append(text, EmiPort.literal(" + "));
 		}
 		if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
-			text.append(EmiPort.translatable("key.keyboard.shift"));
-			text.append(EmiPort.literal(" + "));
+			EmiPort.append(text, EmiPort.translatable("key.keyboard.shift"));
+			EmiPort.append(text, EmiPort.literal(" + "));
 		}
 	}
 

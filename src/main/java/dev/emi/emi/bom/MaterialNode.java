@@ -68,7 +68,7 @@ public class MaterialNode {
 		for (EmiIngredient i : recipe.getInputs()) {
 			for (MaterialNode node : children) {
 				if (EmiIngredient.areEqual(i, node.ingredient)) {
-					node.amount += node.ingredient.getAmount();
+					node.amount += i.getAmount();
 					continue outer;
 				}
 			}
