@@ -43,8 +43,8 @@
   "config.emi.ui.show_cost_per_batch": "Показывать Цену за Несколько",
   "config.emi.ui.recipe_default_button": "Стандартная Клавиша Рецептов",
   "config.emi.ui.recipe_tree_button": "Клавиша Дерева Рецептов",
-  "config.emi.ui.recipe_fill_button": "Клавиша Заполнения Рецептов", !!
-  "config.emi.ui.use_batched_renderer": "Использовать Batched Отрисовку", !!
+  "config.emi.ui.recipe_fill_button": "Клавиша Заполнения Рецептов",
+  "config.emi.ui.use_batched_renderer": "Использовать Batched Отрисовку",
 
   "config.emi.dev.dev_mode": "режим Разработчика",
   "config.emi.dev.log_untranslated_tags": "Логгировать Непереведенные Теги",
@@ -337,7 +337,7 @@
   "tag.c.glass_panes.gray": "Серые Стеклянные Панели",
   "tag.c.glass_panes.light_gray": "Светло-серые Стеклянные Панели",
   "tag.c.glass_panes.cyan": "Бирюзовые Стеклянные Панели",
-  "tag.c.glass_panes.purple": "Фиолетовые Стеклянные Панели,
+  "tag.c.glass_panes.purple": "Фиолетовые Стеклянные Панели",
   "tag.c.glass_panes.blue": "Синие Стеклянные Панели",
   "tag.c.glass_panes.brown": "Коричневые Стеклянные Панели",
   "tag.c.glass_panes.green": "Зеленые Стеклянные Панели",
