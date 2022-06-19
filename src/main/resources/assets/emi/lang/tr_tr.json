@@ -38,7 +38,7 @@
     "config.emi.ui.append_item_mod_id": "Eşya Mod ID'sini Ekle",
     "config.emi.ui.empty_search_craftable": "Boş aramayla Üretilebilenleri Göster",
     "config.emi.ui.vertical_margin": "Dikey  Sınırı",
-    "config.emi.ui.miscraft_prevention": "Miscraft Engellemesi",
+    "config.emi.ui.miscraft_prevention": "Yanlışlıkla Üretim Önlemesi",
     "config.emi.ui.fluid_unit": "Sıvı Birimi",
     "config.emi.ui.show_cost_per_batch": "Üretim Başına Maliyet Göster",
     "config.emi.ui.recipe_default_button": "Tarif Varsayılan Buton",
