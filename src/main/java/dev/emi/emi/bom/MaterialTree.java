@@ -110,37 +110,39 @@ public class MaterialTree {
 		if (amount == 0) {
 			return;
 		}
-
-		if (node.ingredient.getEmiStacks().size() == 1) {
-			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
-			if (!r.isEmpty()) {
-				addRemainder(remainders, r, amount);
-			}
-		}
 		
 		if (recipe != null && node.state != FoldState.COLLAPSED) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
+			for (MaterialNode n : node.children) {
+				calculateFlatCost(costs, remainders, minBatches * n.amount, n);
+			}
 			long remainder = minBatches * node.divisor;
 			remainder -= amount;
 			EmiStack stack = node.ingredient.getEmiStacks().get(0);
 			addRemainder(remainders, stack, remainder);
 
-			for (MaterialNode n : node.children) {
-				calculateFlatCost(costs, remainders, minBatches * n.amount, n);
-			}
 			for (EmiStack es : recipe.getOutputs()) {
 				if (!stack.equals(es)) {
 					addRemainder(remainders, es, minBatches * es.getAmount());
 				}
 			}
 		} else {
-			for (FlatMaterialCost cost : costs) {
-				if (EmiIngredient.areEqual(cost.ingredient, node.ingredient)) {
-					cost.amount += amount;
-					return;
+			outer: {
+				for (FlatMaterialCost cost : costs) {
+					if (EmiIngredient.areEqual(cost.ingredient, node.ingredient)) {
+						cost.amount += amount;
+						break outer;
+					}
 				}
+				costs.add(new FlatMaterialCost(node.ingredient, amount));
 			}
-			costs.add(new FlatMaterialCost(node.ingredient, amount));
+		}
+
+		if (node.ingredient.getEmiStacks().size() == 1) {
+			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
+			if (!r.isEmpty()) {
+				addRemainder(remainders, r, amount);
+			}
 		}
 	}
 
