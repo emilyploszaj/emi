@@ -281,10 +281,12 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 
 		for (Item i : Registry.ITEM) {
-			if (i instanceof ArmorItem ai) {
-				registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
-			} else if (i instanceof ToolItem ti) {
-				registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
+			if (i.getMaxDamage() > 0) {
+				if (i instanceof ArmorItem ai) {
+					registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
+				} else if (i instanceof ToolItem ti) {
+					registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
+				}
 			}
 		}
 		registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
