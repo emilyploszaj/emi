@@ -70,6 +70,9 @@ public class EmiAnvilRecipe implements EmiRecipe {
 
 	private EmiStack getTool(Random r, boolean repaired) {
 		ItemStack stack = tool.getItemStack().copy();
+		if (stack.getMaxDamage() <= 0) {
+			return tool;
+		}
 		int d = r.nextInt(stack.getMaxDamage());
 		if (repaired) {
 			d -= stack.getMaxDamage() / 4;
