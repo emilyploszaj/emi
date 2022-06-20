@@ -146,7 +146,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
 			//String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
-			//list.add(TooltipComponent.of(EmiLang.literal(mod).formatted(Formatting.BLUE, Formatting.ITALIC)));
+			//list.add(TooltipComponent.of(EmiLang.literal(mod, Formatting.BLUE, Formatting.ITALIC)));
 			if (!getRemainder().isEmpty()) {
 				list.add(new RemainderTooltipComponent(this));
 			}

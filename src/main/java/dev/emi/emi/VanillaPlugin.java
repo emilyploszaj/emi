@@ -494,7 +494,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		});
 
-		if (!EmiPort.VERSION.equals("1.18.2")) {
+		if (Registry.ITEM.containsId(new Identifier("minecraft:mud"))) {
 			EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
 				.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
 			EmiStack mud = EmiStack.of(Registry.ITEM.get(new Identifier("minecraft:mud")));

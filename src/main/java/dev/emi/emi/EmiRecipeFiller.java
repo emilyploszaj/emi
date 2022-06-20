@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -30,9 +31,14 @@ public class EmiRecipeFiller {
 	public static boolean isSupported(EmiRecipe recipe) {
 		for (List<EmiRecipeHandler<?>> list : handlers.values()) {
 			for (EmiRecipeHandler<?> handler : list) {
-				if (handler.supportsRecipe(recipe)) {
+				if (handler.supportsRecipe(recipe) && !handler.onlyDisplayWhenApplicable(recipe)) {
 					return true;
 				}
+			}
+		}
+		for (EmiRecipeHandler<?> handler : getAllHandlers(EmiApi.getHandledScreen())) {
+			if (handler.supportsRecipe(recipe)) {
+				return true;
 			}
 		}
 		return false;

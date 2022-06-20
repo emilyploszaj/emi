@@ -38,7 +38,18 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 		return null;
 	}
 
+	/**
+	 * @return Whether this handler is applicable for the provided recipe.
+	 */
 	boolean supportsRecipe(EmiRecipe recipe);
+
+	/**
+	 * @return Whether the provided recipe is only conscious of the handler when the handler is applicable.
+	 * Effectively, whether to not display the plus fill button outside of applicable screens.
+	 */
+	default boolean onlyDisplayWhenApplicable(EmiRecipe recipe) {
+		return false;
+	}
 
 	default boolean canCraft(EmiRecipe recipe, EmiPlayerInventory inventory, HandledScreen<T> screen) {
 		return inventory.canCraft(recipe);

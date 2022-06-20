@@ -38,7 +38,7 @@ public class EmiBindWidget extends ListWidget.Entry {
 		buttons.clear();
 		for (int i = 0; i < bind.boundKeys.size(); i++) {
 			final int j = i;
-			ButtonWidget widget = new ButtonWidget(0, 0, 200, 20, getKeyText(bind.boundKeys.get(i)), button -> {
+			ButtonWidget widget = new ButtonWidget(0, 0, 200, 20, getKeyText(bind.boundKeys.get(i), Formatting.RESET), button -> {
 				screen.setActiveBind(bind, j);
 			}) {
 
@@ -72,19 +72,19 @@ public class EmiBindWidget extends ListWidget.Entry {
 				button.setWidth(200);
 				button.x = x + width - 224;
 				if (screen.lastModifier == 0) {
-					button.setMessage(EmiPort.literal("...").formatted(Formatting.YELLOW));
+					button.setMessage(EmiPort.literal("...", Formatting.YELLOW));
 				} else {
 					button.setMessage(getKeyText(new ModifiedKey(InputUtil.Type.KEYSYM
-						.createFromCode(screen.lastModifier), screen.activeModifiers)).formatted(Formatting.YELLOW));
+						.createFromCode(screen.lastModifier), screen.activeModifiers), Formatting.YELLOW));
 				}
 			} else if (i < bind.boundKeys.size()) {
 				if (bind.boundKeys.get(i).isUnbound() && i > 0) {
 					button.setWidth(20);
 					button.x = x + width - 20;
 					button.y = y;
-					button.setMessage(EmiPort.literal("+").formatted(Formatting.AQUA));
+					button.setMessage(EmiPort.literal("+", Formatting.AQUA));
 				} else {
-					button.setMessage(getKeyText(bind.boundKeys.get(i)));
+					button.setMessage(getKeyText(bind.boundKeys.get(i), Formatting.RESET));
 				}
 			}
 			button.render(matrices, mouseX, mouseY, delta);
@@ -107,8 +107,8 @@ public class EmiBindWidget extends ListWidget.Entry {
 		return size;
 	}
 
-	private MutableText getKeyText(ModifiedKey key) {
-		MutableText text = EmiPort.literal("");
+	private MutableText getKeyText(ModifiedKey key, Formatting formatting) {
+		MutableText text = EmiPort.literal("", formatting);
 		appendModifiers(text, key.modifiers());
 		EmiPort.append(text, key.key().getLocalizedText());
 		return text;

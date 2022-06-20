@@ -287,7 +287,7 @@ public class BoMScreen extends Screen {
 		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_R) {
 			if (EmiRecipes.recipes.size() > 0) {
 				for (int i = 0; i < 100_000; i++) {
-					EmiRecipe recipe = EmiRecipes.recipes.get(client.world.getRandom().nextInt(EmiRecipes.recipes.size()));
+					EmiRecipe recipe = EmiRecipes.recipes.get(EmiUtil.RANDOM.nextInt(EmiRecipes.recipes.size()));
 					if (recipe.supportsRecipeTree()) {
 						BoM.setGoal(recipe);
 						init();
