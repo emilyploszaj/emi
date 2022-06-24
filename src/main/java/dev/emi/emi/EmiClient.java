@@ -84,6 +84,7 @@ public class EmiClient implements ClientModInitializer {
 
 
 		ClientPlayConnectionEvents.INIT.register((handler, client) -> {
+			EmiReloadManager.clear();
 			onServer = false;
 		});
 
