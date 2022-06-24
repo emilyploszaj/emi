@@ -122,11 +122,12 @@ public class SlotWidget extends Widget {
 	 * Sets the slot to use a custom texture and custom sizing
 	 * @param id The texture identifier to use to draw the background
 	 */
-	public void custom(Identifier id, int u, int v, int width, int height) {
+	public SlotWidget custom(Identifier id, int u, int v, int width, int height) {
 		backgroundTexture(id, u, v);
 		this.custom = true;
 		this.customWidth = width;
 		this.customHeight = height;
+		return this;
 	}
 
 	@Override
