@@ -579,22 +579,29 @@ public class EmiScreenManager {
 			if (isDisabled()) {
 				return false;
 			}
+			int mx = (int) mouseX;
+			int my = (int) mouseY;
 			recalculate();
 			if (EmiConfig.cheatMode) {
 				if (client.currentScreen instanceof HandledScreen<?> handled) {
 					ItemStack cursor = handled.getScreenHandler().getCursorStack();
 					if (!cursor.isEmpty() && searchSpace.contains(lastMouseX, lastMouseY)) {
-						handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
-						ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
-						// Returning false here makes the handled screen do something and removes a bug, oh well.
-						return false;
+						outer: {
+							for (Bounds bounds : EmiExclusionAreas.getExclusion(client.currentScreen)) {
+								if (bounds.contains(mx, my)) {
+									break outer;
+								}
+							}
+							handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
+							ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
+							// Returning false here makes the handled screen do something and removes a bug, oh well.
+							return false;
+						}
 					}
 				}
 			}
 			if (!pressedStack.isEmpty()) {
 				if (!draggedStack.isEmpty()) {
-					int mx = (int) mouseX;
-					int my = (int) mouseY;
 					if (favoriteSpace.contains(mx, my)) {
 						int index = favoriteSpace.getClosestEdge(mx, my);
 						EmiFavorites.addFavoriteAt(draggedStack, index + favoriteSpace.pageSize * favoritePage);
