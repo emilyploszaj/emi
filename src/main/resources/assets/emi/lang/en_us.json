@@ -78,6 +78,10 @@
   "tooltip.emi.fill_recipe_no_server": "Cannot Fill Recipe without EMI on server",
   "tooltip.emi.set_default": "Set as Default Recipe",
   "tooltip.emi.view_tree": "View Recipe Tree",
+  "tooltip.emi.resolution": "Resolving recipe tree for ingredient",
+  "tooltip.emi.select_resolution": "Click a §6recipe's output§r to assign for §dthis§r recipe tree",
+  "tooltip.emi.default_resolution": "Click the §6recipe default button§r to assign for §aall§r recipe trees",
+  "tooltip.emi.clear_resolution": "Click §6here§r to §cclear§r resolution",
 
   "tooltip.emi.config": "%s Config",
   "tooltip.emi.recipe_tree": "Recipe Tree",
@@ -85,6 +89,14 @@
   "tooltip.emi.craftable_toggle_craftable": "Showing Craftable Recipes",
   "tooltip.emi.local_craftable_toggle_off": "Showing All Craftable Recipes",
   "tooltip.emi.local_craftable_toggle_on": "Showing Only Craftable in Workstation",
+
+  "tooltip.emi.synfav.uncraftable": "Unable to craft §cany§r batches",
+  "tooltip.emi.synfav.partially_craftable": "Able to craft §dsome§r batches\n§6Interact§r to craft as many as possible",
+  "tooltip.emi.synfav.fully_craftable": "Able to craft §aall %1$s§r batches\n§6Interact§r to craft up to §9%1$s§r batches",
+
+  "tooltip.emi.bom.batch_size": "Batch size: %s\nScroll to adjust\nHold §6[shift]§r to adjust by 16",
+  "tooltip.emi.bom.mode.view": "§6Viewing§r recipe tree",
+  "tooltip.emi.bom.mode.craft": "§6Crafting§r recipe tree\nProgress will be shown in recipe tree\n§bSynthetic favorites§r added to sidebar",
   
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Below lava",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Adjacent to lava",

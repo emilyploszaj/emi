@@ -119,7 +119,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		}
 
 		@Override
-		protected EmiRecipe getRecipe() {
+		public EmiRecipe getRecipe() {
 			return manager.getRecipe(offset);
 		}
 

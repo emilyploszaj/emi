@@ -1,7 +1,5 @@
 package dev.emi.emi;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -56,6 +54,7 @@ public class EmiReloadManager {
 		public void run() {
 			outer:
 			do {
+				long reloadStart = System.currentTimeMillis();
 				restart = false;
 				EmiRecipes.clear();
 				EmiStackList.clear();
@@ -100,12 +99,7 @@ public class EmiReloadManager {
 						plugin.getEntrypoint().register(registry);
 					} catch (Exception e) {
 						EmiLog.warn("[emi] Exception loading plugin provided by " + plugin.getProvider().getMetadata().getId());
-						StringWriter writer = new StringWriter();
-						e.printStackTrace(new PrintWriter(writer, true));
-						String[] strings = writer.getBuffer().toString().split("/");
-						for (String s : strings) {
-							EmiLog.warn(s);
-						}
+						EmiLog.error(e);
 						if (restart) {
 							continue outer;
 						}
@@ -131,6 +125,7 @@ public class EmiReloadManager {
 				EmiPersistentData.load();
 				// Update search
 				EmiScreenManager.search.setText(EmiScreenManager.search.getText());
+				System.out.println("[emi] Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 			} while (restart);
 			finish();
 		}

@@ -1,12 +1,13 @@
 package dev.emi.emi.screen;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorites;
@@ -16,16 +17,20 @@ import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.MaterialTree;
+import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
@@ -33,7 +38,13 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
 public class BoMScreen extends Screen {
@@ -42,9 +53,12 @@ public class BoMScreen extends Screen {
 	private static final int NODE_VERTICAL_SPACING = 20;
 	private static final int COST_HORIZONTAL_SPACING = 10;
 	private static int zoom = 0;
+	private Bounds batches = new Bounds(-24, -50, 48, 26);
+	private Bounds mode = new Bounds(-24, -50, 16, 16);
 	private double offX, offY;
 	private List<Node> nodes = Lists.newArrayList();
 	private List<Cost> costs = Lists.newArrayList();
+	private EmiPlayerInventory playerInv;
 	public HandledScreen<?> old;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
@@ -66,15 +80,22 @@ public class BoMScreen extends Screen {
 
 	public void recalculateTree() {
 		if (BoM.tree != null) {
-			TreeVolume volume = addNewNodes(BoM.tree.goal, 1, 1, 0);
+			TreeVolume volume = addNewNodes(BoM.tree.goal, BoM.tree.batches, 1, 0);
 			nodes = volume.nodes;
 			int horizontalOffset = (volume.getMaxRight() + volume.getMinLeft()) / 2;
 			for (Node node : volume.nodes) {
 				node.x -= horizontalOffset;
 			}
+			if (!volume.nodes.isEmpty()) {
+				Node node = volume.nodes.get(0);
+				int width = textRenderer.getWidth("x" + BoM.tree.batches);
+				batches = new Bounds(node.x + node.width / 2 + 6, node.y - 10, width + 12, 22);
+			}
 
 			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
 			nodeHeight = getNodeHeight(BoM.tree.goal);
+			playerInv = new EmiPlayerInventory(client.player);
+			BoM.tree.calculateProgress(playerInv);
 			BoM.tree.calculateCost(false);
 
 			costs.clear();
@@ -82,33 +103,37 @@ public class BoMScreen extends Screen {
 			int costWidth = 0;
 			for (FlatMaterialCost node : BoM.tree.costs) {
 				costWidth += 16 + COST_HORIZONTAL_SPACING
-					+ EmiRenderHelper.getAmountOverflow(node.ingredient.getAmountText(node.amount));
+						+ EmiRenderHelper.getAmountOverflow(new Cost(node, 0, 0, false).getAmountText());
 			}
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			int costX = (costWidth - COST_HORIZONTAL_SPACING) / -2;
 			for (FlatMaterialCost node : BoM.tree.costs) {
-				costs.add(new Cost(node, costX, cy));
-				costX += 16 + COST_HORIZONTAL_SPACING
-					+ EmiRenderHelper.getAmountOverflow(node.ingredient.getAmountText(node.amount));
+				Cost cost = new Cost(node, costX, cy, false);
+				costs.add(cost);
+				costX += 16 + COST_HORIZONTAL_SPACING + EmiRenderHelper.getAmountOverflow(cost.getAmountText());
 			}
+
+			int totalCostWidth = textRenderer.getWidth(EmiPort.translatable("emi.total_cost"));
+			mode = new Bounds(totalCostWidth / 2 + 4, cy - 20, 16, 16);
 
 			int remainderWidth = 0;
 			for (FlatMaterialCost node : BoM.tree.remainders.values()) {
 				remainderWidth += 16 + COST_HORIZONTAL_SPACING
-					+ EmiRenderHelper.getAmountOverflow(node.ingredient.getAmountText(node.amount));
+						+ EmiRenderHelper.getAmountOverflow(new Cost(node, 0, 0, true).getAmountText());
 			}
 			cy += 40;
 			int remainderX = (remainderWidth - COST_HORIZONTAL_SPACING) / -2;
 			for (FlatMaterialCost node : BoM.tree.remainders.values()) {
-				costs.add(new Cost(node, remainderX, cy));
+				Cost cost = new Cost(node, remainderX, cy, true);
+				costs.add(cost);
 				remainderX += 16 + COST_HORIZONTAL_SPACING
-					+ EmiRenderHelper.getAmountOverflow(node.ingredient.getAmountText(node.amount));
+						+ EmiRenderHelper.getAmountOverflow(cost.getAmountText());
 			}
 		} else {
 			nodes = Lists.newArrayList();
 		}
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackgroundTexture(0);
@@ -137,9 +162,11 @@ public class BoMScreen extends Screen {
 		RenderSystem.applyModelViewMatrix();
 		if (BoM.tree != null) {
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
-			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
+			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16,
+					-1);
 			if (!BoM.tree.remainders.isEmpty()) {
-				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40, -1);
+				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0,
+						cy - 16 + 40, -1);
 			}
 			for (Cost cost : costs) {
 				cost.render(matrices);
@@ -147,8 +174,22 @@ public class BoMScreen extends Screen {
 			for (Node node : nodes) {
 				node.render(matrices, mx, my, delta);
 			}
+			int color = -1;
+			if (batches.contains(mx, my)) {
+				color = 0xff8099ff;
+			}
+			drawTextWithShadow(matrices, textRenderer, EmiPort.literal("x" + BoM.tree.batches),
+					batches.x() + 6, batches.y() + batches.height() / 2 - 4, color);
+
+			if (mode.contains(mx, my)) {
+				RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+			}
+			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+			drawTexture(matrices, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
+			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		} else {
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
+			drawCenteredText(matrices, textRenderer,
+					EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
 			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
 			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
 			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
@@ -159,6 +200,17 @@ public class BoMScreen extends Screen {
 		Hover hover = getHoveredStack(mouseX, mouseY);
 		if (hover != null) {
 			hover.drawTooltip(this, matrices, mouseX, mouseY);
+		} else if (BoM.tree != null && batches.contains(mx, my)) {
+			List<TooltipComponent> list = Arrays
+					.stream(I18n.translate("tooltip.emi.bom.batch_size", BoM.tree.batches).split("\n"))
+					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
+			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
+		} else if (BoM.tree != null && mode.contains(mx, my)) {
+			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
+			List<TooltipComponent> list = Arrays
+					.stream(I18n.translate(key, BoM.tree.batches).split("\n"))
+					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
+			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
 		}
 	}
 
@@ -226,34 +278,6 @@ public class BoMScreen extends Screen {
 			return;
 		}
 		fill(matrices, x1, y1, x2 + 1, y2 + 1, 0xFFFFFFFF);
-		/*
-		matrices.push();
-		matrices.translate(x1, y1, 0);
-		matrices.multiply(Vec3f.POSITIVE_Z.getRadialQuaternion((float) Math.atan2(y2 - y1, x2 - x1)));
-
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.disableTexture();
-		BufferBuilder builder = Tessellator.getInstance().getBuffer();
-		builder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-		float w = (float) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y2 - y1, 2));
-		float size = 0.5f;
-		if (zoom < -3) {
-			size = 1f;
-			if (zoom < -4) {
-				size = 2f;
-			}
-		} 
-
-		Matrix4f mat = matrices.peek().getPositionMatrix();
-		builder.vertex(mat, 0, -size, 1).color(1, 1, 1, 1f).next();
-		builder.vertex(mat, 0, size, 1).color(1, 1, 1, 1f).next();
-		builder.vertex(mat, w, size, 1).color(1, 1, 1, 1f).next();
-		builder.vertex(mat, w, -size, 1).color(1, 1, 1, 1f).next();
-		builder.end();
-		BufferRenderer.draw(builder);
-		matrices.pop();*/
 	}
 
 	public float getScale() {
@@ -305,6 +329,9 @@ public class BoMScreen extends Screen {
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		Hover hover = getHoveredStack((int) mouseX, (int) mouseY);
+		float scale = getScale();
+		int mx = (int) ((mouseX - width / 2) / scale - offX);
+		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (hover != null) {
 			if (button == 1 && hover.node != null) {
 				if (hover.node.state == FoldState.EXPANDED) {
@@ -318,6 +345,10 @@ public class BoMScreen extends Screen {
 			if (hover.stack != null) {
 				EmiApi.displayRecipes(hover.stack);
 				RecipeScreen.resolve = hover.stack;
+				MinecraftClient client = MinecraftClient.getInstance();
+				// The first init doesn't realize a resolution exists so we do it again. What
+				// could go wrong.
+				client.currentScreen.init(client, client.currentScreen.width, client.currentScreen.height);
 				if (hover.node != null) {
 					if (hover.node.recipe != null) {
 						EmiApi.focusRecipe(hover.node.recipe);
@@ -325,6 +356,10 @@ public class BoMScreen extends Screen {
 				}
 				return true;
 			}
+		} else if (mode.contains(mx, my)) {
+			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			BoM.craftingMode = !BoM.craftingMode;
+			recalculateTree();
 		}
 		Function<EmiBind, Boolean> function = bind -> bind.matchesMouse(button);
 		if (function.apply(EmiConfig.back)) {
@@ -336,6 +371,22 @@ public class BoMScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		float scale = getScale();
+		int mx = (int) ((mouseX - width / 2) / scale - offX);
+		int my = (int) ((mouseY - height / 2) / scale - offY);
+		if (BoM.tree != null && batches.contains(mx, my)) {
+			if (EmiUtil.isShiftDown()) {
+				amount *= 16;
+			}
+			if (BoM.tree.batches == 1 && amount > 1) {
+				BoM.tree.batches = (int) amount;
+			} else {
+				BoM.tree.batches += (int) amount;
+			}
+			BoM.tree.batches = Math.max(1, BoM.tree.batches);
+			recalculateTree();
+			return true;
+		}
 		zoom += (int) amount;
 		return true;
 	}
@@ -361,19 +412,40 @@ public class BoMScreen extends Screen {
 		MinecraftClient.getInstance().setScreen(old);
 	}
 
-	private static class Cost {
+	private class Cost {
 		public FlatMaterialCost cost;
 		public int x, y;
-		
-		public Cost(FlatMaterialCost cost, int x, int y) {
+		public boolean remainder;
+
+		public Cost(FlatMaterialCost cost, int x, int y, boolean remainder) {
 			this.cost = cost;
 			this.x = x;
 			this.y = y;
+			this.remainder = remainder;
 		}
 
 		public void render(MatrixStack matrices) {
 			cost.ingredient.render(matrices, x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
-			EmiRenderHelper.renderAmount(matrices, x, y, cost.ingredient.getAmountText(cost.amount));
+			EmiRenderHelper.renderAmount(matrices, x, y, getAmountText());
+		}
+
+		public Text getAmountText() {
+			if (!remainder && BoM.craftingMode) {
+				long amount = 0;
+				for (EmiStack stack : cost.ingredient.getEmiStacks()) {
+					if (playerInv.inventory.containsKey(stack)) {
+						amount += playerInv.inventory.get(stack).getAmount();
+					}
+				}
+				if (amount < cost.amount) {
+					Text amountText = amount == 0 ? EmiPort.literal("0") : (cost.ingredient.getAmountText(amount));
+					MutableText text = EmiPort.append(EmiPort.literal("", Formatting.RED), amountText);
+					text = EmiPort.append(text, EmiPort.literal("/"));
+					text = EmiPort.append(text, cost.ingredient.getAmountText(cost.amount));
+					return text;
+				}
+			}
+			return cost.ingredient.getAmountText(cost.amount);
 		}
 	}
 
@@ -407,11 +479,12 @@ public class BoMScreen extends Screen {
 				if (node != null && node.recipe != null) {
 					list.add(new RecipeTooltipComponent(node.recipe));
 				}
-				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
+				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, list, mouseX,
+						Math.max(16, mouseY));
 				return true;
 			} else if (category != null) {
 				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices,
-					category.getTooltip(), mouseX, Math.max(16, mouseY));
+						category.getTooltip(), mouseX, Math.max(16, mouseY));
 				return true;
 			}
 			return false;
@@ -443,6 +516,15 @@ public class BoMScreen extends Screen {
 
 		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 			if (parent != null) {
+				matrices.push();
+				if (BoM.craftingMode) {
+					if (parent.node.progress == ProgressState.COMPLETED) {
+						RenderSystem.setShaderColor(0.1f, 0.8f, 0.5f, 1f);
+					} else if (parent.node.progress == ProgressState.PARTIAL) {
+						RenderSystem.setShaderColor(0.8f, 0.2f, 0.9f, 1f);
+					}
+				}
+				
 				int nx = x;
 				int ny = y;
 				int px = parent.x;
@@ -458,12 +540,13 @@ public class BoMScreen extends Screen {
 				} else {
 					drawLine(matrices, nx, ny - 11, nx, py + off);
 				}
+				matrices.pop();
 			}
 			if (leaf) {
-				//fill(matrices, x - 9, node.y - 9, node.x + 9, node.y + 9, 0x66ff0000);
-				//drawLine(matrices, x - 9, node.y + 10, node.x + 9, node.y + 10);
-				//drawLine(matrices, x - 9, node.y + 10, node.x - 9, node.y + 6);
-				//drawLine(matrices, node.x + 9, node.y + 10, node.x + 9, node.y + 6);
+				// fill(matrices, x - 9, node.y - 9, node.x + 9, node.y + 9, 0x66ff0000);
+				// drawLine(matrices, x - 9, node.y + 10, node.x + 9, node.y + 10);
+				// drawLine(matrices, x - 9, node.y + 10, node.x - 9, node.y + 6);
+				// drawLine(matrices, node.x + 9, node.y + 10, node.x + 9, node.y + 6);
 			}
 			int xo = 0;
 			if (node.recipe != null) {
@@ -476,6 +559,14 @@ public class BoMScreen extends Screen {
 				}
 				boolean hovered = mouseX >= lx && mouseY >= ly && mouseX <= hx && mouseY <= hy;
 				matrices.push();
+				if (BoM.craftingMode) {
+					if (node.progress == ProgressState.COMPLETED) {
+						RenderSystem.setShaderColor(0.1f, 0.8f, 0.5f, 1f);
+					} else if (node.progress == ProgressState.PARTIAL) {
+						RenderSystem.setShaderColor(0.8f, 0.2f, 0.9f, 1f);
+					}
+				}
+				
 				if (hovered) {
 					RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
 				}
@@ -487,10 +578,10 @@ public class BoMScreen extends Screen {
 				cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
 				xo = 10;
 				matrices.pop();
-			} else {
 			}
 			node.ingredient.render(matrices, x + xo - 8 + midOffset, y - 8, 0);
-			EmiRenderHelper.renderAmount(matrices, x + xo - 8 + midOffset, y - 8, node.ingredient.getAmountText(amount));
+			EmiRenderHelper.renderAmount(matrices, x + xo - 8 + midOffset, y - 8,
+					node.ingredient.getAmountText(amount));
 		}
 
 		public Hover getHover(int mouseX, int mouseY) {

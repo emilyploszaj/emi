@@ -14,6 +14,12 @@ loom {
 	accessWidenerPath = file("src/main/resources/emi.accesswidener")
 }
 
+repositories {
+    maven {
+		url = "https://maven.terraformersmc.com/"
+	}
+}
+
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -22,8 +28,12 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
+	modCompileOnly "com.terraformersmc:modmenu:3.2.3"
+
 	// Run setup-platforms.sh to populate
-	modImplementation files("platform-1.18.2/build/libs/include.jar")
+	modCompileOnly files("platform-1.18.2/build/libs/include.jar")
+	// Uncomment for dev
+	//modRuntimeOnly files("platform-1.18.2/build/libs/include.jar")
 }
 
 processResources {

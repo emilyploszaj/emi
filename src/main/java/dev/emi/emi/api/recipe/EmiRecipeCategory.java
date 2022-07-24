@@ -1,6 +1,10 @@
 package dev.emi.emi.api.recipe;
 
+import java.util.Comparator;
 import java.util.List;
+
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
@@ -15,6 +19,8 @@ import net.minecraft.util.Identifier;
 public class EmiRecipeCategory implements EmiRenderable {
 	public Identifier id;
 	public EmiRenderable icon, simplified;
+	@ApiStatus.Experimental
+	public Comparator<EmiRecipe> sorter;
 	
 	/**
 	 * A constructor to use only a single renderable for both the icon and simplified icon.
@@ -30,9 +36,18 @@ public class EmiRecipeCategory implements EmiRenderable {
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
 	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified) {
+		this(id, icon, simplified, EmiRecipeSorting.none());
+	}
+
+	/**
+	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
+	 */
+	@ApiStatus.Experimental
+	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
 		this.id = id;
 		this.icon = icon;
 		this.simplified = simplified;
+		this.sorter = sorter;
 	}
 
 	public Identifier getId() {
@@ -54,5 +69,10 @@ public class EmiRecipeCategory implements EmiRenderable {
 		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
 			Formatting.BLUE, Formatting.ITALIC))));
 		return list;
+	}
+
+	@ApiStatus.Experimental
+	public @Nullable Comparator<EmiRecipe> getSort() {
+		return sorter;
 	}
 }

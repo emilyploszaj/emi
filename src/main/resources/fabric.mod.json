@@ -22,6 +22,9 @@
     "server": [],
     "emi": [
       "dev.emi.emi.VanillaPlugin"
+    ],
+    "modmenu": [
+      "dev.emi.emi.compat.EmiModMenu"
     ]
   },
   "mixins": [
@@ -31,5 +34,12 @@
   "depends": {
     "fabricloader": ">=0.13.1",
     "fabric": "*"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1935": ["dev/emi/emi/api/stack/EmiStackConvertible"],
+      "net/minecraft/class_1799": ["dev/emi/emi/api/stack/EmiStackConvertible"],
+      "net/minecraft/class_3611": ["dev/emi/emi/api/stack/EmiStackConvertible"]
+    }
   }
 }

@@ -130,4 +130,14 @@ public class EmiRenderHelper {
 		DrawableHelper.drawTexture(matrices, x + 12, y, 12, 252, 4, 4, 256, 256);
 		return;
 	}
+
+	public static void renderRecipeFavorite(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+		matrices.push();
+		matrices.translate(0, 0, 200);
+		RenderSystem.disableDepthTest();
+		RenderSystem.setShaderTexture(0, WIDGETS);
+		DrawableHelper.drawTexture(matrices, x + 12, y, 16, 252, 4, 4, 256, 256);
+		matrices.pop();
+		return;
+	}
 }

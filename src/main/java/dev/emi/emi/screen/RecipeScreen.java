@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
@@ -26,6 +26,7 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
+import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
@@ -53,6 +54,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	private List<SizedButtonWidget> arrows;
 	private List<WidgetGroup> currentPage = Lists.newArrayList();
 	private int tabOff = 0;
+	private Widget hoveredWidget = null;
+	private ResolutionButtonWidget resolutionButton;
 	int backgroundWidth = 176;
 	int backgroundHeight = 200;
 	int x = (this.width - backgroundWidth) / 2;
@@ -74,7 +77,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page - 1)),
 			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 64,
 				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page + 1))
-		);		resolve = null;
+		);
+		resolve = null;
 		this.recipes = recipes;
 	}
 
@@ -90,6 +94,10 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			addDrawableChild(widget);
 		}
 		EmiScreenManager.addWidgets(this);
+		if (resolve != null) {
+			resolutionButton = new ResolutionButtonWidget(x - 18, y + 10, 18, 18, resolve, () -> hoveredWidget);
+			this.addDrawableChild(resolutionButton);
+		}
 		if (recipes != null) {
 			EmiRecipe current = null;
 			if (tab < tabs.size() && page < tabs.get(tab).recipes.size() && tabs.get(tab).recipes.get(page).size() > 0) {
@@ -98,7 +106,17 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			tabs.clear();
 			if (!recipes.isEmpty()) {
 				for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : recipes.entrySet().stream()
-						.sorted((a, b) -> EmiRecipes.categories.indexOf(a.getKey()) - EmiRecipes.categories.indexOf(b.getKey())).toList()) {
+						.sorted((a, b) -> {
+							int ai = EmiRecipes.categories.indexOf(a.getKey());
+							int bi = EmiRecipes.categories.indexOf(b.getKey());
+							if (ai < 0) {
+								ai = Integer.MAX_VALUE;
+							}
+							if (bi < 0) {
+								bi = Integer.MAX_VALUE;
+							}
+							return ai - bi;
+						}).toList()) {
 					List<EmiRecipe> set = entry.getValue();
 					if (!set.isEmpty()) {
 						tabs.add(new RecipeTab(entry.getKey(), set));
@@ -169,7 +187,11 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (!workstations.isEmpty()) {
 			int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18);
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + 7, 24, 6 + 18 * size, 27, 0, 3, 1);
+			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + getWorkstationsY() - 3, 24, 6 + 18 * size, 27, 0, 3, 1);
+		}
+		if (resolve != null) {
+			RenderSystem.setShaderTexture(0, TEXTURE);
+			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + 7, 24, 24, 27, 0, 3, 1);
 		}
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
@@ -198,6 +220,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (categoryHovered) {
 			this.renderTooltip(matrices, EmiPort.translatable("emi.view_all_recipes"), mouseX, mouseY);
 		}
+		hoveredWidget = null;
 		outer:
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
@@ -207,6 +230,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					List<TooltipComponent> tooltip = widget.getTooltip(mx, my);
 					if (!tooltip.isEmpty()) {
 						((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, tooltip, mouseX, Math.max(16, mouseY));
+						hoveredWidget = widget;
 						break outer;
 					}
 				}
@@ -220,6 +244,10 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					tabs.get(n).category.getTooltip(), mouseX, Math.max(16, mouseY));
 			}
 		}
+	}
+
+	public int getWorkstationsY() {
+		return resolve == null ? 10 : 36;
 	}
 
 	public EmiRecipeCategory getFocusedCategory() {
@@ -337,11 +365,19 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tabs.get(tab).category, List.of());
 			if (!workstations.isEmpty()) {
 				List<Widget> widgets = Lists.newArrayList();
-				for (int i = 0; i < workstations.size() && i < (backgroundHeight - 30) / 18; i++) {
-					widgets.add(new SlotWidget(workstations.get(i), x - 18, y + 10 + i * 18));
+				for (int i = 0; i < workstations.size(); i++) {
+					int y = getWorkstationsY() + i * 18;
+					if (y + 30 > backgroundHeight) {
+						break;
+					}
+					widgets.add(new SlotWidget(workstations.get(i), x - 18, this.y + y));
 				}
 				currentPage.add(new WidgetGroup(null, widgets, 0, 0));
 			}
+		}
+		if (resolve != null && resolutionButton != null) {
+			resolutionButton.x = this.x - 18;
+			resolutionButton.y = this.y + 10;
 		}
 	}
 
@@ -455,7 +491,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			if (!workstations.isEmpty()) {
 				int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18);
 				RenderSystem.setShaderTexture(0, TEXTURE);
-				consumer.accept(new Bounds(x - 21, y + 7, 24, 6 + 18 * size));
+				consumer.accept(new Bounds(x - 21, y, 24, 6 + 18 * size + getWorkstationsY()));
 			}
 		}
 	}

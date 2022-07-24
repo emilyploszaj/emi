@@ -3,9 +3,10 @@ package dev.emi.emi.api.widget;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.ApiStatus;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiConfig;
@@ -50,7 +51,8 @@ public class SlotWidget extends Widget {
 		return stack;
 	}
 
-	protected EmiRecipe getRecipe() {
+	@ApiStatus.Internal
+	public EmiRecipe getRecipe() {
 		return recipe;
 	}
 
@@ -119,10 +121,21 @@ public class SlotWidget extends Widget {
 	}
 
 	/**
+	 * @see {@link SlotWidget#customBackground}
+	 */
+	@Deprecated
+	public void custom(Identifier id, int u, int v, int width, int height) {
+		backgroundTexture(id, u, v);
+		this.custom = true;
+		this.customWidth = width;
+		this.customHeight = height;
+	}
+
+	/**
 	 * Sets the slot to use a custom texture and custom sizing
 	 * @param id The texture identifier to use to draw the background
 	 */
-	public SlotWidget custom(Identifier id, int u, int v, int width, int height) {
+	public SlotWidget customBackground(Identifier id, int u, int v, int width, int height) {
 		backgroundTexture(id, u, v);
 		this.custom = true;
 		this.customWidth = width;

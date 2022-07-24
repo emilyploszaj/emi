@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
@@ -59,6 +62,18 @@ public class EmiApi {
 	 */
 	public static EmiStackInteraction getHoveredStack(boolean includeStandard) {
 		return EmiScreenManager.getHoveredStack(EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, includeStandard);
+	}
+
+	/**
+	 * @return Recipe context associated with specific ingredient implementations.
+	 *  This could be favorites, craftables, or something else.
+	 */
+	@ApiStatus.Experimental
+	public static @Nullable EmiRecipe getRecipeContext(EmiIngredient stack) {
+		if (stack instanceof EmiFavorite fav) {
+			return fav.getRecipe();
+		}
+		return null;
 	}
 
 	public static HandledScreen<?> getHandledScreen() {

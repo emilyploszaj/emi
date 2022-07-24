@@ -13,9 +13,12 @@ public class MaterialNode {
 	public EmiIngredient ingredient;
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
-	public FoldState state = FoldState.EXPANDED;
 	public long amount = 1;
 	public long divisor = 1;
+	// Should these be decoupled from material nodes?
+	public FoldState state = FoldState.EXPANDED;
+	public ProgressState progress = ProgressState.UNSTARTED;
+	public long neededBatches = 0;
 
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();

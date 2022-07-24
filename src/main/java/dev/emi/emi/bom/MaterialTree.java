@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -17,6 +18,7 @@ public class MaterialTree {
 	public List<FlatMaterialCost> costs = Lists.newArrayList();
 	public Map<EmiStack, FlatMaterialCost> remainders = Maps.newHashMap();
 	public Map<EmiIngredient, EmiRecipe> resolutions = Maps.newHashMap();
+	public int batches = 1;
 
 	public MaterialTree(EmiRecipe recipe) {
 		EmiStack output = recipe.getOutputs().get(0);
@@ -27,7 +29,7 @@ public class MaterialTree {
 
 	public EmiRecipe getRecipe(EmiIngredient stack) {
 		EmiRecipe recipe = resolutions.get(stack);
-		if (recipe == null) {
+		if (recipe == null && !resolutions.containsKey(stack)) {
 			recipe = BoM.getRecipe(stack);
 		}
 		return recipe;
@@ -42,14 +44,23 @@ public class MaterialTree {
 		goal.recalculate(this);
 	}
 
+	public void calculateProgress(EmiPlayerInventory inventory) {
+		Map<EmiStack, FlatMaterialCost> remainders = Maps.newHashMap();
+		for (EmiStack stack : inventory.inventory.values()) {
+			stack = stack.copy();
+			remainders.put(stack, new FlatMaterialCost(stack, stack.getAmount()));
+		}
+		calculateFlatCost(Lists.newArrayList(), remainders, batches * goal.amount, goal, true);
+	}
+
 	public void calculateCost(boolean fractional) {
 		if (fractional) {
 			fractionalCosts.clear();
-			calculateFractionalCost(fractionalCosts, goal.amount, goal);
+			calculateFractionalCost(fractionalCosts, batches * goal.amount, goal);
 		} else {
 			costs.clear();
 			remainders.clear();
-			calculateFlatCost(costs, remainders, goal.amount, goal);
+			calculateFlatCost(costs, remainders, batches * goal.amount, goal, false);
 		}
 	}
 
@@ -95,26 +106,51 @@ public class MaterialTree {
 		return 0;
 	}
 
+	private void complete(MaterialNode node) {
+		node.progress = ProgressState.COMPLETED;
+		node.neededBatches = 0;
+		if (node.children != null) {
+			for (MaterialNode child : node.children) {
+				complete(child);
+			}
+		}
+	}
+
 	// TODO clean up the whole remainder thing, I feel like it's gonna break
-	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiStack, FlatMaterialCost> remainders, long amount, MaterialNode node) {
+	private void calculateFlatCost(List<FlatMaterialCost> costs, Map<EmiStack, FlatMaterialCost> remainders, long amount,
+			MaterialNode node, boolean progress) {
+		if (progress) {
+			node.progress = ProgressState.UNSTARTED;
+			node.neededBatches = 0;
+		}
 		EmiRecipe recipe = node.recipe;
 		if (recipe instanceof EmiResolutionRecipe) {
-			calculateFlatCost(costs, remainders, amount, node.children.get(0));
+			calculateFlatCost(costs, remainders, amount, node.children.get(0), progress);
 			return;
 		}
 		boolean catalyst = isCatalyst(node.ingredient);
 		if (catalyst) {
 			amount = node.amount;
 		}
+		long original = amount;
 		amount -= getRemainder(remainders, node.ingredient.getEmiStacks().get(0), amount, catalyst);
 		if (amount == 0) {
+			if (progress) {
+				complete(node);
+			}
 			return;
 		}
+		if (progress && amount != original) {
+			node.progress = ProgressState.PARTIAL;
+		}
 		
-		if (recipe != null && node.state != FoldState.COLLAPSED) {
+		if (recipe != null && node.state != FoldState.COLLAPSED && (!BoM.craftingMode || node.progress != ProgressState.COMPLETED)) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
+			if (progress) {
+				node.neededBatches = minBatches;
+			}
 			for (MaterialNode n : node.children) {
-				calculateFlatCost(costs, remainders, minBatches * n.amount, n);
+				calculateFlatCost(costs, remainders, minBatches * n.amount, n, progress);
 			}
 			long remainder = minBatches * node.divisor;
 			remainder -= amount;
