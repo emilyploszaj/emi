@@ -26,6 +26,7 @@ public class BoM {
 	public static Map<EmiStack, EmiRecipe> defaultRecipes = Maps.newHashMap();
 	public static Map<EmiStack, EmiRecipe> addedRecipes = Maps.newHashMap();
 	public static Set<EmiRecipe> disabledRecipes = Sets.newHashSet();
+	public static boolean craftingMode = false;
 
 	public static void setDefaults(List<RecipeDefault> defaults) {
 		BoM.defaults = defaults;
@@ -105,6 +106,7 @@ public class BoM {
 
 	public static void setGoal(EmiRecipe recipe) {
 		tree = new MaterialTree(recipe);
+		craftingMode = false;
 	}
 
 	public static void addResolution(EmiIngredient ingredient, EmiRecipe recipe) {

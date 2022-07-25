@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
@@ -26,6 +27,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.Comparison;
@@ -84,6 +86,7 @@ import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CampfireCookingRecipe;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
@@ -121,25 +124,25 @@ public class VanillaPlugin implements EmiPlugin {
 	@Override
 	public void register(EmiRegistry registry) {
 		CRAFTING = new EmiRecipeCategory(new Identifier("minecraft:crafting"),
-			EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240));
+			EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240), EmiRecipeSorting.compareOutputThenInput());
 		SMELTING = new EmiRecipeCategory(new Identifier("minecraft:smelting"),
-			EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240));
+			EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240), EmiRecipeSorting.compareOutputThenInput());
 		BLASTING = new EmiRecipeCategory(new Identifier("minecraft:blasting"),
-			EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240));
+			EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240), EmiRecipeSorting.compareOutputThenInput());
 		SMOKING = new EmiRecipeCategory(new Identifier("minecraft:smoking"),
-			EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240));
+			EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240), EmiRecipeSorting.compareOutputThenInput());
 		CAMPFIRE_COOKING = new EmiRecipeCategory(new Identifier("minecraft:campfire_cooking"),
-			EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240));
+			EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240), EmiRecipeSorting.compareOutputThenInput());
 		STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
-			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240));
+			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240), EmiRecipeSorting.compareInputThenOutput());
 		SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
-			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224));
+			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
 		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
-			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224));
+			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
 		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
-			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224));
+			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.compareOutputThenInput());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
-			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224));
+			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		registry.addCategory(CRAFTING);
 		registry.addCategory(SMELTING);
 		registry.addCategory(BLASTING);
@@ -221,76 +224,76 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.setDefaultComparison(Items.ENCHANTED_BOOK, compareNbt);
 
 		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CRAFTING)) {
-			if (recipe instanceof ShapedRecipe shaped) {
-				registry.addRecipe(new EmiShapedRecipe(shaped));
-			} else if (recipe instanceof ShapelessRecipe shapeless) {
-				registry.addRecipe(new EmiShapelessRecipe(shapeless));
+			if (recipe instanceof ShapedRecipe shaped && recipe.fits(3, 3)) {
+				addRecipeSafe(registry, () -> new EmiShapedRecipe(shaped), recipe);
+			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
+				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
 			} else if (recipe instanceof ArmorDyeRecipe dye) {
 				for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
-					registry.addRecipe(new EmiArmorDyeRecipe(i, null));
+					addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, null), recipe);
 				}
 			} else if (recipe instanceof SuspiciousStewRecipe stew) {
-				registry.addRecipe(new EmiSuspiciousStewRecipe(null));
+				addRecipeSafe(registry, () -> new EmiSuspiciousStewRecipe(null), recipe);
 			} else if (recipe instanceof ShulkerBoxColoringRecipe shulker) {
 				for (DyeColor dye : DyeColor.values()) {
 					DyeItem dyeItem = DyeItem.byColor(dye);
 					Identifier id = new Identifier("emi", "dye_shulker_box/" + EmiUtil.subId(dyeItem));
-					registry.addRecipe(new EmiCraftingRecipe(
+					addRecipeSafe(registry, () -> new EmiCraftingRecipe(
 						List.of(EmiStack.of(Items.SHULKER_BOX), EmiStack.of(dyeItem)),
-						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), id));
+						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), id), recipe);
 				}
 			} else if (recipe instanceof ShieldDecorationRecipe shield) {
-				registry.addRecipe(new EmiBannerShieldRecipe(shield.getId()));
+				addRecipeSafe(registry, () -> new EmiBannerShieldRecipe(shield.getId()), recipe);
 			} else if (recipe instanceof BookCloningRecipe book) {
-				registry.addRecipe(new EmiBookCloningRecipe(book.getId()));
+				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(book.getId()), recipe);
 			} else if (recipe instanceof TippedArrowRecipe tipped) {
 				Registry.POTION.streamEntries().forEach(entry -> {
 					if (entry.value() == Potions.EMPTY) {
 						return;
 					}
 					EmiStack arrow = EmiStack.of(Items.ARROW);
-					registry.addRecipe(new EmiCraftingRecipe(List.of(
+					addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
 							arrow, arrow, arrow, arrow,
 							EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.LINGERING_POTION), entry.value())),
 							arrow, arrow, arrow, arrow
 						),
 						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
 						new Identifier("emi", "tipped_arrow/" + EmiUtil.subId(Registry.POTION.getId(entry.value()))),
-						false));
+						false), recipe);
 				});
 			}
 		}
 
 		for (SmeltingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMELTING)) {
-			registry.addRecipe(new EmiCookingRecipe(recipe, SMELTING, 1, false));
+			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, SMELTING, 1, false), recipe);
 		}
 		for (BlastingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.BLASTING)) {
-			registry.addRecipe(new EmiCookingRecipe(recipe, BLASTING, 2, false));
+			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, BLASTING, 2, false), recipe);
 		}
 		for (SmokingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMOKING)) {
-			registry.addRecipe(new EmiCookingRecipe(recipe, SMOKING, 2, false));
+			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, SMOKING, 2, false), recipe);
 		}
 		for (CampfireCookingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CAMPFIRE_COOKING)) {
-			registry.addRecipe(new EmiCookingRecipe(recipe, CAMPFIRE_COOKING, 1, true));
+			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, CAMPFIRE_COOKING, 1, true), recipe);
 		}
 		for (SmithingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMITHING)) {
-			registry.addRecipe(new EmiSmithingRecipe(recipe));
+			addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
 		}
 		for (StonecuttingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.STONECUTTING)) {
-			registry.addRecipe(new EmiStonecuttingRecipe(recipe));
+			addRecipeSafe(registry, () -> new EmiStonecuttingRecipe(recipe), recipe);
 		}
 
 		for (Item i : Registry.ITEM) {
 			if (i.getMaxDamage() > 0) {
-				if (i instanceof ArmorItem ai) {
-					registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
-				} else if (i instanceof ToolItem ti) {
-					registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
+				if (i instanceof ArmorItem ai && !ai.getMaterial().getRepairIngredient().isEmpty()) {
+					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
+				} else if (i instanceof ToolItem ti && !ti.getMaterial().getRepairIngredient().isEmpty()) {
+					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
 				}
 			}
 		}
-		registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
-		registry.addRecipe(new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {
@@ -301,7 +304,7 @@ public class VanillaPlugin implements EmiPlugin {
 							+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 							+ "/" + EmiUtil.subId(Registry.POTION.getId(recipe.input))
 							+ "/" + EmiUtil.subId(Registry.POTION.getId(recipe.output)));
-						registry.addRecipe(new EmiBrewingRecipe(
+						addRecipeSafe(registry, () -> new EmiBrewingRecipe(
 							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
 							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output)), id));
 					}
@@ -322,7 +325,7 @@ public class VanillaPlugin implements EmiPlugin {
 					if (BrewingRecipeRegistry.isBrewable(potion)) {
 						Identifier id = new Identifier("emi", "brewing/item/"
 							+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
-						registry.addRecipe(new EmiBrewingRecipe(
+						addRecipeSafe(registry, () -> new EmiBrewingRecipe(
 							EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.input), potion)), EmiIngredient.of(recipe.ingredient),
 							EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.output), potion)), id));
 					}
@@ -330,43 +333,43 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		}
 
-		EmiStack water = EmiStack.of(Fluids.WATER);
-		addConcreteRecipe(registry, Blocks.WHITE_CONCRETE_POWDER, water, Blocks.WHITE_CONCRETE);
-		addConcreteRecipe(registry, Blocks.ORANGE_CONCRETE_POWDER, water, Blocks.ORANGE_CONCRETE);
-		addConcreteRecipe(registry, Blocks.MAGENTA_CONCRETE_POWDER, water, Blocks.MAGENTA_CONCRETE);
-		addConcreteRecipe(registry, Blocks.LIGHT_BLUE_CONCRETE_POWDER, water, Blocks.LIGHT_BLUE_CONCRETE);
-		addConcreteRecipe(registry, Blocks.YELLOW_CONCRETE_POWDER, water, Blocks.YELLOW_CONCRETE);
-		addConcreteRecipe(registry, Blocks.LIME_CONCRETE_POWDER, water, Blocks.LIME_CONCRETE);
-		addConcreteRecipe(registry, Blocks.PINK_CONCRETE_POWDER, water, Blocks.PINK_CONCRETE);
-		addConcreteRecipe(registry, Blocks.GRAY_CONCRETE_POWDER, water, Blocks.GRAY_CONCRETE);
-		addConcreteRecipe(registry, Blocks.LIGHT_GRAY_CONCRETE_POWDER, water, Blocks.LIGHT_GRAY_CONCRETE);
-		addConcreteRecipe(registry, Blocks.CYAN_CONCRETE_POWDER, water, Blocks.CYAN_CONCRETE);
-		addConcreteRecipe(registry, Blocks.PURPLE_CONCRETE_POWDER, water, Blocks.PURPLE_CONCRETE);
-		addConcreteRecipe(registry, Blocks.BLUE_CONCRETE_POWDER, water, Blocks.BLUE_CONCRETE);
-		addConcreteRecipe(registry, Blocks.BROWN_CONCRETE_POWDER, water, Blocks.BROWN_CONCRETE);
-		addConcreteRecipe(registry, Blocks.GREEN_CONCRETE_POWDER, water, Blocks.GREEN_CONCRETE);
-		addConcreteRecipe(registry, Blocks.RED_CONCRETE_POWDER, water, Blocks.RED_CONCRETE);
-		addConcreteRecipe(registry, Blocks.BLACK_CONCRETE_POWDER, water, Blocks.BLACK_CONCRETE);
+		EmiStack concreteWater = EmiStack.of(Fluids.WATER);
+		addConcreteRecipe(registry, Blocks.WHITE_CONCRETE_POWDER, concreteWater, Blocks.WHITE_CONCRETE);
+		addConcreteRecipe(registry, Blocks.ORANGE_CONCRETE_POWDER, concreteWater, Blocks.ORANGE_CONCRETE);
+		addConcreteRecipe(registry, Blocks.MAGENTA_CONCRETE_POWDER, concreteWater, Blocks.MAGENTA_CONCRETE);
+		addConcreteRecipe(registry, Blocks.LIGHT_BLUE_CONCRETE_POWDER, concreteWater, Blocks.LIGHT_BLUE_CONCRETE);
+		addConcreteRecipe(registry, Blocks.YELLOW_CONCRETE_POWDER, concreteWater, Blocks.YELLOW_CONCRETE);
+		addConcreteRecipe(registry, Blocks.LIME_CONCRETE_POWDER, concreteWater, Blocks.LIME_CONCRETE);
+		addConcreteRecipe(registry, Blocks.PINK_CONCRETE_POWDER, concreteWater, Blocks.PINK_CONCRETE);
+		addConcreteRecipe(registry, Blocks.GRAY_CONCRETE_POWDER, concreteWater, Blocks.GRAY_CONCRETE);
+		addConcreteRecipe(registry, Blocks.LIGHT_GRAY_CONCRETE_POWDER, concreteWater, Blocks.LIGHT_GRAY_CONCRETE);
+		addConcreteRecipe(registry, Blocks.CYAN_CONCRETE_POWDER, concreteWater, Blocks.CYAN_CONCRETE);
+		addConcreteRecipe(registry, Blocks.PURPLE_CONCRETE_POWDER, concreteWater, Blocks.PURPLE_CONCRETE);
+		addConcreteRecipe(registry, Blocks.BLUE_CONCRETE_POWDER, concreteWater, Blocks.BLUE_CONCRETE);
+		addConcreteRecipe(registry, Blocks.BROWN_CONCRETE_POWDER, concreteWater, Blocks.BROWN_CONCRETE);
+		addConcreteRecipe(registry, Blocks.GREEN_CONCRETE_POWDER, concreteWater, Blocks.GREEN_CONCRETE);
+		addConcreteRecipe(registry, Blocks.RED_CONCRETE_POWDER, concreteWater, Blocks.RED_CONCRETE);
+		addConcreteRecipe(registry, Blocks.BLACK_CONCRETE_POWDER, concreteWater, Blocks.BLACK_CONCRETE);
 
 		EmiIngredient axes = EmiStack.of(Items.IRON_AXE);
 		for (Map.Entry<Block, Block> entry : AxeItemAccessor.getStrippedBlocks().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		for (Map.Entry<Block, Block> entry : Oxidizable.OXIDATION_LEVEL_DECREASES.get().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		for (Map.Entry<Block, Block> entry : HoneycombItem.WAXED_TO_UNWAXED_BLOCKS.get().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), axes, EmiStack.of(entry.getValue()), id));
 		}
 		
 		EmiIngredient shears = EmiStack.of(Items.SHEARS);
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "shearing/minecraft/pumpkin"))
 			.leftInput(EmiStack.of(Items.PUMPKIN))
 			.rightInput(shears, true)
@@ -382,9 +385,9 @@ public class VanillaPlugin implements EmiPlugin {
 				Identifier id = new Identifier("emi", "tilling/" + EmiUtil.subId(b));
 				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer);
 				if (list.size() == 1) {
-					registry.addRecipe(basicWorld(EmiStack.of(b), hoes, list.get(0), id));
+					addRecipeSafe(registry, () -> basicWorld(EmiStack.of(b), hoes, list.get(0), id));
 				} else if (list.size() == 2) {
-					registry.addRecipe(EmiWorldInteractionRecipe.builder()
+					addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 						.id(id)
 						.leftInput(EmiStack.of(b))
 						.rightInput(hoes, true)
@@ -402,55 +405,57 @@ public class VanillaPlugin implements EmiPlugin {
 			Block result = entry.getValue().getBlock();
 			Identifier id = new Identifier("emi", "flattening/" + EmiUtil.subId(result)
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), shovels, EmiStack.of(result), id));
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), shovels, EmiStack.of(result), id));
 		}
 
 		EmiIngredient honeycomb = EmiStack.of(Items.HONEYCOMB);
 		for (Map.Entry<Block, Block> entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
 			Identifier id = new Identifier("emi", "waxing/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));
-			registry.addRecipe(basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
 		}
 
 		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
 			EmiStack cauldron = EmiStack.of(Items.CAULDRON);
 			EmiStack waterThird = EmiStack.of(FluidVariant.of(Fluids.WATER), 81_000 / 3);
-			registry.addRecipe(EmiWorldInteractionRecipe.builder()
+			int uniq = EmiUtil.RANDOM.nextInt();
+			addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
 					ItemStack stack = new ItemStack(i);
 					((DyeableItem) i).setColor(stack, r.nextInt(0xFFFFFF + 1));
 					return EmiStack.of(stack);
-				}, EmiUtil.RANDOM.nextInt(), s.getBounds().x(), s.getBounds().y()))
+				}, uniq, s.getBounds().x(), s.getBounds().y()))
 				.rightInput(cauldron, true)
 				.rightInput(waterThird, false)
 				.output(EmiStack.of(i))
+				.supportsRecipeTree(false)
 				.build());
 		}
 
-		water = EmiStack.of(Fluids.WATER, 81_000);
+		EmiStack water = EmiStack.of(Fluids.WATER, 81_000);
 		EmiStack lava = EmiStack.of(Fluids.LAVA, 81_000);
 		EmiStack waterCatalyst = water.copy().setRemainder(water);
 		EmiStack lavaCatalyst = lava.copy().setRemainder(lava);
 
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "emi/fluid_spring/water"))
 			.leftInput(waterCatalyst)
 			.rightInput(waterCatalyst, false)
 			.output(EmiStack.of(Fluids.WATER, 81_000))
 			.build());
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "emi/fluid_interaction/cobblestone"))
 			.leftInput(waterCatalyst)
 			.rightInput(lavaCatalyst, false)
 			.output(EmiStack.of(Items.COBBLESTONE))
 			.build());
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "emi/fluid_interaction/stone"))
 			.leftInput(waterCatalyst)
 			.rightInput(lavaCatalyst, false)
 			.output(EmiStack.of(Items.STONE))
 			.build());
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "emi/fluid_interaction/obsidian"))
 			.leftInput(lava)
 			.rightInput(waterCatalyst, false)
@@ -462,7 +467,7 @@ public class VanillaPlugin implements EmiPlugin {
 		EmiStack blueIce = EmiStack.of(Items.BLUE_ICE);
 		blueIce.setRemainder(blueIce);
 
-		registry.addRecipe(EmiWorldInteractionRecipe.builder()
+		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(new Identifier("emi", "emi/fluid_interaction/basalt"))
 			.leftInput(lavaCatalyst)
 			.rightInput(soulSoil, false, s -> s.appendTooltip(EmiPort
@@ -476,12 +481,12 @@ public class VanillaPlugin implements EmiPlugin {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
 			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR) {
-				registry.addRecipe(basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
+				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
 					new Identifier("emi", "fill_bucket/" + EmiUtil.subId(fluid)), false));
 			}
 		});
 
-		registry.addRecipe(basicWorld(EmiStack.of(Items.GLASS_BOTTLE), water,
+		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.GLASS_BOTTLE), water,
 			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			new Identifier("emi", "fill_water_bottle")));
 
@@ -492,7 +497,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 			RegistryEntryList.Named<Item> list = pair.getSecond();
 			if (list.size() > 1) {
-				registry.addRecipe(new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
+				addRecipeSafe(registry, () -> new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
 			}
 		});
 
@@ -500,8 +505,26 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
 				.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
 			EmiStack mud = EmiStack.of(Registry.ITEM.get(new Identifier("minecraft:mud")));
-			registry.addRecipe(basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud,
+			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud,
 				new Identifier("emi:emi/mud"), false));
+		}
+	}
+
+	private static void addRecipeSafe(EmiRegistry registry, Supplier<EmiRecipe> supplier) {
+		try {
+			registry.addRecipe(supplier.get());
+		} catch (Exception e) {
+			EmiLog.warn("Exception when parsing EMI recipe (no ID available)");
+			EmiLog.error(e);
+		}
+	}
+
+	private static void addRecipeSafe(EmiRegistry registry, Supplier<EmiRecipe> supplier, Recipe<?> recipe) {
+		try {
+			registry.addRecipe(supplier.get());
+		} catch (Exception e) {
+			EmiLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
+			EmiLog.error(e);
 		}
 	}
 
@@ -513,7 +536,7 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private void addConcreteRecipe(EmiRegistry registry, Block powder, EmiStack water, Block result) {
-		registry.addRecipe(basicWorld(EmiStack.of(powder), water, EmiStack.of(result),
+		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(powder), water, EmiStack.of(result),
 			new Identifier("emi", "concrete/" + EmiUtil.subId(result))));
 	}
 

@@ -1,22 +1,31 @@
 package dev.emi.emi;
 
+import java.util.AbstractList;
 import java.util.List;
+
+import org.apache.commons.compress.utils.Lists;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.compress.utils.Lists;
-
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
+import dev.emi.emi.bom.BoM;
+import dev.emi.emi.bom.MaterialNode;
+import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class EmiFavorites {
 	public static List<EmiFavorite> favorites = Lists.newArrayList();
+	public static List<EmiFavorite> syntheticFavorites = Lists.newArrayList();
+	public static List<EmiFavorite> favoriteSidebar = new CompoundList<>(favorites, syntheticFavorites);
 
 	public static JsonArray save() {
 		JsonArray arr = new JsonArray();
@@ -122,5 +131,75 @@ public class EmiFavorites {
 			}
 		}
 		EmiPersistentData.save();
+	}
+
+	public static void updateSynthetic(EmiPlayerInventory inv) {
+		syntheticFavorites.clear();
+		if (BoM.tree != null && BoM.craftingMode) {
+			BoM.tree.calculateProgress(inv);
+			Object2LongMap<EmiRecipe> batches = new Object2LongLinkedOpenHashMap<>();
+			countRecipes(batches, BoM.tree.goal);
+			boolean hasSomething = false;
+			for (Object2LongMap.Entry<EmiRecipe> entry : batches.object2LongEntrySet()) {
+				EmiRecipe recipe = entry.getKey();
+				long amount = entry.getLongValue();
+				if (amount == 0) {
+					continue;
+				}
+				hasSomething = true;
+				int state = 0;
+				if (inv.canCraft(recipe, amount)) {
+					state = 2;
+				} else if (inv.canCraft(recipe)) {
+					state = 1;
+				}
+				syntheticFavorites.add(new EmiFavorite.Synthetic(recipe, amount, state));
+			}
+			if (!hasSomething) {
+				BoM.craftingMode = false;
+			}
+		}
+	}
+
+	public static void countRecipes(Object2LongMap<EmiRecipe> batches, MaterialNode node) {
+		if (node.recipe instanceof EmiResolutionRecipe recipe) {
+			countRecipes(batches, node.children.get(0));
+			return;
+		}
+		// Include empty costs for proper sorting
+		if (node.recipe != null) {
+			long amount = node.neededBatches;
+			if (batches.containsKey(node.recipe)) {
+				// Remove?
+				amount += batches.getLong(node.recipe);
+				batches.removeLong(node.recipe);
+			}
+			batches.put(node.recipe, amount);
+			for (MaterialNode child : node.children) {
+				countRecipes(batches, child);
+			}
+		}
+	}
+
+	private static class CompoundList<T> extends AbstractList<T> {
+		private List<T> a, b;
+
+		public CompoundList(List<T> a, List<T> b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public T get(int index) {
+			if (index >= a.size()) {
+				return b.get(index - a.size());
+			}
+			return a.get(index);
+		}
+
+		@Override
+		public int size() {
+			return a.size() + b.size();
+		}
 	}
 }

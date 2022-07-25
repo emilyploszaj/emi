@@ -134,6 +134,10 @@ public class EmiPlayerInventory {
 	}
 
 	public boolean canCraft(EmiRecipe recipe) {
+		return canCraft(recipe, 1);
+	}
+
+	public boolean canCraft(EmiRecipe recipe, long amount) {
 		Object2LongMap<EmiStack> used = new Object2LongOpenHashMap<>();
 		outer:
 		for (EmiIngredient ingredient : recipe.getInputs()) {
@@ -141,7 +145,7 @@ public class EmiPlayerInventory {
 				continue;
 			}
 			for (EmiStack stack : ingredient.getEmiStacks()) {
-				long desired = stack.getAmount();
+				long desired = stack.getAmount() * amount;
 				if (inventory.containsKey(stack)) {
 					EmiStack identity = inventory.get(stack);
 					long alreadyUsed = used.getOrDefault(identity, 0);

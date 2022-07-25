@@ -22,11 +22,6 @@ public class ClientPlayNetworkHandlerMixin {
 	@Unique
 	private int infoMask = 0;
 
-	@Inject(at = @At("RETURN"), method = "<init>")
-	private void init(CallbackInfo info) {
-		EmiReloadManager.clear();
-	}
-
 	@Inject(at = @At("RETURN"), method = "onSynchronizeRecipes")
 	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
 		infoMask |= 1;

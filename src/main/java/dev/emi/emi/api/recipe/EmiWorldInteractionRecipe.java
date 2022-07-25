@@ -19,12 +19,13 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 	private final List<WorldIngredient> left, right, outputIngredients;
 	private final List<EmiIngredient> inputs, catalysts;
 	private final List<EmiStack> outputs;
+	private final boolean supportsRecipeTree;
 	private final int slotHeight;
 	private int width = 125, height;
 	private int totalSize, leftSize, rightSize, outputSize;
 	private int leftHeight, rightHeight, outputHeight;
 
-	private EmiWorldInteractionRecipe(Builder builder) {
+	protected EmiWorldInteractionRecipe(Builder builder) {
 		this.id = builder.id;
 		this.left = builder.left;
 		this.right = builder.right;
@@ -34,6 +35,7 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 			.filter(i -> i.catalyst).map(i -> i.stack).toList();
 		this.outputIngredients = builder.output;
 		this.outputs = builder.output.stream().map(i -> (EmiStack) i.stack).toList();
+		this.supportsRecipeTree = builder.supportsRecipeTree;
 		totalSize = left.size() + right.size() + outputs.size();
 		if (totalSize > 5) {
 			int[] portions = new int[] {
@@ -100,6 +102,11 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 	}
 
 	@Override
+	public boolean supportsRecipeTree() {
+		return this.supportsRecipeTree;
+	}
+
+	@Override
 	public int getDisplayWidth() {
 		return width;
 	}
@@ -144,6 +151,7 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 		private final List<WorldIngredient> left = Lists.newArrayList();
 		private final List<WorldIngredient> right = Lists.newArrayList();
 		private final List<WorldIngredient> output = Lists.newArrayList();
+		private boolean supportsRecipeTree = true;
 		private Identifier id = null;
 
 		private Builder() {
@@ -228,6 +236,11 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 		 */
 		public Builder output(EmiStack stack, Function<SlotWidget, SlotWidget> mutator) {
 			output.add(new WorldIngredient(stack, false, mutator));
+			return this;
+		}
+
+		public Builder supportsRecipeTree(boolean supportsRecipeTree) {
+			this.supportsRecipeTree = supportsRecipeTree;
 			return this;
 		}
 	}

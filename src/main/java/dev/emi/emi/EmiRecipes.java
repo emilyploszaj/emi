@@ -14,6 +14,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.util.Identifier;
@@ -45,6 +46,7 @@ public class EmiRecipes {
 	}
 
 	public static void bake() {
+		long start = System.currentTimeMillis();
 		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byInput = Maps.newHashMap();
 		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byOutput = Maps.newHashMap();
 		outer:
@@ -66,12 +68,21 @@ public class EmiRecipes {
 				}
 				byId.put(id, recipe);
 			}
-			getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
-				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
-			getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
-				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
-			getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
-				.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+		}
+		for (EmiRecipeCategory category : byCategory.keySet()) {
+			List<EmiRecipe> cRecipes = byCategory.get(category);
+			if (category.getSort() != EmiRecipeSorting.none()) {
+				cRecipes = cRecipes.stream().sorted(category.getSort()).collect(Collectors.toList());
+			}
+			byCategory.put(category, cRecipes);
+			for (EmiRecipe recipe : cRecipes) {
+				getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
+					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+				getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
+					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+				getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
+					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+			}
 		}
 		EmiRecipes.byInput = byInput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
 			return m.getValue().entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue().stream().toList()));
@@ -86,6 +97,7 @@ public class EmiRecipes {
 				}
 			}
 		}
+		System.out.println("[emi] Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	public static void addCategory(EmiRecipeCategory category) {

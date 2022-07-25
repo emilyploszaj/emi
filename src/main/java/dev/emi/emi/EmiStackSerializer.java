@@ -137,10 +137,12 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 	}
 
 	public static EmiIngredient deserialize(JsonObject object) {
-		String type = JsonHelper.getString(object, "type", "");
-		if (Identifier.isValid(type)) {
-			Identifier id = new Identifier(type);
-			return deserialize(id, object);
+		if (object != null) {
+			String type = JsonHelper.getString(object, "type", "");
+			if (Identifier.isValid(type)) {
+				Identifier id = new Identifier(type);
+				return deserialize(id, object);
+			}
 		}
 		return EmiStack.EMPTY;
 	}
