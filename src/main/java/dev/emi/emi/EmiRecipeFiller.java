@@ -111,6 +111,10 @@ public class EmiRecipeFiller {
 					if (biggest == null && !ingredient.isEmpty()) {
 						return null;
 					}
+					if (biggest != null) {
+						Slot slot = handler.getCraftingSlots(screenHandler).get(i);
+						biggest.max = Math.min(biggest.max, slot.getMaxItemCount());
+					}
 					discovered.add(biggest);
 				}
 				if (discovered.isEmpty()) {
@@ -135,7 +139,7 @@ public class EmiRecipeFiller {
 				for (DiscoveredItem ui : unique) {
 					if (!ui.catalyst()) {
 						maxAmount = Math.min(maxAmount, ui.amount / ui.consumed);
-						maxAmount = Math.min(maxAmount, ui.stack.getMaxCount());
+						maxAmount = Math.min(maxAmount, ui.max);
 					}
 				}
 				maxAmount = Math.min(maxAmount, amount);
@@ -170,12 +174,14 @@ public class EmiRecipeFiller {
 		public ItemStack stack;
 		public int consumed;
 		public int amount;
+		public int max;
 
 		public DiscoveredItem(EmiStack ingredient, ItemStack stack, int amount, int consumed) {
 			this.ingredient = ingredient;
 			this.stack = stack.copy();
 			this.amount = amount;
 			this.consumed = consumed;
+			max = stack.getMaxCount();
 		}
 
 		public boolean catalyst() {

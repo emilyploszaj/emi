@@ -63,6 +63,7 @@ public class BoMScreen extends Screen {
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
+	private double scrollAcc = 0;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.bom"));
@@ -333,7 +334,7 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (hover != null) {
-			if (button == 1 && hover.node != null) {
+			if (button == 1 && hover.node != null && hover.node.recipe != null && !(hover.node.recipe instanceof EmiResolutionRecipe)) {
 				if (hover.node.state == FoldState.EXPANDED) {
 					hover.node.state = FoldState.COLLAPSED;
 				} else {
@@ -371,6 +372,9 @@ public class BoMScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		scrollAcc += amount;
+		amount = scrollAcc;
+		scrollAcc %= 1;
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);

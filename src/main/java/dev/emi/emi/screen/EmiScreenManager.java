@@ -74,6 +74,7 @@ public class EmiScreenManager {
 	// Even if the recipe it was focusing becomes invalid
 	private static boolean lastHoveredCraftableSturdy = false;
 	private static int lastHoveredCraftableOffset = -1;
+	private static double scrollAcc = 0;
 
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);
 	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 64,
@@ -548,15 +549,18 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		scrollAcc += amount;
+		int sa = (int) scrollAcc;
+		scrollAcc %= 0;
 		if (isDisabled()) {
 			return false;
 		}
 		recalculate();
 		if (searchSpace.containsNotExcluded((int) mouseX, (int) mouseY)) {
-			scrollSearch((int) -amount);
+			scrollSearch(-sa);
 			return true;
 		} else if (favoriteSpace.containsNotExcluded((int) mouseX, (int) mouseY)) {
-			scrollFavorite((int) -amount);
+			scrollFavorite(-sa);
 			return true;
 		}
 		return false;

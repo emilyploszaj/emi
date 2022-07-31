@@ -33,7 +33,7 @@ dependencies {
 	// Run setup-platforms.sh to populate
 	modCompileOnly files("platform-1.18.2/build/libs/include.jar")
 	// Uncomment for dev
-	//modRuntimeOnly files("platform-1.18.2/build/libs/include.jar")
+	modLocalRuntime files("platform-1.18.2/build/libs/include.jar")
 }
 
 processResources {

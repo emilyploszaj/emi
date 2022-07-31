@@ -334,6 +334,7 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 
 		EmiStack concreteWater = EmiStack.of(Fluids.WATER);
+		concreteWater.setRemainder(concreteWater);
 		addConcreteRecipe(registry, Blocks.WHITE_CONCRETE_POWDER, concreteWater, Blocks.WHITE_CONCRETE);
 		addConcreteRecipe(registry, Blocks.ORANGE_CONCRETE_POWDER, concreteWater, Blocks.ORANGE_CONCRETE);
 		addConcreteRecipe(registry, Blocks.MAGENTA_CONCRETE_POWDER, concreteWater, Blocks.MAGENTA_CONCRETE);
@@ -351,7 +352,9 @@ public class VanillaPlugin implements EmiPlugin {
 		addConcreteRecipe(registry, Blocks.RED_CONCRETE_POWDER, concreteWater, Blocks.RED_CONCRETE);
 		addConcreteRecipe(registry, Blocks.BLACK_CONCRETE_POWDER, concreteWater, Blocks.BLACK_CONCRETE);
 
-		EmiIngredient axes = EmiStack.of(Items.IRON_AXE);
+		ItemStack damaged = new ItemStack(Items.IRON_AXE);
+		damaged.setDamage(1);
+		EmiIngredient axes = EmiStack.of(Items.IRON_AXE).setRemainder(EmiStack.of(damaged));
 		for (Map.Entry<Block, Block> entry : AxeItemAccessor.getStrippedBlocks().entrySet()) {
 			Identifier id = new Identifier("emi", "stripping/" + EmiUtil.subId(entry.getValue())
 				+ "/from/" + EmiUtil.subId(entry.getKey()));

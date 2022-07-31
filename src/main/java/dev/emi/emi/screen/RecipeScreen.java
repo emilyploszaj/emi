@@ -56,6 +56,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	private int tabOff = 0;
 	private Widget hoveredWidget = null;
 	private ResolutionButtonWidget resolutionButton;
+	private double scrollAcc = 0;
 	int backgroundWidth = 176;
 	int backgroundHeight = 200;
 	int x = (this.width - backgroundWidth) / 2;
@@ -434,10 +435,13 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (EmiScreenManager.mouseScrolled(mouseX, mouseY, amount)) {
 			return true;
 		} else if (mouseX > x && mouseX < x + backgroundWidth && mouseY < x + backgroundHeight) {
+			scrollAcc += amount;
+			int sa = (int) scrollAcc;
+			scrollAcc %= 1;
 			if (EmiUtil.isShiftDown()) {
-				setPage(tabPage, (int) (tab - amount), 0);
+				setPage(tabPage, tab - sa, 0);
 			} else {
-				setPage(tabPage, tab, (int) (page - amount));
+				setPage(tabPage, tab, page - sa);
 			}
 		}
 		return super.mouseScrolled(mouseX, mouseY, amount);

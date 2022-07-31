@@ -39,7 +39,7 @@ public class EmiStackList {
 			}
 			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
 			item.appendStacks(ItemGroup.SEARCH, itemStacks);
-			stacks.addAll(itemStacks.stream().map(EmiStack::of).collect(Collectors.toList()));
+			stacks.addAll(itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).collect(Collectors.toList()));
 			if (itemStacks.isEmpty()) {
 				stacks.add(EmiStack.of(item));
 			}

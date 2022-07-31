@@ -76,7 +76,13 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 	
 	public static EmiIngredient of(TagKey<Item> key, long amount) {
-		return new TagEmiIngredient(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
+		List<EmiStack> stacks = EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList();
+		if (stacks.isEmpty()) {
+			return EmiStack.EMPTY;
+		} else if (stacks.size() == 1) {
+			return stacks.get(0);
+		}
+		return new TagEmiIngredient(key, stacks, amount);
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {

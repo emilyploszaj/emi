@@ -106,7 +106,7 @@ public class EmiMain implements ModInitializer {
 									return;
 								} else {
 									Slot s = crafting.get(i);
-									if (s.canInsert(stack)) {
+									if (s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount()) {
 										s.setStack(stack);
 									} else {
 										player.getInventory().offerOrDrop(stack);

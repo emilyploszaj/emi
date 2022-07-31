@@ -102,7 +102,7 @@ public class EmiApi {
 	
 	public static void displayRecipes(EmiIngredient stack) {
 		if (stack instanceof TagEmiIngredient tag) {
-			for (EmiRecipe recipe : EmiRecipes.byCategory.get(VanillaPlugin.TAG)) {
+			for (EmiRecipe recipe : EmiRecipes.byCategory.getOrDefault(VanillaPlugin.TAG, List.of())) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
 					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)));
 					break;
