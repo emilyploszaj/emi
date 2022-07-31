@@ -51,6 +51,9 @@ import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
 import dev.emi.emi.recipe.special.EmiBannerShieldRecipe;
 import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
+import dev.emi.emi.recipe.special.EmiFireworkRocketRecipe;
+import dev.emi.emi.recipe.special.EmiFireworkStarFadeRecipe;
+import dev.emi.emi.recipe.special.EmiFireworkStarRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -85,6 +88,9 @@ import net.minecraft.recipe.BookCloningRecipe;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CampfireCookingRecipe;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.FireworkRocketRecipe;
+import net.minecraft.recipe.FireworkStarFadeRecipe;
+import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
@@ -261,6 +267,12 @@ public class VanillaPlugin implements EmiPlugin {
 						new Identifier("emi", "tipped_arrow/" + EmiUtil.subId(Registry.POTION.getId(entry.value()))),
 						false), recipe);
 				});
+			} else if (recipe instanceof FireworkStarRecipe star) {
+				addRecipeSafe(registry, () -> new EmiFireworkStarRecipe(star.getId()), recipe);
+			} else if (recipe instanceof FireworkStarFadeRecipe star) {
+				addRecipeSafe(registry, () -> new EmiFireworkStarFadeRecipe(star.getId()), recipe);
+			} else if (recipe instanceof FireworkRocketRecipe rocket) {
+				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(rocket.getId()), recipe);
 			}
 		}
 
