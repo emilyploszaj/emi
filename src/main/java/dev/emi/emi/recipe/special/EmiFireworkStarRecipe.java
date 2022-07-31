@@ -23,9 +23,9 @@ import java.util.stream.Stream;
 public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
     private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(DyeItem::byColor).toList();
 
-    private static final List<Item> SHAPES = Stream.of(Items.FIRE_CHARGE, Items.FEATHER, Items.GOLD_NUGGET, Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, Items.CREEPER_HEAD, Items.PLAYER_HEAD, Items.DRAGON_HEAD, Items.ZOMBIE_HEAD).toList();
+    private static final List<Item> SHAPES = List.of(Items.FIRE_CHARGE, Items.FEATHER, Items.GOLD_NUGGET, Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, Items.CREEPER_HEAD, Items.PLAYER_HEAD, Items.DRAGON_HEAD, Items.ZOMBIE_HEAD);
 
-    private static final List<Item> EFFECTS = Stream.of(Items.DIAMOND, Items.GLOWSTONE_DUST).toList();
+    private static final List<Item> EFFECTS = List.of(Items.DIAMOND, Items.GLOWSTONE_DUST);
 
     public EmiFireworkStarRecipe(Identifier id) {
         super(List.of(

@@ -59,7 +59,7 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
         List<EmiStack> items = getItems(random);
         int gunpowder = 0;
         for (EmiStack item : items) {
-            if (item.getId() == Items.FIREWORK_STAR.emi().getId()){
+            if (item.getId() == EmiStack.of(Items.FIREWORK_STAR).getId()){
                 explosions.add(item.getNbt().get("Explosion"));
             } else if (item.isEqual(EmiStack.of(Items.GUNPOWDER))) {
                 gunpowder++;
@@ -80,7 +80,7 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
         List<EmiStack> items = Lists.newArrayList();
         int amount = random.nextInt(3);
         for(int i= 0; i<= amount; i++) {
-            items.add(Items.GUNPOWDER.emi());
+            items.add(EmiStack.of(Items.GUNPOWDER));
         }
         amount = random.nextInt(8-items.size());
         for(int i= 0; i<= amount; i++) {
@@ -126,21 +126,19 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
             items = items + 2;
         }
 
-        {
-            List<DyeItem> dyeItems = getDyes(random, 8 - items);
-            List<Integer> colors = Lists.newArrayList();
-            for (DyeItem dyeItem : dyeItems) {
-                colors.add(dyeItem.getColor().getFireworkColor());
-            }
-            explosion.putIntArray("Colors", colors);
+        List<DyeItem> dyeItems = getDyes(random, 8 - items);
+        List<Integer> colors = Lists.newArrayList();
+        for (DyeItem dyeItem : dyeItems) {
+            colors.add(dyeItem.getColor().getFireworkColor());
         }
+        explosion.putIntArray("Colors", colors);
 
         amount = random.nextInt(2);
 
         if (amount == 1) {
-            List<DyeItem> dyeItems = getDyes(random, 8);
+            List<DyeItem> dyeItemsFaded = getDyes(random, 8);
             List<Integer> fadedColors = Lists.newArrayList();
-            for (DyeItem dyeItem : dyeItems) {
+            for (DyeItem dyeItem : dyeItemsFaded) {
                 fadedColors.add(dyeItem.getColor().getFireworkColor());
             }
             explosion.putIntArray("FadeColors", fadedColors);

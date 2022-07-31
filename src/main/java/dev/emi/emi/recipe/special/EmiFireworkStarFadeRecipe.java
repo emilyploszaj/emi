@@ -84,19 +84,16 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 			items = items + 2;
 		}
 
-		{
-			List<DyeItem> dyeItems = getDyes(random, 8 - items);
-			List<Integer> colors = Lists.newArrayList();
-			for (DyeItem dyeItem : dyeItems) {
-				colors.add(dyeItem.getColor().getFireworkColor());
-			}
-			explosion.putIntArray("Colors", colors);
+		List<DyeItem> dyeItems = getDyes(random, 8 - items);
+		List<Integer> colors = Lists.newArrayList();
+		for (DyeItem dyeItem : dyeItems) {
+			colors.add(dyeItem.getColor().getFireworkColor());
 		}
 
 		if (faded) {
-			List<DyeItem> dyeItems = getDyes(random, 8);
+			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
 			List<Integer> fadedColors = Lists.newArrayList();
-			for (DyeItem dyeItem : dyeItems) {
+			for (DyeItem dyeItem : dyeItemsFaded) {
 				fadedColors.add(dyeItem.getColor().getFireworkColor());
 			}
 			explosion.putIntArray("FadeColors", fadedColors);
