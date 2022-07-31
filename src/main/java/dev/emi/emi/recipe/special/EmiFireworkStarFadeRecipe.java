@@ -89,6 +89,7 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 		for (DyeItem dyeItem : dyeItems) {
 			colors.add(dyeItem.getColor().getFireworkColor());
 		}
+		explosion.putIntArray("Colors", colors);
 
 		if (faded) {
 			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
