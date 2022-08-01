@@ -32,7 +32,7 @@ public class EmiBannerDuplicateRecipe extends EmiPatternCraftingRecipe {
     public EmiBannerDuplicateRecipe(Item banner, Identifier id) {
         super(List.of(
                 EmiStack.of(banner),
-                EmiStack.of(banner)),
+                EmiStack.of(banner).setRemainder(EmiStack.of(banner))),
                 EmiStack.of(banner), id);
         this.banner = banner;
     }
@@ -42,17 +42,17 @@ public class EmiBannerDuplicateRecipe extends EmiPatternCraftingRecipe {
         if (slot == 0) {
             return new SlotWidget(EmiStack.of(banner), x, y);
         } else if (slot == 1) {
-            return new GeneratedSlotWidget(this::getPattern, unique, x, y);
+            return new GeneratedSlotWidget(r -> getPattern(r, true), unique, x, y);
         }
         return new SlotWidget(EmiStack.EMPTY, x, y);
     }
 
     @Override
     public SlotWidget getOutputWidget(int x, int y) {
-        return new GeneratedSlotWidget(this::getPattern, unique, x, y);
+        return new GeneratedSlotWidget(r -> getPattern(r, false) , unique, x, y);
     }
 
-    public EmiStack getPattern(Random random) {
+    public EmiStack getPattern(Random random, boolean reminder) {
         ItemStack stack = new ItemStack(banner);
         int patterns = 1 + Math.max(random.nextInt(5), random.nextInt(3));
         BannerPattern.Patterns pattern = new BannerPattern.Patterns();
@@ -65,6 +65,10 @@ public class EmiBannerDuplicateRecipe extends EmiPatternCraftingRecipe {
 
         BlockItem.setBlockEntityNbt(stack, BlockEntityType.BANNER, tag);
         //stack.setNbt(tag);
-        return EmiStack.of(stack);
+        EmiStack emiStack = EmiStack.of(stack);
+        if (reminder) {
+            emiStack.setRemainder(EmiStack.of(stack));
+        }
+        return emiStack;
     }
 }
