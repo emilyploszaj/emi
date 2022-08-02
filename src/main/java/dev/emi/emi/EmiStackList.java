@@ -47,7 +47,8 @@ public class EmiStackList {
 		for (int i = 0; i < Registry.FLUID.size(); i++) {
 			Fluid fluid = Registry.FLUID.get(i);
 			if (fluid.isStill(fluid.getDefaultState())) {
-				EmiStack fs = new FluidEmiStack(FluidVariant.of(fluid));
+				FluidVariant variant = FluidVariant.of(fluid);
+				EmiStack fs = new FluidEmiStack(variant);
 				try {
 					fs.getName();
 					fs.getTooltip();

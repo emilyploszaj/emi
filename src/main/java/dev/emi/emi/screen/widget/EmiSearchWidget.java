@@ -27,6 +27,8 @@ public class EmiSearchWidget extends TextFieldWidget {
 	private long lastClick = 0;
 	private String last = "";
 	public boolean highlight = false;
+	// Reimplement focus because other mods keep breaking it
+	public boolean isFocused;
 
 	public EmiSearchWidget(TextRenderer textRenderer, int x, int y, int width, int height) {
 		super(textRenderer, x, y, width, height, EmiPort.literal(""));
@@ -137,27 +139,37 @@ public class EmiSearchWidget extends TextFieldWidget {
 	}
 
 	@Override
-	public void setTextFieldFocused(boolean focused) {
-		super.setTextFieldFocused(focused);
+	protected void setFocused(boolean focused) {
+		isFocused = focused;
+	}
+
+	@Override
+	public boolean isFocused() {
+		return isFocused;
 	}
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
-		if (this.isFocused()) {
-			if (button == 0) {
-				if (System.currentTimeMillis() - lastClick < 500) {
-					highlight = !highlight;
-					lastClick = 0;
-				} else {
-					lastClick = System.currentTimeMillis();
+		if (!isMouseOver(mouseX, mouseY)) {
+			setFocused(false);
+			return false;
+		} else {
+			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
+			if (this.isFocused()) {
+				if (button == 0) {
+					if (System.currentTimeMillis() - lastClick < 500) {
+						highlight = !highlight;
+						lastClick = 0;
+					} else {
+						lastClick = System.currentTimeMillis();
+					}
+				} else if (button == 1) {
+					this.setText("");
+					this.setTextFieldFocused(true);
 				}
-			} else if (button == 1) {
-				this.setText("");
-				this.setTextFieldFocused(true);
 			}
+			return b;
 		}
-		return b;
 	}
 
 	@Override

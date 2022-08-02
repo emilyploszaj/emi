@@ -77,10 +77,11 @@ public class FluidEmiStack extends EmiStack {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		if ((flags & RENDER_ICON) != 0) {
-			Sprite sprite = FluidVariantRendering.getSprite(fluid);
-			if (sprite == null) {
+			Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
+			if (sprites == null || sprites.length < 1 || sprites[0] == null) {
 				return;
 			}
+			Sprite sprite = sprites[0];
 			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
