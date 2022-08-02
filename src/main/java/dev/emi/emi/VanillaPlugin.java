@@ -49,11 +49,14 @@ import dev.emi.emi.recipe.EmiSmithingRecipe;
 import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
+import dev.emi.emi.recipe.special.EmiBannerDuplicateRecipe;
 import dev.emi.emi.recipe.special.EmiBannerShieldRecipe;
 import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkRocketRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarFadeRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarRecipe;
+import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
+import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -83,6 +86,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.ArmorDyeRecipe;
+import net.minecraft.recipe.BannerDuplicateRecipe;
 import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.BookCloningRecipe;
 import net.minecraft.recipe.BrewingRecipeRegistry;
@@ -92,8 +96,11 @@ import net.minecraft.recipe.FireworkRocketRecipe;
 import net.minecraft.recipe.FireworkStarFadeRecipe;
 import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.MapCloningRecipe;
+import net.minecraft.recipe.MapExtendingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.RepairItemRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.ShieldDecorationRecipe;
@@ -230,7 +237,16 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.setDefaultComparison(Items.ENCHANTED_BOOK, compareNbt);
 
 		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CRAFTING)) {
-			if (recipe instanceof ShapedRecipe shaped && recipe.fits(3, 3)) {
+			if (recipe instanceof MapExtendingRecipe map) {
+				EmiStack paper = EmiStack.of(Items.PAPER);
+				addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
+						paper, paper, paper, paper,
+						EmiStack.of(Items.FILLED_MAP),
+						paper, paper, paper, paper
+				), 
+						EmiStack.of(Items.FILLED_MAP),
+						map.getId(), false), recipe);
+			} else if (recipe instanceof ShapedRecipe shaped && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapedRecipe(shaped), recipe);
 			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
@@ -273,6 +289,16 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiFireworkStarFadeRecipe(star.getId()), recipe);
 			} else if (recipe instanceof FireworkRocketRecipe rocket) {
 				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(rocket.getId()), recipe);
+			} else if (recipe instanceof BannerDuplicateRecipe banner) {
+				for (Item i : EmiBannerDuplicateRecipe.BANNERS) {
+					addRecipeSafe(registry, () -> new EmiBannerDuplicateRecipe(i, null), recipe);
+				}
+			} else if (recipe instanceof RepairItemRecipe tool) {
+				for (Item i : EmiRepairItemRecipe.TOOLS) {
+					addRecipeSafe(registry, () -> new EmiRepairItemRecipe(i, null), recipe);
+				}
+			} else if (recipe instanceof MapCloningRecipe map) {
+				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
 			}
 		}
 

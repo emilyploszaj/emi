@@ -33,12 +33,7 @@ public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
 
 	@SuppressWarnings("unchecked")
 	public EmiBannerShieldRecipe(Identifier id) {
-		super((List<EmiIngredient>) (List<?>) Stream.concat(Stream.of(SHIELD), EMI_BANNERS.stream()).toList(), EmiStack.EMPTY, id);
-	}
-
-	@Override
-	public List<EmiStack> getOutputs() {
-		return EMI_BANNERS;
+		super((List<EmiIngredient>) (List<?>) Stream.concat(Stream.of(SHIELD), EMI_BANNERS.stream()).toList(), EmiStack.of(Items.SHIELD), id);
 	}
 
 	@Override
