@@ -551,7 +551,7 @@ public class EmiScreenManager {
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		scrollAcc += amount;
 		int sa = (int) scrollAcc;
-		scrollAcc %= 0;
+		scrollAcc %= 1;
 		if (isDisabled()) {
 			return false;
 		}
