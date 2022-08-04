@@ -11,8 +11,8 @@
   "config.emi.general.enabled": " Afficher EMI",
   "config.emi.tooltip.general.enabled": "Permet de cacher EMI\n§cAttention: N'oubliez pas le raccourci§r\n§cclavier pour re-afficher EMI§r\n( normalement c'est §6CTRL+o§r )",
 
-  "config.emi.general.cheat_mode": " Mode créatif",
-  "config.emi.tooltip.general.cheat_mode": "Permet de tricher",
+  "config.emi.general.cheat_mode": " Mode triche",
+  "config.emi.tooltip.general.cheat_mode": "Un peu comme le mode créatif",
 
   "config.emi.ui.move_effects": " Effets de potions",
   "config.emi.tooltip.ui.move_effects": "Change la position de\nla liste des effets de potions\n(à gauche, ou à droite)",
@@ -26,8 +26,8 @@
   "config.emi.ui.append_item_mod_id": " Noms des mods",
   "config.emi.tooltip.ui.append_item_mod_id": "Ajoute sous chaque objet\nle nom du mod d'où il est issu",
 
-  "config.emi.ui.empty_search_craftable": " TODO - Show Craftable With Empty Search",
-  "config.emi.tooltip.ui.empty_search_craftable": "TODO",
+  "config.emi.ui.empty_search_craftable": " Barre de recherche vide",
+  "config.emi.tooltip.ui.empty_search_craftable": "Si la barre de recherche\nest vide alors seulement\nles recettes possibles\nseront affichées",
 
   "config.emi.ui.max_favorite_columns": " Nombre de colonnes (gauche)",
   "config.emi.tooltip.ui.max_favorite_columns": "Nombre maximal de colonnes\npour les favoris",
@@ -39,7 +39,7 @@
   "config.emi.tooltip.ui.vertical_margin": "La quantité d'espace vide\nen haut et en bas de EMI",
 
   "config.emi.ui.miscraft_prevention": " Protection contre les accidents",
-  "config.emi.tooltip.ui.miscraft_prevention": "Vous empêche de faire des\ncatastrophes, comme fabriquer\nplus d'objets que nécessaires",
+  "config.emi.tooltip.ui.miscraft_prevention": "En théorie:\nVous empêche de faire des\ncatastrophes, comme fabriquer\nplus d'objets que nécessaires",
 
   "config.emi.ui.fluid_unit": " Unités (fluides)",
   "config.emi.tooltip.ui.fluid_unit": "L'unité pour mesurer le volume des fluides",
@@ -47,14 +47,14 @@
   "config.emi.ui.show_cost_per_batch": " TODO - Show Cost Per Batch",
   "config.emi.tooltip.ui.show_cost_per_batch": "TODO",
 
-  "config.emi.ui.recipe_default_button": " TODO - Recipe Default Button",
-  "config.emi.tooltip.ui.recipe_default_button": "TODO",
+  "config.emi.ui.recipe_default_button": " Afficher le bouton (défaut)",
+  "config.emi.tooltip.ui.recipe_default_button": "Permet de masquer le bouton\n\"Définir par défaut\"",
 
-  "config.emi.ui.recipe_tree_button": " TODO - Recipe Tree Button",
-  "config.emi.tooltip.ui.recipe_tree_button": "TODO",
+  "config.emi.ui.recipe_tree_button": " Afficher le bouton (graph)",
+  "config.emi.tooltip.ui.recipe_tree_button": "Permet de masquer le bouton\n\"Voir graph\"",
 
-  "config.emi.ui.recipe_fill_button": " TODO - Recipe Fill Button",
-  "config.emi.tooltip.ui.recipe_fill_button": "TODO",
+  "config.emi.ui.recipe_fill_button": " Afficher le bouton (utiliser)",
+  "config.emi.tooltip.ui.recipe_fill_button": "Permet de masquer le bouton\n\"Utiliser les ingrédients\"",
 
   "config.emi.ui.use_batched_renderer": " TODO - Use Batched Renderer",
   "config.emi.tooltip.ui.use_batched_renderer": "TODO",
@@ -87,39 +87,38 @@
   "key.emi.back": " Retour",
   "config.emi.tooltip.binds.back": "Permet de retourner une page en arrière",
 
-  "key.emi.toggle_craftable": "TODO - Toggle Craftable",
-  "config.emi.tooltip.binds.toggle_craftable": "TODO",
+  "key.emi.toggle_craftable": " Affichage primaire",
+  "config.emi.tooltip.binds.toggle_craftable": "Permet de tout afficher\nou uniquement les recettes possibles",
 
-  "key.emi.toggle_local_craftable": "TODO - Toggle Local Craftable",
-  "config.emi.tooltip.binds.toggle_local_craftable": "TODO",
+  "key.emi.toggle_local_craftable": " Affichage secondaire",
+  "config.emi.tooltip.binds.toggle_local_craftable": "Permet de ne rien filtrer\nou de filtrer selon le contexte",
 
-  "key.emi.craft_one": "TODO - Craft One",
-  "config.emi.tooltip.binds.craft_one": "TODO",
+  "key.emi.craft_one": " Fabriquer 1",
+  "config.emi.tooltip.binds.craft_one": "Place les ingrédients\npour fabriquer un objet",
 
-  "key.emi.craft_all": "TODO - Craft All",
-  "config.emi.tooltip.binds.craft_all": "TODO",
+  "key.emi.craft_all": " Fabriquer tout",
+  "config.emi.tooltip.binds.craft_all": "Place les ingrédients\npour fabriquer tout les objets",
 
-  "key.emi.craft_one_to_inventory": "TODO - Craft One to Inventory",
-  "config.emi.tooltip.binds.craft_one_to_inventory": "TODO",
+  "key.emi.craft_one_to_inventory": " Fabriquer 1 (inventaire)",
+  "config.emi.tooltip.binds.craft_one_to_inventory": "Fabrique un objet",
 
-  "key.emi.craft_all_to_inventory": "TODO - Craft All to Inventory",
-  "config.emi.tooltip.binds.craft_all_to_inventory": "TODO",
+  "key.emi.craft_all_to_inventory": " Fabriquer tout (inventaire)",
+  "config.emi.tooltip.binds.craft_all_to_inventory": "fabrique tout les objets",
 
-  "key.emi.craft_one_to_cursor": "TODO - Craft One to Cursor",
-  "config.emi.tooltip.binds.craft_one_to_cursor": "TODO",
+  "key.emi.craft_one_to_cursor": " Fabriquer 1 (curseur)",
+  "config.emi.tooltip.binds.craft_one_to_cursor": "Fabrique un objet\nle place dans votre curseur",
 
-  "key.emi.cheat_one_to_inventory": "TODO - Cheat One to Inventory",
-  "config.emi.tooltip.binds.cheat_one_to_inventory": "TODO",
+  "key.emi.cheat_one_to_inventory": "Tricher 1 (inventaire)",
+  "config.emi.tooltip.binds.cheat_one_to_inventory": "Crée un objet",
 
-  "key.emi.cheat_stack_to_inventory": "TODO - Cheat Stack to Inventory",
-  "config.emi.tooltip.binds.cheat_stack_to_inventory": "TODO",
+  "key.emi.cheat_stack_to_inventory": "Tricher 64 (inventaire)",
+  "config.emi.tooltip.binds.cheat_stack_to_inventory": "Crée un stack de cet objet",
 
-  "key.emi.cheat_one_to_cursor": "TODO - Cheat One to Cursor",
-  "config.emi.tooltip.binds.cheat_one_to_cursor": "TODO",
+  "key.emi.cheat_one_to_cursor": "Tricher 1 (curseur)",
+  "config.emi.tooltip.binds.cheat_one_to_cursor": "Crée un objet\nle place dans votre curseur",
 
-  "key.emi.cheat_stack_to_cursor": "TODO - Cheat Stack to Cursor",
-  "config.emi.tooltip.binds.cheat_stack_to_cursor": "TODO",
-
+  "key.emi.cheat_stack_to_cursor": "Tricher 64 (curseur)",
+  "config.emi.tooltip.binds.cheat_stack_to_cursor": "Crée un stack de cet objet\nle place dans votre curseur",
 
   "config.emi.dev.dev_mode": " Mode développeur",
   "config.emi.tooltip.dev.dev_mode": "Vous n'en n'aurez pas besoin\nmais vous pouvez l'utiliser si vous voulez",
@@ -142,7 +141,7 @@
 
   "emi.inapplicable": "Contexte §cinadapté§r",
   "emi.not_enough_ingredients": "Pas assez d'ingrédients",
-  "emi.too_small": "TODO - Crafting grid too small to fit ingredients",
+  "emi.too_small": "Grille trop petite",
   "emi.resolve": "Choisir cette variante",
   "emi.page": "Page %s sur %s",
   "emi.page.short": "%s/%s",
@@ -485,7 +484,7 @@
   "tag.c.eggs": "Oeufs",
 
   "tag.c.empty_buckets": "Seaux vides",
-  "tag.c.enchanting_fuels": "TODO",
+  "tag.c.enchanting_fuels": "Carburant d'enchantement",
   "tag.c.end_stones": "Pierres de l'End",
   "tag.c.feathers": "Plumes",
   "tag.c.fences.nether_brick": "Barrières en briques du Nether",
