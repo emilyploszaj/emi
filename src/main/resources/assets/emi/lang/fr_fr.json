@@ -3,30 +3,6 @@
   "key.keyboard.alt": "Alt",
   "key.keyboard.shift": "Shift",
 
-  "key.emi.toggle_visibility": "Changer la visibilité",
-  "key.emi.focus_search": "Barre de recherche",
-  "key.emi.view_recipes": "Voir recettes",
-  "key.emi.view_uses": "Voir usages",
-  "key.emi.favorite": "Favori",
-  "key.emi.set_default": "Par défaut",
-  "key.emi.view_stack_tree": "Voir ce graph",
-  "key.emi.view_tree": "Voir le graph actuel",
-  "key.emi.back": "Retour",
-
-  "key.emi.toggle_craftable": "Toggle Craftable",
-  "key.emi.toggle_local_craftable": "TODO - Toggle Local Craftable",
-
-  "key.emi.craft_one": "TODO - Craft One",
-  "key.emi.craft_all": "TODO - Craft All",
-  "key.emi.craft_one_to_inventory": "TODO - Craft One to Inventory",
-  "key.emi.craft_all_to_inventory": "TODO - Craft All to Inventory",
-  "key.emi.craft_one_to_cursor": "TODO - Craft One to Cursor",
-
-  "key.emi.cheat_one_to_inventory": "TODO - Cheat One to Inventory",
-  "key.emi.cheat_stack_to_inventory": "TODO - Cheat Stack to Inventory",
-  "key.emi.cheat_one_to_cursor": "TODO - Cheat One to Cursor",
-  "key.emi.cheat_stack_to_cursor": "TODO - Cheat Stack to Cursor",
-
   "config.emi.group.general": "Général",
   "config.emi.group.ui": "Interface",
   "config.emi.group.binds": "Raccourcis",
@@ -39,52 +15,114 @@
   "config.emi.tooltip.general.cheat_mode": "Permet de tricher",
 
   "config.emi.ui.move_effects": " Effets de potions",
-  "config.emi.tooltip.ui.move_effects": "Change la position de la liste des effets de potions\n(à gauche, ou à droite)",
+  "config.emi.tooltip.ui.move_effects": "Change la position de\nla liste des effets de potions\n(à gauche, ou à droite)",
 
   "config.emi.ui.center_search_bar": " Barre de recherche",
-  "config.emi.tooltip.ui.center_search_bar": "Change la position de la barre de recherche\n(au milieu, ou à droite)",
+  "config.emi.tooltip.ui.center_search_bar": "Change la position de\nla barre de recherche\n(au milieu, ou à droite)",
 
-  "config.emi.ui.show_hover_overlay": " Show Hover Overlay",
+  "config.emi.ui.show_hover_overlay": " TODO - Show Hover Overlay",
   "config.emi.tooltip.ui.show_hover_overlay": "TODO",
 
-  "config.emi.ui.append_item_mod_id": " Afficher les noms des mods",
+  "config.emi.ui.append_item_mod_id": " Noms des mods",
   "config.emi.tooltip.ui.append_item_mod_id": "Ajoute sous chaque objet\nle nom du mod d'où il est issu",
 
-  "config.emi.ui.empty_search_craftable": " Show Craftable With Empty Search",
+  "config.emi.ui.empty_search_craftable": " TODO - Show Craftable With Empty Search",
   "config.emi.tooltip.ui.empty_search_craftable": "TODO",
 
   "config.emi.ui.max_favorite_columns": " Nombre de colonnes (gauche)",
-  "config.emi.tooltip.ui.max_favorite_columns": "Nombre maximal de colonnes pour les favoris",
+  "config.emi.tooltip.ui.max_favorite_columns": "Nombre maximal de colonnes\npour les favoris",
 
   "config.emi.ui.max_index_columns": " Nombre de colonnes (droite)",
-  "config.emi.tooltip.ui.max_index_columns": "Nombre maximal de colonnes pour la liste des objets",
+  "config.emi.tooltip.ui.max_index_columns": "Nombre maximal de colonnes\npour la liste des objets",
 
   "config.emi.ui.vertical_margin": " Marge verticale",
-  "config.emi.tooltip.ui.vertical_margin": "La quantité d'espace vide\nEn haut et en bas de EMI",
+  "config.emi.tooltip.ui.vertical_margin": "La quantité d'espace vide\nen haut et en bas de EMI",
 
   "config.emi.ui.miscraft_prevention": " Protection contre les accidents",
-  "config.emi.tooltip.ui.miscraft_prevention": "Vous empêche de faire des catastrophes\nComme fabriquer plus d'objets que nécessaires",
+  "config.emi.tooltip.ui.miscraft_prevention": "Vous empêche de faire des\ncatastrophes, comme fabriquer\nplus d'objets que nécessaires",
 
   "config.emi.ui.fluid_unit": " Unités (fluides)",
   "config.emi.tooltip.ui.fluid_unit": "L'unité pour mesurer le volume des fluides",
 
-  "config.emi.ui.show_cost_per_batch": "Show Cost Per Batch",
+  "config.emi.ui.show_cost_per_batch": " TODO - Show Cost Per Batch",
   "config.emi.tooltip.ui.show_cost_per_batch": "TODO",
 
-  "config.emi.ui.recipe_default_button": "Recipe Default Button",
+  "config.emi.ui.recipe_default_button": " TODO - Recipe Default Button",
   "config.emi.tooltip.ui.recipe_default_button": "TODO",
 
-  "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
+  "config.emi.ui.recipe_tree_button": " TODO - Recipe Tree Button",
   "config.emi.tooltip.ui.recipe_tree_button": "TODO",
 
-  "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+  "config.emi.ui.recipe_fill_button": " TODO - Recipe Fill Button",
   "config.emi.tooltip.ui.recipe_fill_button": "TODO",
 
-  "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
+  "config.emi.ui.use_batched_renderer": " TODO - Use Batched Renderer",
   "config.emi.tooltip.ui.use_batched_renderer": "TODO",
 
+  "key.emi.toggle_visibility": " Afficher EMI",
+  "config.emi.tooltip.binds.toggle_visibility": "Permet de cacher ou d'afficher EMI",
+
+  "key.emi.focus_search": " Barre de recherche",
+  "config.emi.tooltip.binds.focus_search": "Place votre curseur\ndans la barre de recherche",
+
+  "key.emi.view_recipes": " Voir recettes",
+  "config.emi.tooltip.binds.view_recipes": "Affiche la liste des recettes",
+
+  "key.emi.view_uses": " Voir usages",
+  "config.emi.tooltip.binds.view_uses": "Affiche la liste des usages",
+
+  "key.emi.favorite": " Favori",
+  "config.emi.tooltip.binds.favorite": "Mettre en favori",
+
+  "_info.set_default": "Quand j'ai traduit ce fichier, le truc set_default était absent du fichier de config",
+  "key.emi.set_default": " Par défaut",
+  "config.emi.tooltip.binds.set_default": "Mettre en recette par défaut",
+
+  "key.emi.view_stack_tree": " Voir ce graph",
+  "config.emi.tooltip.binds.view_stack_tree": "Permet de voir le graph d'un objet spécifique",
+
+  "key.emi.view_tree": " Voir le graph actif",
+  "config.emi.tooltip.binds.view_tree": "Permet de voir le graph actif",
+
+  "key.emi.back": " Retour",
+  "config.emi.tooltip.binds.back": "Permet de retourner une page en arrière",
+
+  "key.emi.toggle_craftable": "TODO - Toggle Craftable",
+  "config.emi.tooltip.binds.toggle_craftable": "TODO",
+
+  "key.emi.toggle_local_craftable": "TODO - Toggle Local Craftable",
+  "config.emi.tooltip.binds.toggle_local_craftable": "TODO",
+
+  "key.emi.craft_one": "TODO - Craft One",
+  "config.emi.tooltip.binds.craft_one": "TODO",
+
+  "key.emi.craft_all": "TODO - Craft All",
+  "config.emi.tooltip.binds.craft_all": "TODO",
+
+  "key.emi.craft_one_to_inventory": "TODO - Craft One to Inventory",
+  "config.emi.tooltip.binds.craft_one_to_inventory": "TODO",
+
+  "key.emi.craft_all_to_inventory": "TODO - Craft All to Inventory",
+  "config.emi.tooltip.binds.craft_all_to_inventory": "TODO",
+
+  "key.emi.craft_one_to_cursor": "TODO - Craft One to Cursor",
+  "config.emi.tooltip.binds.craft_one_to_cursor": "TODO",
+
+  "key.emi.cheat_one_to_inventory": "TODO - Cheat One to Inventory",
+  "config.emi.tooltip.binds.cheat_one_to_inventory": "TODO",
+
+  "key.emi.cheat_stack_to_inventory": "TODO - Cheat Stack to Inventory",
+  "config.emi.tooltip.binds.cheat_stack_to_inventory": "TODO",
+
+  "key.emi.cheat_one_to_cursor": "TODO - Cheat One to Cursor",
+  "config.emi.tooltip.binds.cheat_one_to_cursor": "TODO",
+
+  "key.emi.cheat_stack_to_cursor": "TODO - Cheat Stack to Cursor",
+  "config.emi.tooltip.binds.cheat_stack_to_cursor": "TODO",
+
+
   "config.emi.dev.dev_mode": " Mode développeur",
-  "config.emi.tooltip.dev.dev_mode": "Vous n'en n'aurez pas besoin\nMais vous pouvez l'utiliser si vous voulez",
+  "config.emi.tooltip.dev.dev_mode": "Vous n'en n'aurez pas besoin\nmais vous pouvez l'utiliser si vous voulez",
 
   "config.emi.dev.log_untranslated_tags": " Mémorise les erreurs",
   "config.emi.tooltip.dev.log_untranslated_tags": "Les erreurs seront stockées dans les logs",
@@ -117,7 +155,7 @@
   "emi.random_tree": "Vous voulez-vous en voir un au hasard ?",
   "emi.random_tree_input": "Appuyez sur §6[ctrl + r]",
 
-  "tooltip.emi.fill_recipe": "TODO - Fill Recipe",
+  "tooltip.emi.fill_recipe": "Utiliser les ingrédients",
   "tooltip.emi.fill_recipe_no_server": "EMI n'est pas installé sur ce serveur",
   "tooltip.emi.set_default": "Définir par défaut",
   "tooltip.emi.view_tree": "Voir graph",
@@ -127,7 +165,7 @@
   "tooltip.emi.clear_resolution": "Cliquez §6ici§r pour §cannuler§r le choix",
 
   "tooltip.emi.config": "%s Config",
-  "tooltip.emi.recipe_tree": "Graph actuel",
+  "tooltip.emi.recipe_tree": "Graph actif",
   "tooltip.emi.craftable_toggle_index": "Tout afficher",
   "tooltip.emi.craftable_toggle_craftable": "Uniquement les recettes possibles",
   "tooltip.emi.local_craftable_toggle_off": "Aucun filtre",
@@ -138,7 +176,7 @@
   "tooltip.emi.synfav.fully_craftable": "§aPossible§r de tout faire §a(%1$s)§r\n§6Cliquez§r pour en fabriquer",
 
   "tooltip.emi.bom.batch_size": "Quantité: %s\nScrollez pour changer\nMaintenez §6[shift]§r pour changer par 16",
-  "tooltip.emi.bom.mode.view": "§6Voir§r le graph actuel",
+  "tooltip.emi.bom.mode.view": "§6Voir§r le graph actif",
   "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans le graph, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
   
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Sous la lave",
@@ -355,6 +393,7 @@
   "tag.c.dusts.glowstone": "Poudres lumineuses",
   "tag.c.dusts.prismarine": "Poudres de prismarine",
   "tag.c.dusts.redstone": "Poudres de redstone",
+
   "tag.c.emeralds": "Émeraudes",
   "tag.c.ender_pearl_dusts": "Poudres de perles de l'Ender",
   "tag.c.ender_pearls": "Perles de l'Ender",
@@ -363,6 +402,7 @@
   "tag.c.gems.lapis": "Lapis Lazuli",
   "tag.c.gems.prismarine": "Prismarine",
   "tag.c.gems.quartz": "Quartz",
+
   "tag.c.ingots.brick": "Briques",
   "tag.c.ingots.nether_brick": "Briques du Nether",
   "tag.c.ingots.netherite": "Lingots de Netherite",
@@ -443,6 +483,7 @@
   "tag.c.crops.potato": "Pommes de terre",
   "tag.c.crops.wheat": "Blé",
   "tag.c.eggs": "Oeufs",
+
   "tag.c.empty_buckets": "Seaux vides",
   "tag.c.enchanting_fuels": "TODO",
   "tag.c.end_stones": "Pierres de l'End",
@@ -461,6 +502,7 @@
   "tag.c.obsidian": "Obsidienne",
   "tag.c.pickaxes": "Pioches",
   "tag.c.potions": "Potions",
+
   "tag.c.red_sandstone": "Grès rouge",
   "tag.c.red_sandstone_slabs": "Dalles en grès rouge",
   "tag.c.red_sandstone_stairs": "Escaliers en grès rouge",
@@ -474,6 +516,7 @@
   "tag.c.seeds.melon": "Graines de pastèque",
   "tag.c.seeds.pumpkin": "Graines de citrouille",
   "tag.c.seeds.wheat": "Graines de blé",
+
   "tag.c.shears": "Cisailles",
   "tag.c.shovels": "Pelles",
   "tag.c.shulker_boxes": "Boîtes de Shulker",
