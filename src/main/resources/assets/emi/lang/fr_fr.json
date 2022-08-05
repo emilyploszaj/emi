@@ -50,8 +50,8 @@
   "config.emi.ui.recipe_default_button": " Afficher le bouton (défaut)",
   "config.emi.tooltip.ui.recipe_default_button": "Permet de masquer le bouton\n\"Définir par défaut\"",
 
-  "config.emi.ui.recipe_tree_button": " Afficher le bouton (graph)",
-  "config.emi.tooltip.ui.recipe_tree_button": "Permet de masquer le bouton\n\"Voir graph\"",
+  "config.emi.ui.recipe_tree_button": " Afficher le bouton (graphe)",
+  "config.emi.tooltip.ui.recipe_tree_button": "Permet de masquer le bouton\n\"Voir graphe\"",
 
   "config.emi.ui.recipe_fill_button": " Afficher le bouton (utiliser)",
   "config.emi.tooltip.ui.recipe_fill_button": "Permet de masquer le bouton\n\"Utiliser les ingrédients\"",
@@ -78,11 +78,11 @@
   "key.emi.set_default": " Par défaut",
   "config.emi.tooltip.binds.set_default": "Mettre en recette par défaut",
 
-  "key.emi.view_stack_tree": " Voir ce graph",
-  "config.emi.tooltip.binds.view_stack_tree": "Permet de voir le graph d'un objet spécifique",
+  "key.emi.view_stack_tree": " Voir ce graphe",
+  "config.emi.tooltip.binds.view_stack_tree": "Permet de voir le graphe d'un objet spécifique",
 
-  "key.emi.view_tree": " Voir le graph actif",
-  "config.emi.tooltip.binds.view_tree": "Permet de voir le graph actif",
+  "key.emi.view_tree": " Voir le graphe actif",
+  "config.emi.tooltip.binds.view_tree": "Permet de voir le graphe actif",
 
   "key.emi.back": " Retour",
   "config.emi.tooltip.binds.back": "Permet de retourner une page en arrière",
@@ -150,7 +150,7 @@
   "emi.leftovers": "Restes",
   "emi.view_all_recipes": "Voir toutes les recettes",
   "emi.tree_welcome": "Bienvenue dans %s",
-  "emi.no_tree": "Vous n'avez pas encore défini de graph",
+  "emi.no_tree": "Vous n'avez pas encore défini de graphe",
   "emi.random_tree": "Vous voulez-vous en voir un au hasard ?",
   "emi.random_tree_input": "Appuyez sur §6[ctrl + r]",
 
@@ -164,7 +164,7 @@
   "tooltip.emi.clear_resolution": "Cliquez §6ici§r pour §cannuler§r le choix",
 
   "tooltip.emi.config": "%s Config",
-  "tooltip.emi.recipe_tree": "Graph actif",
+  "tooltip.emi.recipe_tree": "Graphe actif",
   "tooltip.emi.craftable_toggle_index": "Tout afficher",
   "tooltip.emi.craftable_toggle_craftable": "Uniquement les recettes possibles",
   "tooltip.emi.local_craftable_toggle_off": "Aucun filtre",
@@ -175,14 +175,14 @@
   "tooltip.emi.synfav.fully_craftable": "§aPossible§r de tout faire §a(%1$s)§r\n§6Cliquez§r pour en fabriquer",
 
   "tooltip.emi.bom.batch_size": "Quantité: %s\nScrollez pour changer\nMaintenez §6[shift]§r pour changer par 16",
-  "tooltip.emi.bom.mode.view": "§6Voir§r le graph actif",
-  "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans le graph, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
+  "tooltip.emi.bom.mode.view": "§6Voir§r le graphe actif",
+  "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans le graphe, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
   
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Sous la lave",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Proche de la lave",
 
   "screen.emi.recipe": "Recette",
-  "screen.emi.com": "Graph",
+  "screen.emi.com": "Graphe",
   "screen.emi.config": "Config",
 
   "emi.cooking.experience": "%s XP",
