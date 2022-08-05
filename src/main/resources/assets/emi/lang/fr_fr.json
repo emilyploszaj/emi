@@ -9,7 +9,7 @@
   "config.emi.group.dev": "Développeur",
 
   "config.emi.general.enabled": " Afficher EMI",
-  "config.emi.tooltip.general.enabled": "Permet de cacher EMI\n§cAttention: N'oubliez pas le raccourci§r\n§cclavier pour re-afficher EMI§r\n( normalement c'est §6CTRL+o§r )",
+  "config.emi.tooltip.general.enabled": "Permet de cacher EMI\n§cAttention: N'oubliez pas le raccourci§r\n§cclavier pour re-afficher EMI§r\n(normalement c'est §6CTRL+o§r)",
 
   "config.emi.general.cheat_mode": " Mode triche",
   "config.emi.tooltip.general.cheat_mode": "Un peu comme le mode créatif",
