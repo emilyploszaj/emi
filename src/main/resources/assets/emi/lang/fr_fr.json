@@ -157,7 +157,7 @@
   "tooltip.emi.fill_recipe": "Utiliser les ingrédients",
   "tooltip.emi.fill_recipe_no_server": "EMI n'est pas installé sur ce serveur",
   "tooltip.emi.set_default": "Définir par défaut",
-  "tooltip.emi.view_tree": "Voir graph",
+  "tooltip.emi.view_tree": "Voir graphe",
   "tooltip.emi.resolution": "Choix de la recette pour cet ingrédient",
   "tooltip.emi.select_resolution": "Cliquez sur §6le résultat§r pour le choisir sur §dune recette§r",
   "tooltip.emi.default_resolution": "Cliquez sur §6définir par défaut§r pour la choisir §apartout§r",
