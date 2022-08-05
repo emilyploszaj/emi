@@ -1,7 +1,7 @@
 {
   "key.keyboard.control": "Ctrl",
   "key.keyboard.alt": "Alt",
-  "key.keyboard.shift": "Shift",
+  "key.keyboard.shift": "Maj",
 
   "config.emi.group.general": "Général",
   "config.emi.group.ui": "Interface",
