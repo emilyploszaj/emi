@@ -2,6 +2,7 @@ package dev.emi.emi.api;
 
 import java.util.List;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiClient;
@@ -27,8 +28,16 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 
 	/**
 	 * @return The slots where inputs should be placed to perform crafting.
+	 * 
+	 * @deprecated to be replaced with {@link EmiRecipeHandler#getCraftingSlots(EmiRecipe, HandledScreen)}
 	 */
+	@Deprecated
 	List<Slot> getCraftingSlots(T handler);
+
+	@ApiStatus.Experimental
+	default List<Slot> getCraftingSlots(EmiRecipe recipe, HandledScreen<T> screen) {
+		return getCraftingSlots(screen.getScreenHandler());
+	}
 
 	/**
 	 * @return The output slot for recipe handlers that support instant interaction, like crafting tables.
@@ -65,13 +74,14 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 			stacks = mutateFill(recipe, screen, stacks);
 			if (stacks != null) {
 				MinecraftClient.getInstance().setScreen(screen);
-				EmiClient.sendFillRecipe(this, screen, screen.getScreenHandler().syncId, action.id, stacks);
+				EmiClient.sendFillRecipe(this, screen, screen.getScreenHandler().syncId, action.id, stacks, recipe);
 				return true;
 			}
 		}
 		return false;
 	}
 
+	@Deprecated
 	default List<ItemStack> mutateFill(EmiRecipe recipe, HandledScreen<T> screen, List<ItemStack> stacks) {
 		return stacks;
 	}

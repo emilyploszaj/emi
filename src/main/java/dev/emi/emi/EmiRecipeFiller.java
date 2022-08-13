@@ -83,7 +83,7 @@ public class EmiRecipeFiller {
 			EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 			if (handler != null) {
 				List<Slot> slots = handler.getInputSources(screenHandler);
-				List<Slot> craftingSlots = handler.getCraftingSlots(screenHandler);
+				List<Slot> craftingSlots = handler.getCraftingSlots(recipe, screen);
 				List<EmiIngredient> ingredients = recipe.getInputs();
 				List<DiscoveredItem> discovered = Lists.newArrayList();
 				for (int i = 0; i < ingredients.size(); i++) {

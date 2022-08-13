@@ -157,13 +157,13 @@ public class EmiClient implements ClientModInitializer {
 	}
 	
 	public static <T extends ScreenHandler> void sendFillRecipe(EmiRecipeHandler<T> handler, HandledScreen<T> screen,
-			int syncId, int action, List<ItemStack> stacks) {
+			int syncId, int action, List<ItemStack> stacks, EmiRecipe recipe) {
 		T screenHandler = screen.getScreenHandler();
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(handler.getInputSources(screenHandler), buf);
-		List<Slot> crafting = handler.getCraftingSlots(screenHandler);
+		List<Slot> crafting = handler.getCraftingSlots(recipe, screen);
 		buf.writeVarInt(crafting.size());
 		for (Slot s : crafting) {
 			buf.writeVarInt(s == null ? -1 : s.id);

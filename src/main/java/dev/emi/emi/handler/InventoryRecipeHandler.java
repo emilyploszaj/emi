@@ -52,6 +52,20 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 	}
 
 	@Override
+	public List<Slot> getCraftingSlots(EmiRecipe recipe, HandledScreen<PlayerScreenHandler> screen) {
+		PlayerScreenHandler handler = screen.getScreenHandler();
+		if (recipe instanceof EmiCraftingRecipe craf && craf.shapeless) {
+			List<Slot> list = Lists.newArrayList();
+			list.add(handler.getSlot(1));
+			list.add(handler.getSlot(2));
+			list.add(handler.getSlot(3));
+			list.add(handler.getSlot(4));
+			return list;
+		}
+		return getCraftingSlots(handler);
+	}
+
+	@Override
 	public @Nullable Slot getOutputSlot(PlayerScreenHandler handler) {
 		return handler.slots.get(0);
 	}
