@@ -163,7 +163,11 @@ public class EmiClient implements ClientModInitializer {
 		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(handler.getInputSources(screenHandler), buf);
-		writeCompressedSlots(handler.getCraftingSlots(screenHandler), buf);
+		List<Slot> crafting = handler.getCraftingSlots(screenHandler);
+		buf.writeVarInt(crafting.size());
+		for (Slot s : crafting) {
+			buf.writeVarInt(s == null ? -1 : s.id);
+		}
 		Slot output = handler.getOutputSlot(screenHandler);
 		if (output != null) {
 			buf.writeBoolean(true);

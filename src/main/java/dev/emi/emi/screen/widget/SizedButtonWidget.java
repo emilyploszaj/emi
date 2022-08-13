@@ -53,12 +53,12 @@ public class SizedButtonWidget extends ButtonWidget {
 		this.active = this.isActive.getAsBoolean();
 		if (!this.active) {
 			v += this.height * 2;
-		} else if (this.isHovered()) {
+		} else if (this.isMouseOver(mouseX, mouseY)) {
 			v += this.height;
 		}
 		RenderSystem.enableDepthTest();
 		drawTexture(matrices, this.x, this.y, this.u, v, this.width, this.height, 256, 256);
-		if (this.isHovered() && text != null && this.active) {
+		if (this.isMouseOver(mouseX, mouseY) && text != null && this.active) {
 			matrices.push();
 			RenderSystem.disableDepthTest();
 			MinecraftClient client = MinecraftClient.getInstance();

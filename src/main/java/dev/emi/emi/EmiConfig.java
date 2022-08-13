@@ -41,7 +41,7 @@ public class EmiConfig {
 	public static boolean cheatMode = false;
 
 	// UI
-	@Comment("Whether to move status effects to the\nleft of the screen.")
+	@Comment("Whether to move status effects to the\ntop of the screen.")
 	@ConfigValue("ui.move-effects")
 	public static boolean moveEffects = true;
 
@@ -211,6 +211,10 @@ public class EmiConfig {
 	@Comment("Whether stacks in the index should display a highlight\nif they have a recipe default.")
 	@ConfigValue("dev.highlight-defaulted")
 	public static boolean highlightDefaulted = false;
+
+	@Comment("Whether to display exclusion areas")
+	@ConfigValue("dev.highlight-exclusion-areas")
+	public static boolean highlightExclusionAreas = false;
 
 	// Persistent
 	@ConfigValue("persistent.craftable")

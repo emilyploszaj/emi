@@ -179,7 +179,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
-		drawCenteredText(matrices, textRenderer, EmiPort.translatable(EmiUtil.translateId("emi.category.", tab.category.getId())),
+		drawCenteredText(matrices, textRenderer, tab.category.getName(),
 			x + backgroundWidth / 2, y + 7, categoryNameColor);
 		drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.page", this.page + 1, tab.recipes.size()),
 			x + backgroundWidth / 2, y + 20, 0xffffff);

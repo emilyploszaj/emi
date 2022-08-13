@@ -206,6 +206,7 @@ public class VanillaPlugin implements EmiPlugin {
 						int height = (collection.size() - 1) * k + 32;
 						int left, width;
 						if (EmiConfig.moveEffects) {
+							/*
 							boolean wide = ((HandledScreenAccessor) inv).getX() >= 122;
 							if (wide) {
 								left = ((HandledScreenAccessor) inv).getX() - 122;
@@ -213,7 +214,8 @@ public class VanillaPlugin implements EmiPlugin {
 							} else {
 								left = ((HandledScreenAccessor) inv).getX() - 34;
 								width = 32;
-							}
+							}*/
+							return;
 						} else {
 							left = right;
 							boolean wide = rightWidth >= 120;

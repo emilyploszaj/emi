@@ -61,7 +61,16 @@ public class EmiMain implements ModInitializer {
 			ScreenHandler sh = player.currentScreenHandler;
 			if (sh != null && sh.syncId == syncId) {
 				List<Slot> slots = parseCompressedSlots(sh, buf);
-				List<Slot> crafting = parseCompressedSlots(sh, buf);
+				List<Slot> crafting = Lists.newArrayList();
+				int craftingSize = buf.readVarInt();
+				for (int i = 0; i < craftingSize; i++) {
+					int s = buf.readVarInt();
+					if (s > 0 && s < sh.slots.size()) {
+						crafting.add(sh.slots.get(s));
+					} else {
+						crafting.add(null);
+					}
+				}
 				if (slots == null || crafting == null) {
 					return;
 				}
@@ -86,7 +95,7 @@ public class EmiMain implements ModInitializer {
 						List<ItemStack> rubble = Lists.newArrayList();
 						for (int i = 0; i < crafting.size(); i++) {
 							Slot s = crafting.get(i);
-							if (s.canTakeItems(player) && !s.getStack().isEmpty()) {
+							if (s != null && s.canTakeItems(player) && !s.getStack().isEmpty()) {
 								rubble.add(s.getStack().copy());
 								s.setStack(ItemStack.EMPTY);
 							}
@@ -106,7 +115,7 @@ public class EmiMain implements ModInitializer {
 									return;
 								} else {
 									Slot s = crafting.get(i);
-									if (s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount()) {
+									if (s != null && s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount()) {
 										s.setStack(stack);
 									} else {
 										player.getInventory().offerOrDrop(stack);
@@ -132,6 +141,7 @@ public class EmiMain implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(DESTROY_HELD, (server, player, networkHandler, buf, sender) -> {
 			if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
 				server.execute(() -> {
+					System.out.println("[emi] " + player.getEntityName() + " deleted " + player.currentScreenHandler.getCursorStack());
 					player.currentScreenHandler.setCursorStack(ItemStack.EMPTY);
 				});
 			}
@@ -141,6 +151,7 @@ public class EmiMain implements ModInitializer {
 				int mode = buf.readByte();
 				ItemStack stack = buf.readItemStack();
 				server.execute(() -> {
+					System.out.println("[emi] " + player.getEntityName() + " cheated in " + stack);
 					if (mode == 0) {
 						player.getInventory().offerOrDrop(stack);
 					} else if (mode == 1) {

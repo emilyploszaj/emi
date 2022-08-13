@@ -83,16 +83,21 @@ public class EmiRecipeFiller {
 			EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 			if (handler != null) {
 				List<Slot> slots = handler.getInputSources(screenHandler);
+				List<Slot> craftingSlots = handler.getCraftingSlots(screenHandler);
 				List<EmiIngredient> ingredients = recipe.getInputs();
 				List<DiscoveredItem> discovered = Lists.newArrayList();
 				for (int i = 0; i < ingredients.size(); i++) {
 					List<DiscoveredItem> d = Lists.newArrayList();
 					EmiIngredient ingredient = ingredients.get(i);
 					List<EmiStack> emiStacks = ingredient.getEmiStacks();
+					if (ingredient.isEmpty()) {
+						discovered.add(null);
+						continue;
+					}
 					for (int e = 0; e < emiStacks.size(); e++) {
 						EmiStack stack = emiStacks.get(e);
 						ItemStack item = stack.getItemStack();
-						DiscoveredItem di = new DiscoveredItem(stack, item, 0, item.getCount());
+						DiscoveredItem di = new DiscoveredItem(stack, item, 0, item.getCount(), item.getMaxCount());
 						for (Slot s : slots) {
 							if (ItemStack.canCombine(item, s.getStack())) {
 								di.amount += s.getStack().getCount();
@@ -108,13 +113,14 @@ public class EmiRecipeFiller {
 							biggest = di;
 						}
 					}
-					if (biggest == null && !ingredient.isEmpty()) {
+					if (biggest == null || i >= craftingSlots.size()) {
 						return null;
 					}
-					if (biggest != null) {
-						Slot slot = handler.getCraftingSlots(screenHandler).get(i);
-						biggest.max = Math.min(biggest.max, slot.getMaxItemCount());
+					Slot slot = craftingSlots.get(i);
+					if (slot == null) {
+						return null;
 					}
+					biggest.max = Math.min(biggest.max, slot.getMaxItemCount());
 					discovered.add(biggest);
 				}
 				if (discovered.isEmpty()) {
@@ -133,7 +139,7 @@ public class EmiRecipeFiller {
 							continue outer;
 						}
 					}
-					unique.add(new DiscoveredItem(di.ingredient, di.stack, di.amount, di.consumed));
+					unique.add(new DiscoveredItem(di.ingredient, di.stack, di.amount, di.consumed, di.max));
 				}
 				int maxAmount = Integer.MAX_VALUE;
 				for (DiscoveredItem ui : unique) {
@@ -176,12 +182,12 @@ public class EmiRecipeFiller {
 		public int amount;
 		public int max;
 
-		public DiscoveredItem(EmiStack ingredient, ItemStack stack, int amount, int consumed) {
+		public DiscoveredItem(EmiStack ingredient, ItemStack stack, int amount, int consumed, int max) {
 			this.ingredient = ingredient;
 			this.stack = stack.copy();
 			this.amount = amount;
 			this.consumed = consumed;
-			max = stack.getMaxCount();
+			this.max = max;
 		}
 
 		public boolean catalyst() {

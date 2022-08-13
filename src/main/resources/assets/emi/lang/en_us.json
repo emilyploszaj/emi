@@ -52,6 +52,7 @@
   "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",
   "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
   "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
+  "config.emi.dev.highlight_exclusion_areas": "Highlight Exclusion Areas",
 
   "emi.unit.liters": "Liters",
   "emi.unit.millibuckets": "Millibuckets",
@@ -74,6 +75,7 @@
   "emi.no_tree": "You haven't set a recipe tree to view yet...",
   "emi.random_tree": "Perhaps you'd like to see a random one?",
   "emi.random_tree_input": "Press §6[ctrl + r]",
+  "tooltip.emi.accepts": "Accepts:",
   "tooltip.emi.fill_recipe": "Fill Recipe",
   "tooltip.emi.fill_recipe_no_server": "Cannot Fill Recipe without EMI on server",
   "tooltip.emi.set_default": "Set as Default Recipe",

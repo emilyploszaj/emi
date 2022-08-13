@@ -451,6 +451,21 @@ public class EmiScreenManager {
 			client.textRenderer.drawWithShadow(matrices, title, 48, screen.height + off, color);
 		}
 		client.getProfiler().pop();
+		if (EmiConfig.highlightExclusionAreas) {
+			if (screen instanceof EmiScreen emi) {
+				DrawableHelper.fill(matrices, emi.emi$getLeft(), 0, emi.emi$getRight(), screen.height, 0x4400ff00);
+				DrawableHelper.fill(matrices, searchSpace.tx, searchSpace.ty,
+					searchSpace.tx + searchSpace.tw * ENTRY_SIZE, searchSpace.ty + searchSpace.th * ENTRY_SIZE, 0x440000ff);
+				DrawableHelper.fill(matrices, favoriteSpace.tx, favoriteSpace.ty,
+					favoriteSpace.tx + favoriteSpace.tw * ENTRY_SIZE, favoriteSpace.ty + favoriteSpace.th * ENTRY_SIZE, 0x440000ff);
+				List<Bounds> exclusions = EmiExclusionAreas.getExclusion(screen);
+				// Skip the first one
+				for (int i = 1; i < exclusions.size(); i++) {
+					Bounds b = exclusions.get(i);
+					DrawableHelper.fill(matrices, b.x(), b.y(), b.x() + b.width(), b.y() + b.height(), 0x44ff0000);
+				}
+			}
+		}
 		client.getProfiler().pop();
 	}
 
@@ -653,7 +668,7 @@ public class EmiScreenManager {
 			}
 			recalculate();
 			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
-			if (hovered.getStack() != pressedStack) {
+			if (hovered.getStack() != pressedStack && !(pressedStack instanceof EmiFavorite.Synthetic)) {
 				draggedStack = pressedStack;
 			}
 		}

@@ -2,9 +2,9 @@ package dev.emi.emi.handler;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiRecipeHandler;
@@ -12,9 +12,7 @@ import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.recipe.EmiShapelessRecipe;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -40,9 +38,16 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 	@Override
 	public List<Slot> getCraftingSlots(PlayerScreenHandler handler) {
 		List<Slot> list = Lists.newArrayList();
-		for (int i = 1; i < 5; i++) { 
-			list.add(handler.getSlot(i));
-		}
+		// This is like, bad, right? There has to be a better way to do this
+		list.add(handler.getSlot(1));
+		list.add(handler.getSlot(2));
+		list.add(null);
+		list.add(handler.getSlot(3));
+		list.add(handler.getSlot(4));
+		list.add(null);
+		list.add(null);
+		list.add(null);
+		list.add(null);
 		return list;
 	}
 
@@ -79,28 +84,5 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 			}
 		}
 		return EmiRecipeHandler.super.getInvalidReason(recipe, inventory, screen);
-	}
-
-	@Override
-	public List<ItemStack> mutateFill(EmiRecipe recipe, HandledScreen<PlayerScreenHandler> screen, List<ItemStack> stacks) {
-		if (recipe instanceof EmiCraftingRecipe crafting && crafting.shapeless) {
-			return stacks;
-		}
-		if (recipe instanceof EmiShapelessRecipe) {
-			return stacks;
-		}
-		List<ItemStack> out = Lists.newArrayList();
-		int width = screen.getScreenHandler().getCraftingWidth();
-		int height = screen.getScreenHandler().getCraftingHeight();
-		for (int i = 0; i < stacks.size(); i++) {
-			int x = i % 3;
-			int y = i / 3;
-			if (x < width && y < height) {
-				out.add(stacks.get(i));
-			} else if (!stacks.get(i).isEmpty()) {
-				return null;
-			}
-		}
-		return out;
 	}
 }

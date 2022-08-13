@@ -13,6 +13,7 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -50,6 +51,10 @@ public class EmiRecipeCategory implements EmiRenderable {
 		this.sorter = sorter;
 	}
 
+	public Text getName() {
+		return EmiPort.translatable(EmiUtil.translateId("emi.category.", getId()));
+	}
+
 	public Identifier getId() {
 		return id;
 	}
@@ -65,7 +70,7 @@ public class EmiRecipeCategory implements EmiRenderable {
 
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
-		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable(EmiUtil.translateId("emi.category.", getId())))));
+		list.add(TooltipComponent.of(EmiPort.ordered(getName())));
 		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
 			Formatting.BLUE, Formatting.ITALIC))));
 		return list;

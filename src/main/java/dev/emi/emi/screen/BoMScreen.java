@@ -373,7 +373,7 @@ public class BoMScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		scrollAcc += amount;
-		amount = scrollAcc;
+		amount = (int) scrollAcc;
 		scrollAcc %= 1;
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
