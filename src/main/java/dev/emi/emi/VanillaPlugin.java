@@ -48,6 +48,8 @@ import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
 import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
+import dev.emi.emi.recipe.special.EmiAnvilEnchantRecipe;
+import dev.emi.emi.recipe.special.EmiAnvilRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
 import dev.emi.emi.recipe.special.EmiBannerDuplicateRecipe;
 import dev.emi.emi.recipe.special.EmiBannerShieldRecipe;
@@ -70,6 +72,7 @@ import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -333,6 +336,22 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
+		for (Item i : EmiAnvilRepairItemRecipe.TOOLS) {
+			addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
+		}
+		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+			for (Item i : Registry.ITEM.stream().toList()) {
+				if (e.isAcceptableItem(i.getDefaultStack())) {
+					int max = e.getMaxLevel();
+					int min = e.getMinLevel();
+					while (min <= max) {
+						int finalMin = min;
+						addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
+						min++;
+					}
+				}
+			}
+		}
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {
