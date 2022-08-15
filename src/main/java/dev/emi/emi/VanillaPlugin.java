@@ -73,6 +73,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -333,25 +334,26 @@ public class VanillaPlugin implements EmiPlugin {
 					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
 				}
 			}
-		}
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
-		for (Item i : EmiAnvilRepairItemRecipe.TOOLS) {
-			addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
-		}
-		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
-			for (Item i : Registry.ITEM.stream().toList()) {
-				if (e.isAcceptableItem(i.getDefaultStack())) {
-					int max = e.getMaxLevel();
-					int min = e.getMinLevel();
-					while (min <= max) {
-						int finalMin = min;
-						addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
-						min++;
+			if (i.isDamageable()) {
+				addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
+			}
+			if (Enchantments.VANISHING_CURSE.isAcceptableItem(i.getDefaultStack())) {
+				for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+					if (e.isAcceptableItem(i.getDefaultStack())) {
+						int max = e.getMaxLevel();
+						int min = e.getMinLevel();
+						while (min <= max) {
+							int finalMin = min;
+							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
+							min++;
+						}
 					}
 				}
 			}
 		}
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
+
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {

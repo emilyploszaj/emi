@@ -19,8 +19,6 @@ import net.minecraft.util.registry.Registry;
 import org.apache.commons.compress.utils.Lists;
 
 public class EmiAnvilRepairItemRecipe implements EmiRecipe {
-    public static final List<Item> TOOLS = Registry.ITEM.stream()
-            .filter(Item::isDamageable).collect(Collectors.toList());
     private final Item tool;
     private final int uniq = EmiUtil.RANDOM.nextInt();
 
