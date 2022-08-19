@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.item.ItemGroup;
 
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenMixin {
@@ -25,6 +26,9 @@ public abstract class CreativeInventoryScreenMixin {
 
 	@Inject(at = @At("HEAD"), method = "keyPressed", cancellable = true)
     public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> info) {
+		if (selectedTab == ItemGroup.SEARCH.getIndex()) {
+			return;
+		}
 		if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {
 			info.setReturnValue(true);
 		}
