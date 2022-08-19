@@ -16,6 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
@@ -45,6 +46,9 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 				info.cancel();
 			}
 			int y = this.y - 34;
+			if (((Object) this) instanceof CreativeInventoryScreen) {
+				y -= 28;
+			}
 			int xOff = 34;
 			if (size == 1) {
 				xOff = 122;
@@ -77,7 +81,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
             if (hovered != null && size > 1) {
                 List<Text> list = List.of(this.getStatusEffectDescription(hovered),
 					EmiPort.literal(StatusEffectUtil.durationToString(hovered, 1.0f)));
-                this.renderTooltip(matrices, list, Optional.empty(), mouseX, mouseY);
+                this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
             }
 			info.cancel();
 			if (this instanceof RecipeBookProvider rbp) {
