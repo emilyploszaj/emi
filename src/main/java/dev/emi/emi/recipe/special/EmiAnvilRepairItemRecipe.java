@@ -2,7 +2,8 @@ package dev.emi.emi.recipe.special;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
+
+import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -15,8 +16,6 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import org.apache.commons.compress.utils.Lists;
 
 public class EmiAnvilRepairItemRecipe implements EmiRecipe {
     private final Item tool;

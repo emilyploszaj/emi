@@ -12,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiConfig.Comment;
 import dev.emi.emi.EmiConfig.ConfigEnum;
+import dev.emi.emi.EmiConfig.ConfigGroup;
 import dev.emi.emi.EmiConfig.ConfigValue;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -24,6 +25,7 @@ import dev.emi.emi.screen.widget.EnumWidget;
 import dev.emi.emi.screen.widget.GroupNameWidget;
 import dev.emi.emi.screen.widget.IntWidget;
 import dev.emi.emi.screen.widget.ListWidget;
+import dev.emi.emi.screen.widget.SubGroupNameWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -97,6 +99,10 @@ public class ConfigScreen extends Screen {
 					if (!group.equals(lastGroup)) {
 						lastGroup = group;
 						list.addEntry(new GroupNameWidget(EmiPort.translatable("config.emi.group." + group)));
+					}
+					ConfigGroup configGroup = field.getAnnotation(ConfigGroup.class);
+					if (configGroup != null) {
+						list.addEntry(new SubGroupNameWidget(EmiPort.translatable("config.emi.group." + configGroup.value())));
 					}
 					Text translation = EmiPort.translatable("config.emi." + annot.value().replace('-', '_'));
 					if (field.getType() == boolean.class) {

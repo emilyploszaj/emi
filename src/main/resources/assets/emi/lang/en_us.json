@@ -29,6 +29,10 @@
   "config.emi.group.binds": "Binds",
   "config.emi.group.dev": "Dev",
 
+  "config.emi.group.ui.recipe-buttons": "Recipe Buttons",
+  "config.emi.group.binds.crafts": "Crafts",
+  "config.emi.group.binds.cheats": "Cheats",
+
   "config.emi.general.enabled": "Enabled",
   "config.emi.general.cheat_mode": "Cheat Mode",
 
