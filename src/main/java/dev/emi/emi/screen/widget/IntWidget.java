@@ -5,26 +5,19 @@ import java.util.regex.Pattern;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
-import dev.emi.emi.screen.widget.ListWidget.Entry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
-public class IntWidget extends Entry {
+public class IntWidget extends ConfigEntryWidget {
 	private static final Pattern NUMBER = Pattern.compile("^-?[0-9]*$");
-	private final Text name;
-	private final Drawable tooltip;
 	private TextFieldWidget text;
 	private ButtonWidget up, down;
 
 	public IntWidget(Text name, Drawable tooltip, Mutator<Integer> mutator) {
-		this.name = name;
-		this.tooltip = tooltip;
+		super(name, tooltip, 24);
 		MinecraftClient client = MinecraftClient.getInstance();
 		text = new TextFieldWidget(client.textRenderer, 0, 0, 136, 18, EmiPort.literal(""));
 		text.setText("" + mutator.get());
@@ -46,14 +39,11 @@ public class IntWidget extends Entry {
 			mutator.set(mutator.get() - 1);
 			text.setText("" + mutator.get());
 		});
+		this.setChildren(List.of(text, up, down));
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
-			boolean hovered, float delta) {
-		DrawableHelper.fill(matrices, x, y, x + width, y + height, 0x66000000);
-		parentList.client.textRenderer.drawWithShadow(matrices, this.name, x,
-			y + 10 - parentList.client.textRenderer.fontHeight / 2, 0xFFFFFF);
+	public void update(int y, int x, int width, int height) {
 		int right = x + width;
 		text.x = right - 149;
 		text.y = y + 1;
@@ -61,23 +51,5 @@ public class IntWidget extends Entry {
 		up.y = y;
 		down.x = right - 12;
 		down.y = y + 10;
-		text.render(matrices, mouseX, mouseY, delta);
-		up.render(matrices, mouseX, mouseY, delta);
-		down.render(matrices, mouseX, mouseY, delta);
-	}
-
-	@Override
-	public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		tooltip.render(matrices, mouseX, mouseY, delta);
-	}
-
-	@Override
-	public int getHeight() {
-		return 24;
-	}
-	
-	@Override
-	public List<? extends Element> children() {
-		return List.of(text, up, down);
 	}
 }

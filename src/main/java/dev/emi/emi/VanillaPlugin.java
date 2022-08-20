@@ -38,8 +38,10 @@ import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.handler.CookingRecipeHandler;
 import dev.emi.emi.handler.CraftingRecipeHandler;
 import dev.emi.emi.handler.InventoryRecipeHandler;
+import dev.emi.emi.mixin.accessor.AxeItemAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
+import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.recipe.EmiCookingRecipe;
@@ -48,6 +50,8 @@ import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
 import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
+import dev.emi.emi.recipe.special.EmiAnvilEnchantRecipe;
+import dev.emi.emi.recipe.special.EmiAnvilRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
 import dev.emi.emi.recipe.special.EmiBannerDuplicateRecipe;
 import dev.emi.emi.recipe.special.EmiBannerShieldRecipe;
@@ -60,20 +64,22 @@ import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.screen.RecipeScreen;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.mixin.content.registry.AxeItemAccessor;
-import net.fabricmc.fabric.mixin.content.registry.ShovelItemAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.HoneycombItem;
@@ -332,9 +338,30 @@ public class VanillaPlugin implements EmiPlugin {
 					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
 				}
 			}
+			if (i.isDamageable()) {
+				addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
+			}
+			if (Enchantments.VANISHING_CURSE.isAcceptableItem(i.getDefaultStack())) {
+				for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+					if (e.isAcceptableItem(i.getDefaultStack())) {
+						int max = e.getMaxLevel();
+						int min = e.getMinLevel();
+						while (min <= max) {
+							int finalMin = min;
+							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
+							min++;
+						}
+					}
+				}
+			}
+			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock) {
+				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
+						new Identifier("emi", "flower_dupe/" + EmiUtil.subId(i)), false));
+			}
 		}
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
+
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {

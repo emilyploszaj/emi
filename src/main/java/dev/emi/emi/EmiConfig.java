@@ -53,7 +53,7 @@ public class EmiConfig {
 	@ConfigValue("ui.show-hover-overlay")
 	public static boolean showHoverOverlay = false;
 
-	@Comment("Whether to add mod name to item tooltips")
+	@Comment("Whether to add mod name to item tooltips\nIn case another mod provides behavior")
 	@ConfigValue("ui.append-item-mod-id")
 	public static boolean appendItemModId = true;
 
@@ -85,6 +85,7 @@ public class EmiConfig {
 	@ConfigValue("ui.show-cost-per-batch")
 	public static boolean showCostPerBatch = true;
 
+	@ConfigGroup("ui.recipe-buttons")
 	@Comment("Whether recipes should have a button to\nset as default.")
 	@ConfigValue("ui.recipe-default-button")
 	public static boolean recipeDefaultButton = true;
@@ -93,6 +94,7 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-tree-button")
 	public static boolean recipeTreeButton = true;
 
+	@ConfigGroupEnd
 	@Comment("Whether recipes should have a button to\nfill the ingredients in a handler.")
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
@@ -148,6 +150,7 @@ public class EmiConfig {
 	@ConfigValue("binds.toggle-local-craftable")
 	public static EmiBind toggleLocalCraftable = new EmiBind("key.emi.toggle_local_craftable", InputUtil.UNKNOWN_KEY.getCode());
 
+	@ConfigGroup("binds.crafts")
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result.")
 	@ConfigValue("binds.craft-one")
@@ -170,12 +173,14 @@ public class EmiConfig {
 	@ConfigValue("binds.craft-all-to-inventory")
 	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
 
+	@ConfigGroupEnd
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result\nand put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
 
+	@ConfigGroup("binds.cheats")
 	@Comment("Cheat in one of an item into the inventory.")
 	@ConfigValue("binds.cheat-one-to-inventory")
 	public static EmiBind cheatOneToInventory = new EmiBind("key.emi.cheat_one_to_inventory",
@@ -191,6 +196,7 @@ public class EmiConfig {
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiUtil.CONTROL_MASK));
 	
+	@ConfigGroupEnd
 	@Comment("Cheat in a stack of an item into the cursor.")
 	@ConfigValue("binds.cheat-stack-to-cursor")
 	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
@@ -390,6 +396,17 @@ public class EmiConfig {
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Comment {
 		public String value();
+	}
+	
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface ConfigGroup {
+		public String value();
+	}
+	
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface ConfigGroupEnd {
 	}
 
 	private static interface Setter {

@@ -169,7 +169,7 @@ public class EmiScreenManager {
 			int tw = Math.min((xMax - xMin) / ENTRY_SIZE, EmiConfig.maxIndexColumns);
 			int tx = xMax - tw * ENTRY_SIZE;
 			int ty = yMin;
-			int th = (yMax - yMin) / ENTRY_SIZE;
+			int th = Math.max((yMax - yMin) / ENTRY_SIZE, 1);
 			searchSpace = new ScreenSpace(xMin, xMax, yMin, yMax, tx, ty, tw, th, true, exclusion);
 			int fxMin = horizontalPadding;
 			int fxMax = left;
@@ -178,7 +178,7 @@ public class EmiScreenManager {
 			int ftw = Math.min((fxMax - fxMin) / ENTRY_SIZE, EmiConfig.maxFavoriteColumns);
 			int ftx = fxMin;
 			int fty = fyMin;
-			int fth = (fyMax - fyMin) / ENTRY_SIZE;
+			int fth = Math.max((fyMax - fyMin) / ENTRY_SIZE, 1);
 			favoriteSpace = new ScreenSpace(fxMin, fxMax, fyMin, fyMax, ftx, fty, ftw, fth, false, exclusion);
 
 			searchLeft.x = searchSpace.tx;

@@ -10,28 +10,25 @@ import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.ConfigScreen;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class EmiBindWidget extends ListWidget.Entry {
+public class EmiBindWidget extends ConfigEntryWidget {
 	private final ConfigScreen screen;
-	private final Drawable tooltip;
 	private final Text bindName;
 	private EmiBind bind;
 	private List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public EmiBindWidget(ConfigScreen screen, Drawable tooltip, EmiBind bind) {
-		this.tooltip = tooltip;
+		super(EmiPort.translatable(bind.translationKey), tooltip, 0);
 		this.screen = screen;
 		this.bindName = EmiPort.translatable(bind.translationKey);
 		this.bind = bind;
 		updateButtons();
+		setChildren(buttons);
 	}
 
 	private void updateButtons() {
@@ -55,14 +52,10 @@ public class EmiBindWidget extends ListWidget.Entry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
-			boolean hovered, float delta) {
+	public void update(int y, int x, int width, int height) {
 		if (buttons.size() != bind.boundKeys.size()) {
 			updateButtons();
 		}
-		DrawableHelper.fill(matrices, x, y, x + width, y + height, 0x66000000);
-		parentList.client.textRenderer.drawWithShadow(matrices, this.bindName, x,
-			y + 10 - parentList.client.textRenderer.fontHeight / 2, 0xFFFFFF);
 		int h = 0;
 		for (int i = 0; i < buttons.size(); i++) {
 			ButtonWidget button = buttons.get(i);
@@ -87,14 +80,8 @@ public class EmiBindWidget extends ListWidget.Entry {
 					button.setMessage(getKeyText(bind.boundKeys.get(i), Formatting.RESET));
 				}
 			}
-			button.render(matrices, mouseX, mouseY, delta);
 			h += 24;
 		}
-	}
-
-	@Override
-	public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		tooltip.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Override
@@ -127,10 +114,5 @@ public class EmiBindWidget extends ListWidget.Entry {
 			EmiPort.append(text, EmiPort.translatable("key.keyboard.shift"));
 			EmiPort.append(text, EmiPort.literal(" + "));
 		}
-	}
-
-	@Override
-	public List<? extends Element> children() {
-		return buttons;
 	}
 }

@@ -6,11 +6,13 @@
     "accessor.ScreenHandlerAccessor"
   ],
   "client": [
+    "accessor.AxeItemAccessor",
     "accessor.CraftingResultSlotAccessor",
     "accessor.HandledScreenAccessor",
     "accessor.HoeItemAccessor",
     "accessor.ItemRendererAccessor",
     "accessor.ScreenAccessor",
+    "accessor.ShovelItemAccessor",
     "accessor.SmithingRecipeAccessor",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
