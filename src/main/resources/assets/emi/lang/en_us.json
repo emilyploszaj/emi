@@ -113,6 +113,7 @@
 
   "emi.cooking.experience": "%s XP",
   "emi.cooking.time": "%s Seconds",
+  "emi.grinding.experience": "%s - %s XP",
 
   "emi.category.minecraft.crafting": "Crafting",
   "emi.category.minecraft.smelting": "Smelting",
@@ -123,6 +124,7 @@
   "emi.category.minecraft.smithing": "Smithing",
   "emi.category.emi.anvil_repairing": "Anvil Repairing",
   "emi.category.minecraft.brewing": "Brewing",
+  "emi.category.emi.grinding": "Grinding",
   "emi.category.emi.world_interaction": "World Interaction",
   "emi.category.emi.tag": "Tags",
 

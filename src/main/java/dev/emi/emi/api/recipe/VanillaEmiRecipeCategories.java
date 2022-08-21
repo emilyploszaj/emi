@@ -10,5 +10,6 @@ public class VanillaEmiRecipeCategories {
 	public static EmiRecipeCategory SMITHING;
 	public static EmiRecipeCategory ANVIL_REPAIRING;
 	public static EmiRecipeCategory BREWING;
+	public static EmiRecipeCategory GRINDING;
 	public static EmiRecipeCategory WORLD_INTERACTION;
 }
