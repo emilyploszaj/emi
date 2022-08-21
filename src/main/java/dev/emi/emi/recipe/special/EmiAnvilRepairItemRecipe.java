@@ -70,7 +70,7 @@ public class EmiAnvilRepairItemRecipe implements EmiRecipe {
         widgets.addGeneratedSlot(r -> getItem(r, 2), notUniq, 107, 0).recipeContext(this);
     }
 
-    private EmiStack getItem(Random random, int item) {
+    protected EmiStack getItem(Random random, int item) {
         List<ItemStack> items = Lists.newArrayList();
         items.add(getTool(random));
         items.add(getTool(random));

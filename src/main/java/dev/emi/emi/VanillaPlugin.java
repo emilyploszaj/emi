@@ -9,6 +9,7 @@ import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMELTING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMITHING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMOKING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.STONECUTTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.GRINDING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.WORLD_INTERACTION;
 
 import java.util.Collection;
@@ -45,6 +46,7 @@ import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.recipe.EmiCookingRecipe;
+import dev.emi.emi.recipe.EmiGrindstoneRecipe;
 import dev.emi.emi.recipe.EmiShapedRecipe;
 import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
@@ -59,6 +61,7 @@ import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkRocketRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarFadeRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarRecipe;
+import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingRecipe;
 import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
@@ -160,6 +163,8 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
 		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
 			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.compareOutputThenInput());
+		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
+				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		registry.addCategory(CRAFTING);
@@ -171,6 +176,7 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addCategory(SMITHING);
 		registry.addCategory(ANVIL_REPAIRING);
 		registry.addCategory(BREWING);
+		registry.addCategory(GRINDING);
 		registry.addCategory(WORLD_INTERACTION);
 		registry.addCategory(TAG);
 		registry.addCategory(INGREDIENT);
@@ -188,6 +194,7 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.CHIPPED_ANVIL));
 		registry.addWorkstation(ANVIL_REPAIRING, EmiStack.of(Items.DAMAGED_ANVIL));
 		registry.addWorkstation(BREWING, EmiStack.of(Items.BREWING_STAND));
+		registry.addWorkstation(GRINDING, EmiStack.of(Items.GRINDSTONE));
 
 		registry.addRecipeHandler(null, new InventoryRecipeHandler());
 		registry.addRecipeHandler(ScreenHandlerType.CRAFTING, new CraftingRecipeHandler());
@@ -340,6 +347,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 			if (i.isDamageable()) {
 				addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
+				addRecipeSafe(registry, () -> new EmiGrindstoneRecipe(i));
 			}
 			if (Enchantments.VANISHING_CURSE.isAcceptableItem(i.getDefaultStack())) {
 				for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
@@ -349,6 +357,9 @@ public class VanillaPlugin implements EmiPlugin {
 						while (min <= max) {
 							int finalMin = min;
 							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
+							if (!e.isCursed()) {
+								addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i, e, finalMin));
+							}
 							min++;
 						}
 					}
@@ -362,6 +373,17 @@ public class VanillaPlugin implements EmiPlugin {
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
 
+		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+			if (!e.isCursed()) {
+				int max = e.getMaxLevel();
+				int min = e.getMinLevel();
+				while (min <= max) {
+					int finalMin = min;
+					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(Items.ENCHANTED_BOOK, e, finalMin));
+					min++;
+				}
+			}
+		}
 
 		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {
