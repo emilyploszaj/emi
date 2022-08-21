@@ -61,6 +61,7 @@ import dev.emi.emi.recipe.special.EmiBookCloningRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkRocketRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarFadeRecipe;
 import dev.emi.emi.recipe.special.EmiFireworkStarRecipe;
+import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingBookRecipe;
 import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingRecipe;
 import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
@@ -357,13 +358,11 @@ public class VanillaPlugin implements EmiPlugin {
 						while (min <= max) {
 							int finalMin = min;
 							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
-							if (!e.isCursed()) {
-								addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i, e, finalMin));
-							}
 							min++;
 						}
 					}
 				}
+				addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
 			}
 			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
@@ -379,7 +378,7 @@ public class VanillaPlugin implements EmiPlugin {
 				int min = e.getMinLevel();
 				while (min <= max) {
 					int finalMin = min;
-					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(Items.ENCHANTED_BOOK, e, finalMin));
+					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingBookRecipe(e, finalMin));
 					min++;
 				}
 			}

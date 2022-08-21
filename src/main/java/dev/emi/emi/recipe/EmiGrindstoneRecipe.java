@@ -34,9 +34,9 @@ public class EmiGrindstoneRecipe extends EmiAnvilRepairItemRecipe {
         widgets.addTexture(BACKGROUND, 0, 0, 130, 61, 16, 14);
 
         int notUniq= uniq;
-        widgets.addGeneratedSlot(r -> getItem(r, 0), notUniq, 32, 4);
-        widgets.addGeneratedSlot(r -> getItem(r, 1), notUniq, 32, 24);
-        widgets.addGeneratedSlot(r -> getItem(r, 2), notUniq, 112, 19).recipeContext(this);
+        widgets.addGeneratedSlot(r -> getItem(r, 0), notUniq, 32, 4).drawBack(false);
+        widgets.addGeneratedSlot(r -> getItem(r, 1), notUniq, 32, 24).drawBack(false);
+        widgets.addGeneratedSlot(r -> getItem(r, 2), notUniq, 112, 19).drawBack(false).recipeContext(this);
 
     }
 }
