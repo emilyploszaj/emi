@@ -3,7 +3,6 @@ package dev.emi.emi.recipe;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.recipe.special.EmiAnvilRepairItemRecipe;
 import net.minecraft.item.Item;

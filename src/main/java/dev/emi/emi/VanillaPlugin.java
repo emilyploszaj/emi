@@ -164,7 +164,7 @@ public class VanillaPlugin implements EmiPlugin {
 		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
 			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.compareOutputThenInput());
 		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
-				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
+				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.compareOutputThenInput());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		registry.addCategory(CRAFTING);

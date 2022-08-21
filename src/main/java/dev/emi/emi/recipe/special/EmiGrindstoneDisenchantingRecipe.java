@@ -1,15 +1,12 @@
 package dev.emi.emi.recipe.special;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.client.gui.screen.ingame.GrindstoneScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,7 +14,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.util.Identifier;
 
@@ -28,7 +24,6 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
     private final Item tool;
     private final Enchantment enchantment;
     private final int level;
-    private final int uniq = EmiUtil.RANDOM.nextInt();
 
     public EmiGrindstoneDisenchantingRecipe(Item tool, Enchantment enchantment, int level) {
         this.tool = tool;
@@ -78,7 +73,6 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
         widgets.addText(getExp(), 78, 39, -1, true);
         widgets.addSlot(getEnchantedTool(), 32, 4);
         widgets.addSlot(getTool(), 112, 19).recipeContext(this);
-
     }
 
     private EmiStack getEnchantedTool() {
