@@ -354,7 +354,7 @@ public class VanillaPlugin implements EmiPlugin {
 					}
 				}
 			}
-			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock) {
+			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && tf.isFertilizable(null,null,null, true) && tf.canGrow(null, null, null ,null)) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
 						new Identifier("emi", "flower_dupe/" + EmiUtil.subId(i)), false));
 			}
