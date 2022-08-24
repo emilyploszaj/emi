@@ -1,5 +1,6 @@
 package dev.emi.emi;
 
+import static dev.emi.emi.EmiPort.canTallFlowerDuplicate;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.ANVIL_REPAIRING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BLASTING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BREWING;
@@ -354,7 +355,7 @@ public class VanillaPlugin implements EmiPlugin {
 					}
 				}
 			}
-			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && tf.isFertilizable(null,null,null, true) && tf.canGrow(null, null, null ,null)) {
+			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && canTallFlowerDuplicate(tf)) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
 						new Identifier("emi", "flower_dupe/" + EmiUtil.subId(i)), false));
 			}
