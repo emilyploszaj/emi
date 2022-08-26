@@ -13,6 +13,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -95,6 +96,14 @@ public final class EmiPort {
 	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
 		return patterns.add(Registry.BANNER_PATTERN.getEntry(random.nextInt(Registry.BANNER_PATTERN.size())).get(),
 			DyeColor.values()[random.nextInt(DyeColor.values().length)]);
+	}
+
+	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
+		try {
+			return tallFlowerBlock.isFertilizable(null, null, null, true) && tallFlowerBlock.canGrow(null, null, null, null);
+		} catch(Exception e) {
+			return false;
+		}
 	}
 
 	public static void upload(VertexBuffer vb, BufferBuilder bldr) {
