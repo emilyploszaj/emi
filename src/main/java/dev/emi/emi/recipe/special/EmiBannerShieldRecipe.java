@@ -67,7 +67,7 @@ public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
 		if (item == Items.SHIELD) {
 			tag.putInt("Base", ((BannerItem) BANNERS.get(base)).getColor().getId());
 		}
-        BlockItem.setBlockEntityNbt(stack, BlockEntityType.BANNER, tag);
+		BlockItem.setBlockEntityNbt(stack, BlockEntityType.BANNER, tag);
 		//stack.setNbt(tag);
 		return EmiStack.of(stack);
 	}

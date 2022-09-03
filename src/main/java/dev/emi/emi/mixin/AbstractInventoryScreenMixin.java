@@ -78,11 +78,11 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 				}
 				x += xOff;
 			}
-            if (hovered != null && size > 1) {
-                List<Text> list = List.of(this.getStatusEffectDescription(hovered),
+			if (hovered != null && size > 1) {
+				List<Text> list = List.of(this.getStatusEffectDescription(hovered),
 					EmiPort.literal(StatusEffectUtil.durationToString(hovered, 1.0f)));
-                this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
-            }
+				this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
+			}
 			info.cancel();
 			if (this instanceof RecipeBookProvider rbp) {
 				RecipeBookWidget widget = rbp.getRecipeBookWidget();
