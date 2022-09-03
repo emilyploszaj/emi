@@ -197,6 +197,9 @@ public class SlotWidget extends Widget {
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
 		List<TooltipComponent> list = Lists.newArrayList();
+		if (getStack().isEmpty()) {
+			return list;
+		}
 		list.addAll(getStack().getTooltip());
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
 			list.add(supplier.get());

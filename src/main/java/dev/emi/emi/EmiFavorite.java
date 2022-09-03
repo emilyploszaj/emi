@@ -86,11 +86,19 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	public static class Synthetic extends EmiFavorite {
 		public final long amount;
 		public final int state;
+		public long total;
 
 		public Synthetic(EmiRecipe recipe, long amount, int state) {
 			super(recipe.getOutputs().get(0), recipe);
 			this.amount = amount;
 			this.state = state;
+		}
+
+		public Synthetic(EmiIngredient ingredient, long needed, long total) {
+			super(ingredient, null);
+			this.amount = needed;
+			this.total = total;
+			this.state = -1;
 		}
 
 		@Override
@@ -100,6 +108,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 				color = 0xaa00ff;
 			} else if (state == 2) {
 				color = 0x00dddd;
+			} else if (state == -1) {
+				color = 0xea842a;
 			}
 			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x44000000 | color);
 			super.render(matrices, x, y, delta, flags);
@@ -110,6 +120,9 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		public List<TooltipComponent> getTooltip() {
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(super.getTooltip());
+			if (state == -1) {
+				return list;
+			}
 			String key = "";
 			if (state == 0) {
 				key = "tooltip.emi.synfav.uncraftable";

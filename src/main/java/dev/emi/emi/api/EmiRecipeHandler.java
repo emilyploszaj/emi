@@ -28,12 +28,12 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 
 	/**
 	 * @return The slots where inputs should be placed to perform crafting.
-	 * 
-	 * @deprecated to be replaced with {@link EmiRecipeHandler#getCraftingSlots(EmiRecipe, HandledScreen)}
 	 */
-	@Deprecated
 	List<Slot> getCraftingSlots(T handler);
 
+	/**
+	 * @return The slots where inputs should be placed to perform crafting for a particular context.
+	 */
 	@ApiStatus.Experimental
 	default List<Slot> getCraftingSlots(EmiRecipe recipe, HandledScreen<T> screen) {
 		return getCraftingSlots(screen.getScreenHandler());
@@ -74,7 +74,11 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 			stacks = mutateFill(recipe, screen, stacks);
 			if (stacks != null) {
 				MinecraftClient.getInstance().setScreen(screen);
-				EmiClient.sendFillRecipe(this, screen, screen.getScreenHandler().syncId, action.id, stacks, recipe);
+				if (!EmiClient.onServer) {
+					return EmiRecipeFiller.clientFill(recipe, screen, stacks, action);
+				} else {
+					EmiClient.sendFillRecipe(this, screen, screen.getScreenHandler().syncId, action.id, stacks, recipe);
+				}
 				return true;
 			}
 		}

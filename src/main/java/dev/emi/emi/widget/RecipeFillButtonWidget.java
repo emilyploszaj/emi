@@ -28,7 +28,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 		EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 		EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
 		boolean applicable = handler != null && handler.supportsRecipe(recipe);
-		canFill = EmiClient.onServer && applicable && handler.canCraft(recipe, inv, hs);
+		canFill = applicable && handler.canCraft(recipe, inv, hs);
 		if (!canFill) {
 			if (!applicable) {
 				invalid = EmiPort.translatable("emi.inapplicable");

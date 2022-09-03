@@ -16,6 +16,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -65,6 +66,9 @@ public class EmiFavorites {
 	}
 
 	public static void addFavoriteAt(EmiIngredient stack, int offset) {
+		if (stack instanceof EmiFavorite.Synthetic) {
+			return;
+		}
 		EmiFavorite favorite;
 		if (stack instanceof EmiFavorite fav) {
 			int original = favorites.indexOf(fav);
@@ -97,6 +101,9 @@ public class EmiFavorites {
 	}
 
 	public static void addFavorite(EmiIngredient stack, EmiRecipe context) {
+		if (stack instanceof EmiFavorite.Synthetic) {
+			return;
+		}
 		if (stack instanceof EmiFavorite f) {
 			if (!favorites.remove(f)) {
 				favorites.add(f);
@@ -157,6 +164,12 @@ public class EmiFavorites {
 			}
 			if (!hasSomething) {
 				BoM.craftingMode = false;
+			} else {
+				for (FlatMaterialCost cost : BoM.tree.costs) {
+					if (cost.amount > 0) {
+						syntheticFavorites.add(new EmiFavorite.Synthetic(cost.ingredient, cost.amount, cost.amount));
+					}
+				}
 			}
 		}
 	}

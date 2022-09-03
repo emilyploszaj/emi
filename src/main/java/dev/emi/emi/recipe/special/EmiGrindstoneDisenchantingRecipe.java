@@ -1,5 +1,10 @@
 package dev.emi.emi.recipe.special;
 
+import java.util.List;
+import java.util.Random;
+
+import org.apache.commons.compress.utils.Lists;
+
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -13,89 +18,96 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import java.util.List;
-import java.util.Random;
-
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
-    private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
-    private final int uniq = EmiUtil.RANDOM.nextInt();
-    private final Item tool;
+	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private final int uniq = EmiUtil.RANDOM.nextInt();
+	private final Item tool;
 
-    public EmiGrindstoneDisenchantingRecipe(Item tool) {
-        this.tool = tool;
-    }
+	public EmiGrindstoneDisenchantingRecipe(Item tool) {
+		this.tool = tool;
+	}
 
-    @Override
-    public EmiRecipeCategory getCategory() {
-        return VanillaEmiRecipeCategories.GRINDING;
-    }
+	@Override
+	public EmiRecipeCategory getCategory() {
+		return VanillaEmiRecipeCategories.GRINDING;
+	}
 
-    @Override
-    public Identifier getId() {
-        return null;
-    }
+	@Override
+	public Identifier getId() {
+		return null;
+	}
 
-    @Override
-    public List<EmiIngredient> getInputs() {
-        return List.of(EmiStack.of(tool));
-    }
+	@Override
+	public List<EmiIngredient> getInputs() {
+		return List.of(EmiStack.of(tool));
+	}
 
-    @Override
-    public List<EmiStack> getOutputs() {
-        return List.of(EmiStack.of(tool));
-    }
+	@Override
+	public List<EmiStack> getOutputs() {
+		return List.of(EmiStack.of(tool));
+	}
 
-    @Override
-    public boolean supportsRecipeTree() {
-        return false;
-    }
+	@Override
+	public boolean supportsRecipeTree() {
+		return false;
+	}
 
-    @Override
-    public int getDisplayWidth() {
-        return 130;
-    }
+	@Override
+	public int getDisplayWidth() {
+		return 130;
+	}
 
-    @Override
-    public int getDisplayHeight() {
-        return 61;
-    }
+	@Override
+	public int getDisplayHeight() {
+		return 61;
+	}
 
-    @Override
-    public void addWidgets(WidgetHolder widgets) {
-        widgets.addTexture(BACKGROUND, 0, 0, 130, 61, 16, 14);
+	@Override
+	public void addWidgets(WidgetHolder widgets) {
+		widgets.addTexture(BACKGROUND, 0, 0, 130, 61, 16, 14);
 
-        int notUniq= uniq;
-        widgets.addGeneratedSlot(r -> getTool(r, true), notUniq,32, 4).drawBack(false);
-        widgets.addGeneratedSlot(r -> getTool(r, false), notUniq, 112, 19).drawBack(false).recipeContext(this);
-    }
+		int notUniq= uniq;
+		widgets.addGeneratedSlot(r -> getTool(r, true), notUniq,32, 4).drawBack(false);
+		widgets.addGeneratedSlot(r -> getTool(r, false), notUniq, 112, 19).drawBack(false).recipeContext(this);
+	}
 
-    private EmiStack getTool(Random random, Boolean enchanted){
-        ItemStack itemStack = new ItemStack(tool);
-        int enchantments = 1 + Math.max(random.nextInt(5), random.nextInt(3));
+	private EmiStack getTool(Random random, Boolean enchanted){
+		ItemStack itemStack = new ItemStack(tool);
+		int enchantments = 1 + Math.max(random.nextInt(5), random.nextInt(3));
 
-        for (int i = 0; i < enchantments; i++) {
-            Enchantment enchantment = getEnchantment(random);
+		List<Enchantment> list = Lists.newArrayList();
 
-            int maxLvl = enchantment.getMaxLevel();
-            int minLvl = enchantment.getMinLevel();
-            int lvl = random.nextInt(maxLvl) + 1;
+		outer:
+		for (int i = 0; i < enchantments; i++) {
+			Enchantment enchantment = getEnchantment(random);
 
-            if (lvl < minLvl) {
-                lvl = minLvl;
-            }
+			int maxLvl = enchantment.getMaxLevel();
+			int minLvl = enchantment.getMinLevel();
+			int lvl = random.nextInt(maxLvl) + 1;
 
-            if (enchantment.isCursed()) {
-                itemStack.addEnchantment(enchantment, lvl);
-            } else if (enchanted) {
-                itemStack.addEnchantment(enchantment, lvl);
-            }
-        }
-        return EmiStack.of(itemStack);
-    }
+			if (lvl < minLvl) {
+				lvl = minLvl;
+			}
+			
+			for (Enchantment e : list) {
+				if (e == enchantment || !e.canCombine(enchantment)) {
+					continue outer;
+				}
+			}
+			list.add(enchantment);
 
-    private Enchantment getEnchantment(Random random){
-        List<Enchantment> enchantments = Registry.ENCHANTMENT.stream().filter(i -> i.isAcceptableItem(tool.getDefaultStack())).toList();
-        int enchantment = random.nextInt(enchantments.size());
-        return enchantments.get(enchantment);
-    }
+			if (enchantment.isCursed()) {
+				itemStack.addEnchantment(enchantment, lvl);
+			} else if (enchanted) {
+				itemStack.addEnchantment(enchantment, lvl);
+			}
+		}
+		return EmiStack.of(itemStack);
+	}
+
+	private Enchantment getEnchantment(Random random){
+		List<Enchantment> enchantments = Registry.ENCHANTMENT.stream().filter(i -> i.isAcceptableItem(tool.getDefaultStack())).toList();
+		int enchantment = random.nextInt(enchantments.size());
+		return enchantments.get(enchantment);
+	}
 }

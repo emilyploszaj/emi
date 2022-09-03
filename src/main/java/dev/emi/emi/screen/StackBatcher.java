@@ -1,9 +1,13 @@
 package dev.emi.emi.screen;
 
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +19,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -23,13 +28,38 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Matrix4f;
 
 /**
  * @author Una "unascribed" Thompson
  */
 public class StackBatcher {
+	private static MethodHandle sodiumSpriteHandle;
+	
+	static {
+		try {
+			Class<?> clazz = null;
+			// TODO this is a 1.18 -> 1.19 refactor for Sodium
+			try {
+				clazz = Class.forName("net.caffeinemc.sodium.render.texture.SpriteUtil");
+			} catch (Throwable t) {
+			}
+			if (clazz == null) {
+				clazz = Class.forName("me.jellysquid.mods.sodium.client.render.texture.SpriteUtil");
+			}
+			sodiumSpriteHandle = MethodHandles.lookup()
+				.findStatic(clazz, "markSpriteActive", MethodType.methodType(void.class, Sprite.class));
+			if (sodiumSpriteHandle != null) {
+				System.out.println("[emi] Discovered Sodium");
+			}
+		} catch (Throwable e) {
+		}
+	}
 
 	public interface Batchable {
 		boolean isSideLit();
@@ -41,6 +71,7 @@ public class StackBatcher {
 	private final BatcherVertexConsumerProvider imm;
 	private final VertexConsumerProvider unlitFacade;
 	private final Map<RenderLayer, VertexBuffer> buffers = new LinkedHashMap<>();
+	private final Set<Sprite> spritesToUpdate = Sets.newHashSet();
 	private boolean populated = false;
 	private boolean dirty = false;
 	private int x;
@@ -85,6 +116,7 @@ public class StackBatcher {
 		if (dirty) {
 			populated = false;
 			dirty = false;
+			spritesToUpdate.clear();
 		}
 	}
 
@@ -93,6 +125,19 @@ public class StackBatcher {
 			if (populated) return;
 			try {
 				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
+				if (sodiumSpriteHandle != null && !stack.isEmpty()) {
+					ItemStack is = stack.getEmiStacks().get(0).getItemStack();
+					MinecraftClient client = MinecraftClient.getInstance();
+					BakedModel model = client.getItemRenderer().getModels().getModel(is);
+					if (model != null) {
+						List<BakedQuad> quads = EmiPort.getQuads(model);
+						for (BakedQuad quad : quads) {
+							if (quad != null) {
+								spritesToUpdate.add(quad.getSprite());
+							}
+						}
+					}
+				}
 			} catch (Throwable t) {
 				if (EmiConfig.devMode) {
 					System.err.println("[emi] Stack threw exception during batched rendering. See log for info");
@@ -108,6 +153,14 @@ public class StackBatcher {
 	public void draw() {
 		if (!isEnabled()) {
 			return;
+		}
+		if (sodiumSpriteHandle != null) {
+			try {
+				for (Sprite sprite : spritesToUpdate) {
+					sodiumSpriteHandle.invoke(sprite);
+				}
+			} catch (Throwable t) {
+			}
 		}
 		if (!populated) {
 			bake();

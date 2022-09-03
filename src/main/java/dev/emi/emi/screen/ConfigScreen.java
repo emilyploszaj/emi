@@ -13,12 +13,14 @@ import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiConfig.Comment;
 import dev.emi.emi.EmiConfig.ConfigEnum;
 import dev.emi.emi.EmiConfig.ConfigGroup;
+import dev.emi.emi.EmiConfig.ConfigGroupEnd;
 import dev.emi.emi.EmiConfig.ConfigValue;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.widget.BooleanWidget;
+import dev.emi.emi.screen.widget.ConfigEntryWidget;
 import dev.emi.emi.screen.widget.EmiBindWidget;
 import dev.emi.emi.screen.widget.EmiNameWidget;
 import dev.emi.emi.screen.widget.EnumWidget;
@@ -89,6 +91,7 @@ public class ConfigScreen extends Screen {
 		list.addEntry(new EmiNameWidget());
 		try {
 			String lastGroup = "";
+			ConfigGroup currentGroup = null;
 			for (Field field : EmiConfig.class.getFields()) {
 				ConfigValue annot = field.getAnnotation(ConfigValue.class);
 				if (annot != null) {
@@ -102,11 +105,13 @@ public class ConfigScreen extends Screen {
 					}
 					ConfigGroup configGroup = field.getAnnotation(ConfigGroup.class);
 					if (configGroup != null) {
+						currentGroup = configGroup;
 						list.addEntry(new SubGroupNameWidget(EmiPort.translatable("config.emi.group." + configGroup.value())));
 					}
 					Text translation = EmiPort.translatable("config.emi." + annot.value().replace('-', '_'));
+					ConfigEntryWidget entry = null;
 					if (field.getType() == boolean.class) {
-						list.addEntry(new BooleanWidget(translation, getTooltipRenderer(field), new Mutator<Boolean>() {
+						entry = new BooleanWidget(translation, getTooltipRenderer(field), new Mutator<Boolean>() {
 
 							public Boolean get() {
 								try {
@@ -120,9 +125,9 @@ public class ConfigScreen extends Screen {
 									field.setBoolean(null, value);
 								} catch (Exception e) {}
 							}						
-						}));
+						});
 					} else if (field.getType() == int.class) {
-						list.addEntry(new IntWidget(translation, getTooltipRenderer(field), new Mutator<Integer>() {
+						entry = new IntWidget(translation, getTooltipRenderer(field), new Mutator<Integer>() {
 
 							public Integer get() {
 								try {
@@ -136,11 +141,11 @@ public class ConfigScreen extends Screen {
 									field.setInt(null, value);
 								} catch (Exception e) {}
 							}						
-						}));
+						});
 					} else if (field.getType() == EmiBind.class) {
-						list.addEntry(new EmiBindWidget(this, getTooltipRenderer(field), (EmiBind) field.get(null)));
+						entry = new EmiBindWidget(this, getTooltipRenderer(field), (EmiBind) field.get(null));
 					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {
-						list.addEntry(new EnumWidget(translation, getTooltipRenderer(field), new Mutator<ConfigEnum>() {
+						entry = new EnumWidget(translation, getTooltipRenderer(field), new Mutator<ConfigEnum>() {
 
 							public ConfigEnum get() {
 								try {
@@ -157,7 +162,14 @@ public class ConfigScreen extends Screen {
 									throw new RuntimeException(e);
 								}
 							}
-						}));
+						});
+					}
+					if (entry != null) {
+						entry.group = currentGroup;
+						list.addEntry(entry);
+					}
+					if (field.getAnnotation(ConfigGroupEnd.class) != null) {
+						currentGroup = null;
 					}
 				}
 			}

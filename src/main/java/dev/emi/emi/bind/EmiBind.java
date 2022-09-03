@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiUtil;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 
 public class EmiBind {
@@ -53,9 +54,22 @@ public class EmiBind {
 		updateBinds();
 	}
 
+	public boolean isHeld() {
+		for (ModifiedKey boundKey : boundKeys) {
+			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
+				if (boundKey.key.getCategory() == InputUtil.Type.KEYSYM && boundKey.key.getCode() != -1) {
+					if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), boundKey.key.getCode())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean matchesKey(int keyCode, int scanCode) {
 		for (ModifiedKey boundKey : boundKeys) {
-			if (EmiUtil.getCurrentModifiers() == boundKey.modifiers) {
+			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
 					if (boundKey.key.getCategory() == InputUtil.Type.SCANCODE && boundKey.key.getCode() == scanCode) {
 						return true;
@@ -72,7 +86,7 @@ public class EmiBind {
 
 	public boolean matchesMouse(int code) {
 		for (ModifiedKey boundKey : boundKeys) {
-			if (EmiUtil.getCurrentModifiers() == boundKey.modifiers) {
+			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (boundKey.key.getCategory() == InputUtil.Type.MOUSE && boundKey.key.getCode() == code) {
 					return true;
 				}
@@ -120,6 +134,14 @@ public class EmiBind {
 			}
 			name += key.getTranslationKey();
 			return name;
+		}
+
+		public int modifiersToMatch() {
+			int modifiers = this.modifiers;
+			if (key.getCategory() == InputUtil.Type.KEYSYM) {
+				modifiers ^= EmiUtil.maskFromCode(key.getCode());
+			}
+			return modifiers;
 		}
 
 		public boolean isUnbound() {

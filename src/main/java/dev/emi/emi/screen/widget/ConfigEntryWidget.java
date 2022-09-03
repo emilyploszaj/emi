@@ -2,6 +2,7 @@ package dev.emi.emi.screen.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiConfig.ConfigGroup;
 import dev.emi.emi.screen.widget.ListWidget.Entry;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
@@ -13,6 +14,7 @@ public abstract class ConfigEntryWidget extends Entry {
 	private final Text name;
 	private final Drawable tooltip;
 	private final int height;
+	public ConfigGroup group;
 	private List<? extends Element> children = List.of();
 	
 	public ConfigEntryWidget(Text name, Drawable tooltip, int height) {
@@ -31,6 +33,10 @@ public abstract class ConfigEntryWidget extends Entry {
 	@Override
 	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
+		if (group != null) {
+			x += 10;
+			width -= 10;
+		}
 		update(y, x, width, height);
 		DrawableHelper.fill(matrices, x, y, x + width, y + height, 0x66000000);
 		parentList.client.textRenderer.drawWithShadow(matrices, this.name, x + 6,

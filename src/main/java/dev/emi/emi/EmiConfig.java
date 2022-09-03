@@ -114,6 +114,10 @@ public class EmiConfig {
 	@ConfigValue("binds.focus-search")
 	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_F);
 
+	@Comment("Clears the search bar.")
+	@ConfigValue("binds.clear-search")
+	public static EmiBind clearSearch = new EmiBind("key.emi.clear_search", InputUtil.UNKNOWN_KEY.getCode());
+
 	@Comment("Display the recipes for creating an item.")
 	@ConfigValue("binds.view-recipes")
 	public static EmiBind viewRecipes = new EmiBind("key.emi.view_recipes",
@@ -173,12 +177,16 @@ public class EmiConfig {
 	@ConfigValue("binds.craft-all-to-inventory")
 	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
 
-	@ConfigGroupEnd
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result\nand put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+
+	@ConfigGroupEnd
+	@Comment("Display the recipe that will be used\nto craft on a stack with no recipe context.")
+	@ConfigValue("binds.show-craft")
+	public static EmiBind showCraft = new EmiBind("key.emi.show_craft", GLFW.GLFW_KEY_LEFT_SHIFT);
 
 	@ConfigGroup("binds.cheats")
 	@Comment("Cheat in one of an item into the inventory.")

@@ -50,7 +50,8 @@ public class MaterialTree {
 			stack = stack.copy();
 			remainders.put(stack, new FlatMaterialCost(stack, stack.getAmount()));
 		}
-		calculateFlatCost(Lists.newArrayList(), remainders, batches * goal.amount, goal, true);
+		costs.clear();
+		calculateFlatCost(costs, remainders, batches * goal.amount, goal, true);
 	}
 
 	public void calculateCost(boolean fractional) {
@@ -133,7 +134,10 @@ public class MaterialTree {
 			amount = node.amount;
 		}
 		long original = amount;
-		amount -= getRemainder(remainders, node.ingredient.getEmiStacks().get(0), amount, catalyst);
+		List<EmiStack> ingredientStacks = node.ingredient.getEmiStacks();
+		for (int i = 0; i < ingredientStacks.size(); i++) {
+			amount -= getRemainder(remainders, ingredientStacks.get(i), amount, catalyst);
+		}
 		if (amount == 0) {
 			if (progress) {
 				complete(node);
@@ -144,7 +148,7 @@ public class MaterialTree {
 			node.progress = ProgressState.PARTIAL;
 		}
 		
-		if (recipe != null && node.state != FoldState.COLLAPSED && (!BoM.craftingMode || node.progress != ProgressState.COMPLETED)) {
+		if (recipe != null && node.state != FoldState.COLLAPSED) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
 			if (progress) {
 				node.neededBatches = minBatches;

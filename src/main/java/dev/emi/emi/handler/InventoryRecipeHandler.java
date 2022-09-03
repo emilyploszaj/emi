@@ -72,7 +72,13 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 
 	@Override
 	public boolean supportsRecipe(EmiRecipe recipe) {
-		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree();
+		if (recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree()) {
+			if (recipe instanceof EmiCraftingRecipe crafting) {
+				return crafting.canFit(2, 2);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override

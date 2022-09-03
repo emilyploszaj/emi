@@ -1,16 +1,16 @@
 package dev.emi.emi;
 
-import static dev.emi.emi.EmiPort.canTallFlowerDuplicate;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.ANVIL_REPAIRING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BLASTING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.BREWING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.CAMPFIRE_COOKING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.CRAFTING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.GRINDING;
+import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.INFO;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMELTING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMITHING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.SMOKING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.STONECUTTING;
-import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.GRINDING;
 import static dev.emi.emi.api.recipe.VanillaEmiRecipeCategories.WORLD_INTERACTION;
 
 import java.util.Collection;
@@ -169,6 +169,8 @@ public class VanillaPlugin implements EmiPlugin {
 				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.compareOutputThenInput());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
+		INFO = new EmiRecipeCategory(new Identifier("emi:info"),
+			EmiStack.of(Items.WRITABLE_BOOK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		registry.addCategory(CRAFTING);
 		registry.addCategory(SMELTING);
 		registry.addCategory(BLASTING);
@@ -180,6 +182,7 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addCategory(BREWING);
 		registry.addCategory(GRINDING);
 		registry.addCategory(WORLD_INTERACTION);
+		registry.addCategory(INFO);
 		registry.addCategory(TAG);
 		registry.addCategory(INGREDIENT);
 		registry.addCategory(RESOLUTION);
@@ -365,7 +368,7 @@ public class VanillaPlugin implements EmiPlugin {
 				}
 				addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
 			}
-			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && canTallFlowerDuplicate(tf)) {
+			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && EmiPort.canTallFlowerDuplicate(tf)) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
 						new Identifier("emi", "flower_dupe/" + EmiUtil.subId(i)), false));
 			}

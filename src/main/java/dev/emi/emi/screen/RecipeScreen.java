@@ -186,7 +186,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
 		if (!workstations.isEmpty()) {
-			int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18);
+			int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18 - 1);
 			RenderSystem.setShaderTexture(0, TEXTURE);
 			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + getWorkstationsY() - 3, 24, 6 + 18 * size, 27, 0, 3, 1);
 		}

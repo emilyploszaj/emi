@@ -5,6 +5,7 @@
 
   "key.emi.toggle_visibility": "Toggle Visibility",
   "key.emi.focus_search": "Focus Search",
+  "key.emi.clear_search": "Clear Search",
   "key.emi.view_recipes": "View Recipes",
   "key.emi.view_uses": "View Uses",
   "key.emi.favorite": "Favorite",
@@ -19,6 +20,7 @@
   "key.emi.craft_one_to_inventory": "Craft One to Inventory",
   "key.emi.craft_all_to_inventory": "Craft All to Inventory",
   "key.emi.craft_one_to_cursor": "Craft One to Cursor",
+  "key.emi.show_craft": "Show Craft",
   "key.emi.cheat_one_to_inventory": "Cheat One to Inventory",
   "key.emi.cheat_stack_to_inventory": "Cheat Stack to Inventory",
   "key.emi.cheat_one_to_cursor": "Cheat One to Cursor",
@@ -103,6 +105,7 @@
   "tooltip.emi.bom.batch_size": "Batch size: %s\nScroll to adjust\nHold §6[shift]§r to adjust by 16",
   "tooltip.emi.bom.mode.view": "§6Viewing§r recipe tree",
   "tooltip.emi.bom.mode.craft": "§6Crafting§r recipe tree\nProgress will be shown in recipe tree\n§bSynthetic favorites§r added to sidebar",
+  "tooltip.emi.bom.help": "The recipe tree shows the process and base cost of a recipe\nThe display can be panned and zoomed\n\nLeft click a node to choose a recipe to assign to it\nHold §6[shift]§r to automatically pick based on your inventory\n\nRight click a recipe node to fold it temporarily\nHold §6[shift]§r to clear the recipe\n\nThe initial tree state is controlled by default recipes\nA button next to recipes can set default recipe preferences\n\nThe toggle by total cost can be used to help craft a recipe tree\nWhile crafting, materials that need to be collected will be displayed\n§bSynthetic favorites§r will be added to the favorites sidebar that\nwill show incomplete steps and can be used to craft",
   
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Below lava",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Adjacent to lava",
@@ -126,8 +129,9 @@
   "emi.category.minecraft.brewing": "Brewing",
   "emi.category.emi.grinding": "Grinding",
   "emi.category.emi.world_interaction": "World Interaction",
+  "emi.category.emi.info": "Info",
+  
   "emi.category.emi.tag": "Tags",
-
   "emi.category.emi.ingredient": "Ingredients",
 
   "tag.minecraft.logs": "Logs",

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
-
 import org.lwjgl.glfw.GLFW;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
@@ -174,11 +174,17 @@ public class EmiSearchWidget extends TextFieldWidget {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (this.isFocused() && (EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
-				|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {
-			this.setTextFieldFocused(false);
-			this.setFocused(false);
-			return true;
+		if (this.isFocused()) {
+			if (EmiConfig.clearSearch.matchesKey(keyCode, scanCode)) {
+				setText("");
+				return true;
+			}
+			if ((EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
+					|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {
+				this.setTextFieldFocused(false);
+				this.setFocused(false);
+				return true;
+			}
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}

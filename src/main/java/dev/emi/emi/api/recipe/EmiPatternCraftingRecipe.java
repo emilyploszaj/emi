@@ -16,6 +16,10 @@ public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
 		super(input, output, id);
 	}
+	
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
+		super(input, output, id, shapeless);
+	}
 
 	public abstract SlotWidget getInputWidget(int slot, int x, int y);
 

@@ -2,7 +2,10 @@ package dev.emi.emi.screen;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
@@ -55,6 +58,7 @@ public class BoMScreen extends Screen {
 	private static int zoom = 0;
 	private Bounds batches = new Bounds(-24, -50, 48, 26);
 	private Bounds mode = new Bounds(-24, -50, 16, 16);
+	private Bounds help = new Bounds(0, 0, 16, 16);
 	private double offX, offY;
 	private List<Node> nodes = Lists.newArrayList();
 	private List<Cost> costs = Lists.newArrayList();
@@ -80,6 +84,7 @@ public class BoMScreen extends Screen {
 	}
 
 	public void recalculateTree() {
+		help = new Bounds(width - 18, height - 18, 16, 16);
 		if (BoM.tree != null) {
 			TreeVolume volume = addNewNodes(BoM.tree.goal, BoM.tree.batches, 1, 0);
 			nodes = volume.nodes;
@@ -97,6 +102,8 @@ public class BoMScreen extends Screen {
 			nodeHeight = getNodeHeight(BoM.tree.goal);
 			playerInv = new EmiPlayerInventory(client.player);
 			BoM.tree.calculateProgress(playerInv);
+			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.tree.costs.stream()
+				.collect(Collectors.toMap(c -> c.ingredient, c -> c));
 			BoM.tree.calculateCost(false);
 
 			costs.clear();
@@ -110,6 +117,14 @@ public class BoMScreen extends Screen {
 			int costX = (costWidth - COST_HORIZONTAL_SPACING) / -2;
 			for (FlatMaterialCost node : BoM.tree.costs) {
 				Cost cost = new Cost(node, costX, cy, false);
+				if (BoM.craftingMode) {
+					if (!progressCosts.containsKey(node.ingredient)) {
+						cost.alreadyDone = node.amount;
+					} else {
+						FlatMaterialCost progress = progressCosts.get(node.ingredient);
+						cost.alreadyDone = node.amount - progress.amount;
+					}
+				}
 				costs.add(cost);
 				costX += 16 + COST_HORIZONTAL_SPACING + EmiRenderHelper.getAmountOverflow(cost.getAmountText());
 			}
@@ -198,6 +213,14 @@ public class BoMScreen extends Screen {
 
 		viewMatrices.pop();
 		RenderSystem.applyModelViewMatrix();
+
+		if (help.contains(mouseX, mouseY)) {
+			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+		}
+		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+		drawTexture(matrices, help.x(), help.y(), 32, 146, help.width(), help.height());
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
 		Hover hover = getHoveredStack(mouseX, mouseY);
 		if (hover != null) {
 			hover.drawTooltip(this, matrices, mouseX, mouseY);
@@ -212,6 +235,11 @@ public class BoMScreen extends Screen {
 					.stream(I18n.translate(key, BoM.tree.batches).split("\n"))
 					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
 			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
+		} else if (help.contains(mouseX, mouseY)) {
+			List<TooltipComponent> list = Arrays
+					.stream(I18n.translate("tooltip.emi.bom.help").split("\n"))
+					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
+			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, width - 18, height - 18);
 		}
 	}
 
@@ -327,6 +355,43 @@ public class BoMScreen extends Screen {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
+	private static boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
+		EmiPlayerInventory inv = EmiScreenManager.lastPlayerInventory;
+		if (inv != null) {
+			List<EmiStack> stacks = hover.stack.getEmiStacks();
+			if (stacks.size() > 1) {
+				for (EmiStack invStack : inv.inventory.values()) {
+					for (EmiStack stack : stacks) {
+						if (stack.equals(invStack)) {
+							consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+							return true;
+						}
+					}
+				}
+				for (EmiStack stack : stacks) {
+					EmiRecipe recipe = EmiUtil.getRecipeResolution(stack, inv, true);
+					if (recipe != null) {
+						consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+						consumer.accept(stack, recipe);
+						return true;
+					}
+				}
+				consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stacks.get(0)));
+				return true;
+			} else {
+				EmiRecipe recipe = EmiUtil.getRecipeResolution(hover.stack, inv, true);
+				if (recipe == null) {
+					recipe = EmiUtil.getRecipeResolution(hover.stack, inv, false);
+				}
+				if (recipe != null) {
+					consumer.accept(hover.stack, recipe);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		Hover hover = getHoveredStack((int) mouseX, (int) mouseY);
@@ -334,28 +399,41 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (hover != null) {
-			if (button == 1 && hover.node != null && hover.node.recipe != null && !(hover.node.recipe instanceof EmiResolutionRecipe)) {
-				if (hover.node.state == FoldState.EXPANDED) {
-					hover.node.state = FoldState.COLLAPSED;
-				} else {
-					hover.node.state = FoldState.EXPANDED;
+			if (button == 1 && hover.node != null && hover.node.recipe != null) {
+				if (EmiUtil.isShiftDown()) {
+					BoM.tree.addResolution(hover.node.ingredient, null);
+				} else if (!(hover.node.recipe instanceof EmiResolutionRecipe)) {
+					if (hover.node.state == FoldState.EXPANDED) {
+						hover.node.state = FoldState.COLLAPSED;
+					} else {
+						hover.node.state = FoldState.EXPANDED;
+					}
 				}
 				recalculateTree();
 				return true;
 			}
 			if (hover.stack != null) {
-				EmiApi.displayRecipes(hover.stack);
-				RecipeScreen.resolve = hover.stack;
-				MinecraftClient client = MinecraftClient.getInstance();
-				// The first init doesn't realize a resolution exists so we do it again. What
-				// could go wrong.
-				client.currentScreen.init(client, client.currentScreen.width, client.currentScreen.height);
-				if (hover.node != null) {
-					if (hover.node.recipe != null) {
-						EmiApi.focusRecipe(hover.node.recipe);
+				if (EmiUtil.isShiftDown() && button == 0) {
+					if (getAutoResolutions(hover, BoM.tree::addResolution)) {
+						recalculateTree();
+					}
+					return true;
+				} else {
+					if (button == 0) {
+						EmiApi.displayRecipes(hover.stack);
+						RecipeScreen.resolve = hover.stack;
+						MinecraftClient client = MinecraftClient.getInstance();
+						// The first init doesn't realize a resolution exists so we do it again. What
+						// could go wrong.
+						client.currentScreen.init(client, client.currentScreen.width, client.currentScreen.height);
+						if (hover.node != null) {
+							if (hover.node.recipe != null) {
+								EmiApi.focusRecipe(hover.node.recipe);
+							}
+						}
+						return true;
 					}
 				}
-				return true;
 			}
 		} else if (mode.contains(mx, my)) {
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
@@ -419,6 +497,7 @@ public class BoMScreen extends Screen {
 	private class Cost {
 		public FlatMaterialCost cost;
 		public int x, y;
+		public long alreadyDone = 0;
 		public boolean remainder;
 
 		public Cost(FlatMaterialCost cost, int x, int y, boolean remainder) {
@@ -435,12 +514,7 @@ public class BoMScreen extends Screen {
 
 		public Text getAmountText() {
 			if (!remainder && BoM.craftingMode) {
-				long amount = 0;
-				for (EmiStack stack : cost.ingredient.getEmiStacks()) {
-					if (playerInv.inventory.containsKey(stack)) {
-						amount += playerInv.inventory.get(stack).getAmount();
-					}
-				}
+				long amount = alreadyDone;
 				if (amount < cost.amount) {
 					Text amountText = amount == 0 ? EmiPort.literal("0") : (cost.ingredient.getAmountText(amount));
 					MutableText text = EmiPort.append(EmiPort.literal("", Formatting.RED), amountText);
@@ -480,8 +554,18 @@ public class BoMScreen extends Screen {
 			if (stack != null) {
 				List<TooltipComponent> list = Lists.newArrayList();
 				list.addAll(stack.getTooltip());
-				if (node != null && node.recipe != null) {
-					list.add(new RecipeTooltipComponent(node.recipe));
+				if (node != null) {
+					if (EmiUtil.isShiftDown()) {
+						getAutoResolutions(this, (stack, recipe) -> {
+							if (recipe != node.recipe) {
+								list.add(new RecipeTooltipComponent(recipe, 0x4488FFAA));
+							} else {
+								list.add(new RecipeTooltipComponent(recipe));
+							}
+						});
+					} else if (node.recipe != null) {
+						list.add(new RecipeTooltipComponent(node.recipe));
+					}
 				}
 				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, list, mouseX,
 						Math.max(16, mouseY));

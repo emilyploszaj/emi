@@ -1,16 +1,26 @@
 package dev.emi.emi;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
 
+import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
+import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.bom.BoM;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -108,5 +118,47 @@ public class EmiUtil {
 			return container.get().getMetadata().getName();
 		}
 		return namespace;
+	}
+
+	public static EmiRecipe getPreferredRecipe(List<EmiRecipe> recipes) {
+		if (recipes.isEmpty()) {
+			return null;
+		}
+		for (EmiRecipe recipe : recipes) {
+			if (BoM.isRecipeEnabled(recipe)) {
+				return recipe;
+			}
+		}
+		return recipes.get(0);
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static List<EmiRecipe> getValidRecipes(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
+		if (ingredient.getEmiStacks().size() == 1) {
+			HandledScreen<?> hs = EmiApi.getHandledScreen();
+			EmiStack stack = ingredient.getEmiStacks().get(0);
+			return EmiRecipes.byOutput.getOrDefault(stack.getKey(), Map.of()).values().stream().flatMap(l -> l.stream()).filter(r -> {
+				if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
+					EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
+					return handler != null && (!requireCraftable || handler.canCraft(r, inventory, hs));
+				}
+				return false;
+			}).toList();
+		}
+		return List.of();
+	}
+
+	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
+		if (ingredient.getEmiStacks().size() == 1) {
+			EmiStack stack = ingredient.getEmiStacks().get(0);
+			return getPreferredRecipe(EmiRecipes.byOutput.getOrDefault(stack.getKey(), Map.of()).values().stream()
+				.flatMap(l -> l.stream()).filter(r -> {
+					if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
+						return !requireCraftable || inventory.canCraft(r);
+					}
+					return false;
+				}).toList());
+		}
+		return null;
 	}
 }
