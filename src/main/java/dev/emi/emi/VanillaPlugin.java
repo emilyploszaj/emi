@@ -366,7 +366,10 @@ public class VanillaPlugin implements EmiPlugin {
 						}
 					}
 				}
-				addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
+				// Who said the vanishing curse is actually in the registry?
+				if (!Registry.ENCHANTMENT.stream().filter(e -> e.isAcceptableItem(i.getDefaultStack())).toList().isEmpty()) {
+					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
+				}
 			}
 			if (i instanceof BlockItem bi && bi.getBlock() instanceof TallFlowerBlock tf && EmiPort.canTallFlowerDuplicate(tf)) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(bi).setRemainder(EmiStack.of(bi)), EmiStack.of(Items.BONE_MEAL), EmiStack.of(i),
