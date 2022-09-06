@@ -2,7 +2,6 @@ package dev.emi.emi.widget;
 
 import java.util.List;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiUtil;
@@ -48,9 +47,10 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		if (!EmiClient.onServer) {
+		// TODO should this still be used?
+		/*if (!EmiClient.onServer) {
 			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.fill_recipe_no_server"))));
-		}
+		}*/
 		if (canFill) {
 			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.fill_recipe"))));
 		} else {
