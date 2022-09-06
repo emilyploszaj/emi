@@ -60,9 +60,6 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
-		if (!EmiClient.onServer) {
-			return false;
-		}
 		if (canFill) {
 			this.playButtonSound();
 			EmiApi.performFill(recipe, EmiFillAction.FILL, EmiUtil.isShiftDown() ? Integer.MAX_VALUE : 1);
