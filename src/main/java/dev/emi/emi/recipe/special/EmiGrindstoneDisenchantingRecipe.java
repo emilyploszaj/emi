@@ -83,7 +83,8 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 
 			int maxLvl = enchantment.getMaxLevel();
 			int minLvl = enchantment.getMinLevel();
-			int lvl = random.nextInt(maxLvl) + 1;
+			// Some enchantments are returning zero for max level? I don't want to think about it
+			int lvl = maxLvl > 0 ? random.nextInt(maxLvl) + 1 : 0;
 
 			if (lvl < minLvl) {
 				lvl = minLvl;
