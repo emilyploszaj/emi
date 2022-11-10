@@ -1,11 +1,18 @@
 package dev.emi.emi;
 
+import java.util.List;
+
+import org.apache.commons.compress.utils.Lists;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -64,6 +71,14 @@ public class EmiRenderHelper {
 			}
 		}
 		return text;
+	}
+
+	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
+		y = Math.max(16, y);
+		// Some mods assume this list will be mutable, oblige them
+		List<TooltipComponent> mutable = Lists.newArrayList();
+		mutable.addAll(components);
+		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, mutable, x, y);
 	}
 
 	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {

@@ -34,7 +34,6 @@ import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.ProgressState;
-import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -228,18 +227,18 @@ public class BoMScreen extends Screen {
 			List<TooltipComponent> list = Arrays
 					.stream(I18n.translate("tooltip.emi.bom.batch_size", BoM.tree.batches).split("\n"))
 					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
-			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
+			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
 		} else if (BoM.tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
 			List<TooltipComponent> list = Arrays
 					.stream(I18n.translate(key, BoM.tree.batches).split("\n"))
 					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
-			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, mouseX, Math.max(16, mouseY));
+			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
 			List<TooltipComponent> list = Arrays
 					.stream(I18n.translate("tooltip.emi.bom.help").split("\n"))
 					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList();
-			((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, list, width - 18, height - 18);
+			EmiRenderHelper.drawTooltip(this, matrices, list, width - 18, height - 18);
 		}
 	}
 
@@ -567,12 +566,10 @@ public class BoMScreen extends Screen {
 						list.add(new RecipeTooltipComponent(node.recipe));
 					}
 				}
-				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, list, mouseX,
-						Math.max(16, mouseY));
+				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
 				return true;
 			} else if (category != null) {
-				((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices,
-						category.getTooltip(), mouseX, Math.max(16, mouseY));
+				EmiRenderHelper.drawTooltip(screen, matrices, category.getTooltip(), mouseX, mouseY);
 				return true;
 			}
 			return false;

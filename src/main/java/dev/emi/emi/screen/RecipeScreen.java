@@ -25,7 +25,6 @@ import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
-import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
@@ -230,7 +229,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				if (widget.getBounds().contains(mx, my)) {
 					List<TooltipComponent> tooltip = widget.getTooltip(mx, my);
 					if (!tooltip.isEmpty()) {
-						((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices, tooltip, mouseX, Math.max(16, mouseY));
+						EmiRenderHelper.drawTooltip(this, matrices, tooltip, mouseX, mouseY);
 						hoveredWidget = widget;
 						break outer;
 					}
@@ -241,8 +240,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (mouseX >= x + 16 + tabOff && mouseX < x + backgroundWidth && mouseY >= y - 24 && mouseY < y) {
 			int n = (mouseX - x - 16 - tabOff) / 24 + tabPage * tabPageSize;
 			if (n < tabs.size() && n >= tabPage * tabPageSize && n < (tabPage + 1) * tabPageSize) {
-				((ScreenAccessor) this).invokeRenderTooltipFromComponents(matrices,
-					tabs.get(n).category.getTooltip(), mouseX, Math.max(16, mouseY));
+				EmiRenderHelper.drawTooltip(this, matrices, tabs.get(n).category.getTooltip(), mouseX, mouseY);
 			}
 		}
 	}

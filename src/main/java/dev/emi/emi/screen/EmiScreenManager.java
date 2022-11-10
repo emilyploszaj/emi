@@ -35,7 +35,6 @@ import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
@@ -389,7 +388,7 @@ public class EmiScreenManager {
 					}
 				}
 			}
-			((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, list, mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
 			EmiClient.shiftTooltipsLeft = false;
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
