@@ -6,13 +6,17 @@ import org.apache.commons.compress.utils.Lists;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -21,6 +25,7 @@ import net.minecraft.util.Identifier;
 public class EmiRenderHelper {
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
+	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
 
 	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
 		int cor = cornerLength;
@@ -154,5 +159,47 @@ public class EmiRenderHelper {
 		DrawableHelper.drawTexture(matrices, x + 12, y, 16, 252, 4, 4, 256, 256);
 		matrices.pop();
 		return;
+	}
+
+	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
+		RenderSystem.applyModelViewMatrix();
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderSystem.setShaderTexture(0, BACKGROUND);
+		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 0, 0, 4, 1);
+		List<Widget> widgets = Lists.newArrayList();
+		WidgetHolder holder = new WidgetHolder() {
+
+			public int getWidth() {
+				return recipe.getDisplayWidth();
+			}
+
+			public int getHeight() {
+				return recipe.getDisplayHeight();
+			}
+
+			public <T extends Widget> T add(T widget) {
+				widgets.add(widget);
+				return widget;
+			}
+		};
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.push();
+		view.translate(x + 4, y + 4, 0);
+		RenderSystem.applyModelViewMatrix();
+		recipe.addWidgets(holder);
+		if (showMissing) {
+			EmiClient.getAvailable(recipe);
+		}
+		float delta = MinecraftClient.getInstance().getTickDelta();
+		for (Widget widget : widgets) {
+			widget.render(matrices, -1000, -1000, delta);
+		}
+		if (overlayColor != -1) {
+			DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
+		}
+		EmiClient.availableForCrafting.clear();
+		view.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 }
