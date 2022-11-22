@@ -16,10 +16,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
-/**
- * add ghost slot support to recipe filling
- * add project table buffer return support to recipe filling
- */
 public class EmiMain implements ModInitializer {
 	public static final Identifier FILL_RECIPE = new Identifier("emi:fill_recipe");
 	public static final Identifier CREATE_ITEM = new Identifier("emi:create_item");
@@ -65,7 +61,7 @@ public class EmiMain implements ModInitializer {
 				int craftingSize = buf.readVarInt();
 				for (int i = 0; i < craftingSize; i++) {
 					int s = buf.readVarInt();
-					if (s > 0 && s < sh.slots.size()) {
+					if (s >= 0 && s < sh.slots.size()) {
 						crafting.add(sh.slots.get(s));
 					} else {
 						crafting.add(null);
