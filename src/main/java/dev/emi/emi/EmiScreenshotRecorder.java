@@ -14,10 +14,8 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
 
@@ -37,7 +35,7 @@ public class EmiScreenshotRecorder {
 
 		int scale;
 		if (EmiConfig.recipeScreenshotScale < 0) {
-			scale = client.options.guiScale;
+			scale = EmiPort.getGuiScale(client);
 		} else {
 			scale = EmiConfig.recipeScreenshotScale;
 		}
@@ -68,7 +66,8 @@ public class EmiScreenshotRecorder {
 		framebuffer.endWrite();
 		client.getFramebuffer().beginWrite(true);
 
-		saveScreenshotInner(client.runDirectory, prefix, framebuffer, message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
+		saveScreenshotInner(client.runDirectory, prefix, framebuffer,
+			message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
 	}
 
 	private static void saveScreenshotInner(File gameDirectory, String prefix, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
@@ -79,9 +78,8 @@ public class EmiScreenshotRecorder {
 		Util.getIoWorkerExecutor().execute(() -> {
 			try {
 				nativeImage.writeTo(file2);
-				MutableText
-					text = new LiteralText(file2.getName()).formatted(Formatting.UNDERLINE)
-					.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath())));
+				Text text = EmiPort.literal(file2.getName(),
+					Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath())));
 				messageReceiver.accept(EmiPort.translatable("screenshot.success", text));
 			} catch (Exception exception) {
 				EmiLog.error(exception);

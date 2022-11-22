@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -122,5 +123,9 @@ public final class EmiPort {
 
 	public static void draw(BufferBuilder bufferBuilder) {
 		BufferRenderer.drawWithShader(bufferBuilder.end());
+	}
+
+	public static int getGuiScale(MinecraftClient client) {
+		return client.options.getGuiScale().getValue();
 	}
 }
