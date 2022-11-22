@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.api.recipe.EmiRecipe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
@@ -25,14 +24,15 @@ import net.minecraft.util.math.Matrix4f;
 public class EmiScreenshotRecorder {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
-	public static void saveScreenshot(EmiRecipe recipe) {
-		int width = recipe.getDisplayWidth() + 8;
-		int height = recipe.getDisplayHeight() + 8;
-
-		saveScreenshot("recipe-", width, height, () -> EmiRenderHelper.renderRecipe(recipe, new MatrixStack(), 0, 0, false, -1));
+	public static void saveScreenshot(String prefix, int width, int height, Runnable renderer) {
+		if (!RenderSystem.isOnRenderThread()) {
+			RenderSystem.recordRenderCall(() -> saveScreenshotInner(prefix, width, height, renderer));
+		} else {
+			saveScreenshotInner(prefix, width, height, renderer);
+		}
 	}
 
-	public static void saveScreenshot(String prefix, int width, int height, Runnable renderer) {
+	private static void saveScreenshotInner(String prefix, int width, int height, Runnable renderer) {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		int scale;
@@ -68,15 +68,7 @@ public class EmiScreenshotRecorder {
 		framebuffer.endWrite();
 		client.getFramebuffer().beginWrite(true);
 
-		saveScreenshot(client.runDirectory, prefix, framebuffer, message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
-	}
-
-	public static void saveScreenshot(File gameDirectory, String prefix, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
-		if (!RenderSystem.isOnRenderThread()) {
-			RenderSystem.recordRenderCall(() -> saveScreenshotInner(gameDirectory, prefix, framebuffer, messageReceiver));
-		} else {
-			saveScreenshotInner(gameDirectory, prefix, framebuffer, messageReceiver);
-		}
+		saveScreenshotInner(client.runDirectory, prefix, framebuffer, message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
 	}
 
 	private static void saveScreenshotInner(File gameDirectory, String prefix, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
@@ -100,7 +92,7 @@ public class EmiScreenshotRecorder {
 		});
 	}
 
-	public static NativeImage takeScreenshot(Framebuffer framebuffer) {
+	private static NativeImage takeScreenshot(Framebuffer framebuffer) {
 		int i = framebuffer.textureWidth;
 		int j = framebuffer.textureHeight;
 		NativeImage nativeImage = new NativeImage(i, j, false);
