@@ -86,6 +86,7 @@
   "tooltip.emi.fill_recipe_no_server": "Cannot Fill Recipe without EMI on server",
   "tooltip.emi.set_default": "Set as Default Recipe",
   "tooltip.emi.view_tree": "View Recipe Tree",
+  "tooltip.emi.recipe_screenshot": "Take Recipe Screenshot",
   "tooltip.emi.resolution": "Resolving recipe tree for ingredient",
   "tooltip.emi.select_resolution": "Click a §6recipe's output§r to assign for §dthis§r recipe tree",
   "tooltip.emi.default_resolution": "Click the §6recipe default button§r to assign for §aall§r recipe trees",

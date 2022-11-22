@@ -94,10 +94,18 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-tree-button")
 	public static boolean recipeTreeButton = true;
 
-	@ConfigGroupEnd
 	@Comment("Whether recipes should have a button to\nfill the ingredients in a handler.")
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
+
+	@ConfigGroupEnd
+	@Comment("Whether recipes should have a button to\ntake a screenshot of the recipe.")
+	@ConfigValue("ui.recipe-screenshot-button")
+	public static boolean recipeScreenshotButton = false;
+
+	@Comment("The GUI scale at which recipe screenshots\nare saved. Use -1 to use the current GUI scale.")
+	@ConfigValue("ui.recipe-screenshot-scale")
+	public static int recipeScreenshotScale = -1;
 
 	@Comment("Whether to use the batched render system.\nBatching is faster, but may have incompatibilities"
 		+ "\nwith shaders or other mods.")
