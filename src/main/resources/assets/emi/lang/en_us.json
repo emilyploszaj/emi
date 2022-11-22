@@ -52,6 +52,8 @@
   "config.emi.ui.recipe_default_button": "Recipe Default Button",
   "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
   "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+  "config.emi.ui.recipe_screenshot_button": "Recipe Screenshot Button",
+  "config.emi.ui.recipe_screenshot_scale": "Recipe Screenshot Scale",
   "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
 
   "config.emi.dev.dev_mode": "Dev Mode",

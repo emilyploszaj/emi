@@ -34,7 +34,7 @@ public class EmiScreenshotRecorder {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		int scale;
-		if (EmiConfig.recipeScreenshotScale < 0) {
+		if (EmiConfig.recipeScreenshotScale < 1) {
 			scale = EmiPort.getGuiScale(client);
 		} else {
 			scale = EmiConfig.recipeScreenshotScale;
