@@ -6,15 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Consumer;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.ClickEvent;
@@ -29,10 +26,15 @@ public class EmiScreenshotRecorder {
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
 	public static void saveScreenshot(EmiRecipe recipe) {
-		MinecraftClient client = MinecraftClient.getInstance();
-
 		int width = recipe.getDisplayWidth() + 8;
 		int height = recipe.getDisplayHeight() + 8;
+
+		saveScreenshot("recipe-", width, height, () -> EmiRenderHelper.renderRecipe(recipe, new MatrixStack(), 0, 0, false, -1));
+	}
+
+	public static void saveScreenshot(String prefix, int width, int height, Runnable renderer) {
+		MinecraftClient client = MinecraftClient.getInstance();
+
 		int scale;
 		if (EmiConfig.recipeScreenshotScale < 0) {
 			scale = client.options.guiScale;
@@ -57,7 +59,7 @@ public class EmiScreenshotRecorder {
 		Matrix4f backupProj = RenderSystem.getProjectionMatrix();
 		RenderSystem.setProjectionMatrix(Util.make(new Matrix4f(), Matrix4f::loadIdentity));
 
-		EmiRenderHelper.renderRecipe(recipe, new MatrixStack(), 0, 0, false, -1);
+		renderer.run();
 
 		RenderSystem.setProjectionMatrix(backupProj);
 		view.pop();
@@ -66,8 +68,7 @@ public class EmiScreenshotRecorder {
 		framebuffer.endWrite();
 		client.getFramebuffer().beginWrite(true);
 
-		saveScreenshot(client.runDirectory, "recipe-", framebuffer,
-			message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
+		saveScreenshot(client.runDirectory, prefix, framebuffer, message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
 	}
 
 	public static void saveScreenshot(File gameDirectory, String prefix, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
