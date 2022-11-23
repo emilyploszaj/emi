@@ -1,9 +1,6 @@
 package dev.emi.emi;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -20,17 +17,34 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
 
 public class EmiScreenshotRecorder {
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+	private static final String SCREENSHOTS_DIRNAME = "screenshots";
 
-	public static void saveScreenshot(String prefix, int width, int height, Runnable renderer) {
+	/**
+	 * Saves a screenshot to the game's `screenshots` directory, doing the appropriate setup so that anything rendered in renderer will be captured
+	 * and saved.
+	 * <p>
+	 * <b>Note:</b> the path can have <code>/</code> characters, indicating subdirectories. Java handles these correctly on Windows. The path should
+	 * <b>not</b> contain the <code>.png</code> extension, as that will be added after checking for duplicates. If a file with this path already
+	 * exists, then path will be suffixed with a <code>_#</code>, before adding the <code>.png</code> extension, where <code>#</code> represents an
+	 * increasing number to avoid conflicts.
+	 * <p>
+	 * <b>Note 2:</b> The width and height parameters are reflected in the viewport when rendering. But the EMI-config
+	 * <code>ui.recipe-screenshot-scale</code> value causes the resulting image to be scaled.
+	 *
+	 * @param path     the path to save the screenshot to, without extension.
+	 * @param width    the width of the screenshot, not counting EMI-config scale.
+	 * @param height   the height of the screenshot, not counting EMI-config scale.
+	 * @param renderer a function to render the things being screenshotted.
+	 */
+	public static void saveScreenshot(String path, int width, int height, Runnable renderer) {
 		if (!RenderSystem.isOnRenderThread()) {
-			RenderSystem.recordRenderCall(() -> saveScreenshotInner(prefix, width, height, renderer));
+			RenderSystem.recordRenderCall(() -> saveScreenshotInner(path, width, height, renderer));
 		} else {
-			saveScreenshotInner(prefix, width, height, renderer);
+			saveScreenshotInner(path, width, height, renderer);
 		}
 	}
 
-	private static void saveScreenshotInner(String prefix, int width, int height, Runnable renderer) {
+	private static void saveScreenshotInner(String path, int width, int height, Runnable renderer) {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		int scale;
@@ -66,20 +80,30 @@ public class EmiScreenshotRecorder {
 		framebuffer.endWrite();
 		client.getFramebuffer().beginWrite(true);
 
-		saveScreenshotInner(client.runDirectory, prefix, framebuffer,
+		saveScreenshotInner(client.runDirectory, path, framebuffer,
 			message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
 	}
 
-	private static void saveScreenshotInner(File gameDirectory, String prefix, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
+	private static void saveScreenshotInner(File gameDirectory, String suggestedPath, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
 		NativeImage nativeImage = takeScreenshot(framebuffer);
-		File file = new File(gameDirectory, "screenshots");
-		file.mkdir();
-		File file2 = getScreenshotFilename(file, prefix);
+
+		File screenshots = new File(gameDirectory, SCREENSHOTS_DIRNAME);
+		screenshots.mkdir();
+
+		String filename = getScreenshotFilename(screenshots, suggestedPath);
+		File file = new File(screenshots, filename);
+
+		// Make sure the parent file exists. Note: `/`s in suggestedPath are valid, as they indicate subdirectories. Java even translates this
+		// correctly on Windows.
+		File parent = file.getParentFile();
+		parent.mkdirs();
+
 		Util.getIoWorkerExecutor().execute(() -> {
 			try {
-				nativeImage.writeTo(file2);
-				Text text = EmiPort.literal(file2.getName(),
-					Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath())));
+				nativeImage.writeTo(file);
+
+				Text text = EmiPort.literal(filename,
+					Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
 				messageReceiver.accept(EmiPort.translatable("screenshot.success", text));
 			} catch (Exception exception) {
 				EmiLog.error(exception);
@@ -100,13 +124,11 @@ public class EmiScreenshotRecorder {
 		return nativeImage;
 	}
 
-	private static File getScreenshotFilename(File directory, String prefix) {
-		String string = DATE_FORMAT.format(new Date());
+	private static String getScreenshotFilename(File directory, String path) {
 		int i = 1;
-		File file;
-		while ((file = new File(directory, prefix + string + (i == 1 ? "" : "_" + i) + ".png")).exists()) {
+		while ((new File(directory, path + (i == 1 ? "" : "_" + i) + ".png")).exists()) {
 			++i;
 		}
-		return file;
+		return path + (i == 1 ? "" : "_" + i) + ".png";
 	}
 }
