@@ -162,11 +162,16 @@ public class EmiRenderHelper {
 		return;
 	}
 
-	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
+	public static void renderRecipeBackground(EmiRecipe recipe, MatrixStack matrices, int x, int y) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, BACKGROUND);
 		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 0, 0, 4, 1);
+	}
+
+	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
+		renderRecipeBackground(recipe, matrices, x, y);
+
 		List<Widget> widgets = Lists.newArrayList();
 		WidgetHolder holder = new WidgetHolder() {
 
@@ -183,12 +188,12 @@ public class EmiRenderHelper {
 				return widget;
 			}
 		};
+
 		MatrixStack view = RenderSystem.getModelViewStack();
 		view.push();
 		view.translate(x + 4, y + 4, 0);
 		RenderSystem.applyModelViewMatrix();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+
 		recipe.addWidgets(holder);
 		if (showMissing) {
 			EmiClient.getAvailable(recipe);
@@ -200,10 +205,18 @@ public class EmiRenderHelper {
 		if (overlayColor != -1) {
 			DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
 		}
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.disableBlend();
+
 		EmiClient.availableForCrafting.clear();
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
+
+		// Force translucency to match that of the recipe background
+		RenderSystem.disableBlend();
+		RenderSystem.colorMask(false, false, false, true);
+		RenderSystem.disableDepthTest();
+		renderRecipeBackground(recipe, matrices, x, y);
+		RenderSystem.enableDepthTest();
+		RenderSystem.colorMask(true, true, true, true);
+		// Blend should be off by default
 	}
 }
