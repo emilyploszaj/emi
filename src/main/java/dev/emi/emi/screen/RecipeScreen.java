@@ -342,6 +342,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					by += 4;
 				}
 				int button = 0;
+				int lbutton = 0;
 				if (EmiRecipeFiller.isSupported(r)) {
 					if (EmiConfig.recipeFillButton) {
 						widgets.add(new RecipeFillButtonWidget(r.getDisplayWidth() + 5, by + 14 * button++, r));
@@ -356,7 +357,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					}
 				}
 				if (EmiConfig.recipeScreenshotButton) {
-					widgets.add(new RecipeScreenshotButtonWidget(-5 - 12, 0, r));
+					widgets.add(new RecipeScreenshotButtonWidget(-5 - 12, by - 14 * lbutton++, r));
 				}
 				off += recipeHeight + RECIPE_PADDING;
 				currentPage.add(new WidgetGroup(r, widgets, wx, wy));
