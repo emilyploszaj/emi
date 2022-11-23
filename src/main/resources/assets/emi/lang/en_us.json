@@ -52,6 +52,8 @@
   "config.emi.ui.recipe_default_button": "Recipe Default Button",
   "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
   "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+  "config.emi.ui.recipe_screenshot_button": "Recipe Screenshot Button",
+  "config.emi.ui.recipe_screenshot_scale": "Recipe Screenshot Scale",
   "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
 
   "config.emi.dev.dev_mode": "Dev Mode",
@@ -86,6 +88,7 @@
   "tooltip.emi.fill_recipe_no_server": "Cannot Fill Recipe without EMI on server",
   "tooltip.emi.set_default": "Set as Default Recipe",
   "tooltip.emi.view_tree": "View Recipe Tree",
+  "tooltip.emi.recipe_screenshot": "Take Recipe Screenshot",
   "tooltip.emi.resolution": "Resolving recipe tree for ingredient",
   "tooltip.emi.select_resolution": "Click a §6recipe's output§r to assign for §dthis§r recipe tree",
   "tooltip.emi.default_resolution": "Click the §6recipe default button§r to assign for §aall§r recipe trees",

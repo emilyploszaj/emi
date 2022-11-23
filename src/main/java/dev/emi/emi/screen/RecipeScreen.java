@@ -27,10 +27,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import dev.emi.emi.widget.RecipeBackground;
-import dev.emi.emi.widget.RecipeDefaultButtonWidget;
-import dev.emi.emi.widget.RecipeFillButtonWidget;
-import dev.emi.emi.widget.RecipeTreeButtonWidget;
+import dev.emi.emi.widget.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -345,6 +342,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					by += 4;
 				}
 				int button = 0;
+				int lbutton = 0;
 				if (EmiRecipeFiller.isSupported(r)) {
 					if (EmiConfig.recipeFillButton) {
 						widgets.add(new RecipeFillButtonWidget(r.getDisplayWidth() + 5, by + 14 * button++, r));
@@ -357,6 +355,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					if (EmiConfig.recipeDefaultButton) {
 						widgets.add(new RecipeDefaultButtonWidget(r.getDisplayWidth() + 5, by - 14 * button++, r));
 					}
+				}
+				if (EmiConfig.recipeScreenshotButton) {
+					widgets.add(new RecipeScreenshotButtonWidget(-5 - 12, by - 14 * lbutton++, r));
 				}
 				off += recipeHeight + RECIPE_PADDING;
 				currentPage.add(new WidgetGroup(r, widgets, wx, wy));
