@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -186,6 +187,8 @@ public class EmiRenderHelper {
 		view.push();
 		view.translate(x + 4, y + 4, 0);
 		RenderSystem.applyModelViewMatrix();
+		RenderSystem.enableBlend();
+		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
 		recipe.addWidgets(holder);
 		if (showMissing) {
 			EmiClient.getAvailable(recipe);
@@ -197,6 +200,8 @@ public class EmiRenderHelper {
 		if (overlayColor != -1) {
 			DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
 		}
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.disableBlend();
 		EmiClient.availableForCrafting.clear();
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
