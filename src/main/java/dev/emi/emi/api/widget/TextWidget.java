@@ -5,7 +5,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 
 public class TextWidget extends Widget {
-	private static final int HEIGHT = 10;
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	private final OrderedText text;
 	private final int x, y;
@@ -36,15 +35,15 @@ public class TextWidget extends Widget {
 	public Bounds getBounds() {
 		int width = CLIENT.textRenderer.getWidth(text);
 		int xOff = horizontalAlignment.offset(width);
-		int yOff = verticalAlignment.offset(HEIGHT);
-		return new Bounds(x + xOff, y + yOff, width, HEIGHT);
+		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
+		return new Bounds(x + xOff, y + yOff, width, CLIENT.textRenderer.fontHeight);
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		matrices.push();
 		int xOff = horizontalAlignment.offset(CLIENT.textRenderer.getWidth(text));
-		int yOff = verticalAlignment.offset(HEIGHT);
+		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
 		matrices.translate(xOff, yOff, 300);
 		if (shadow) {
 			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, color);
