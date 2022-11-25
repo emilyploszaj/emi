@@ -10,6 +10,8 @@ public class TextWidget extends Widget {
 	private final int x, y;
 	private final int color;
 	private final boolean shadow;
+	private Alignment horizontalAlignment = Alignment.START;
+	private Alignment verticalAlignment = Alignment.START;
 
 	public TextWidget(OrderedText text, int x, int y, int color, boolean shadow) {
 		this.text = text;
@@ -19,20 +21,47 @@ public class TextWidget extends Widget {
 		this.shadow = shadow;
 	}
 
+	public TextWidget horizontalAlign(Alignment alignment) {
+		this.horizontalAlignment = alignment;
+		return this;
+	}
+
+	public TextWidget verticalAlign(Alignment alignment) {
+		this.verticalAlignment = alignment;
+		return this;
+	}
+
 	@Override
 	public Bounds getBounds() {
-		return new Bounds(x, y, CLIENT.textRenderer.getWidth(text), 10);
+		int width = CLIENT.textRenderer.getWidth(text);
+		int xOff = horizontalAlignment.offset(width);
+		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
+		return new Bounds(x + xOff, y + yOff, width, CLIENT.textRenderer.fontHeight);
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		matrices.push();
-		matrices.translate(0, 0, 300);
+		int xOff = horizontalAlignment.offset(CLIENT.textRenderer.getWidth(text));
+		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
+		matrices.translate(xOff, yOff, 300);
 		if (shadow) {
 			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, color);
 		} else {
 			CLIENT.textRenderer.draw(matrices, text, x, y, color);
 		}
 		matrices.pop();
+	}
+
+	public enum Alignment {
+		START, CENTER, END;
+
+		public int offset(int length) {
+			return switch (this) {
+				case START -> 0;
+				case CENTER -> -(length / 2);
+				case END -> -length;
+			};
+		}
 	}
 }
