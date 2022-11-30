@@ -12,8 +12,6 @@
     "key.emi.view_stack_tree": "Stek Ağacını Gör",
     "key.emi.view_tree": "Ağacı Gör",
     "key.emi.back": "Geri",
-    "key.emi.toggle_craftable": "Üretilebilir Aç/Kapa",
-    "key.emi.toggle_local_craftable": "Yerel Üretilebilir Aç/Kapa",
     "key.emi.craft_one": "Bir Tane Üret",
     "key.emi.craft_all": "Hepsini Üret",
     "key.emi.craft_one_to_inventory": "Envantere Bir Tane Üret",
@@ -78,10 +76,6 @@
   
     "tooltip.emi.config": "%s Konfig",
     "tooltip.emi.recipe_tree": "Tarif Ağacı",
-    "tooltip.emi.craftable_toggle_index": "İndeks Gösteriliyor",
-    "tooltip.emi.craftable_toggle_craftable": "Üretilebilir Tarifler Gösteriliyor",
-    "tooltip.emi.local_craftable_toggle_off": "Bütün Üretilebilir Tarifler Gösteriliyor",
-    "tooltip.emi.local_craftable_toggle_on": "Sadece İstasyonda Üretilebilir Gösteriliyor",
   
     "screen.emi.recipe": "Tarif",
     "screen.emi.com": "Tarif Ağacı",

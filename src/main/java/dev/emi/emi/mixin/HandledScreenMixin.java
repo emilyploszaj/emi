@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -36,7 +37,8 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	}
 
 	@Inject(at = @At(value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawForeground(Lnet/minecraft/client/util/math/MatrixStack;II)V"),
+			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawForeground(Lnet/minecraft/client/util/math/MatrixStack;II)V",
+			shift = Shift.AFTER),
 		method = "render")
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
 		MatrixStack viewStack = RenderSystem.getModelViewStack();
@@ -117,5 +119,15 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	@Override
 	public int emi$getRight() {
 		return x + backgroundWidth;
+	}
+
+	@Override
+	public int emi$getTop() {
+		return y;
+	}
+
+	@Override
+	public int emi$getBottom() {
+		return y + backgroundHeight;
 	}
 }

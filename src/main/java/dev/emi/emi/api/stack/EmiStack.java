@@ -69,10 +69,29 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract Object getKey();
 
-	public abstract Entry<?> getEntry();
+	@SuppressWarnings("unchecked")
+	public <T> @Nullable T getKeyOfType(Class<T> clazz) {
+		Object o = getKey();
+		if (clazz.isAssignableFrom(o.getClass())) {
+			return (T) o;
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated Use getKey
+	 */
+	@Deprecated
+	public Entry<?> getEntry() {
+		return EmptyEmiStack.ENTRY;
+	}
 
 	public abstract Identifier getId();
 
+	/**
+	 * @deprecated Use getKeyOfType
+	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public <T> @Nullable Entry<T> getEntryOfType(Class<T> clazz) {
 		Entry<?> entry = getEntry();
@@ -134,6 +153,11 @@ public abstract class EmiStack implements EmiIngredient {
 		return getKey().hashCode();
 	}
 
+	@Override
+	public String toString() {
+		return "EmiStack[key=" + getKey() + ", nbt=" + getNbt() + "amount=" + getAmount() + "]";
+	}
+
 	public static EmiStack of(ItemStack stack) {
 		return new ItemEmiStack(stack);
 	}
@@ -158,22 +182,33 @@ public abstract class EmiStack implements EmiIngredient {
 		return new ItemEmiStack(item, amount);
 	}
 
+	@Deprecated
 	public static EmiStack of(FluidVariant fluid) {
 		return new FluidEmiStack(fluid);
 	}
 
+	@Deprecated
 	public static EmiStack of(FluidVariant fluid, long amount) {
 		return new FluidEmiStack(fluid, amount);
 	}
 
 	public static EmiStack of(Fluid fluid) {
-		return of(FluidVariant.of(fluid));
+		return new FluidEmiStack(fluid, null);
 	}
 
 	public static EmiStack of(Fluid fluid, long amount) {
-		return of(FluidVariant.of(fluid), amount);
+		return new FluidEmiStack(fluid, null, amount);
 	}
 
+	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
+		return new FluidEmiStack(fluid, nbt);
+	}
+
+	public static EmiStack of(Fluid fluid, NbtCompound nbt, long amount) {
+		return new FluidEmiStack(fluid, nbt, amount);
+	}
+
+	@Deprecated
 	public static abstract class Entry<T> {
 		private final T value;
 

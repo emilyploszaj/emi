@@ -4,6 +4,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
@@ -18,6 +19,8 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.chess.EmiChess;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiTagExclusionsLoader;
 import dev.emi.emi.data.RecipeDefaultLoader;
 import io.netty.buffer.Unpooled;
@@ -45,8 +48,6 @@ public class EmiClient implements ClientModInitializer {
 	public static boolean onServer = false;
 	public static Set<Identifier> excludedTags = Sets.newHashSet();
 	public static List<TagKey<Item>> itemTags = List.of();
-	// Flag used by a mixin
-	public static boolean shiftTooltipsLeft = false;
 	public static Map<EmiIngredient, Boolean> availableForCrafting = Maps.newHashMap();
 
 	public static void getAvailable(EmiRecipe recipe) {
@@ -64,7 +65,7 @@ public class EmiClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		EmiConfig.load();
+		EmiConfig.loadConfig();
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
@@ -124,6 +125,16 @@ public class EmiClient implements ClientModInitializer {
 					}
 				});
 			}
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(EmiMain.CHESS, (client, handler, buf, sender) -> {
+			UUID uuid = buf.readUuid();
+			int type = buf.readByte();
+			int start = buf.readByte();
+			int end = buf.readByte();
+			client.execute(() -> {
+				EmiChess.receiveNetwork(uuid, type, start, end);
+			});
 		});
 	}
 	

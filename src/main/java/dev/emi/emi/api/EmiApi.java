@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiRecipeFiller;
@@ -24,6 +23,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;

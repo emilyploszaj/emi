@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -22,7 +23,7 @@ public class EmiBind {
 	}
 	
 	public EmiBind(String translationKey, int modifiers, int code) {
-		this(translationKey, new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(code), modifiers));
+		this(translationKey, ModifiedKey.of(code, modifiers));
 	}
 
 	public EmiBind(String translationKey, ModifiedKey... defaultKeys) {
@@ -45,6 +46,16 @@ public class EmiBind {
 		if (!boundKeys.get(boundKeys.size() - 1).isUnbound() && boundKeys.size() < MAX_BINDS) {
 			boundKeys.add(new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
 		}
+	}
+
+	public void setToDefault() {
+		this.boundKeys = this.defaultKeys.stream().collect(Collectors.toCollection(ArrayList::new));
+		updateBinds();
+	}
+
+	public void setBinds(ModifiedKey... keys) {
+		this.boundKeys = Stream.of(keys).collect(Collectors.toCollection(ArrayList::new));
+		updateBinds();
 	}
 
 	public void setBind(int offset, ModifiedKey key) {
@@ -120,6 +131,10 @@ public class EmiBind {
 	}
 
 	public static record ModifiedKey(InputUtil.Key key, int modifiers) {
+
+		public static ModifiedKey of(int code, int modifiers) {
+			return new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(code), modifiers);
+		}
 
 		public String toName() {
 			String name = "";

@@ -6,12 +6,11 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.apache.commons.compress.utils.Lists;
-
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
@@ -74,9 +73,6 @@ public class EmiPlayerInventory {
 	}
 
 	public Predicate<EmiRecipe> getPredicate() {
-		if (!EmiConfig.localCraftable) {
-			return r -> this.canCraft(r);
-		}
 		HandledScreen screen = EmiApi.getHandledScreen();
 		List<EmiRecipeHandler> handlers = EmiRecipeFiller.getAllHandlers(screen);
 		if (!handlers.isEmpty()) {

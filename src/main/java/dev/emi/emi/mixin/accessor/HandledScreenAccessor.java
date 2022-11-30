@@ -22,6 +22,9 @@ public interface HandledScreenAccessor {
 	@Accessor("backgroundWidth")
 	int getBackgroundWidth();
 
+	@Accessor("backgroundHeight")
+	int getBackgroundHeight();
+
 	@Invoker("getSlotAt")
 	Slot invokeGetSlotAt(double x, double y);
 }

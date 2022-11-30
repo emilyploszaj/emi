@@ -43,9 +43,9 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void addRecipe(EmiRecipe recipe) {
 		if (recipe.getInputs() == null) {
-			EmiLog.warn("Recipe " + recipe.getId() + " provides null inputs and cannot be added");
+			EmiReloadLog.warn("Recipe " + recipe.getId() + " provides null inputs and cannot be added");
 		} else if (recipe.getOutputs() == null) {
-			EmiLog.warn("Recipe " + recipe.getId() + " provides null outputs and cannot be added");
+			EmiReloadLog.warn("Recipe " + recipe.getId() + " provides null outputs and cannot be added");
 		} else {
 			EmiRecipes.addRecipe(recipe);
 		}

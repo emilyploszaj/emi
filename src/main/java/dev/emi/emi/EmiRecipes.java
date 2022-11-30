@@ -59,12 +59,12 @@ public class EmiRecipes {
 			Identifier id = recipe.getId();
 			EmiRecipeCategory category = recipe.getCategory();
 			if (!categories.contains(category)) {
-				EmiLog.warn("Recipe " + id + " loaded with unregistered category: " + category.getId());
+				EmiReloadLog.warn("Recipe " + id + " loaded with unregistered category: " + category.getId());
 			}
 			byCategory.computeIfAbsent(category, a -> Lists.newArrayList()).add(recipe);
 			if (id != null) {
 				if (byId.containsKey(id)) {
-					EmiLog.warn("Recipe loaded with duplicate id: " + id);
+					EmiReloadLog.warn("Recipe loaded with duplicate id: " + id);
 				}
 				byId.put(id, recipe);
 			}
@@ -97,7 +97,7 @@ public class EmiRecipes {
 				}
 			}
 		}
-		System.out.println("[emi] Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
+		EmiLog.info("Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	public static void addCategory(EmiRecipeCategory category) {

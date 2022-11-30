@@ -1,4 +1,4 @@
-package dev.emi.emi.screen.widget;
+package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
 import java.util.Random;
@@ -12,16 +12,16 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 
-public class EmiNameWidget extends ListWidget.Entry {
+public class EmiNameWidget implements Drawable {
 	private static MinecraftClient client = MinecraftClient.getInstance();
 	private List<String[]> NAMES = Lists.<String[]>newArrayList(
 		"Emi Memy Imi".split(" "),
-		"Exhaustively Many Items".split(" "),
+		"Exhaustively Many Ingredients".split(" "),
 		"Explicitly Mandated Items".split(" "),
 		"Endless Material Information".split(" "),
 		"Evolving Manufacturing Index".split(" "),
@@ -34,7 +34,7 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Exciting Minecraft Information".split(" "),
 		"Expropriated Matter Insights".split(" "),
 		"Efficiently Managed Inventory".split(" "),
-		"Eerily Many Items".split(" "),
+		"Eerily Many Ingredients".split(" "),
 		"Eventually Made Impressive".split(" "),
 		"Exceptionally Motionless Interface".split(" "),
 		"Emi's Magic Inventory".split(" "),
@@ -42,6 +42,12 @@ public class EmiNameWidget extends ListWidget.Entry {
 		"Exploring Modified: Iridescent".split(" "),
 		"E M I".split(" ")
 	);
+	public int x, y;
+
+	public EmiNameWidget(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
 
 	public IntSet pruneSet(Random rand, int bound, int portion) {
 		IntList ints = new IntArrayList();
@@ -93,8 +99,7 @@ public class EmiNameWidget extends ListWidget.Entry {
 		return ret;
 	}
 
-	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX,
-			int mouseY, boolean hovered, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		long time = System.currentTimeMillis();
 		long progress = time % 5_000;
 		Random rand = new Random(time / 5_000);
@@ -116,7 +121,6 @@ public class EmiNameWidget extends ListWidget.Entry {
 			parts[1] = transformString(rand, parts[1], p);
 			parts[2] = transformString(rand, parts[2], p);
 		}
-		int mid = x + width / 2;
 
 		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer,
 			EmiPort.ordered(EmiPort.append(
@@ -127,14 +131,6 @@ public class EmiNameWidget extends ListWidget.Entry {
 							EmiPort.literal("  ")),
 						EmiPort.literal(parts[1], Style.EMPTY.withColor(0x7bfca2))),
 					EmiPort.literal("  ")),
-				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc)))), mid, y + 30, -1);
-	}
-
-	public int getHeight() {
-		return 60;
-	}
-	
-	public List<? extends Element> children() {
-		return List.of();
+				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc)))), x, y, -1);
 	}
 }

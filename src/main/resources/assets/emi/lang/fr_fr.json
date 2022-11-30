@@ -87,12 +87,6 @@
   "key.emi.back": " Retour",
   "config.emi.tooltip.binds.back": "Permet de retourner une page en arrière",
 
-  "key.emi.toggle_craftable": " Affichage primaire",
-  "config.emi.tooltip.binds.toggle_craftable": "Permet de tout afficher\nou uniquement les recettes possibles",
-
-  "key.emi.toggle_local_craftable": " Affichage secondaire",
-  "config.emi.tooltip.binds.toggle_local_craftable": "Permet de ne rien filtrer\nou de filtrer selon le contexte",
-
   "key.emi.craft_one": " Fabriquer 1",
   "config.emi.tooltip.binds.craft_one": "Place les ingrédients\npour fabriquer un objet",
 
@@ -165,10 +159,6 @@
 
   "tooltip.emi.config": "%s Config",
   "tooltip.emi.recipe_tree": "Graphe actif",
-  "tooltip.emi.craftable_toggle_index": "Tout afficher",
-  "tooltip.emi.craftable_toggle_craftable": "Uniquement les recettes possibles",
-  "tooltip.emi.local_craftable_toggle_off": "Aucun filtre",
-  "tooltip.emi.local_craftable_toggle_on": "Filtrer selon contexte",
 
   "tooltip.emi.synfav.uncraftable": "§cImpossible§r de fabriquer\n(dans ces conditions)",
   "tooltip.emi.synfav.partially_craftable": "§dImpossible§r de tout faire\n§6Cliquez§r pour en fabriquer",

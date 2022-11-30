@@ -4,12 +4,13 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.compress.utils.Lists;
-
+import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -66,7 +67,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 					}
 				}
 			} catch (Exception e) {
-				System.err.println("[emi] Error loading recipe default file " + id);
+				EmiLog.error("Error loading recipe default file " + id);
 				e.printStackTrace();
 			}
 			allDefaults.addAll(defaults);

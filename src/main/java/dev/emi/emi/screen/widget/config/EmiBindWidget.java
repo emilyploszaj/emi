@@ -1,6 +1,7 @@
-package dev.emi.emi.screen.widget;
+package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.commons.compress.utils.Lists;
 
@@ -9,7 +10,7 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.ConfigScreen;
-import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
@@ -22,8 +23,8 @@ public class EmiBindWidget extends ConfigEntryWidget {
 	private EmiBind bind;
 	private List<ButtonWidget> buttons = Lists.newArrayList();
 
-	public EmiBindWidget(ConfigScreen screen, Drawable tooltip, EmiBind bind) {
-		super(EmiPort.translatable(bind.translationKey), tooltip, 0);
+	public EmiBindWidget(ConfigScreen screen, List<TooltipComponent> tooltip, Supplier<String> search, EmiBind bind) {
+		super(EmiPort.translatable(bind.translationKey), tooltip, search, 0);
 		this.screen = screen;
 		this.bindName = EmiPort.translatable(bind.translationKey);
 		this.bind = bind;
@@ -86,12 +87,15 @@ public class EmiBindWidget extends ConfigEntryWidget {
 
 	@Override
 	public int getHeight() {
+		if (!isVisible() || !isParentVisible()) {
+			return 0;
+		}
 		int size = buttons.size() * 24;
 		if (buttons.size() > 1 && buttons.size() <= bind.boundKeys.size() && bind.boundKeys.get(buttons.size() - 1).isUnbound()
 				&& (screen.activeBind != bind || screen.activeBindOffset != buttons.size() - 1)) {
 			size -= 24;
 		}
-		return size;
+		return size - 4;
 	}
 
 	private MutableText getKeyText(ModifiedKey key, Formatting formatting) {

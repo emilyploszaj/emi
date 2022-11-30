@@ -8,13 +8,14 @@ import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -70,15 +71,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 		});
 		this.setChangedListener(string -> {
 			if (string.isEmpty()) {
-				this.setSuggestion("Search EMI...");
-				if (EmiConfig.emptySearchCraftable && !EmiConfig.craftable) {
-					EmiScreenManager.swapCraftables();
-				}
+				this.setSuggestion(I18n.translate("emi.search"));
+				EmiScreenManager.focusSearchSidebarType(EmiConfig.emptySearchSidebarFocus);
 			} else {
 				this.setSuggestion("");
-				if (EmiConfig.emptySearchCraftable && EmiConfig.craftable) {
-					EmiScreenManager.swapCraftables();
-				}
+				EmiScreenManager.focusSearchSidebarType(EmiConfig.searchSidebarFocus);
 			}
 			Matcher matcher = EmiSearch.TOKENS.matcher(string);
 			List<Pair<Integer, Style>> styles = Lists.newArrayList();
@@ -129,10 +126,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 		});
 	}
 
+	public void update() {
+		setText(getText());
+	}
+
 	public void swap() {
-		if (EmiConfig.emptySearchCraftable) {
-			return;
-		}
 		String last = this.getText();
 		this.setText(this.last);
 		this.last = last;

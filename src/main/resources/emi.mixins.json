@@ -22,8 +22,7 @@
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
-    "ItemStackMixin",
-    "ScreenMixin"
+    "ItemStackMixin"
   ],
   "server": [],
   "injectors": {

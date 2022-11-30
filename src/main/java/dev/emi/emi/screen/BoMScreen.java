@@ -12,7 +12,6 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
@@ -34,6 +33,7 @@ import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.ProgressState;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -217,7 +217,7 @@ public class BoMScreen extends Screen {
 			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
 		}
 		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-		drawTexture(matrices, help.x(), help.y(), 32, 146, help.width(), help.height());
+		drawTexture(matrices, help.x(), help.y(), 0, 200, help.width(), help.height());
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
 		Hover hover = getHoveredStack(mouseX, mouseY);

@@ -12,8 +12,6 @@
   "key.emi.view_stack_tree": "Просмотреть Дерево Стаков",
   "key.emi.view_tree": "Просмотреть Дерево",
   "key.emi.back": "Назад",
-  "key.emi.toggle_craftable": "Переключить Создаваемые",
-  "key.emi.toggle_local_craftable": "Переключить Локальные Создаваемые",
   "key.emi.craft_one": "Создать Один",
   "key.emi.craft_all": "Создать Все",
   "key.emi.craft_one_to_inventory": "Создать Один в Инвентарь",
@@ -78,10 +76,6 @@
 
   "tooltip.emi.config": "Конфигурация %s",
   "tooltip.emi.recipe_tree": "Дерево рецептов",
-  "tooltip.emi.craftable_toggle_index": "Показывать Список",
-  "tooltip.emi.craftable_toggle_craftable": "Показывать Создаваемые Рецепты",
-  "tooltip.emi.local_craftable_toggle_off": "Показывать ВСЕ Возможные Рецепты",
-  "tooltip.emi.local_craftable_toggle_on": "Показывать Только Создаваемые на Ремесленном Столе",
 
   "screen.emi.recipe": "Рецепт",
   "screen.emi.com": "Дерево Рецептов",

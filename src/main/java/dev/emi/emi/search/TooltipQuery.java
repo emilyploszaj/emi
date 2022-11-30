@@ -1,26 +1,20 @@
 package dev.emi.emi.search;
 
-import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.text.Text;
 
 public class TooltipQuery extends Query {
-	private final String name;
+	private final Set<EmiStack> valid;
 
 	public TooltipQuery(String name) {
-		this.name = name.toLowerCase();
+		valid = Sets.newHashSet(EmiSearch.tooltips.findAll(name));
 	}
 
 	@Override
 	public boolean matches(EmiStack stack) {
-		List<Text> lines = stack.getTooltipText();
-		lines.remove(0);
-		for (Text text : lines) {
-			if (text.getString().toLowerCase().contains(name)) {
-				return true;
-			}
-		}
-		return false;
+		return valid.contains(stack);
 	}
 }

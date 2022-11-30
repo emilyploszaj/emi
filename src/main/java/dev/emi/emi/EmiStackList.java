@@ -10,7 +10,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -47,8 +46,7 @@ public class EmiStackList {
 		for (int i = 0; i < Registry.FLUID.size(); i++) {
 			Fluid fluid = Registry.FLUID.get(i);
 			if (fluid.isStill(fluid.getDefaultState())) {
-				FluidVariant variant = FluidVariant.of(fluid);
-				EmiStack fs = new FluidEmiStack(variant);
+				EmiStack fs = new FluidEmiStack(fluid);
 				try {
 					fs.getName();
 					fs.getTooltip();

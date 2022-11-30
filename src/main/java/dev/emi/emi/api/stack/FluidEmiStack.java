@@ -3,12 +3,14 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -20,6 +22,7 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -31,10 +34,24 @@ public class FluidEmiStack extends EmiStack {
 	private final FluidEntry entry;
 	private final FluidVariant fluid;
 
+	public FluidEmiStack(Fluid fluid) {
+		this(FluidVariant.of(fluid));
+	}
+
+	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt) {
+		this(FluidVariant.of(fluid, nbt));
+	}
+
+	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt, long amount) {
+		this(FluidVariant.of(fluid, nbt), amount);
+	}
+
+	@Deprecated
 	public FluidEmiStack(FluidVariant fluid) {
 		this(fluid, 0);
 	}
 
+	@Deprecated
 	public FluidEmiStack(FluidVariant fluid, long amount) {
 		entry = new FluidEntry(fluid);
 		this.fluid = fluid;

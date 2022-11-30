@@ -1,0 +1,110 @@
+package dev.emi.emi.screen;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.lwjgl.glfw.GLFW;
+
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.screen.widget.config.EmiNameWidget;
+import dev.emi.emi.screen.widget.config.ListWidget;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+
+public class ConfigEnumScreen<T> extends Screen {
+	private final ConfigScreen last;
+	private final List<Entry<T>> entries;
+	private final Consumer<T> selection;
+	private ListWidget list;
+
+	public ConfigEnumScreen(ConfigScreen last, List<Entry<T>> entries, Consumer<T> selection) {
+		super(EmiPort.translatable("screen.emi.config"));
+		this.last = last;
+		this.entries = entries;
+		this.selection = selection;
+	}
+
+	@Override
+	public void init() {
+		super.init();
+		this.addDrawable(new EmiNameWidget(width / 2, 16));
+		int w = 200;
+		int x = (width - w) / 2;
+		this.addDrawableChild(new ButtonWidget(x, height - 30, w, 20, ScreenTexts.CANCEL, button -> {
+			close();
+		}));
+		list = new ListWidget(client, width, height, 40, height - 40);
+		for (Entry<T> e : entries) {
+			list.addEntry(new SelectionWidget(e));
+		}
+		this.addSelectableChild(list);
+	}
+
+	@Override
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		list.setScrollAmount(list.getScrollAmount());
+		this.renderBackgroundTexture(0);
+		list.render(matrices, mouseX, mouseY, delta);
+		super.render(matrices, mouseX, mouseY, delta);
+	}
+
+	@Override
+	public void close() {
+		MinecraftClient.getInstance().setScreen(last);
+	}
+	
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+			this.close();
+			return true;
+		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+			this.close();
+			return true;
+		} else if (keyCode == GLFW.GLFW_KEY_TAB) {
+			return false;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	public static record Entry<T>(T value, Text name, List<TooltipComponent> tooltip) {
+	}
+
+	public class SelectionWidget extends ListWidget.Entry {
+		private final ButtonWidget button;
+
+		public SelectionWidget(Entry<T> e) {
+			button = new ButtonWidget(0, 0, 200, 20, e.name(), t -> {
+				selection.accept(e.value());
+				close();
+			}, (b, matrices, mx, my) -> {
+				EmiRenderHelper.drawTooltip(ConfigEnumScreen.this, matrices, e.tooltip(), mx, my);
+			});
+		}
+
+		@Override
+		public List<? extends Element> children() {
+			return List.of(button);
+		}
+
+		@Override
+		public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+				boolean hovered, float delta) {
+			button.y = y;
+			button.x = x + width / 2 - button.getWidth() / 2;
+			button.render(matrices, mouseX, mouseY, delta);
+		}
+
+		@Override
+		public int getHeight() {
+			return 20;
+		}
+	}
+}

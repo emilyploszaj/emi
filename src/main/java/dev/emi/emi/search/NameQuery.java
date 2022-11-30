@@ -1,16 +1,20 @@
 package dev.emi.emi.search;
 
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
 import dev.emi.emi.api.stack.EmiStack;
 
 public class NameQuery extends Query {
-	private final String name;
+	private final Set<EmiStack> valid;
 
 	public NameQuery(String name) {
-		this.name = name.toLowerCase();
+		valid = Sets.newHashSet(EmiSearch.names.findAll(name));
 	}
 
 	@Override
 	public boolean matches(EmiStack stack) {
-		return stack.getName().getString().toLowerCase().contains(name);
+		return valid.contains(stack);
 	}
 }

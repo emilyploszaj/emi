@@ -37,6 +37,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.handler.CookingRecipeHandler;
 import dev.emi.emi.handler.CraftingRecipeHandler;
 import dev.emi.emi.handler.InventoryRecipeHandler;
@@ -67,8 +68,6 @@ import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingRecipe;
 import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
-import dev.emi.emi.screen.RecipeScreen;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -78,6 +77,7 @@ import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -207,7 +207,14 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addRecipeHandler(ScreenHandlerType.BLAST_FURNACE, new CookingRecipeHandler<BlastFurnaceScreenHandler>(BLASTING));
 		registry.addRecipeHandler(ScreenHandlerType.SMOKER, new CookingRecipeHandler<SmokerScreenHandler>(SMOKING));
 
-		registry.addExclusionArea(RecipeScreen.class, RecipeScreen::getExclusion);
+		registry.addExclusionArea(CreativeInventoryScreen.class, (screen, consumer) -> {
+			int left = ((HandledScreenAccessor) screen).getX();
+			int top = ((HandledScreenAccessor) screen).getY();
+			int width = ((HandledScreenAccessor) screen).getBackgroundWidth();
+			int bottom = top + ((HandledScreenAccessor) screen).getBackgroundHeight();
+			consumer.accept(new Bounds(left, top - 28, width, 28));
+			consumer.accept(new Bounds(left, bottom, width, 28));
+		});
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
 			if (screen instanceof AbstractInventoryScreen<?> inv) {
@@ -221,29 +228,29 @@ public class VanillaPlugin implements EmiPlugin {
 					int right = ((HandledScreenAccessor) inv).getX() + ((HandledScreenAccessor) inv).getBackgroundWidth() + 2;
 					int rightWidth = inv.width - right;
 					if (rightWidth >= 32) {
+						int top = ((HandledScreenAccessor) inv).getY();
 						int height = (collection.size() - 1) * k + 32;
 						int left, width;
 						if (EmiConfig.moveEffects) {
-							/*
-							boolean wide = ((HandledScreenAccessor) inv).getX() >= 122;
-							if (wide) {
-								left = ((HandledScreenAccessor) inv).getX() - 122;
-								width = 120;
-							} else {
-								left = ((HandledScreenAccessor) inv).getX() - 34;
-								width = 32;
-							}*/
-							return;
+							int size = collection.size();
+							top = ((HandledScreenAccessor) inv).getY() - 34;
+							if (((Object) screen) instanceof CreativeInventoryScreen) {
+								top -= 28;
+							}
+							int xOff = 34;
+							if (size == 1) {
+								xOff = 122;
+							} else if (size > 5) {
+								xOff = (((HandledScreenAccessor) inv).getBackgroundWidth() - 32) / (size - 1);
+							}
+							width = Math.max(122, (size - 1) * xOff + 32);
+							left = ((HandledScreenAccessor) inv).getX() + (((HandledScreenAccessor) inv).getBackgroundWidth() - width) / 2;
+							height = 32;
 						} else {
 							left = right;
-							boolean wide = rightWidth >= 120;
-							if (wide) {
-								width = 120;
-							} else {
-								width = 32;
-							}
+							width = 32;
 						}
-						consumer.accept(new Bounds(left, ((HandledScreenAccessor) inv).getY(), width, height));
+						consumer.accept(new Bounds(left, top, width, height));
 					}
 				}
 			}
@@ -494,7 +501,7 @@ public class VanillaPlugin implements EmiPlugin {
 						.output(list.get(1))
 						.build());
 				} else {
-					EmiLog.warn("Encountered hoe action of peculiar size " + list.size() + ", skipping.");
+					EmiReloadLog.warn("Encountered hoe action of peculiar size " + list.size() + ", skipping.");
 				}
 			}
 		}
@@ -516,7 +523,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
 			EmiStack cauldron = EmiStack.of(Items.CAULDRON);
-			EmiStack waterThird = EmiStack.of(FluidVariant.of(Fluids.WATER), 81_000 / 3);
+			EmiStack waterThird = EmiStack.of(Fluids.WATER, 81_000 / 3);
 			int uniq = EmiUtil.RANDOM.nextInt();
 			addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
@@ -613,8 +620,8 @@ public class VanillaPlugin implements EmiPlugin {
 		try {
 			registry.addRecipe(supplier.get());
 		} catch (Exception e) {
-			EmiLog.warn("Exception when parsing EMI recipe (no ID available)");
-			EmiLog.error(e);
+			EmiReloadLog.warn("Exception when parsing EMI recipe (no ID available)");
+			EmiReloadLog.error(e);
 		}
 	}
 
@@ -622,8 +629,8 @@ public class VanillaPlugin implements EmiPlugin {
 		try {
 			registry.addRecipe(supplier.get());
 		} catch (Exception e) {
-			EmiLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
-			EmiLog.error(e);
+			EmiReloadLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
+			EmiReloadLog.error(e);
 		}
 	}
 

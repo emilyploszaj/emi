@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -27,6 +26,8 @@ public class EmiRenderHelper {
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
 	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
+	public static final Identifier GRID = new Identifier("emi", "textures/gui/grid.png");
+	public static final Identifier PIECES = new Identifier("emi", "textures/gui/pieces.png");
 
 	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
 		int cor = cornerLength;
@@ -79,6 +80,16 @@ public class EmiRenderHelper {
 		return text;
 	}
 
+	public static void drawLeftTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
+		int original = screen.width;
+		try {
+			screen.width = x;
+			drawTooltip(screen, matrices, components, x, y);
+		} finally {
+			screen.width = original;
+		}
+	}
+
 	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
@@ -90,11 +101,9 @@ public class EmiRenderHelper {
 	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {
 		matrices.push();
 		matrices.translate(0, 0, 100);
-        RenderSystem.disableDepthTest();
         RenderSystem.colorMask(true, true, true, false);
 		DrawableHelper.fill(matrices, x, y, x + w, y + h, -2130706433);
         RenderSystem.colorMask(true, true, true, true);
-        RenderSystem.enableDepthTest();
 		matrices.pop();
 	}
 

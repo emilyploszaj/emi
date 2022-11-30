@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.registry.Registry;
 
-@Mixin(ItemStack.class)
+@Mixin(value = ItemStack.class, priority = 2000)
 public class ItemStackMixin {
 	
 	@Inject(at = @At("RETURN"), method = "getTooltip")

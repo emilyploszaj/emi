@@ -17,7 +17,7 @@ import net.minecraft.text.Text;
 
 public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	private final boolean canFill;
-	private Text invalid;
+	private Text invalid = EmiPort.translatable("emi.inapplicable");
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public RecipeFillButtonWidget(int x, int y, EmiRecipe recipe) {
@@ -26,13 +26,15 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 		HandledScreen hs = EmiApi.getHandledScreen();
 		EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 		EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
-		boolean applicable = handler != null && handler.supportsRecipe(recipe);
-		canFill = applicable && handler.canCraft(recipe, inv, hs);
-		if (!canFill) {
-			if (!applicable) {
-				invalid = EmiPort.translatable("emi.inapplicable");
-			} else {
-				invalid = handler.getInvalidReason(recipe, inv, hs);
+		if (handler == null) {
+			canFill = false;
+		} else {
+			boolean applicable = handler.supportsRecipe(recipe);
+			canFill = applicable && handler.canCraft(recipe, inv, hs);
+			if (!canFill) {
+				if (applicable) {
+					invalid = handler.getInvalidReason(recipe, inv, hs);
+				}
 			}
 		}
 	}

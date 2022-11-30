@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.EmiClient;
+import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.Resource;
@@ -47,12 +48,12 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 							}
 						}
 					} catch (Exception e) {
-						System.err.println("[emi] Error loading tag exclusions");
+						EmiLog.error("Error loading tag exclusions");
 						e.printStackTrace();
 					}
 				}
 			} catch (Exception e) {
-				System.err.println("[emi] Error loading tag exclusions");
+				EmiLog.error("Error loading tag exclusions");
 				e.printStackTrace();
 			}
 			allExclusions.addAll(exclusions);

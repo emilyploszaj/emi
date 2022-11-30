@@ -16,9 +16,10 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -55,7 +56,7 @@ public class StackBatcher {
 			sodiumSpriteHandle = MethodHandles.lookup()
 				.findStatic(clazz, "markSpriteActive", MethodType.methodType(void.class, Sprite.class));
 			if (sodiumSpriteHandle != null) {
-				System.out.println("[emi] Discovered Sodium");
+				EmiLog.info("Discovered Sodium");
 			}
 		} catch (Throwable e) {
 		}
@@ -124,7 +125,7 @@ public class StackBatcher {
 		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled()) {
 			if (populated) return;
 			try {
-				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
+				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
 				if (sodiumSpriteHandle != null && !stack.isEmpty()) {
 					ItemStack is = stack.getEmiStacks().get(0).getItemStack();
 					MinecraftClient client = MinecraftClient.getInstance();
@@ -140,7 +141,7 @@ public class StackBatcher {
 				}
 			} catch (Throwable t) {
 				if (EmiConfig.devMode) {
-					System.err.println("[emi] Stack threw exception during batched rendering. See log for info");
+					EmiLog.error("Stack threw exception during batched rendering. See log for info");
 					t.printStackTrace();
 				}
 				b.setUnbatchable();
@@ -169,7 +170,8 @@ public class StackBatcher {
 		DiffuseLighting.enableGuiDepthLighting();
 		Matrix4f mat = RenderSystem.getModelViewMatrix().copy();
 		mat.multiply(Matrix4f.scale(1, -1, 1));
-		mat.multiplyByTranslation(x, 0, 0);
+		// Flipped Y creates an offset
+		mat.multiplyByTranslation(x, -y - 16, 0);
 		for (Map.Entry<RenderLayer, VertexBuffer> en : buffers.entrySet()) {
 			en.getKey().startDrawing();
 			EmiPort.setShader(en.getValue(), mat);

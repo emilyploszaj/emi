@@ -1,6 +1,7 @@
 package dev.emi.emi;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
@@ -14,6 +15,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class EmiMain implements ModInitializer {
@@ -21,6 +23,7 @@ public class EmiMain implements ModInitializer {
 	public static final Identifier CREATE_ITEM = new Identifier("emi:create_item");
 	public static final Identifier DESTROY_HELD = new Identifier("emi:destroy_held");
 	public static final Identifier COMMAND = new Identifier("emi:command");
+	public static final Identifier CHESS = new Identifier("emi:chess");
 	public static final Identifier PING = new Identifier("emi:ping");
 
 	private static List<Slot> parseCompressedSlots(ScreenHandler handler, PacketByteBuf buf) {
@@ -137,7 +140,7 @@ public class EmiMain implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(DESTROY_HELD, (server, player, networkHandler, buf, sender) -> {
 			if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
 				server.execute(() -> {
-					System.out.println("[emi] " + player.getEntityName() + " deleted " + player.currentScreenHandler.getCursorStack());
+					EmiLog.info(player.getEntityName() + " deleted " + player.currentScreenHandler.getCursorStack());
 					player.currentScreenHandler.setCursorStack(ItemStack.EMPTY);
 				});
 			}
@@ -147,7 +150,7 @@ public class EmiMain implements ModInitializer {
 				int mode = buf.readByte();
 				ItemStack stack = buf.readItemStack();
 				server.execute(() -> {
-					System.out.println("[emi] " + player.getEntityName() + " cheated in " + stack);
+					EmiLog.info(player.getEntityName() + " cheated in " + stack);
 					if (mode == 0) {
 						player.getInventory().offerOrDrop(stack);
 					} else if (mode == 1) {
@@ -156,6 +159,18 @@ public class EmiMain implements ModInitializer {
 						}
 					}
 				});
+			}
+		});
+		ServerPlayNetworking.registerGlobalReceiver(CHESS, (server, player, networkHandler, buf, sender) -> {
+			UUID uuid = buf.readUuid();
+			PlayerEntity opponent = server.getOverworld().getPlayerByUuid(uuid);
+			if (opponent instanceof ServerPlayerEntity spe) {
+				PacketByteBuf msg = new PacketByteBuf(Unpooled.buffer());
+				msg.writeUuid(player.getUuid());
+				msg.writeByte(buf.readByte());
+				msg.writeByte(buf.readByte());
+				msg.writeByte(buf.readByte());
+				ServerPlayNetworking.send(spe, CHESS, msg);
 			}
 		});
 	}

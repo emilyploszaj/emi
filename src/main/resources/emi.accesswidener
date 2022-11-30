@@ -10,4 +10,4 @@ accessible field net/minecraft/recipe/BrewingRecipeRegistry$Recipe input Ljava/l
 accessible field net/minecraft/recipe/BrewingRecipeRegistry$Recipe ingredient Lnet/minecraft/recipe/Ingredient;
 accessible field net/minecraft/recipe/BrewingRecipeRegistry$Recipe output Ljava/lang/Object;
 
-accessible method net/minecraft/client/gui/screen/Screen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
+accessible method net/minecraft/client/gui/screen/Screen addSelectableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;

@@ -13,7 +13,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -60,8 +59,8 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 			register(new Identifier("emi", "fluid"), FluidEmiStack.class, new EmiStackSerializer<FluidEmiStack>() {
 				public JsonObject toJson(FluidEmiStack stack) {
 					JsonObject object = new JsonObject();
-					FluidVariant fluid = stack.getEntryOfType(FluidVariant.class).getValue();
-					object.addProperty("fluid", Registry.FLUID.getId(fluid.getFluid()).toString());
+					Fluid fluid = stack.getKeyOfType(Fluid.class);
+					object.addProperty("fluid", Registry.FLUID.getId(fluid).toString());
 					object.addProperty("amount", stack.getAmount());
 					if (stack.hasNbt()) {
 						object.addProperty("nbt", stack.getNbt().toString());
@@ -72,13 +71,11 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				public EmiIngredient toStack(JsonObject object) {
 					Fluid fluid = Registry.FLUID.get(new Identifier(object.get("fluid").getAsString()));
 					int amount = JsonHelper.getInt(object, "amount", 1);
-					FluidVariant var;
 					if (JsonHelper.hasString(object, "nbt")) {
-						var = FluidVariant.of(fluid, parseNbt(object));
+						return EmiStack.of(fluid, parseNbt(object), amount);
 					} else {
-						var = FluidVariant.of(fluid);
+						return EmiStack.of(fluid, amount);
 					}
-					return EmiStack.of(var, amount);
 				}
 
 				public Identifier getId() {

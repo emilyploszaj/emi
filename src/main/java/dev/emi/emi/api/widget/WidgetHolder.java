@@ -55,16 +55,25 @@ public interface WidgetHolder {
 		return add(new ButtonWidget(x, y, width, height, u, v, isActive, action));
 	}
 
+	/**
+	 * @param time Filling time, in milliseconds
+	 */
 	default FillingArrowWidget addFillingArrow(int x, int y, int time) {
 		return add(new FillingArrowWidget(x, y, time));
 	}
 
+	/**
+	 * @param time Animation time, in milliseconds
+	 */
 	default AnimatedTextureWidget addAnimatedTexture(Identifier texture, int x, int y, int width, int height, int u, int v, int time,
 			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
 		return add(new AnimatedTextureWidget(texture, x, y, width, height, u, v,
 			time, horizontal, endToStart, fullToEmpty));
 	}
 
+	/**
+	 * @param time Animation time, in milliseconds
+	 */
 	default AnimatedTextureWidget addAnimatedTexture(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight, int time,
 			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
@@ -73,6 +82,9 @@ public interface WidgetHolder {
 			time, horizontal, endToStart, fullToEmpty));
 	}
 
+	/**
+	 * @param time Animation time, in milliseconds
+	 */
 	default AnimatedTextureWidget addAnimatedTexture(EmiTexture texture, int x, int y, int time,
 			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
 		return addAnimatedTexture(texture.texture, x, y, texture.width, texture.height, texture.u, texture.v,

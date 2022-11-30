@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -94,17 +94,9 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 	}
 	
 	@ModifyVariable(at = @At(value = "STORE", ordinal = 0),
-		method = "drawStatusEffects", ordinal = 2)
-	private int moveEffects(int original) {
-		if (!EmiConfig.moveEffects) {
-			return original;
-		}
-		boolean wide = this.x >= 122;
-		if (wide) {
-			return this.x - 122;
-		} else {
-			return this.x - 34;
-		}
+		method = "drawStatusEffects", ordinal = 0)
+	private boolean squishEffects(boolean original) {
+		return false;
 	}
 
 	@ModifyVariable(at = @At(value = "STORE", ordinal = 0),

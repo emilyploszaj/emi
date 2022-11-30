@@ -2,7 +2,6 @@ package dev.emi.emi.screen;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +10,6 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
@@ -21,10 +19,10 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.*;
@@ -132,15 +130,18 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	}
 
 	private void setRecipePageWidth(int width) {
+		if ((width & 1) == 1) {
+			width++;
+		}
 		this.backgroundWidth = width;
 		this.x = (this.width - backgroundWidth) / 2;
 		this.tabOff = (backgroundWidth - 176) / 2;
-		this.arrows.get(0).x = this.x + 2;
-		this.arrows.get(1).x = this.x + this.backgroundWidth - 14;
-		this.arrows.get(2).x = this.x + 5;
-		this.arrows.get(3).x = this.x + this.backgroundWidth - 17;
-		this.arrows.get(4).x = this.x + 5;
-		this.arrows.get(5).x = this.x + this.backgroundWidth - 17;
+		this.arrows.get(0).x = this.x + 2 + tabOff;
+		this.arrows.get(1).x = this.x + 162 + tabOff;
+		this.arrows.get(2).x = this.x + 5 + tabOff;
+		this.arrows.get(3).x = this.x + 159 + tabOff;
+		this.arrows.get(4).x = this.x + 5 + tabOff;
+		this.arrows.get(5).x = this.x + 159 + tabOff;
 
 		this.arrows.get(0).y = this.y - 18;
 		this.arrows.get(1).y = this.y - 18;
@@ -168,10 +169,10 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				i == this.tab ? 9 : 18, 0, 4, 1);
 			tab.category.render(matrices, x + tabOff + off++ * 24 + 20, y - 20 - (i == this.tab ? 2 : 0), delta);
 		}
-		fillGradient(matrices, x + 19, y + 5, x + backgroundWidth - 19, y + 5 + 12, 0xff999999, 0xff999999);
-		fillGradient(matrices, x + 19, y + 18, x + backgroundWidth - 19, y + 18 + 12, 0xff999999, 0xff999999);
+		fillGradient(matrices, x + 19 + tabOff, y + 5, x + 157 + tabOff, y + 5 + 12, 0xff999999, 0xff999999);
+		fillGradient(matrices, x + 19 + tabOff, y + 18, x + 157 + tabOff, y + 18 + 12, 0xff999999, 0xff999999);
 		
-		boolean categoryHovered = mouseX >= x + 19 && mouseY >= y + 5 && mouseX < x + backgroundWidth - 19 && mouseY <= y + 5 + 12;
+		boolean categoryHovered = mouseX >= x + 19 + tabOff && mouseY >= y + 5 && mouseX < x + 176 + tabOff - 19 && mouseY <= y + 5 + 12;
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
@@ -182,7 +183,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
 		if (!workstations.isEmpty()) {
-			int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18 - 1);
+			int size = Math.min(workstations.size(), (backgroundHeight + 6 - getWorkstationsY()) / 18 - 1);
 			RenderSystem.setShaderTexture(0, TEXTURE);
 			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + getWorkstationsY() - 3, 24, 6 + 18 * size, 27, 0, 3, 1);
 		}
@@ -385,7 +386,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		int mx = (int) mouseX;
 		int my = (int) mouseY;
-		if (mouseX >= x + 19 && mouseY >= y + 5 && mouseX < x + backgroundWidth - 19 && mouseY <= y + 5 + 12) {
+		if (mouseX >= x + 19 + tabOff && mouseY >= y + 5 && mouseX < x + 176 + tabOff - 19 && mouseY <= y + 5 + 12) {
 			EmiApi.displayAllRecipes();
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			return true;
@@ -406,6 +407,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		} else if (mx >= x + 16 + tabOff && mx < x + backgroundWidth && my >= y - 24 && my < y) {
 			int n = (mx - x - 16 - tabOff) / 24 + tabPage * tabPageSize;
 			if (n < tabs.size() && n >= tabPage * tabPageSize && n < (tabPage + 1) * tabPageSize) {
+				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 				setPage(tabPage, n, 0);
 				return true;
 			}
@@ -487,26 +489,24 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		return false;
 	}
 
-	public void getExclusion(Consumer<Bounds> consumer) {
-		if (this.tab < tabs.size()) {
-			RecipeTab tab = tabs.get(this.tab);
-			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
-			if (!workstations.isEmpty()) {
-				int size = Math.min(workstations.size(), (backgroundHeight - 30) / 18);
-				RenderSystem.setShaderTexture(0, TEXTURE);
-				consumer.accept(new Bounds(x - 21, y, 24, 6 + 18 * size + getWorkstationsY()));
-			}
-		}
-	}
-
 	@Override
 	public int emi$getLeft() {
-		return x;
+		return x - 21;
 	}
 
 	@Override
 	public int emi$getRight() {
 		return x + backgroundWidth;
+	}
+
+	@Override
+	public int emi$getTop() {
+		return y - 26;
+	}
+
+	@Override
+	public int emi$getBottom() {
+		return y + backgroundHeight;
 	}
 
 	private class RecipeTab {

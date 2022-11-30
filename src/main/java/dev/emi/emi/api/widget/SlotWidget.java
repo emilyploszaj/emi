@@ -9,7 +9,6 @@ import org.jetbrains.annotations.ApiStatus;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
-import dev.emi.emi.EmiConfig;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -19,6 +18,7 @@ import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
@@ -190,7 +190,9 @@ public class SlotWidget extends Widget {
 		}
 
 		if (EmiConfig.showHoverOverlay && bounds.contains(mouseX, mouseY)) {
+			RenderSystem.disableDepthTest();
 			EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
+			RenderSystem.enableDepthTest();
 		}
 	}
 	

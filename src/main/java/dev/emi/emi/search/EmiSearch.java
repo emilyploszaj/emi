@@ -7,13 +7,21 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiConfig;
+import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiStackList;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.search.SuffixArray;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
@@ -21,24 +29,71 @@ public class EmiSearch {
 	public static Thread thread;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
+	public static SuffixArray<EmiStack> names, tooltips, mods;
+
+	public static void bake() {
+		SuffixArray<EmiStack> names = new SuffixArray<EmiStack>();
+		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
+		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
+		boolean old = EmiConfig.appendItemModId;
+		EmiConfig.appendItemModId = false;
+		for (EmiStack stack : EmiStackList.stacks) {
+			Text name = stack.getName();
+			if (name != null) {
+				names.add(stack, name.getString().toLowerCase());
+			}
+			List<Text> tooltip = stack.getTooltipText();
+			if (tooltip != null) {
+				for (int i = 1; i < tooltip.size(); i++) {
+					Text text = tooltip.get(i);
+					if (text != null) {
+						tooltips.add(stack, text.getString().toLowerCase());
+					}
+				}
+			}
+			Identifier id = stack.getId();
+			if (id != null) {
+				mods.add(stack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
+			}
+			if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
+				for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
+					Identifier eid = Registry.ENCHANTMENT.getId(e);
+					if (eid != null && !eid.getNamespace().equals("minecraft")) {
+						mods.add(stack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
+					}
+				}
+			}
+		}
+		EmiConfig.appendItemModId = old;
+		names.build();
+		tooltips.build();
+		mods.build();
+		EmiSearch.names = names;
+		EmiSearch.tooltips = tooltips;
+		EmiSearch.mods = mods;
+	}
 
 	public static void update() {
 		search(query);
 	}
 
-	public static synchronized void search(String query) {
-		inv = EmiScreenManager.lastPlayerInventory;
-		EmiSearch.query = query;
-		if (thread == null || !thread.isAlive()) {
-			thread = new Thread(new SearchWorker());
-			thread.setDaemon(true);
-			thread.start();
+	public static void search(String query) {
+		synchronized (EmiSearch.class) {
+			inv = EmiScreenManager.lastPlayerInventory;
+			EmiSearch.query = query;
+			if (thread == null || !thread.isAlive()) {
+				thread = new Thread(new SearchWorker());
+				thread.setDaemon(true);
+				thread.start();
+			}
 		}
 	}
 
-	public static synchronized void apply(List<? extends EmiIngredient> stacks) {
-		EmiSearch.stacks = stacks;
-		thread = null;
+	public static void apply(List<? extends EmiIngredient> stacks) {
+		synchronized (EmiSearch.class) {
+			EmiSearch.stacks = stacks;
+			thread = null;
+		}
 	}
 
 	public static class CompiledQuery {
@@ -55,8 +110,32 @@ public class EmiSearch {
 					q = q.substring(1);
 				}
 				QueryType type = QueryType.fromString(q);
-				addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries,
-					type.queryConstructor, type.regexQueryConstructor);
+				Function<String, Query> constructor = type.queryConstructor;
+				Function<String, Query> regexConstructor = type.regexQueryConstructor;
+				if (type == QueryType.DEFAULT) {
+					List<Function<String, Query>> constructors = Lists.newArrayList();
+					List<Function<String, Query>> regexConstructors = Lists.newArrayList();
+					constructors.add(constructor);
+					regexConstructors.add(regexConstructor);
+
+					if (EmiConfig.searchTooltipByDefault) {
+						constructors.add(QueryType.TOOLTIP.queryConstructor);
+						regexConstructors.add(QueryType.TOOLTIP.regexQueryConstructor);
+					}
+					if (EmiConfig.searchModNameByDefault) {
+						constructors.add(QueryType.MOD.queryConstructor);
+						regexConstructors.add(QueryType.MOD.regexQueryConstructor);
+					}
+					if (EmiConfig.searchTagsByDefault) {
+						constructors.add(QueryType.TAG.queryConstructor);
+						regexConstructors.add(QueryType.TAG.regexQueryConstructor);
+					}
+					if (constructors.size() > 1) {
+						constructor = name -> new LogicalOrQuery(constructors.stream().map(c -> c.apply(name)).toList());
+						regexConstructor = name -> new LogicalOrQuery(regexConstructors.stream().map(c -> c.apply(name)).toList());
+					}
+				}
+				addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries, constructor, regexConstructor);
 			}
 		}
 
@@ -99,16 +178,7 @@ public class EmiSearch {
 				do {
 					query = EmiSearch.query;
 					CompiledQuery compiled = new CompiledQuery(query);
-					List<? extends EmiIngredient> source;
-					if (EmiConfig.craftable) {
-						if (inv == null) {
-							MinecraftClient client = MinecraftClient.getInstance();
-							inv = new EmiPlayerInventory(client.player);
-						}
-						source = inv.getCraftables();
-					} else {
-						source = EmiStackList.stacks;
-					}
+					List<? extends EmiIngredient> source = EmiScreenManager.getSearchSource();
 					if (compiled.isEmpty()) {
 						stacks = source;
 						continue;
@@ -125,7 +195,7 @@ public class EmiSearch {
 				} while (query != EmiSearch.query);
 				apply(stacks);
 			} catch (Exception e) {
-				System.err.println("[emi] Error when attempting to search:");
+				EmiLog.error("Error when attempting to search:");
 				e.printStackTrace();
 			}
 		}

@@ -1,15 +1,15 @@
-package dev.emi.emi.screen.widget;
+package dev.emi.emi.screen.widget.config;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import net.fabricmc.api.EnvType;
@@ -17,10 +17,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -118,11 +121,11 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		if (x < this.getScrollbarPositionX() && x >= rowLeft && x <= rowRight && m >= 0) {
 			int h = 0;
 			for (int i = 0; i < this.getEntryCount(); i++) {
-				int eh = this.getEntry(i).getHeight();
-				if (m >= h && m < h + eh) {
+				int eh = getEntryHeight(i);
+				if (m >= h && m < h + eh - padding) {
 					return this.getEntry(i);
 				}
-				h += eh + padding;
+				h += eh;
 			}
 		}
 		return null;
@@ -157,9 +160,80 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
+
+		{	// Render background
+			RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+			bufferBuilder.vertex((double)this.left, (double)this.bottom, 0.0)
+				.texture((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F)
+				.color(32, 32, 32, 255)
+				.next();
+			bufferBuilder.vertex((double)this.right, (double)this.bottom, 0.0)
+				.texture((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F)
+				.color(32, 32, 32, 255)
+				.next();
+			bufferBuilder.vertex((double)this.right, (double)this.top, 0.0)
+				.texture((float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F)
+				.color(32, 32, 32, 255)
+				.next();
+			bufferBuilder.vertex((double)this.left, (double)this.top, 0.0)
+				.texture((float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F)
+				.color(32, 32, 32, 255)
+				.next();
+			tessellator.draw();
+		}
+		
 		int k = this.getRowLeft();
 		int l = this.top + 4 - (int)this.getScrollAmount();
 		this.renderList(matrices, k, l, mouseX, mouseY, delta);
+
+
+		{	// Render horizontal shadows
+			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+			RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.enableDepthTest();
+			RenderSystem.depthFunc(519);
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+			bufferBuilder.vertex((double)this.left, (double)this.top, -100.0).texture(0.0F, (float)this.top / 32.0F).color(64, 64, 64, 255).next();
+			bufferBuilder.vertex((double)(this.left + this.width), (double)this.top, -100.0)
+				.texture((float)this.width / 32.0F, (float)this.top / 32.0F)
+				.color(64, 64, 64, 255)
+				.next();
+			bufferBuilder.vertex((double)(this.left + this.width), 0.0, -100.0).texture((float)this.width / 32.0F, 0.0F).color(64, 64, 64, 255).next();
+			bufferBuilder.vertex((double)this.left, 0.0, -100.0).texture(0.0F, 0.0F).color(64, 64, 64, 255).next();
+			bufferBuilder.vertex((double)this.left, (double)this.height, -100.0).texture(0.0F, (float)this.height / 32.0F).color(64, 64, 64, 255).next();
+			bufferBuilder.vertex((double)(this.left + this.width), (double)this.height, -100.0)
+				.texture((float)this.width / 32.0F, (float)this.height / 32.0F)
+				.color(64, 64, 64, 255)
+				.next();
+			bufferBuilder.vertex((double)(this.left + this.width), (double)this.bottom, -100.0)
+				.texture((float)this.width / 32.0F, (float)this.bottom / 32.0F)
+				.color(64, 64, 64, 255)
+				.next();
+			bufferBuilder.vertex((double)this.left, (double)this.bottom, -100.0).texture(0.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255).next();
+			tessellator.draw();
+			RenderSystem.depthFunc(515);
+			RenderSystem.disableDepthTest();
+			RenderSystem.enableBlend();
+			RenderSystem.blendFuncSeparate(
+				GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE
+			);
+			RenderSystem.disableTexture();
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			n = 4;
+			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+			bufferBuilder.vertex((double)this.left, (double)(this.top + 4), 0.0).color(0, 0, 0, 0).next();
+			bufferBuilder.vertex((double)this.right, (double)(this.top + 4), 0.0).color(0, 0, 0, 0).next();
+			bufferBuilder.vertex((double)this.right, (double)this.top, 0.0).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex((double)this.left, (double)this.top, 0.0).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex((double)this.left, (double)this.bottom, 0.0).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex((double)this.right, (double)this.bottom, 0.0).color(0, 0, 0, 255).next();
+			bufferBuilder.vertex((double)this.right, (double)(this.bottom - 4), 0.0).color(0, 0, 0, 0).next();
+			bufferBuilder.vertex((double)this.left, (double)(this.bottom - 4), 0.0).color(0, 0, 0, 0).next();
+			tessellator.draw();
+		}
+
 		if ((o = this.getMaxScroll()) > 0) {
 			RenderSystem.disableTexture();
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -217,7 +291,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	public int getMaxScroll() {
-		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4));
+		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4) + 40);
 	}
 
 	protected void updateScrollingState(double mouseX, double mouseY, int button) {
@@ -226,6 +300,29 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 
 	protected int getScrollbarPositionX() {
 		return this.width - 6;
+	}
+
+	public void unfocusTextField() {
+		for (Entry e : this.children) {
+			for (Element el : e.children()) {
+				if (el instanceof TextFieldWidget tfw) {
+					tfw.setTextFieldFocused(false);
+				}
+			}
+		}
+	}
+
+	public TextFieldWidget getFocusedTextField() {
+		for (Entry e : this.children) {
+			for (Element el : e.children()) {
+				if (el instanceof TextFieldWidget tfw) {
+					if (tfw.isFocused()) {
+						return tfw;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -239,6 +336,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				return true;
 			}
 		}*/
+		unfocusTextField();
 		if (!this.isMouseOver(mouseX, mouseY)) {
 			return false;
 		}
@@ -285,7 +383,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		this.setScrollAmount(this.getScrollAmount() - amount * 32);
+		this.setScrollAmount(this.getScrollAmount() - amount * 22);
 		return true;
 	}
 
@@ -294,6 +392,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		if (super.keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
 		}
+		/*
 		if (keyCode == GLFW.GLFW_KEY_DOWN) {
 			this.moveSelection(MoveDirection.DOWN);
 			return true;
@@ -301,7 +400,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		if (keyCode == GLFW.GLFW_KEY_UP) {
 			this.moveSelection(MoveDirection.UP);
 			return true;
-		}
+		}*/
 		return false;
 	}
 
@@ -354,7 +453,11 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			int l = this.getRowBottom(j);
 			if (l < this.top || k > this.bottom) continue;
 			int m = k;
-			int n = this.getEntry(j).getHeight() - 4;
+			int n = getEntryHeight(j);
+			if (n == 0) {
+				continue;
+			}
+			n -= 4;
 			Entry entry = this.getEntry(j);
 			int o = this.getRowWidth();
 			if (this.renderSelection && this.isSelectedEntry(j)) {
@@ -392,10 +495,22 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return this.getRowLeft() + this.getRowWidth();
 	}
 
+	private int getEntryHeight(int i) {
+		return getEntryHeight(this.getEntry(i));
+	}
+
+	private int getEntryHeight(Entry entry) {
+		int h = entry.getHeight();
+		if (h == 0) {
+			return 0;
+		}
+		return h + padding;
+	}
+
 	protected int getRowTop(int index) {
 		int height = 0;
 		for (int i = 0; i < index; i++) {
-			height += this.getEntry(i).getHeight() + padding;
+			height += getEntryHeight(i);
 		}
 		return this.top + 4 - (int)this.getScrollAmount() + height;
 	}
@@ -437,17 +552,18 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	public int getTotalHeight() {
-		int height = padding * this.getEntryCount();
+		int height = 0;
 		for (int i = 0; i < this.getEntryCount(); i++) {
-			height += this.getEntry(i).getHeight();
+			height += getEntryHeight(i);
+		}
+		if (height > 0) {
+			height -= padding;
 		}
 		return height;
 	}
 
 	@Override
 	public void appendNarrations(NarrationMessageBuilder var1) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Environment(value=EnvType.CLIENT)
@@ -462,7 +578,8 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			return Objects.equals(this.parentList.getEntryAtPosition(mouseX, mouseY), this);
 		}
 
-		public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+			return List.of();
 		}
 
 		public abstract int getHeight();

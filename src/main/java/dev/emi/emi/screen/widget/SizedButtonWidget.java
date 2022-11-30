@@ -10,16 +10,17 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class SizedButtonWidget extends ButtonWidget {
-	private final int u, v;
 	private final BooleanSupplier isActive;
 	private final IntSupplier vOffset;
-	private final Supplier<List<Text>> text;
+	protected Supplier<List<Text>> text;
+	protected int u, v;
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action) {
 		this(x, y, width, height, u, v, isActive, action, () -> 0);
@@ -44,11 +45,12 @@ public class SizedButtonWidget extends ButtonWidget {
 		this.vOffset = vOffset;
 		this.text = text;
 	}
-	
-	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+
+	protected int getU(int mouseX, int mouseY) {
+		return this.u;
+	}
+
+	protected int getV(int mouseX, int mouseY) {
 		int v = this.v + vOffset.getAsInt();
 		this.active = this.isActive.getAsBoolean();
 		if (!this.active) {
@@ -56,13 +58,20 @@ public class SizedButtonWidget extends ButtonWidget {
 		} else if (this.isMouseOver(mouseX, mouseY)) {
 			v += this.height;
 		}
+		return v;
+	}
+	
+	@Override
+	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 		RenderSystem.enableDepthTest();
-		drawTexture(matrices, this.x, this.y, this.u, v, this.width, this.height, 256, 256);
+		drawTexture(matrices, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height, 256, 256);
 		if (this.isMouseOver(mouseX, mouseY) && text != null && this.active) {
 			matrices.push();
 			RenderSystem.disableDepthTest();
 			MinecraftClient client = MinecraftClient.getInstance();
-			client.currentScreen.renderTooltip(matrices, text.get(), mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(client.currentScreen, matrices, text.get().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList(), mouseX, mouseY);
 			matrices.pop();
 		}
 	}

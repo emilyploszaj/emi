@@ -374,7 +374,7 @@ public class QDCSS {
 	
 	private static final Pattern JUNK_PATTERN = Pattern.compile("^(\\s*(/\\*.*?\\*/)?\\s*)*$", Pattern.DOTALL);
 	private static final Pattern RULESET_PATTERN = Pattern.compile("[#.]?(\\w+?)\\s*\\{(.*?)\\}", Pattern.DOTALL);
-	private static final Pattern RULE_PATTERN = Pattern.compile("(\\S+?)\\s*:\\s*(\\\".*?\\\"|'.*?'|\\S+?)\\s*(;|$)");
+	private static final Pattern RULE_PATTERN = Pattern.compile("(\\S+?)\\s*:\\s*(\\\".*?\\\"|'.*?'|.+?)\\s*(;|$)");
 	
 	public static QDCSS load(String fileName, String s) throws SyntaxErrorException {
 		// vanilla CSS is a very simple grammar, so we can parse it using only regexes

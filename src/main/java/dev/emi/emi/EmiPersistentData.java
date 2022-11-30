@@ -23,7 +23,7 @@ public class EmiPersistentData {
 			GSON.toJson(json, writer);
 			writer.close();
 		} catch (Exception e) {
-			System.err.println("[emi] Failed to write persistent data");
+			EmiLog.error("Failed to write persistent data");
 			e.printStackTrace();
 		}
 	}
@@ -41,7 +41,7 @@ public class EmiPersistentData {
 				BoM.loadAdded(JsonHelper.getObject(json, "recipe_defaults"));
 			}
 		} catch (Exception e) {
-			System.err.println("[emi] Failed to parse persistent data");
+			EmiLog.error("Failed to parse persistent data");
 			e.printStackTrace();
 		}
 	}
