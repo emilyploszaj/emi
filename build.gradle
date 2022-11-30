@@ -8,7 +8,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = "${project.mod_version}+${project.platform_version}"
 group = project.maven_group
 
 loom {
@@ -35,20 +35,13 @@ dependencies {
 	modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	modCompileOnly "com.terraformersmc:modmenu:3.2.3"
-
-	// Run setup-platforms.sh to populate
-	modCompileOnly files("platform-1.18.2/build/libs/include.jar")
-	// Uncomment for dev
-	modLocalRuntime files("platform-1.18.2/build/libs/include.jar")
 }
 
 processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version,
-				"platform": project.minecraft_version,
-				"accessWidener": 'accessWidener'
+		expand "version": project.version
 	}
 }
 
@@ -71,42 +64,18 @@ jar {
 	from "LICENSE"
 }
 
-task makePlatformJars(type: Exec) {
-	dependsOn remapJar, remapSourcesJar
-	commandLine './make-platform-jars.sh', remapJar.archiveFile.get().toString(), remapSourcesJar.archiveFile.get().toString(), project.minecraft_version
-}
-
-tasks.build.dependsOn makePlatformJars
-
-// configure the maven publication
 publishing {
 	publications {
-		//def versions = [project.minecraft_version]
-		def versions = []
-
-		file('.').list().each {
-			if (it.startsWith("platform-")) {
-				versions.add(it.substring(9))
-			}
-		}
-
-		versions.each { plat ->
-			create(plat, MavenPublication) {
-				group project.group
-				artifactId project.archivesBaseName
-				version "${project.version}+${plat}"
-				artifact(file("build/libs/${project.archivesBaseName}-${project.version}+${plat}.jar")) {
-					classifier ''
-					builtBy makePlatformJars
-				}
-				artifact(file("build/libs/${project.archivesBaseName}-${project.version}+${plat}-sources.jar")) {
-					classifier 'sources'
-					builtBy makePlatformJars
-				}
-			}
+		mavenJava(MavenPublication) {
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+            afterEvaluate {
+                artifact remapJar
+            }
 		}
 	}
-	setupRepositories(repositories);
+    setupRepositories(repositories)
 }
 
 void setupRepositories(RepositoryHandler repositories) {
