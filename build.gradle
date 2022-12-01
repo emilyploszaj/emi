@@ -1,7 +1,25 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+	}
+}
+
 plugins {
 	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
 	id 'maven-publish'
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	apply plugin: "com.modrinth.minotaur"
+}
+if (System.getenv("CURSE_TOKEN")) {
+	apply plugin: "com.matthewprenger.cursegradle"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -20,7 +38,7 @@ quiltflower {
 }
 
 repositories {
-    maven {
+	maven {
 		url = "https://maven.terraformersmc.com/"
 	}
 }
@@ -67,15 +85,15 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-            afterEvaluate {
-                artifact remapJar
-            }
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
+			afterEvaluate {
+				artifact remapJar
+			}
 		}
 	}
-    setupRepositories(repositories)
+	setupRepositories(repositories)
 }
 
 void setupRepositories(RepositoryHandler repositories) {
@@ -86,6 +104,54 @@ void setupRepositories(RepositoryHandler repositories) {
 				username project.mavenUsername
 				password project.mavenPassword
 			}
+		}
+	}
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = 'emi'
+		versionNumber = project.version
+		versionName = project.version
+		versionType = 'release'
+		uploadFile = remapJar
+		gameVersions = [project.platform_version]
+		loaders = ['fabric', 'quilt']
+		detectLoaders = false
+		changelog = file('CHANGELOG.md').text
+		dependencies {
+			required.project 'fabric-api'
+			required.project 'qsl'
+		}
+	}
+}
+
+if (System.getenv("CURSE_TOKEN")) {
+	curseforge {
+		apiKey = System.getenv("CURSE_TOKEN")
+		project {
+			id = '580555'
+			releaseType = 'release'
+			changelogType = 'markdown'
+			changelog = file('CHANGELOG.md')
+
+			addGameVersion project.platform_version
+			addGameVersion 'Fabric'
+			addGameVersion 'Quilt'
+
+			mainArtifact(remapJar) {
+				displayName = 'EMI ' + project.version
+			}
+			relations {
+				//requiredDependency 'fabric-api'
+				//requiredDependency 'qsl'
+			}
+		}
+		options {
+			javaIntegration = false
+			forgeGradleIntegration = false
+			javaVersionAutoDetect = false
 		}
 	}
 }

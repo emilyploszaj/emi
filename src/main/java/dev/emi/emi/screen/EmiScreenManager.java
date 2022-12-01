@@ -545,9 +545,12 @@ public class EmiScreenManager {
 						index = panel.getStacks().size() - pageSize * page;
 					}
 					if (index >= 0) {
+						matrices.push();
+						matrices.translate(0, 0, 200);
 						int dx = panel.space.getEdgeX(index);
 						int dy = panel.space.getEdgeY(index);
 						DrawableHelper.fill(matrices, dx - 1, dy, dx + 1, dy + 18, 0xFF00FFFF);
+						matrices.pop();
 					}
 				}
 			}
@@ -806,7 +809,7 @@ public class EmiScreenManager {
 			}
 			recalculate();
 			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
-			if (!hovered.getStack().equals(pressedStack) && !(pressedStack instanceof EmiFavorite.Synthetic)) {
+			if (hovered.getStack() != pressedStack && !(pressedStack instanceof EmiFavorite.Synthetic)) {
 				draggedStack = pressedStack;
 			}
 		}
