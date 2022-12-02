@@ -1,0 +1,69 @@
+name: Release
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java: [ 17 ]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: setup JDK${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/loom-cache
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Get Mod Version
+        id: mod_version
+        run: grep "mod_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
+
+      - name: Get Platform Version
+        id: platform_version
+        run: grep "platform_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
+
+      - name: Get Composite Version
+        id: composite_version
+        run: echo "composite_version=${{ steps.mod_version.outputs.mod_version }}+${{ steps.platform_version.outputs.platform_version }}" >> $GITHUB_OUTPUT
+
+      - name: Publish
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: ./gradlew build publish modrinth curseforge -PmavenUrl="${{ secrets.MAVEN_URL }}" -PmavenUsername="${{ secrets.MAVEN_USERNAME }}" -PmavenPassword="${{ secrets.MAVEN_PASSWORD }}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.composite_version.outputs.composite_version }}
+          release_name: EMI ${{ steps.composite_version.outputs.composite_version }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload_release_asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/libs/emi-${{ steps.composite_version.outputs.composite_version }}.jar
+          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}.jar
+          asset_content_type: application/java-archive
