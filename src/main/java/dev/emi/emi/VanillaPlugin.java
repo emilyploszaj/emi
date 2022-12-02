@@ -606,14 +606,6 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
 			}
 		});
-
-		if (Registry.ITEM.containsId(new Identifier("minecraft:mud"))) {
-			EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
-				.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
-			EmiStack mud = EmiStack.of(Registry.ITEM.get(new Identifier("minecraft:mud")));
-			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud,
-				new Identifier("emi:emi/mud"), false));
-		}
 	}
 
 	private static void addRecipeSafe(EmiRegistry registry, Supplier<EmiRecipe> supplier) {
