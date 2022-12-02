@@ -18,7 +18,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -40,13 +39,13 @@ public class ConfigPresetScreen extends Screen {
 		this.addDrawable(new EmiNameWidget(width / 2, 16));
 		int w = Math.min(400, width - 40);
 		int x = (width - w) / 2;
-		this.resetButton = new ButtonWidget(x + 2, height - 30, w / 2 - 2, 20, ScreenTexts.DONE, button -> {
+		this.resetButton = new ButtonWidget(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", last.originalConfig));
 			MinecraftClient client = MinecraftClient.getInstance();
 			this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
 		});
 		this.addDrawableChild(resetButton);
-		this.addDrawableChild(new ButtonWidget(x + w / 2 + 2, height - 30, w / 2 - 2, 20, ScreenTexts.DONE, button -> {
+		this.addDrawableChild(new ButtonWidget(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
 		}));
 		list = new ListWidget(client, width, height, 40, height - 40);

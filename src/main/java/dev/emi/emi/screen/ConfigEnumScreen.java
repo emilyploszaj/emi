@@ -12,7 +12,6 @@ import dev.emi.emi.screen.widget.config.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -37,7 +36,7 @@ public class ConfigEnumScreen<T> extends Screen {
 		this.addDrawable(new EmiNameWidget(width / 2, 16));
 		int w = 200;
 		int x = (width - w) / 2;
-		this.addDrawableChild(new ButtonWidget(x, height - 30, w, 20, ScreenTexts.CANCEL, button -> {
+		this.addDrawableChild(new ButtonWidget(x, height - 30, w, 20, EmiPort.translatable("gui.done"), button -> {
 			close();
 		}));
 		list = new ListWidget(client, width, height, 40, height - 40);
