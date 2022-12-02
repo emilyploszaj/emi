@@ -14,7 +14,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 
 public class EmiScreenshotRecorder {
 	private static final String SCREENSHOTS_DIRNAME = "screenshots";
@@ -69,7 +69,7 @@ public class EmiScreenshotRecorder {
 		RenderSystem.applyModelViewMatrix();
 
 		Matrix4f backupProj = RenderSystem.getProjectionMatrix();
-		RenderSystem.setProjectionMatrix(Util.make(new Matrix4f(), Matrix4f::loadIdentity));
+		RenderSystem.setProjectionMatrix(new Matrix4f().identity());
 
 		renderer.run();
 

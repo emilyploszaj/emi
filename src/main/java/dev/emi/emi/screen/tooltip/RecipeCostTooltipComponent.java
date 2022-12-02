@@ -15,7 +15,7 @@ import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 
 public class RecipeCostTooltipComponent implements TooltipComponent {
 	private static final Text COST = EmiPort.translatable("emi.cost_per");

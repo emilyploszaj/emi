@@ -14,19 +14,16 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class EmiBindWidget extends ConfigEntryWidget {
 	private final ConfigScreen screen;
-	private final Text bindName;
 	private EmiBind bind;
 	private List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public EmiBindWidget(ConfigScreen screen, List<TooltipComponent> tooltip, Supplier<String> search, EmiBind bind) {
 		super(EmiPort.translatable(bind.translationKey), tooltip, search, 0);
 		this.screen = screen;
-		this.bindName = EmiPort.translatable(bind.translationKey);
 		this.bind = bind;
 		updateButtons();
 		setChildren(buttons);
@@ -36,18 +33,9 @@ public class EmiBindWidget extends ConfigEntryWidget {
 		buttons.clear();
 		for (int i = 0; i < bind.boundKeys.size(); i++) {
 			final int j = i;
-			ButtonWidget widget = new ButtonWidget(0, 0, 200, 20, getKeyText(bind.boundKeys.get(i), Formatting.RESET), button -> {
+			ButtonWidget widget = EmiPort.newButton(0, 0, 200, 20, getKeyText(bind.boundKeys.get(i), Formatting.RESET), button -> {
 				screen.setActiveBind(bind, j);
-			}) {
-
-				@Override
-				protected MutableText getNarrationMessage() {
-					if (j < bind.boundKeys.size() && bind.boundKeys.get(j).isUnbound()) {
-						return EmiPort.translatable("narrator.controls.unbound", bindName);
-					}
-					return EmiPort.translatable("narrator.controls.bound", bindName, super.getNarrationMessage());
-				}
-			};
+			});
 			buttons.add(widget);
 		}
 	}

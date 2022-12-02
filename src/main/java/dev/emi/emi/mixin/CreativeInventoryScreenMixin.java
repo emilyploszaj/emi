@@ -9,13 +9,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenMixin {
 	@Shadow
-	private static int selectedTab;
+	private static ItemGroup selectedTab;
 	@Shadow
-	protected abstract boolean hasScrollbar();
+	abstract boolean hasScrollbar();
 
 	@Inject(at = @At("HEAD"), method = "mouseScrolled", cancellable = true)
 	private void mouseScrolled(double mouseX, double mouseY, double amount, CallbackInfoReturnable<Boolean> info) {
@@ -26,7 +27,7 @@ public abstract class CreativeInventoryScreenMixin {
 
 	@Inject(at = @At("HEAD"), method = "keyPressed", cancellable = true)
     public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> info) {
-		if (selectedTab == ItemGroup.SEARCH.getIndex()) {
+		if (selectedTab == ItemGroups.SEARCH) {
 			return;
 		}
 		if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {

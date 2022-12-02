@@ -158,7 +158,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		int j = i + 6;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
 
 		{	// Render background
@@ -190,7 +190,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 
 
 		{	// Render horizontal shadows
-			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthFunc(519);
@@ -220,7 +220,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE
 			);
 			RenderSystem.disableTexture();
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			n = 4;
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 			bufferBuilder.vertex((double)this.left, (double)(this.top + 4), 0.0).color(0, 0, 0, 0).next();
@@ -236,7 +236,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 
 		if ((o = this.getMaxScroll()) > 0) {
 			RenderSystem.disableTexture();
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
+			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
 			m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
 			n = (int)this.getScrollAmount() * (this.bottom - this.top - m) / o + this.top;
@@ -464,7 +464,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				p = this.left + this.width / 2 - o / 2;
 				int q = this.left + this.width / 2 + o / 2;
 				RenderSystem.disableTexture();
-				RenderSystem.setShader(GameRenderer::getPositionShader);
+				RenderSystem.setShader(GameRenderer::getPositionProgram);
 				float f = this.isFocused() ? 1.0f : 0.5f;
 				RenderSystem.setShaderColor(f, f, f, 1.0f);
 				bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);

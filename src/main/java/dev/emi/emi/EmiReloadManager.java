@@ -15,8 +15,7 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.tag.TagKey;
 
 public class EmiReloadManager {
 	private static volatile boolean clear = false, restart = false, populated = false;
@@ -80,7 +79,7 @@ public class EmiReloadManager {
 						break;
 					}
 	
-					EmiClient.itemTags = Registry.ITEM.streamTags()
+					EmiClient.itemTags = EmiPort.getItemRegistry().streamTags()
 						.filter(key -> !EmiClient.excludedTags.contains(key.id()))
 						.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 						.toList();

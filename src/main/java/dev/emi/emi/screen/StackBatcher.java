@@ -34,7 +34,7 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Matrix4f;
+import org.joml.Matrix4f;
 
 /**
  * @author Una "unascribed" Thompson
@@ -168,16 +168,16 @@ public class StackBatcher {
 			populated = true;
 		}
 		DiffuseLighting.enableGuiDepthLighting();
-		Matrix4f mat = RenderSystem.getModelViewMatrix().copy();
-		mat.multiply(Matrix4f.scale(1, -1, 1));
+		Matrix4f mat = new Matrix4f(RenderSystem.getModelViewMatrix());
+		mat.mul(new Matrix4f().scale(1, -1, 1));
 		// Flipped Y creates an offset
-		mat.multiplyByTranslation(x, -y - 16, 0);
+		mat.mul(new Matrix4f().translation(x, -y - 16, 0));
 		for (Map.Entry<RenderLayer, VertexBuffer> en : buffers.entrySet()) {
 			en.getKey().startDrawing();
 			EmiPort.setShader(en.getValue(), mat);
 			en.getKey().endDrawing();
 		}
-		BufferRenderer.unbindAll();
+		BufferRenderer.reset();
 	}
 	
 	private void bake() {

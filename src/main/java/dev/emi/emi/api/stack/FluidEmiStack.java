@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -16,7 +17,6 @@ import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
@@ -27,8 +27,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.registry.Registry;
 
 public class FluidEmiStack extends EmiStack {
 	private final FluidEntry entry;
@@ -88,7 +86,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public Identifier getId() {
-		return Registry.FLUID.getId(fluid.getFluid());
+		return EmiPort.getFluidRegistry().getId(fluid.getFluid());
 	}
 
 	@Override
@@ -99,9 +97,9 @@ public class FluidEmiStack extends EmiStack {
 				return;
 			}
 			Sprite sprite = sprites[0];
-			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+			EmiPort.setPositionColorTexShader();
 			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-			RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+			RenderSystem.setShaderTexture(0, sprite.getAtlasId());
 			
 			int color = FluidVariantRendering.getColor(fluid);
 			float r = ((color >> 16) & 255) / 256f;
@@ -142,7 +140,7 @@ public class FluidEmiStack extends EmiStack {
 		if (amount > 1) {
 			list.add(TooltipComponent.of(EmiPort.ordered(getAmountText(amount))));
 		}
-		String namespace = Registry.FLUID.getId(fluid.getFluid()).getNamespace();
+		String namespace = EmiPort.getFluidRegistry().getId(fluid.getFluid()).getNamespace();
 		String mod = EmiUtil.getModName(namespace);
 		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
 		if (!getRemainder().isEmpty()) {

@@ -7,12 +7,13 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(Screen.class)
 public interface ScreenAccessor {
 	
 	@Invoker("renderTooltipFromComponents")
-	void invokeRenderTooltipFromComponents(MatrixStack matrices, List<TooltipComponent> components, int x, int y);
+	void invokeRenderTooltipFromComponents(MatrixStack matrices, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner);
 
 }

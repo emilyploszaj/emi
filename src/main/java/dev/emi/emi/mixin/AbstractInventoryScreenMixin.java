@@ -64,7 +64,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 				Sprite sprite = this.client.getStatusEffectSpriteManager().getSprite(effect);
 				int ew = size == 1 ? 120 : 32;
 				this.drawTexture(matrices, x, y, 0, size == 1 ? 166 : 198, ew, 32);
-				RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+				RenderSystem.setShaderTexture(0, sprite.getAtlasId());
 				AbstractInventoryScreen.drawSprite(matrices, x + (size == 1 ? 6 : 7), y + 7, this.getZOffset(), 18, 18, sprite);
 				if (size == 1) {
 					AbstractInventoryScreen.drawSprite(matrices, x + 6, y + 7, this.getZOffset(), 18, 18, sprite);

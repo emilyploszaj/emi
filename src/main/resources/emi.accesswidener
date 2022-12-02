@@ -11,3 +11,6 @@ accessible field net/minecraft/recipe/BrewingRecipeRegistry$Recipe ingredient Ln
 accessible field net/minecraft/recipe/BrewingRecipeRegistry$Recipe output Ljava/lang/Object;
 
 accessible method net/minecraft/client/gui/screen/Screen addSelectableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
+
+accessible field net/minecraft/client/gui/widget/ClickableWidget x I
+accessible field net/minecraft/client/gui/widget/ClickableWidget y I

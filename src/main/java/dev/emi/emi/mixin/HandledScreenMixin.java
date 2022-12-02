@@ -1,16 +1,17 @@
 package dev.emi.emi.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -19,7 +20,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 
@@ -32,7 +32,6 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 
 	@Inject(at = @At(value = "TAIL"), method = "init")
 	private void init(CallbackInfo info) {
-		this.client.keyboard.setRepeatEvents(true);
 		EmiScreenManager.addWidgets(this);
 	}
 
@@ -45,7 +44,7 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		viewStack.push();
 		viewStack.translate(-x, -y, 0.0);
 		RenderSystem.applyModelViewMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		EmiPort.setPositionTexShader();
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		viewStack.pop();
 		RenderSystem.applyModelViewMatrix();

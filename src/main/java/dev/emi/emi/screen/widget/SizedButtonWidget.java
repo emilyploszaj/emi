@@ -12,7 +12,6 @@ import dev.emi.emi.EmiRenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -38,7 +37,7 @@ public class SizedButtonWidget extends ButtonWidget {
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
 			IntSupplier vOffset, Supplier<List<Text>> text) {
-		super(x, y, width, height, EmiPort.literal(""), action);
+		super(x, y, width, height, EmiPort.literal(""), action, s -> s.get());
 		this.u = u;
 		this.v = v;
 		this.isActive = isActive;
@@ -63,7 +62,7 @@ public class SizedButtonWidget extends ButtonWidget {
 	
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 		RenderSystem.enableDepthTest();
 		drawTexture(matrices, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height, 256, 256);
