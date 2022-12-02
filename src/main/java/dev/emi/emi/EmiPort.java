@@ -13,14 +13,22 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ButtonWidget.PressAction;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
+import net.minecraft.potion.Potion;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -129,5 +137,37 @@ public final class EmiPort {
 
 	public static int getGuiScale(MinecraftClient client) {
 		return client.options.getGuiScale().getValue();
+	}
+
+	public static void setPositionTexShader() {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+	}
+
+	public static void setPositionColorTexShader() {
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+	}
+
+	public static Registry<Item> getItemRegistry() {
+		return Registry.ITEM;
+	}
+
+	public static Registry<Block> getBlockRegistry() {
+		return Registry.BLOCK;
+	}
+
+	public static Registry<Fluid> getFluidRegistry() {
+		return Registry.FLUID;
+	}
+
+	public static Registry<Potion> getPotionRegistry() {
+		return Registry.POTION;
+	}
+
+	public static Registry<Enchantment> getEnchantmentRegistry() {
+		return Registry.ENCHANTMENT;
+	}
+
+	public static ButtonWidget newButton(int x, int y, int w, int h, Text name, PressAction action) {
+		return new ButtonWidget(x, y, w, h, name, action);
 	}
 }
