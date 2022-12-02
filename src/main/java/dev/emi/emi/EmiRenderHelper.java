@@ -15,8 +15,8 @@ import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -95,7 +95,7 @@ public class EmiRenderHelper {
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();
 		mutable.addAll(components);
-		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, mutable, x, y, HoveredTooltipPositioner.INSTANCE);
+		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, mutable, x, y);
 	}
 
 	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {
@@ -172,7 +172,7 @@ public class EmiRenderHelper {
 	}
 
 	public static void renderRecipeBackground(EmiRecipe recipe, MatrixStack matrices, int x, int y) {
-		EmiPort.setPositionTexShader();
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, BACKGROUND);
 		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 0, 0, 4, 1);

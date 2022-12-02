@@ -15,7 +15,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import org.joml.Matrix4f;
+import net.minecraft.util.math.Matrix4f;
 
 public class RemainderTooltipComponent implements TooltipComponent {
 	public List<Remainder> remainders = Lists.newArrayList();

@@ -18,11 +18,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Util;
-import net.minecraft.registry.entry.RegistryEntryList.Named;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntryList.Named;
 
 public interface EmiStackSerializer<T extends EmiIngredient> {
 	public static final Map<Class<?>, EmiStackSerializer<?>> BY_CLASS = Maps.newHashMap();
@@ -34,7 +35,7 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				public JsonObject toJson(ItemEmiStack stack) {
 					JsonObject object = new JsonObject();
 					ItemStack is = stack.getItemStack();
-					object.addProperty("item", EmiPort.getItemRegistry().getId(is.getItem()).toString());
+					object.addProperty("item", Registry.ITEM.getId(is.getItem()).toString());
 					object.addProperty("amount", stack.getAmount());
 					if (stack.hasNbt()) {
 						object.addProperty("nbt", stack.getNbt().toString());
@@ -43,7 +44,7 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				}
 
 				public EmiIngredient toStack(JsonObject object) {
-					ItemStack is = new ItemStack(EmiPort.getItemRegistry().get(new Identifier(object.get("item").getAsString())));
+					ItemStack is = new ItemStack(Registry.ITEM.get(new Identifier(object.get("item").getAsString())));
 					is.setCount(JsonHelper.getInt(object, "amount", 1));
 					if (JsonHelper.hasString(object, "nbt")) {
 						is.setNbt(parseNbt(object));
@@ -59,7 +60,7 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				public JsonObject toJson(FluidEmiStack stack) {
 					JsonObject object = new JsonObject();
 					Fluid fluid = stack.getKeyOfType(Fluid.class);
-					object.addProperty("fluid", EmiPort.getFluidRegistry().getId(fluid).toString());
+					object.addProperty("fluid", Registry.FLUID.getId(fluid).toString());
 					object.addProperty("amount", stack.getAmount());
 					if (stack.hasNbt()) {
 						object.addProperty("nbt", stack.getNbt().toString());
@@ -68,7 +69,7 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				}
 
 				public EmiIngredient toStack(JsonObject object) {
-					Fluid fluid = EmiPort.getFluidRegistry().get(new Identifier(object.get("fluid").getAsString()));
+					Fluid fluid = Registry.FLUID.get(new Identifier(object.get("fluid").getAsString()));
 					int amount = JsonHelper.getInt(object, "amount", 1);
 					if (JsonHelper.hasString(object, "nbt")) {
 						return EmiStack.of(fluid, parseNbt(object), amount);
@@ -90,9 +91,9 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				}
 
 				public EmiIngredient toStack(JsonObject object) {
-					TagKey<Item> key = TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier(object.get("tag").getAsString()));
+					TagKey<Item> key = TagKey.of(Registry.ITEM.getKey(), new Identifier(object.get("tag").getAsString()));
 					int amount = JsonHelper.getInt(object, "amount", 1);
-					Optional<Named<Item>> optional = EmiPort.getItemRegistry().getEntryList(key);
+					Optional<Named<Item>> optional = Registry.ITEM.getEntryList(key);
 					if (!optional.isPresent() || optional.get().size() < 1) {
 						return EmiStack.EMPTY;
 					}

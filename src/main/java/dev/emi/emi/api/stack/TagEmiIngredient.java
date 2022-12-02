@@ -28,7 +28,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -80,7 +80,7 @@ public class TagEmiIngredient implements EmiIngredient {
 				}
 			} else {
 				BakedModel model = client.getBakedModelManager()
-					.getModel(new ModelIdentifier("emi", "tags/" + id.getNamespace() + "/" + id.getPath(), "inventory"));
+					.getModel(new ModelIdentifier("emi:tags/" + id.getNamespace() + "/" + id.getPath() + "#inventory"));
 					
 				MatrixStack vs = RenderSystem.getModelViewStack();
 				vs.push();

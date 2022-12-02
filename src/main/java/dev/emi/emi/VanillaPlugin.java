@@ -122,16 +122,16 @@ import net.minecraft.recipe.SmokingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.BlastFurnaceScreenHandler;
 import net.minecraft.screen.FurnaceScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.SmokerScreenHandler;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryEntryList;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
