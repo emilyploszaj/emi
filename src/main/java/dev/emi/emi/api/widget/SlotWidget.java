@@ -24,7 +24,6 @@ import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -157,7 +156,7 @@ public class SlotWidget extends Widget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		Bounds bounds = getBounds();
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		int width = bounds.width();
 		int height = bounds.height();

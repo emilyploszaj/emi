@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -16,10 +17,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SuspiciousStewItem;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EmiSuspiciousStewRecipe extends EmiPatternCraftingRecipe {
-	private static final List<Item> FLOWERS = Registry.ITEM.stream()
+	private static final List<Item> FLOWERS = EmiPort.getItemRegistry().stream()
 		.filter(i -> i instanceof BlockItem bi && bi.getBlock() instanceof FlowerBlock).collect(Collectors.toList());
 
 	public EmiSuspiciousStewRecipe(Identifier id) {

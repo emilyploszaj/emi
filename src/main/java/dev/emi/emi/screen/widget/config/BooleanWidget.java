@@ -18,7 +18,7 @@ public class BooleanWidget extends ConfigEntryWidget {
 		super(name, tooltip, search, 20);
 		this.mutator = mutator;
 
-		button = new ButtonWidget(0, 0, 150, 20, getText(), button -> {
+		button = EmiPort.newButton(0, 0, 150, 20, getText(), button -> {
 			mutator.set(!mutator.get());
 			button.setMessage(getText());
 		});

@@ -132,15 +132,15 @@ public class ConfigScreen extends Screen {
 		int x = (width - w) / 2;
 		search = new ConfigSearch(x + 3, height - 51, w / 2 - 4, 18);
 		this.addDrawable(search.field);
-		this.resetButton = new ButtonWidget(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
+		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", originalConfig));
 			MinecraftClient client = MinecraftClient.getInstance();
 			this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
 		});
-		this.addDrawableChild(new ButtonWidget(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
+		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
 		}));
-		this.addDrawableChild(new ButtonWidget(x + w / 2 + 2, height - 52, w / 2 - 2, 20, EmiPort.translatable("screen.emi.presets"), button -> {
+		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 52, w / 2 - 2, 20, EmiPort.translatable("screen.emi.presets"), button -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			client.setScreen(new ConfigPresetScreen(this));
 		}));

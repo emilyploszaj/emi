@@ -32,7 +32,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 	@Override
 	protected List<RecipeDefault> prepare(ResourceManager manager, Profiler profiler) {
 		List<RecipeDefault> allDefaults = Lists.newArrayList();
-		for (Identifier id : EmiPort.findResources(manager, "recipe/defaults/", i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "recipe/defaults", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}

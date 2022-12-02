@@ -39,13 +39,13 @@ public class ConfigPresetScreen extends Screen {
 		this.addDrawable(new EmiNameWidget(width / 2, 16));
 		int w = Math.min(400, width - 40);
 		int x = (width - w) / 2;
-		this.resetButton = new ButtonWidget(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
+		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", last.originalConfig));
 			MinecraftClient client = MinecraftClient.getInstance();
 			this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
 		});
 		this.addDrawableChild(resetButton);
-		this.addDrawableChild(new ButtonWidget(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
+		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
 		}));
 		list = new ListWidget(client, width, height, 40, height - 40);
@@ -124,7 +124,7 @@ public class ConfigPresetScreen extends Screen {
 		private final List<TooltipComponent> tooltip;
 
 		public PresetWidget(Runnable runnable, Text name, List<TooltipComponent> tooltip) {
-			button = new ButtonWidget(0, 0, 200, 20, name, t -> {
+			button = EmiPort.newButton(0, 0, 200, 20, name, t -> {
 				runnable.run();
 				updateChanges();
 			});

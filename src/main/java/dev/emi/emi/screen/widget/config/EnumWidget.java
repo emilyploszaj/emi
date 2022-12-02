@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.ConfigEnum;
 import dev.emi.emi.screen.ConfigEnumScreen;
 import dev.emi.emi.screen.ConfigScreen;
@@ -23,7 +24,7 @@ public class EnumWidget extends ConfigEntryWidget {
 		super(name, tooltip, search, 20);
 		this.mutator = mutator;
 
-		button = new ButtonWidget(0, 0, 150, 20, getText(), button -> {
+		button = EmiPort.newButton(0, 0, 150, 20, getText(), button -> {
 			page(mutator.get(), filter, mutator::set);
 		});
 		this.setChildren(List.of(button));

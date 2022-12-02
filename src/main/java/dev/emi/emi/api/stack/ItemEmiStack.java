@@ -23,7 +23,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private final ItemEntry entry;
@@ -79,7 +78,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Identifier getId() {
-		return Registry.ITEM.getId(item.getItem());
+		return EmiPort.getItemRegistry().getId(item.getItem());
 	}
 
 	@Override
@@ -144,7 +143,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		ItemStack stack = getItemStack();
 		if (!isEmpty()) {
 			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
-			//String namespace = Registry.ITEM.getId(stack.getItem()).getNamespace();
+			//String namespace = EmiPort.getItemRegistry().getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
 			//list.add(TooltipComponent.of(EmiLang.literal(mod, Formatting.BLUE, Formatting.ITALIC)));
 			if (!getRemainder().isEmpty()) {

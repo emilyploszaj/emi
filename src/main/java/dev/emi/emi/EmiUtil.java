@@ -24,11 +24,10 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList.Named;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryEntryList.Named;
 
 public class EmiUtil {
 	public static final Random RANDOM = new Random();
@@ -85,19 +84,19 @@ public class EmiUtil {
 	}
 
 	public static String subId(Block block) {
-		return subId(Registry.BLOCK.getId(block));
+		return subId(EmiPort.getBlockRegistry().getId(block));
 	}
 
 	public static String subId(Item item) {
-		return subId(Registry.ITEM.getId(item));
+		return subId(EmiPort.getItemRegistry().getId(item));
 	}
 
 	public static String subId(Fluid fluid) {
-		return subId(Registry.FLUID.getId(fluid));
+		return subId(EmiPort.getFluidRegistry().getId(fluid));
 	}
 
 	public static Stream<RegistryEntry<Item>> values(TagKey<Item> key) {
-		Optional<Named<Item>> opt = Registry.ITEM.getEntryList(key);
+		Optional<Named<Item>> opt = EmiPort.getItemRegistry().getEntryList(key);
 		if (opt.isEmpty()) {
 			return Stream.of();
 		} else {

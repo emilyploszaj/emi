@@ -131,7 +131,6 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntryList;
 
 public class VanillaPlugin implements EmiPlugin {
@@ -296,7 +295,7 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof BookCloningRecipe book) {
 				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(book.getId()), recipe);
 			} else if (recipe instanceof TippedArrowRecipe tipped) {
-				Registry.POTION.streamEntries().forEach(entry -> {
+				EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
 					if (entry.value() == Potions.EMPTY) {
 						return;
 					}
@@ -307,7 +306,7 @@ public class VanillaPlugin implements EmiPlugin {
 							arrow, arrow, arrow, arrow
 						),
 						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
-						new Identifier("emi", "tipped_arrow/" + EmiUtil.subId(Registry.POTION.getId(entry.value()))),
+						new Identifier("emi", "tipped_arrow/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(entry.value()))),
 						false), recipe);
 				});
 			} else if (recipe instanceof FireworkStarRecipe star) {
@@ -348,7 +347,7 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> new EmiStonecuttingRecipe(recipe), recipe);
 		}
 
-		for (Item i : Registry.ITEM) {
+		for (Item i : EmiPort.getItemRegistry()) {
 			if (i.getMaxDamage() > 0) {
 				if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().getRepairIngredient() != null
 						&& !ai.getMaterial().getRepairIngredient().isEmpty()) {
@@ -374,7 +373,7 @@ public class VanillaPlugin implements EmiPlugin {
 					}
 				}
 				// Who said the vanishing curse is actually in the registry?
-				if (!Registry.ENCHANTMENT.stream().filter(e -> e.isAcceptableItem(i.getDefaultStack())).toList().isEmpty()) {
+				if (!EmiPort.getEnchantmentRegistry().stream().filter(e -> e.isAcceptableItem(i.getDefaultStack())).toList().isEmpty()) {
 					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
 				}
 			}
@@ -405,8 +404,8 @@ public class VanillaPlugin implements EmiPlugin {
 					if (recipe.ingredient.getMatchingStacks().length > 0) {
 						Identifier id = new Identifier("emi", "brewing/potion/" + pid
 							+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
-							+ "/" + EmiUtil.subId(Registry.POTION.getId(recipe.input))
-							+ "/" + EmiUtil.subId(Registry.POTION.getId(recipe.output)));
+							+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
+							+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output)));
 						addRecipeSafe(registry, () -> new EmiBrewingRecipe(
 							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
 							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output)), id));
@@ -420,7 +419,7 @@ public class VanillaPlugin implements EmiPlugin {
 				String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
 				String iid = EmiUtil.subId(recipe.input);
 				String oid = EmiUtil.subId(recipe.output);
-				Registry.POTION.streamEntries().forEach(entry -> {
+				EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
 					Potion potion = entry.value();
 					if (potion == Potions.EMPTY) {
 						return;
@@ -583,7 +582,7 @@ public class VanillaPlugin implements EmiPlugin {
 			.output(EmiStack.of(Items.BASALT))
 			.build());
 
-		Registry.FLUID.streamEntries().forEach(entry -> {
+		EmiPort.getFluidRegistry().streamEntries().forEach(entry -> {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
 			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR) {
@@ -596,7 +595,7 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			new Identifier("emi", "fill_water_bottle")));
 
-		Registry.ITEM.streamTagsAndEntries().forEach(pair -> {
+		EmiPort.getItemRegistry().streamTagsAndEntries().forEach(pair -> {
 			TagKey<Item> key = pair.getFirst();
 			if (EmiClient.excludedTags.contains(key.id())) {
 				return;

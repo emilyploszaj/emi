@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -18,10 +19,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
-	public static final List<Item> DYEABLE_ITEMS = Registry.ITEM.stream()
+	public static final List<Item> DYEABLE_ITEMS = EmiPort.getItemRegistry().stream()
 		.filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
 	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(c -> DyeItem.byColor(c)).collect(Collectors.toList());
 	private final Item armor;

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiLog;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -21,7 +22,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
@@ -57,7 +57,7 @@ public class EmiSearch {
 			}
 			if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
 				for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
-					Identifier eid = Registry.ENCHANTMENT.getId(e);
+					Identifier eid = EmiPort.getEnchantmentRegistry().getId(e);
 					if (eid != null && !eid.getNamespace().equals("minecraft")) {
 						mods.add(stack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
 					}

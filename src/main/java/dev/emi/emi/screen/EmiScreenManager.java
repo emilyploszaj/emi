@@ -19,9 +19,9 @@ import dev.emi.emi.EmiExclusionAreas;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
-import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiReloadManager;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiStackList;
@@ -60,7 +60,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -69,7 +68,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 
 public class EmiScreenManager {
 	private static final int PADDING_SIZE = 1;
@@ -995,7 +993,7 @@ public class EmiScreenManager {
 		} else {
 			ItemStack is = stack.getItemStack();
 			if (!is.isEmpty()) {
-				Identifier id = Registry.ITEM.getId(is.getItem());
+				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
 				String command = "/give @s " + id;
 				if (is.hasNbt()) {
 					command += is.getNbt().toString();
@@ -1243,7 +1241,7 @@ public class EmiScreenManager {
 				int page, int totalPages, List<? extends EmiIngredient> stacks, int startIndex) {
 			if (this.pageSize > 0) {
 				RenderSystem.enableDepthTest();
-				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				EmiPort.setPositionTexShader();
 				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 				int headerOffset = header ? 18 : 0;
 				if (theme == SidebarTheme.VANILLA) {

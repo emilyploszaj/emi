@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -16,7 +17,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
@@ -107,7 +107,7 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	}
 
 	private Enchantment getEnchantment(Random random){
-		List<Enchantment> enchantments = Registry.ENCHANTMENT.stream().filter(i -> i.isAcceptableItem(tool.getDefaultStack())).toList();
+		List<Enchantment> enchantments = EmiPort.getEnchantmentRegistry().stream().filter(i -> i.isAcceptableItem(tool.getDefaultStack())).toList();
 		int enchantment = random.nextInt(enchantments.size());
 		return enchantments.get(enchantment);
 	}

@@ -36,12 +36,12 @@ public class ConfigEnumScreen<T> extends Screen {
 		this.addDrawable(new EmiNameWidget(width / 2, 16));
 		int w = 200;
 		int x = (width - w) / 2;
-		this.addDrawableChild(new ButtonWidget(x, height - 30, w, 20, EmiPort.translatable("gui.done"), button -> {
+		this.addDrawableChild(EmiPort.newButton(x, height - 30, w, 20, EmiPort.translatable("gui.done"), button -> {
 			close();
 		}));
 		list = new ListWidget(client, width, height, 40, height - 40);
 		for (Entry<T> e : entries) {
-			list.addEntry(new SelectionWidget(e));
+			list.addEntry(new SelectionWidget<T>(this, e));
 		}
 		this.addSelectableChild(list);
 	}
@@ -52,6 +52,12 @@ public class ConfigEnumScreen<T> extends Screen {
 		this.renderBackgroundTexture(0);
 		list.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
+		ListWidget.Entry entry = list.getHoveredEntry();
+		if (entry instanceof SelectionWidget<?> widget) {
+			if (widget.button.isHovered()) {
+				EmiRenderHelper.drawTooltip(this, matrices, widget.tooltip, mouseX, mouseY);
+			}
+		}
 	}
 
 	@Override
@@ -76,16 +82,16 @@ public class ConfigEnumScreen<T> extends Screen {
 	public static record Entry<T>(T value, Text name, List<TooltipComponent> tooltip) {
 	}
 
-	public class SelectionWidget extends ListWidget.Entry {
+	public static class SelectionWidget<T> extends ListWidget.Entry {
 		private final ButtonWidget button;
+		private final List<TooltipComponent> tooltip;
 
-		public SelectionWidget(Entry<T> e) {
-			button = new ButtonWidget(0, 0, 200, 20, e.name(), t -> {
-				selection.accept(e.value());
-				close();
-			}, (b, matrices, mx, my) -> {
-				EmiRenderHelper.drawTooltip(ConfigEnumScreen.this, matrices, e.tooltip(), mx, my);
+		public SelectionWidget(ConfigEnumScreen<T> screen, Entry<T> e) {
+			button = EmiPort.newButton(0, 0, 200, 20, e.name(), t -> {
+				screen.selection.accept(e.value());
+				screen.close();
 			});
+			tooltip = e.tooltip();
 		}
 
 		@Override

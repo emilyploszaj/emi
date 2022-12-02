@@ -25,12 +25,15 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import dev.emi.emi.widget.*;
+import dev.emi.emi.widget.RecipeBackground;
+import dev.emi.emi.widget.RecipeDefaultButtonWidget;
+import dev.emi.emi.widget.RecipeFillButtonWidget;
+import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
+import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
@@ -80,7 +83,6 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	protected void init() {
 		super.init();
-		this.client.keyboard.setRepeatEvents(true);
 		backgroundHeight = height - 52 - EmiConfig.verticalMargin;
 		x = (this.width - backgroundWidth) / 2;
 		y = (this.height - backgroundHeight) / 2 + 1;
@@ -154,7 +156,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackground(matrices);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		EmiRenderHelper.drawNinePatch(matrices, x, y, backgroundWidth, backgroundHeight, 0, 0, 4, 1);

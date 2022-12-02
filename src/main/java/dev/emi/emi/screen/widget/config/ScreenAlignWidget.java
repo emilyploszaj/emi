@@ -3,6 +3,7 @@ package dev.emi.emi.screen.widget.config;
 import java.util.List;
 import java.util.function.Supplier;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -17,13 +18,13 @@ public class ScreenAlignWidget extends ConfigEntryWidget {
 		super(name, tooltip, search, 20);
 		this.mutator = mutator;
 
-		horizontal = new ButtonWidget(0, 0, 100, 20, getHorizontalText(), button -> {
+		horizontal = EmiPort.newButton(0, 0, 100, 20, getHorizontalText(), button -> {
 			EnumWidget.page(mutator.get().horizontal, v -> true, c -> {
 				mutator.get().horizontal = (ScreenAlign.Horizontal) c;
 				mutator.set(mutator.get());
 			});
 		});
-		vertical = new ButtonWidget(0, 0, 100, 20, getVerticalText(), button -> {
+		vertical = EmiPort.newButton(0, 0, 100, 20, getVerticalText(), button -> {
 			EnumWidget.page(mutator.get().vertical, v -> true, c -> {
 				mutator.get().vertical = (ScreenAlign.Vertical) c;
 				mutator.set(mutator.get());

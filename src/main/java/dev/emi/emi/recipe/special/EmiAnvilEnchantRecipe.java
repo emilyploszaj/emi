@@ -1,5 +1,8 @@
 package dev.emi.emi.recipe.special;
 
+import java.util.List;
+
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -15,12 +18,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-
-import java.util.List;
 
 public class EmiAnvilEnchantRecipe implements EmiRecipe {
-	public static final List<Enchantment> ENCHANTMENTS = Registry.ENCHANTMENT.stream().toList();
+	public static final List<Enchantment> ENCHANTMENTS = EmiPort.getEnchantmentRegistry().stream().toList();
 	private final Item tool;
 	private final Enchantment enchantment;
 	private final int level;

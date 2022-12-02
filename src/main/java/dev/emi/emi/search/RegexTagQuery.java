@@ -10,7 +10,6 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class RegexTagQuery extends Query {
 	private final Set<Object> valid;
@@ -26,7 +25,7 @@ public class RegexTagQuery extends Query {
 		} else {
 			final Pattern pat = p;
 			valid = Stream.concat(
-				Registry.ITEM.streamTags().filter(t -> {
+				EmiPort.getItemRegistry().streamTags().filter(t -> {
 					Identifier id = t.id();
 					String translation = EmiUtil.translateId("tag.", id);
 					if (I18n.hasTranslation(translation)) {
@@ -38,12 +37,12 @@ public class RegexTagQuery extends Query {
 						return true;
 					}
 					return false;
-				}).map(t -> Registry.ITEM.getEntryList(t)), Registry.BLOCK.streamTags().filter(t -> {
+				}).map(t -> EmiPort.getItemRegistry().getEntryList(t)), EmiPort.getBlockRegistry().streamTags().filter(t -> {
 					if (pat.matcher(t.id().toString()).find()) {
 						return true;
 					}
 					return false;
-				}).map(t -> Registry.BLOCK.getEntryList(t))).flatMap(v -> v.stream()).collect(Collectors.toSet());
+				}).map(t -> EmiPort.getBlockRegistry().getEntryList(t))).flatMap(v -> v.stream()).collect(Collectors.toSet());
 		}
 	}
 

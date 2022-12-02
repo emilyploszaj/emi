@@ -9,7 +9,6 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class TagQuery extends Query {
 	private final Set<Object> valid;
@@ -17,7 +16,7 @@ public class TagQuery extends Query {
 	public TagQuery(String name) {
 		String lowerName = name.toLowerCase();
 		valid = Stream.concat(
-			Registry.ITEM.streamTags().filter(t -> {
+			EmiPort.getItemRegistry().streamTags().filter(t -> {
 				Identifier id = t.id();
 				String translation = EmiUtil.translateId("tag.", id);
 				if (I18n.hasTranslation(translation)) {
@@ -29,12 +28,12 @@ public class TagQuery extends Query {
 					return true;
 				}
 				return false;
-			}).map(t -> Registry.ITEM.getEntryList(t)), Registry.BLOCK.streamTags().filter(t -> {
+			}).map(t -> EmiPort.getItemRegistry().getEntryList(t)), EmiPort.getBlockRegistry().streamTags().filter(t -> {
 				if (t.id().toString().contains(lowerName)) {
 					return true;
 				}
 				return false;
-			}).map(t -> Registry.BLOCK.getEntryList(t))).flatMap(v -> v.get().stream().map(e -> e.value().asItem())).collect(Collectors.toSet());
+			}).map(t -> EmiPort.getBlockRegistry().getEntryList(t))).flatMap(v -> v.get().stream().map(e -> e.value().asItem())).collect(Collectors.toSet());
 	}
 
 	@Override

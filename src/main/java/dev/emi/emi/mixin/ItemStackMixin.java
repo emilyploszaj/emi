@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.registry.Registry;
 
 @Mixin(value = ItemStack.class, priority = 2000)
 public class ItemStackMixin {
@@ -25,7 +24,7 @@ public class ItemStackMixin {
 	private void getTooltip(PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> info) {
 		if (EmiConfig.appendItemModId && Thread.currentThread() != EmiSearch.thread) {
 			List<Text> text = info.getReturnValue();
-			String namespace = Registry.ITEM.getId(((ItemStack) (Object) this).getItem()).getNamespace();
+			String namespace = EmiPort.getItemRegistry().getId(((ItemStack) (Object) this).getItem()).getNamespace();
 			String mod = EmiUtil.getModName(namespace);
 			text.add(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC));
 		}

@@ -1,5 +1,12 @@
 package dev.emi.emi.recipe.special;
 
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import org.apache.commons.compress.utils.Lists;
+
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
@@ -7,15 +14,9 @@ import dev.emi.emi.api.widget.SlotWidget;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import org.apache.commons.compress.utils.Lists;
-
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class EmiRepairItemRecipe extends EmiPatternCraftingRecipe {
-	public static final List<Item> TOOLS = Registry.ITEM.stream()
+	public static final List<Item> TOOLS = EmiPort.getItemRegistry().stream()
 			.filter(Item::isDamageable).collect(Collectors.toList());
 	private final Item tool;
 

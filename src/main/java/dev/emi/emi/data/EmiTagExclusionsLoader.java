@@ -28,7 +28,7 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 	@Override
 	public Set<Identifier> prepare(ResourceManager manager, Profiler profiler) {
 		Set<Identifier> allExclusions = Sets.newHashSet();
-		for (Identifier id : EmiPort.findResources(manager, "tag/exclusions/", i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "tag/exclusions", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
