@@ -10,9 +10,9 @@ import java.util.function.Predicate;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
@@ -24,49 +24,48 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.registry.Registry;
 
 /**
  * Multiversion quarantine, to avoid excessive git pain
  */
-public class EmiPort {
-	private static final Random RANDOM = new Random();
+public final class EmiPort {
+	private static final net.minecraft.util.math.random.Random RANDOM = net.minecraft.util.math.random.Random.create();
 
 	public static MutableText literal(String s) {
-		return new LiteralText(s);
+		return Text.literal(s);
 	}
 
 	public static MutableText literal(String s, Formatting formatting) {
-		return new LiteralText(s).formatted(formatting);
+		return Text.literal(s).formatted(formatting);
 	}
 
 	public static MutableText literal(String s, Formatting... formatting) {
-		return new LiteralText(s).formatted(formatting);
+		return Text.literal(s).formatted(formatting);
 	}
 
 	public static MutableText literal(String s, Style style) {
-		return new LiteralText(s).setStyle(style);
+		return Text.literal(s).setStyle(style);
 	}
 	
 	public static MutableText translatable(String s) {
-		return new TranslatableText(s);
+		return Text.translatable(s);
 	}
 	
 	public static MutableText translatable(String s, Formatting formatting) {
-		return new TranslatableText(s).formatted(formatting);
+		return Text.translatable(s).formatted(formatting);
 	}
 	
 	public static MutableText translatable(String s, Object... objects) {
-		return new TranslatableText(s, objects);
+		return Text.translatable(s, objects);
 	}
 
 	public static MutableText append(MutableText text, Text appended) {
@@ -78,24 +77,28 @@ public class EmiPort {
 	}
 
 	public static Text fluidName(FluidVariant fluid) {
-		return FluidVariantRendering.getName(fluid);
+		return FluidVariantAttributes.getName(fluid);
 	}
 
 	public static Collection<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
-		return manager.findResources(prefix, pred);
+		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
 	}
 
 	public static InputStream getInputStream(Resource resource) {
-		return resource.getInputStream();
+		try {
+			return resource.getInputStream();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public static void registerCommand(Consumer<CommandDispatcher<ServerCommandSource>> consumer) {
-		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> consumer.accept(dispatcher));
+		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> consumer.accept(dispatcher));
 	}
 
 	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
-		return patterns.add(BannerPattern.values()[random.nextInt(BannerPattern.values().length)],
-				DyeColor.values()[random.nextInt(DyeColor.values().length)]);
+		return patterns.add(Registry.BANNER_PATTERN.getEntry(random.nextInt(Registry.BANNER_PATTERN.size())).get(),
+			DyeColor.values()[random.nextInt(DyeColor.values().length)]);
 	}
 
 	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
@@ -107,12 +110,13 @@ public class EmiPort {
 	}
 
 	public static void upload(VertexBuffer vb, BufferBuilder bldr) {
-		bldr.end();
-		vb.upload(bldr);
+		vb.bind();
+		vb.upload(bldr.end());
 	}
 
 	public static void setShader(VertexBuffer buf, Matrix4f mat) {
-		buf.setShader(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+		buf.bind();
+		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
 	}
 
 	public static List<BakedQuad> getQuads(BakedModel model) {
@@ -120,11 +124,10 @@ public class EmiPort {
 	}
 
 	public static void draw(BufferBuilder bufferBuilder) {
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		BufferRenderer.drawWithShader(bufferBuilder.end());
 	}
 
 	public static int getGuiScale(MinecraftClient client) {
-		return client.options.guiScale;
+		return client.options.getGuiScale().getValue();
 	}
 }
