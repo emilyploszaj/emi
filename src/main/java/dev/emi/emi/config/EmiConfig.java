@@ -94,7 +94,7 @@ public class EmiConfig {
 		return type != SidebarType.CHESS;
 	};
 
-	@Comment("Which sidebar type to focus when the search is cleared.")
+	@Comment("Which sidebar type to focus when the search is empty.")
 	@ConfigValue("ui.empty-search-sidebar-focus")
 	public static SidebarType emptySearchSidebarFocus = SidebarType.NONE;
 
@@ -104,7 +104,7 @@ public class EmiConfig {
 	@Comment("The pages in the left sidebar")
 	@ConfigValue("ui.left-sidebar-pages")
 	public static SidebarPages leftSidebarPages = new SidebarPages(List.of(
-		new SidebarPages.SidebarPage(SidebarType.CRAFTABLES)
+		new SidebarPages.SidebarPage(SidebarType.FAVORITES)
 	), () -> {
 		return EmiConfig.leftSidebarSize.values.getInt(0) == 8
 			&& EmiConfig.leftSidebarSize.values.getInt(1) == 8
@@ -206,7 +206,7 @@ public class EmiConfig {
 
 	@Comment("Whether to render the header buttons and page count for the top sidebar")
 	@ConfigValue("ui.top-sidebar-header")
-	public static HeaderType topSidebarHeader = HeaderType.INVISIBLE;
+	public static HeaderType topSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the top sidebar")
@@ -243,7 +243,7 @@ public class EmiConfig {
 
 	@Comment("Whether to render the header buttons and page count for the bottom sidebar")
 	@ConfigValue("ui.bottom-sidebar-header")
-	public static HeaderType bottomSidebarHeader = HeaderType.INVISIBLE;
+	public static HeaderType bottomSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the bottom sidebar")
@@ -287,11 +287,11 @@ public class EmiConfig {
 	public static boolean recipeFillButton = true;
 
 	@ConfigGroupEnd
-	@Comment("Whether recipes should have a button to\ntake a screenshot of the recipe.")
+	@Comment("Whether recipes should have a button to take a screenshot of the recipe.")
 	@ConfigValue("ui.recipe-screenshot-button")
 	public static boolean recipeScreenshotButton = false;
 
-	@Comment("The GUI scale at which recipe screenshots\nare saved. Use 0 to use the current GUI scale.")
+	@Comment("The GUI scale at which recipe screenshots are saved. Use 0 to use the current GUI scale.")
 	@ConfigValue("ui.recipe-screenshot-scale")
 	public static int recipeScreenshotScale = 0;
 

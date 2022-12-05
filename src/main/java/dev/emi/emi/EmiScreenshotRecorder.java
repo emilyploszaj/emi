@@ -3,8 +3,11 @@ package dev.emi.emi;
 import java.io.File;
 import java.util.function.Consumer;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
@@ -14,7 +17,6 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import org.joml.Matrix4f;
 
 public class EmiScreenshotRecorder {
 	private static final String SCREENSHOTS_DIRNAME = "screenshots";
