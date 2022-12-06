@@ -18,7 +18,7 @@ plugins {
 if (System.getenv("MODRINTH_TOKEN")) {
 	apply plugin: "com.modrinth.minotaur"
 }
-if (System.getenv("CURSE_TOKEN")) {
+if (System.getenv("CURSEFORGE_TOKEN")) {
 	apply plugin: "com.matthewprenger.cursegradle"
 }
 
@@ -127,9 +127,9 @@ if (System.getenv("MODRINTH_TOKEN")) {
 	}
 }
 
-if (System.getenv("CURSE_TOKEN")) {
+if (System.getenv("CURSEFORGE_TOKEN")) {
 	curseforge {
-		apiKey = System.getenv("CURSE_TOKEN")
+		apiKey = System.getenv("CURSEFORGE_TOKEN")
 		project {
 			id = '580555'
 			releaseType = 'release'
