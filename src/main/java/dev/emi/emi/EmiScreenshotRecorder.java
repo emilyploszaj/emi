@@ -3,8 +3,11 @@ package dev.emi.emi;
 import java.io.File;
 import java.util.function.Consumer;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
