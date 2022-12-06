@@ -101,7 +101,7 @@
   "config.emi.ui.search_sidebar_focus": "搜索时侧边栏切换至",
   "config.emi.tooltip.ui.search_sidebar_focus": "搜索栏中有内容时，右侧边栏切换至\n(需要先在右侧边栏设置中添加相应显示内容)",
   "config.emi.ui.empty_search_sidebar_focus": "未搜索时侧边栏切换至",
-  "config.emi。tooltip.ui.empty_search_sidebar_focus": "搜索栏为空时，右侧边栏切换至\n(需要先在右侧边栏设置中添加相应显示内容)",
+  "config.emi.tooltip.ui.empty_search_sidebar_focus": "搜索栏为空时，右侧边栏切换至\n(需要先在右侧边栏设置中添加相应显示内容)",
 
   "config.emi.ui.left_sidebar_pages": "显示内容",
   "config.emi.ui.left_sidebar_size": "尺寸",
