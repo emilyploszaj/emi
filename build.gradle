@@ -143,10 +143,11 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			mainArtifact(remapJar) {
 				displayName = 'EMI ' + project.version
 			}
+			/*
 			relations {
 				//requiredDependency 'fabric-api'
 				//requiredDependency 'qsl'
-			}
+			}*/
 		}
 		options {
 			javaIntegration = false
