@@ -3,8 +3,6 @@ package dev.emi.emi;
 import java.io.File;
 import java.util.function.Consumer;
 
-import org.joml.Matrix4f;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.config.EmiConfig;
