@@ -1,7 +1,0 @@
-{
-  "parent": "emi:item/half_item",
-  "textures": {
-    "first": "minecraft:item/flint_and_steel",
-    "second": "minecraft:item/fire_charge"
-  }
-}
