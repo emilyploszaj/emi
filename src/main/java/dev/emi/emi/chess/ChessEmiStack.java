@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -53,12 +54,20 @@ class ChessEmiStack extends EmiStack {
 				return;
 			}
 		}
+		matrices.push();
+		matrices.translate(0, 0, 10);
 		if (chess.isTarget(position)) {
-			matrices.push();
-			matrices.translate(0, 0, 10);
-			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55ff0000);
-			matrices.pop();
+			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x5555ff00);
 		}
+		boolean dragging = !EmiScreenManager.draggedStack.isEmpty();
+		ChessMove move = chess.board.lastMove;
+		if (!dragging &&move != null && (move.start() == position || move.end() == position)) {
+			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55aaaa00);
+		}
+		if (!dragging && piece != null && piece.type() == PieceType.KING && chess.board.isChecked(piece.color())) {
+			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55ff0000);
+		}
+		matrices.pop();
 		if (piece != null) {
 			matrices.push();
 			matrices.translate(0, 0, 100);
@@ -75,7 +84,7 @@ class ChessEmiStack extends EmiStack {
 
 	@Override
 	public boolean isEmpty() {
-		return false;
+		return EmiChess.get().board.get(position) == null;
 	}
 
 	@Override
