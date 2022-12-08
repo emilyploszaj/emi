@@ -491,7 +491,7 @@
   "tag.c.redstone_dusts": "红石粉",
   "tag.c.redstone_ores": "红石矿",
   "tag.c.quartz": "石英",
-  "tag.c.quartz_ores": " 石英矿",
+  "tag.c.quartz_ores": "石英矿",
   "tag.c.diamond_dusts": "钻石粉",
   "tag.c.diamonds": "钻石",
   "tag.c.dusts.glowstone": "萤石粉",
@@ -540,7 +540,7 @@
   "tag.c.glass.magenta": "品红色玻璃",
   "tag.c.glass.light_blue": "淡蓝色玻璃",
   "tag.c.glass.yellow": "黄色玻璃",
-  "tag.c.glass.lime": " 黄绿色玻璃",
+  "tag.c.glass.lime": "黄绿色玻璃",
   "tag.c.glass.pink": "粉色玻璃",
   "tag.c.glass.gray": "灰色玻璃",
   "tag.c.glass.light_gray": "淡灰色玻璃",
@@ -631,5 +631,6 @@
   "tag.fabric.shovels": "锹",
   "tag.fabric.hoes": "锄",
   "tag.fabric.swords": "剑",
-  "tag.fabric.shears": "剪刀"
+  "tag.fabric.shears": "剪刀",
+  "tooltip.emi.fill_recipe_no_server": "EMI 没有在服务端安装时不能填充配方"
 }
