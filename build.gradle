@@ -141,7 +141,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			addGameVersion 'Quilt'
 
 			mainArtifact(remapJar) {
-				displayName = 'EMI ' + project.version
+				displayName = 'emi-' + project.version
 			}
 			/*
 			relations {
