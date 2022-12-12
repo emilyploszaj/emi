@@ -100,7 +100,6 @@ public class ConfigPresets {
 		EmiConfig.craftAllToInventory.setBinds(
 			new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.SHIFT_MASK)
 		);
-		EmiConfig.craftAllToInventory.setBinds();
 		EmiConfig.showCraft.setToDefault();
 		EmiConfig.cheatOneToInventory.setToDefault();
 		EmiConfig.cheatStackToInventory.setToDefault();

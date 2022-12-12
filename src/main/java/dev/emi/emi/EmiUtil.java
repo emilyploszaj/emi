@@ -104,6 +104,11 @@ public class EmiUtil {
 		}
 	}
 
+	public static boolean showAdvancedTooltips() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		return client.options.advancedItemTooltips;
+	}
+
 	public static String translateId(String prefix, Identifier id) {
 		return prefix + id.getNamespace() + "." + id.getPath().replace('/', '.');
 	}
