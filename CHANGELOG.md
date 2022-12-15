@@ -15,5 +15,4 @@
 * Fixed some default config settings and config presets
 * Fixed screenshot scale issues on auto GUI scale
 * Auto resolution of recipes from ingredients should now always display the correct tooltip
-* 
 * Minor stability and crash fixes
