@@ -120,10 +120,11 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
 		changelog = file('CHANGELOG.md').text
+		/*
 		dependencies {
 			required.project 'fabric-api'
 			required.project 'qsl'
-		}
+		}*/
 	}
 }
 

@@ -139,6 +139,8 @@
   "emi.fluid.amount.millibuckets": "%s mB",
   "emi.fluid.amount.droplets": "%s d",
 
+  "emi.reloading": "EMI Reloading...",
+  "emi.reloading.waiting": "Waiting for recipe data from server...",
   "emi.search": "Search EMI...",
   "emi.search_config": "Search config...",
   "emi.inapplicable": "Current workstation does not support recipe",
@@ -150,7 +152,7 @@
   "emi.total_cost": "Total Cost",
   "emi.cost_per": "Cost Per Batch",
   "emi.leftovers": "Leftovers",
-  "emi.view_all_recipes": "View All Recipes",
+  "emi.view_all_recipes": "Click to view all recipes",
   "emi.tree_welcome": "Welcome to %s",
   "emi.no_tree": "You haven't set a recipe tree to view yet...",
   "emi.random_tree": "Perhaps you'd like to see a random one?",

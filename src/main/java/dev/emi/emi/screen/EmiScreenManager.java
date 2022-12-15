@@ -467,7 +467,10 @@ public class EmiScreenManager {
 		}
 		if (isDisabled()) {
 			if (EmiReloadManager.isReloading()) {
-				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 16, -1);
+				client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading"), 4, screen.height - 16, -1);
+				if (!EmiReloadManager.receivedInitialData) {
+					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 26, -1);
+				}
 			}
 			client.getProfiler().pop();
 			lastHoveredCraftable = null;
@@ -751,8 +754,12 @@ public class EmiScreenManager {
 					}
 				}
 			}
+			SidebarPanel panel = getHoveredPanel(mx, my);
+			if (draggedStack == EmiStack.EMPTY && panel != null && panel.getType() == SidebarType.CHESS) {
+				EmiChess.interact(pressedStack, button);
+				return true;
+			}
 			if (!pressedStack.isEmpty()) {
-				SidebarPanel panel = getHoveredPanel(mx, my);
 				if (!draggedStack.isEmpty()) {
 					if (panel != null) {
 						if (panel.getType() == SidebarType.FAVORITES && panel.space.containsNotExcluded(mx, my)) {
@@ -776,9 +783,6 @@ public class EmiScreenManager {
 						}
 					}
 				} else {
-					if (panel != null && panel.getType() == SidebarType.CHESS) {
-						EmiChess.interact(pressedStack, button);
-					}
 					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
 					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;

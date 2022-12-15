@@ -20,35 +20,38 @@ import net.minecraft.registry.tag.TagKey;
 public class EmiReloadManager {
 	private static volatile boolean clear = false, restart = false, populated = false;
 	private static Thread thread;
+	public static volatile boolean receivedInitialData;
 
-	public synchronized static void clear() {
-		clear = true;
-		populated = false;
-		if (thread != null && thread.isAlive()) {
-			restart = true;
-		} else {
-			thread = new Thread(new ReloadWorker());
-			thread.setDaemon(true);
-			thread.start();
+	public static void clear() {
+		synchronized (EmiReloadManager.class) {
+			clear = true;
+			populated = false;
+			receivedInitialData = false;
+			if (thread != null && thread.isAlive()) {
+				restart = true;
+			} else {
+				thread = new Thread(new ReloadWorker());
+				thread.setDaemon(true);
+				thread.start();
+			}
 		}
 	}
 	
-	public synchronized static void reload() {
-		if (thread != null && thread.isAlive()) {
-			restart = true;
-		} else {
-			thread = new Thread(new ReloadWorker());
-			thread.setDaemon(true);
-			thread.start();
+	public static void reload() {
+		synchronized (EmiReloadManager.class) {
+			receivedInitialData = true;
+			if (thread != null && thread.isAlive()) {
+				restart = true;
+			} else {
+				thread = new Thread(new ReloadWorker());
+				thread.setDaemon(true);
+				thread.start();
+			}
 		}
 	}
 
 	public static boolean isReloading() {
 		return !populated || (thread != null && thread.isAlive());
-	}
-
-	private synchronized static void finish() {
-		thread = null;
 	}
 	
 	private static class ReloadWorker implements Runnable {
@@ -146,7 +149,7 @@ public class EmiReloadManager {
 					restart = true;
 				}
 			} while (restart);
-			finish();
+			thread = null;
 		}
 
 		private final static int entrypointPriority(EntrypointContainer<EmiPlugin> entrypoint) {
