@@ -113,7 +113,11 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			}
 			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x44000000 | color);
 			super.render(matrices, x, y, delta, flags);
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal("" + amount));
+			if (recipe != null) {
+				EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal("" + amount));
+			} else {
+				EmiRenderHelper.renderAmount(matrices, x, y, stack.getAmountText(amount));
+			}
 		}
 
 		@Override

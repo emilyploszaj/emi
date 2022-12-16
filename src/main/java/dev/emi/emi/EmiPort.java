@@ -134,7 +134,7 @@ public class EmiPort {
 	}
 
 	public static int getGuiScale(MinecraftClient client) {
-		return client.options.guiScale;
+		return (int) client.getWindow().getScaleFactor();
 	}
 
 	public static void setPositionTexShader() {

@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
+import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -71,6 +72,9 @@ public class EmiRecipeCategory implements EmiRenderable {
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
 		list.add(TooltipComponent.of(EmiPort.ordered(getName())));
+		if (EmiUtil.showAdvancedTooltips()) {
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(id.toString(), Formatting.DARK_GRAY))));
+		}
 		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
 			Formatting.BLUE, Formatting.ITALIC))));
 		return list;

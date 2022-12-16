@@ -37,6 +37,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen implements EmiScreen {
@@ -178,8 +179,12 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
-		drawCenteredText(matrices, textRenderer, tab.category.getName(),
-			x + backgroundWidth / 2, y + 7, categoryNameColor);
+		Text text = tab.category.getName();
+		if (client.textRenderer.getWidth(text) > 138) {
+			int extraWidth = client.textRenderer.getWidth("...");
+			text = EmiPort.literal(client.textRenderer.trimToWidth(text, 138 - extraWidth).getString() + "...");
+		}
+		drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor);
 		drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.page", this.page + 1, tab.recipes.size()),
 			x + backgroundWidth / 2, y + 20, 0xffffff);
 
@@ -218,7 +223,10 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (categoryHovered) {
-			this.renderTooltip(matrices, EmiPort.translatable("emi.view_all_recipes"), mouseX, mouseY);
+			this.renderTooltip(matrices, List.of(
+				tab.category.getName(),
+				EmiPort.translatable("emi.view_all_recipes")
+			), mouseX, mouseY);
 		}
 		hoveredWidget = null;
 		outer:

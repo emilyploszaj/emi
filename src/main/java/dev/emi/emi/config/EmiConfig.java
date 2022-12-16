@@ -125,7 +125,7 @@ public class EmiConfig {
 
 	@Comment("Where to position the left sidebar")
 	@ConfigValue("ui.left-sidebar-align")
-	public static ScreenAlign leftSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.RIGHT, ScreenAlign.Vertical.TOP);
+	public static ScreenAlign leftSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.LEFT, ScreenAlign.Vertical.TOP);
 
 	@Comment("Whether to render the header buttons and page count for the left sidebar")
 	@ConfigValue("ui.left-sidebar-header")
