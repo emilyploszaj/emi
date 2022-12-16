@@ -36,8 +36,10 @@ public class EmiPlayerInventory {
 	
 	public EmiPlayerInventory(PlayerEntity entity) {
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
-		addStack(screen.getScreenHandler().getCursorStack());
-		if (screen != null) {
+		if (screen != null && screen.getScreenHandler() != null) {
+			if (screen.getScreenHandler().getCursorStack() != null) {
+				addStack(screen.getScreenHandler().getCursorStack());
+			}
 			List<EmiRecipeHandler<?>> handlers = (List) EmiRecipeFiller.getAllHandlers(screen);
 			if (!handlers.isEmpty()) {
 				// TODO this only supports slots from the first one
