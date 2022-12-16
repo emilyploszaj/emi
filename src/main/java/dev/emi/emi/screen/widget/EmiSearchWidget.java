@@ -23,7 +23,7 @@ import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3f;
 
 public class EmiSearchWidget extends TextFieldWidget {
 	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
@@ -204,7 +204,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 		long deg = accumulatedSpin * -180 / 500;
 		if (deg != 0) {
 			matrices.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
-			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
+			matrices.multiply(Vec3f.NEGATIVE_Z.getDegreesQuaternion(deg));
 			matrices.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
 		}
 
