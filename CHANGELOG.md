@@ -1,35 +1,18 @@
-### Sidebars
-* Sidebars have been completely redone
-* Every sidebar can have its size, positioning, and theming options individually changed
-* There are now 4 configurable sidebars, including two new top and bottom sidebars
-* Top and bottom sidebars can be aligned to be above or below existing sidebars
-
-### Config
-* EMI's config system got a facelift, the UI should look nicer, and be much nicer to use
-* Changes are displayed and can be easily reverted
-* Config presets now exist to set a variety of settings at once to a preset option rather than navigating a lot of individual options
-
-### Searching
-* Increased search performance
-* Added tag searching
-* Added config options for searching tooltip/mod/tags without prefix
-
-### Screenshots
-* A button can be enabled to save clean screenshots of recipes at a specified scale
-
 ### Tweaks
-* Moved to a proper EMI logger
-* Unmoved status effects are now squished to not overlap a ton of EMI's sidebar
-* Arrows in the recipe screen no longer shift around when changing tabs
+* Updated Chinese translation
+* Adjusted reload messages to be more clear if the server is not providing data
+* Craftables now take into account the cursor stack, so moving items around shouldn't cause constant changing valid recipes
+* Folded nodes in the recipe tree no longer ignore their base costs as it is generally more useful
+* The recipe screen will now truncate recipe name and show the full name on hover instead of spilling outside of bounds
+* Some tweaks were made to how EMI coerces ingredients to tags
+* The recipe tree now has less superfluous padding, it should be easier to fit more on the screen at once
+* Zooming in the recipe tree should be cleaner
 
 ### Fixes
-* Batched rendering no longer breaks certain rendering conditions (#82)
-* #28
-
-### API
-* `EmiDragDropHandler`s can now render feedback
-* Added `EmiDragDropHandler.BoundsBased` and `EmiDragDropHandler.SlotBased`, simple drag drop handlers with simple rendering
-* Deprecated the `EmiStack.Entry` system. It was mostly duplication of existing systems, not often useful, and cleaner to eventually remove
-* Deprecated usage of `FluidVariant` in API methods
-* Added more convenience methods to `Bounds`, likely only useful internally
-* Added alignment options to `TextWidget`
+* Fixed performance issues baking large sets of recipes, particularly in packs with large amounts of enchantments and gear
+* Fixed fluid count display in synfavs
+* The root node of the recipe tree can be properly reassigned
+* Fixed some default config settings and config presets
+* Fixed screenshot scale issues on auto GUI scale
+* Auto resolution of recipes from ingredients should now always display the correct tooltip
+* Minor stability and crash fixes

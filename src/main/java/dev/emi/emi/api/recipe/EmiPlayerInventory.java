@@ -36,6 +36,7 @@ public class EmiPlayerInventory {
 	
 	public EmiPlayerInventory(PlayerEntity entity) {
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
+		addStack(screen.getScreenHandler().getCursorStack());
 		if (screen != null) {
 			List<EmiRecipeHandler<?>> handlers = (List) EmiRecipeFiller.getAllHandlers(screen);
 			if (!handlers.isEmpty()) {

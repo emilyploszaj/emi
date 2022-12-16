@@ -17,6 +17,7 @@ import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -51,9 +52,9 @@ import net.minecraft.util.math.MathHelper;
 
 public class BoMScreen extends Screen {
 	private static final int NODE_WIDTH = 30;
-	private static final int NODE_HORIZONTAL_SPACING = 20;
+	private static final int NODE_HORIZONTAL_SPACING = 8;
 	private static final int NODE_VERTICAL_SPACING = 20;
-	private static final int COST_HORIZONTAL_SPACING = 10;
+	private static final int COST_HORIZONTAL_SPACING = 8;
 	private static int zoom = 0;
 	private Bounds batches = new Bounds(-24, -50, 48, 26);
 	private Bounds mode = new Bounds(-24, -50, 16, 16);
@@ -107,14 +108,13 @@ public class BoMScreen extends Screen {
 
 			costs.clear();
 
-			int costWidth = 0;
-			for (FlatMaterialCost node : BoM.tree.costs) {
-				costWidth += 16 + COST_HORIZONTAL_SPACING
-						+ EmiRenderHelper.getAmountOverflow(new Cost(node, 0, 0, false).getAmountText());
-			}
+			List<FlatMaterialCost> treeCosts = BoM.tree.costs.stream().sorted((a, b) -> Integer.compare(
+				EmiStackList.indices.getOrDefault(a.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE),
+				EmiStackList.indices.getOrDefault(b.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE)
+			)).toList();
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
-			int costX = (costWidth - COST_HORIZONTAL_SPACING) / -2;
-			for (FlatMaterialCost node : BoM.tree.costs) {
+			int costX = 0;
+			for (FlatMaterialCost node : treeCosts) {
 				Cost cost = new Cost(node, costX, cy, false);
 				if (BoM.craftingMode) {
 					if (!progressCosts.containsKey(node.ingredient)) {
@@ -126,6 +126,10 @@ public class BoMScreen extends Screen {
 				}
 				costs.add(cost);
 				costX += 16 + COST_HORIZONTAL_SPACING + EmiRenderHelper.getAmountOverflow(cost.getAmountText());
+			}
+			int costOffset = (costX - COST_HORIZONTAL_SPACING) / 2;
+			for (Cost cost : costs) {
+				cost.x -= costOffset;
 			}
 
 			int totalCostWidth = textRenderer.getWidth(EmiPort.translatable("emi.total_cost"));
@@ -309,11 +313,14 @@ public class BoMScreen extends Screen {
 	}
 
 	public float getScale() {
-		zoom = MathHelper.clamp(zoom, -5, 4);
-		if (zoom == -5) {
-			return 0.1f;
+		zoom = MathHelper.clamp(zoom, -6, 4);
+		int scale = (int) this.client.getWindow().getScaleFactor();
+		int desired = scale + zoom;
+		if (desired < 1) {
+			zoom -= desired - 1;
+			desired = 1;
 		}
-		return 1 + zoom * 0.2f;
+		return (float) desired / scale;
 	}
 
 	@Override
@@ -553,18 +560,16 @@ public class BoMScreen extends Screen {
 			if (stack != null) {
 				List<TooltipComponent> list = Lists.newArrayList();
 				list.addAll(stack.getTooltip());
-				if (node != null) {
-					if (EmiUtil.isShiftDown()) {
-						getAutoResolutions(this, (stack, recipe) -> {
-							if (recipe != node.recipe) {
-								list.add(new RecipeTooltipComponent(recipe, 0x4488FFAA));
-							} else {
-								list.add(new RecipeTooltipComponent(recipe));
-							}
-						});
-					} else if (node.recipe != null) {
-						list.add(new RecipeTooltipComponent(node.recipe));
-					}
+				if (EmiUtil.isShiftDown()) {
+					getAutoResolutions(this, (stack, recipe) -> {
+						if (node == null || recipe != node.recipe) {
+							list.add(new RecipeTooltipComponent(recipe, 0x4488FFAA));
+						} else {
+							list.add(new RecipeTooltipComponent(recipe));
+						}
+					});
+				} else if (node != null && node.recipe != null) {
+					list.add(new RecipeTooltipComponent(node.recipe));
 				}
 				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
 				return true;
@@ -587,7 +592,7 @@ public class BoMScreen extends Screen {
 		public Node(MaterialNode node, long amount, int x, int y) {
 			this.node = node;
 			if (node.recipe != null) {
-				width = 36;
+				width = 42;
 			} else {
 				width = 16;
 			}
@@ -615,7 +620,7 @@ public class BoMScreen extends Screen {
 				int px = parent.x;
 				int py = parent.y;
 				int off = NODE_VERTICAL_SPACING - 1;
-				drawLine(matrices, px, py + 12, px, py + off);
+				drawLine(matrices, px, py + 11, px, py + off);
 				drawLine(matrices, px, py + off, nx, py + off);
 				if (resolution != null) {
 					RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
@@ -635,10 +640,10 @@ public class BoMScreen extends Screen {
 			}
 			int xo = 0;
 			if (node.recipe != null) {
-				int lx = x - width / 2 - 4;
+				int lx = x - width / 2;
 				int ly = y - 11;
-				int hx = x + width / 2 + 4;
-				int hy = y + 11;
+				int hx = x + width / 2;
+				int hy = y + 10;
 				if (node.state != FoldState.EXPANDED) {
 					drawLine(matrices, x, hy + 1, x, hy + 3);
 				}
@@ -661,7 +666,7 @@ public class BoMScreen extends Screen {
 				drawLine(matrices, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
 				cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
-				xo = 10;
+				xo = 11;
 				matrices.pop();
 			}
 			node.ingredient.render(matrices, x + xo - 8 + midOffset, y - 8, 0);
@@ -680,15 +685,15 @@ public class BoMScreen extends Screen {
 				if (mouseX >= x - 18 + midOffset && mouseX < x - 2 + midOffset && mouseY >= y - 8 && mouseY < y + 8) {
 					return new Hover(node.recipe.getCategory(), node);
 				}
-				imx -= 10;
+				imx -= 11;
 			}
 			if (imx >= x - 8 + midOffset && imx < x + 8 + midOffset && mouseY >= y - 8 && mouseY < y + 8) {
 				return new Hover(node.ingredient, node);
 			}
-			int lx = x - width / 2 - 4;
+			int lx = x - width / 2;
 			int ly = y - 11;
-			int hx = x + width / 2 + 4;
-			int hy = y + 11;
+			int hx = x + width / 2;
+			int hy = y + 10;
 			if (mouseX >= lx && mouseY >= ly && mouseX <= hx && mouseY <= hy) {
 				return new Hover(node);
 			}

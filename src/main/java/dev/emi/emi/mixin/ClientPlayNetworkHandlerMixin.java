@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiReloadManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
@@ -26,8 +27,11 @@ public class ClientPlayNetworkHandlerMixin {
 	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
 		infoMask |= 1;
 		if (infoMask == 3) {
+			EmiLog.info("Recipes synchronized, reloading EMI");
 			infoMask = 0;
 			EmiReloadManager.reload();
+		} else {
+			EmiLog.info("Recipes synchronized, waiting for tags to reload EMI...");
 		}
 	}
 
@@ -35,8 +39,11 @@ public class ClientPlayNetworkHandlerMixin {
 	private void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
 		infoMask |= 2;
 		if (infoMask == 3) {
+			EmiLog.info("Tags synchronized, reloading EMI");
 			infoMask = 0;
 			EmiReloadManager.reload();
+		} else {
+			EmiLog.info("Tags synchronized, waiting for recipes to reload EMI...");
 		}
 	}
 }

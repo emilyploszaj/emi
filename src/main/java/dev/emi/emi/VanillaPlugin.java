@@ -159,13 +159,13 @@ public class VanillaPlugin implements EmiPlugin {
 		STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
 			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240), EmiRecipeSorting.compareInputThenOutput());
 		SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
-			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
+			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
 		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
-			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.compareOutputThenInput());
-		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
-			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.compareOutputThenInput());
+			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
 		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
-				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.compareOutputThenInput());
+				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.none());
+		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
+			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.none());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		INFO = new EmiRecipeCategory(new Identifier("emi:info"),
@@ -178,8 +178,8 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addCategory(STONECUTTING);
 		registry.addCategory(SMITHING);
 		registry.addCategory(ANVIL_REPAIRING);
-		registry.addCategory(BREWING);
 		registry.addCategory(GRINDING);
+		registry.addCategory(BREWING);
 		registry.addCategory(WORLD_INTERACTION);
 		registry.addCategory(INFO);
 		registry.addCategory(TAG);

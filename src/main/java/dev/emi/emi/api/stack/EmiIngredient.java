@@ -143,7 +143,28 @@ public interface EmiIngredient extends EmiRenderable {
 		} else if (list.size() == 1) {
 			return list.get(0);
 		} else {
-			return new ListEmiIngredient(list, amount);
+			long internalAmount = list.get(0).getAmount();
+			for (EmiIngredient i : list) {
+				if (i.getAmount() != internalAmount) {
+					internalAmount = 1;
+				}
+			}
+			if (internalAmount > 1) {
+				amount = internalAmount;
+				for (EmiIngredient i : list) {
+					if (i instanceof EmiStack s) {
+						s.setAmount(1);
+					}
+				}
+			}
+			for (EmiIngredient i : list) {
+				for (EmiStack s : i.getEmiStacks()) {
+					if (!(s.getKey() instanceof Item)) {
+						return new ListEmiIngredient(list, amount);
+					}
+				}
+			}
+			return EmiIngredient.of(Ingredient.ofStacks(list.stream().flatMap(i -> i.getEmiStacks().stream().map(s -> s.getItemStack()))), amount);
 		}
 	}
 }
