@@ -174,10 +174,12 @@ public abstract class EmiStack implements EmiIngredient {
 		return of(ItemVariant.of(item), amount);
 	}
 
+	@Deprecated
 	public static EmiStack of(ItemVariant item) {
 		return new ItemEmiStack(item, 1);
 	}
 
+	@Deprecated
 	public static EmiStack of(ItemVariant item, long amount) {
 		return new ItemEmiStack(item, amount);
 	}

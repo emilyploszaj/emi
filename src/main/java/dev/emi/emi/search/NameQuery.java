@@ -10,7 +10,7 @@ public class NameQuery extends Query {
 	private final Set<EmiStack> valid;
 
 	public NameQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.names.findAll(name));
+		valid = Sets.newHashSet(EmiSearch.names.findAll(name.toLowerCase()));
 	}
 
 	@Override

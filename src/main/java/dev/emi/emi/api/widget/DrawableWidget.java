@@ -7,10 +7,10 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class DrawableWidget extends Widget {
-	private final DrawableWidgetConsumer consumer;
-	private final Bounds bounds;
-	private final int x, y;
-	private BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
+	protected final DrawableWidgetConsumer consumer;
+	protected final Bounds bounds;
+	protected final int x, y;
+	protected BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
 	public DrawableWidget(int x, int y, int w, int h, DrawableWidgetConsumer consumer) {
 		this.x = x;
