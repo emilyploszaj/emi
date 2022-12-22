@@ -10,7 +10,7 @@ public class TooltipQuery extends Query {
 	private final Set<EmiStack> valid;
 
 	public TooltipQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.tooltips.findAll(name));
+		valid = Sets.newHashSet(EmiSearch.tooltips.findAll(name.toLowerCase()));
 	}
 
 	@Override

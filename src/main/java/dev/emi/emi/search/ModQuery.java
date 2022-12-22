@@ -10,7 +10,7 @@ public class ModQuery extends Query {
 	private final Set<EmiStack> valid;
 
 	public ModQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.mods.findAll(name));
+		valid = Sets.newHashSet(EmiSearch.mods.findAll(name.toLowerCase()));
 	}
 
 	@Override

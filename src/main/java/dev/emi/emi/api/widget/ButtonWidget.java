@@ -11,19 +11,26 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 
 public class ButtonWidget extends Widget {
-	private final int x, y, width, height, u, v;
-	private final BooleanSupplier isActive;
-	private final ClickAction action;
+	protected final int x, y, width, height, u, v;
+	protected final BooleanSupplier isActive;
+	protected final ClickAction action;
+	protected final Identifier texture;
 
 	public ButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, ClickAction action) {
+		this(x, y, width, height, u, v, EmiRenderHelper.WIDGETS, isActive, action);
+	}
+
+	public ButtonWidget(int x, int y, int width, int height, int u, int v, Identifier texture, BooleanSupplier isActive, ClickAction action) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.u = u;
 		this.v = v;
+		this.texture = texture;
 		this.isActive = isActive;
 		this.action = action;
 	}
@@ -36,7 +43,7 @@ public class ButtonWidget extends Widget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+		RenderSystem.setShaderTexture(0, texture);
 		int v = this.v;
 		boolean active = this.isActive.getAsBoolean();
 		if (!active) {

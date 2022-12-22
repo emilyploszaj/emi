@@ -58,6 +58,9 @@ public class MaterialNode {
 	}
 
 	public void defineRecipe(EmiRecipe recipe) {
+		if (recipe == null) {
+			return;
+		}
 		this.recipe = recipe;
 		divisor = 1;
 		for (EmiStack stack : recipe.getOutputs()) {

@@ -8,8 +8,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class AnimatedTextureWidget extends TextureWidget {
-	private final int time;
-	private final boolean horizontal, endToStart, fullToEmpty;
+	protected final int time;
+	protected final boolean horizontal, endToStart, fullToEmpty;
 
 	public AnimatedTextureWidget(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight, int time,

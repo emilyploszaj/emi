@@ -9,8 +9,10 @@ import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -19,13 +21,14 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private final ItemEntry entry;
+	private final ItemStack stack;
+	@Deprecated
 	public final ItemVariant item;
 	private boolean unbatchable;
 
@@ -34,23 +37,26 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(ItemStack stack, long amount) {
-		this(ItemVariant.of(stack), amount);
+		stack = stack.copy();
+		stack.setCount((int) amount);
+		this.stack = stack;
+		this.entry = new ItemEntry(new ItemVariantImpl(stack.getItem(), stack.getNbt()));
+		this.item = entry.getValue();
+		this.amount = amount;
 	}
 	
 	public ItemEmiStack(ItemVariant item, long amount) {
-		this.item = item;
-		entry = new ItemEntry(this.item);
-		this.amount = amount;
+		this(item.toStack((int) amount), amount);
 	}
 
 	@Override
 	public ItemStack getItemStack() {
-		return item.toStack((int) amount);
+		return stack;
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(item, amount);
+		EmiStack e = new ItemEmiStack(stack.copy(), amount);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
 		return e;
@@ -58,17 +64,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public boolean isEmpty() {
-		return amount == 0 || item.getItem() == Items.AIR;
+		return amount == 0 || stack.isEmpty();
 	}
 
 	@Override
 	public NbtCompound getNbt() {
-		return item.getNbt();
+		return stack.getNbt();
 	}
 
 	@Override
 	public Object getKey() {
-		return item.getItem();
+		return stack.getItem();
 	}
 
 	@Override
@@ -78,7 +84,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.getItemRegistry().getId(item.getItem());
+		return EmiPort.getItemRegistry().getId(stack.getItem());
 	}
 
 	@Override
@@ -108,7 +114,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || ColorProviderRegistry.ITEM.get(item.getItem()) != null
+		return unbatchable || stack.hasGlint() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
 			|| MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	
@@ -135,7 +141,8 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return FakeScreen.INSTANCE.getTooltipFromItem(getItemStack());
+		MinecraftClient client = MinecraftClient.getInstance();
+		return getItemStack().getTooltip(client.player, TooltipContext.BASIC);
 	}
 
 	@Override
