@@ -142,7 +142,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public List<Text> getTooltipText() {
 		MinecraftClient client = MinecraftClient.getInstance();
-		return getItemStack().getTooltip(client.player, TooltipContext.BASIC);
+		return getItemStack().getTooltip(client.player, TooltipContext.Default.NORMAL);
 	}
 
 	@Override
