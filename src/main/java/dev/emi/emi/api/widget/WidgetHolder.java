@@ -55,6 +55,11 @@ public interface WidgetHolder {
 		return add(new ButtonWidget(x, y, width, height, u, v, isActive, action));
 	}
 
+	default ButtonWidget addButton(int x, int y, int width, int height, int u, int v,
+			Identifier texture, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
+		return add(new ButtonWidget(x, y, width, height, u, v, texture, isActive, action));
+	}
+
 	/**
 	 * @param time Filling time, in milliseconds
 	 */
