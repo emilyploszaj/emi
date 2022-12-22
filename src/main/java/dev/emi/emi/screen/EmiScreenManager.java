@@ -81,6 +81,8 @@ public class EmiScreenManager {
 			new SidebarPanel(SidebarSide.RIGHT, EmiConfig.rightSidebarPages),
 			new SidebarPanel(SidebarSide.TOP, EmiConfig.topSidebarPages),
 			new SidebarPanel(SidebarSide.BOTTOM, EmiConfig.bottomSidebarPages));
+	// The last stack that was used to draw a tooltip, cleared each frame
+	public static ItemStack lastStackTooltipRendered;
 	public static EmiPlayerInventory lastPlayerInventory;
 	public static List<EmiIngredient> craftables = List.of();
 	public static int lastMouseX, lastMouseY;
@@ -352,7 +354,7 @@ public class EmiScreenManager {
 
 	public static @Nullable SidebarPanel getHoveredPanel(int mouseX, int mouseY) {
 		for (SidebarPanel panel : panels) {
-			if (panel.getBounds().contains(mouseX, mouseY)) {
+			if (panel.getBounds().contains(mouseX, mouseY) && panel.isVisible()) {
 				return panel;
 			}
 		}
@@ -425,6 +427,9 @@ public class EmiScreenManager {
 				}
 			}
 		}
+		if (lastStackTooltipRendered != null && notClick) {
+			return new EmiStackInteraction(EmiStack.of(lastStackTooltipRendered));
+		}
 		return EmiStackInteraction.EMPTY;
 	}
 
@@ -467,7 +472,10 @@ public class EmiScreenManager {
 		}
 		if (isDisabled()) {
 			if (EmiReloadManager.isReloading()) {
-				client.textRenderer.drawWithShadow(matrices, "EMI Reloading...", 4, screen.height - 16, -1);
+				client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading"), 4, screen.height - 16, -1);
+				if (!EmiReloadManager.receivedInitialData) {
+					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 26, -1);
+				}
 			}
 			client.getProfiler().pop();
 			lastHoveredCraftable = null;
@@ -570,7 +578,10 @@ public class EmiScreenManager {
 			view.push();
 			view.translate(0, 0, 200);
 			RenderSystem.applyModelViewMatrix();
-			EmiIngredient hov = getHoveredStack(mouseX, mouseY, false).getStack();
+			EmiIngredient hov = EmiStack.EMPTY;
+			if (getHoveredStack(mouseX, mouseY, false) instanceof SidebarEmiStackInteraction sesi) {
+				hov = sesi.getStack();
+			}
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(hov.getTooltip());
 			if (EmiApi.getRecipeContext(hov) == null && EmiConfig.showCraft.isHeld()) {
@@ -594,6 +605,7 @@ public class EmiScreenManager {
 			RenderSystem.applyModelViewMatrix();
 			client.getProfiler().pop();
 		}
+		lastStackTooltipRendered = null;
 	}
 
 	private static void renderDevMode(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
@@ -698,17 +710,15 @@ public class EmiScreenManager {
 			return false;
 		}
 		recalculate();
-		for (SidebarPanel panel : panels) {
-			if (panel.getBounds().contains((int) mouseX, (int) mouseY)) {
-				panel.scroll(-sa);
-				return true;
-			}
+		SidebarPanel panel = getHoveredPanel((int) mouseX, (int) mouseY);
+		if (panel != null) {
+			panel.scroll(-sa);
+			return true;
 		}
 		return false;
 	}
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
-		// TODO This makes sure focus always goes away, but might double fire, is that a problem?
 		if (!search.isMouseOver(mouseX, mouseY)) {
 			EmiScreenManager.search.mouseClicked(mouseX, mouseY, button);
 		}
@@ -751,8 +761,12 @@ public class EmiScreenManager {
 					}
 				}
 			}
+			SidebarPanel panel = getHoveredPanel(mx, my);
+			if (draggedStack == EmiStack.EMPTY && panel != null && panel.getType() == SidebarType.CHESS) {
+				EmiChess.interact(pressedStack, button);
+				return true;
+			}
 			if (!pressedStack.isEmpty()) {
-				SidebarPanel panel = getHoveredPanel(mx, my);
 				if (!draggedStack.isEmpty()) {
 					if (panel != null) {
 						if (panel.getType() == SidebarType.FAVORITES && panel.space.containsNotExcluded(mx, my)) {
@@ -776,9 +790,6 @@ public class EmiScreenManager {
 						}
 					}
 				} else {
-					if (panel != null && panel.getType() == SidebarType.CHESS) {
-						EmiChess.interact(pressedStack, button);
-					}
 					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
 					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;

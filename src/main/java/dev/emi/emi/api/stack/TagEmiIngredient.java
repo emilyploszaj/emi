@@ -134,8 +134,7 @@ public class TagEmiIngredient implements EmiIngredient {
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (I18n.hasTranslation(translation)) {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable(translation))));
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.options.advancedItemTooltips) {
+			if (EmiUtil.showAdvancedTooltips()) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
 			}
 		} else {

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
@@ -21,12 +22,16 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 
 public class EmiSearchWidget extends TextFieldWidget {
 	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
 	private List<Pair<Integer, Style>> styles;
 	private long lastClick = 0;
 	private String last = "";
+	private long lastRender = System.currentTimeMillis();
+	private long accumulatedSpin = 0;
 	public boolean highlight = false;
 	// Reimplement focus because other mods keep breaking it
 	public boolean isFocused;
@@ -190,6 +195,26 @@ public class EmiSearchWidget extends TextFieldWidget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.setEditable(EmiConfig.enabled);
+		matrices.push();
+		String lower = getText().toLowerCase();
+
+		boolean dinnerbone = lower.contains("dinnerbone");
+		accumulatedSpin = MathHelper.clamp(accumulatedSpin + (dinnerbone ? 1 : -1) * (System.currentTimeMillis() - lastRender), 0, 500);
+		lastRender = System.currentTimeMillis();
+		long deg = accumulatedSpin * -180 / 500;
+		if (deg != 0) {
+			matrices.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
+			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
+			matrices.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
+		}
+
+		if (lower.contains("jeb_")) {
+			int amount = 0x3FF;
+			float h = ((lastRender & amount) % (float) amount) / (float) amount;
+			int rgb = MathHelper.hsvToRgb(h, 1, 1);
+			RenderSystem.setShaderColor(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb >> 0) & 0xFF) / 255f, 1);
+		}
+
 		if (EmiConfig.enabled) {
 			super.render(matrices, mouseX, mouseY, delta);
 			if (highlight) {
@@ -200,5 +225,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 				TextFieldWidget.fill(matrices, this.x + this.width, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, border);
 			}
 		}
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		matrices.pop();
 	}
 }

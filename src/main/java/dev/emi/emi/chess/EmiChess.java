@@ -145,10 +145,10 @@ public class EmiChess {
 					} else {
 						if (piece.type() == PieceType.KING) {
 							if (chess.pending != null) {
+								chess.opponent = chess.pending;
 								chess.pending = null;
 								restart();
-								chess.opponent = chess.pending;
-								sendNetwork(chess.pending, -2, 0, 0);
+								sendNetwork(chess.opponent, -2, 0, 0);
 								chess.generator = new NetworkedMoveGenerator(PieceColor.WHITE);
 							}
 						}

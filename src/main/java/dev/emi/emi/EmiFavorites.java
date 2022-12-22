@@ -55,7 +55,10 @@ public class EmiFavorites {
 				}
 				if (JsonHelper.hasJsonObject(json, "stack")) {
 					EmiIngredient ingredient = EmiStackSerializer.deserialize(JsonHelper.getObject(json, "stack"));
-					addFavorite(ingredient, recipe);
+					if (ingredient instanceof EmiStack es) {
+						ingredient = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
+					}
+					favorites.add(new EmiFavorite(ingredient, recipe));
 				}
 			}
 		}

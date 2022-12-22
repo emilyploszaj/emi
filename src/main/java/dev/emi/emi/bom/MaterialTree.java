@@ -37,6 +37,9 @@ public class MaterialTree {
 
 	public void addResolution(EmiIngredient ingredient, EmiRecipe recipe) {
 		resolutions.put(ingredient, recipe);
+		if (ingredient.equals(goal.ingredient)) {
+			goal.defineRecipe(recipe);
+		}
 		recalculate();
 	}
 
@@ -148,7 +151,7 @@ public class MaterialTree {
 			node.progress = ProgressState.PARTIAL;
 		}
 		
-		if (recipe != null && node.state != FoldState.COLLAPSED) {
+		if (recipe != null) {
 			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
 			if (progress) {
 				node.neededBatches = minBatches;

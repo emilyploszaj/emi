@@ -120,10 +120,11 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
 		changelog = file('CHANGELOG.md').text
+		/*
 		dependencies {
 			required.project 'fabric-api'
 			required.project 'qsl'
-		}
+		}*/
 	}
 }
 
@@ -141,7 +142,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			addGameVersion 'Quilt'
 
 			mainArtifact(remapJar) {
-				displayName = 'EMI ' + project.version
+				displayName = 'emi-' + project.version
 			}
 			/*
 			relations {
