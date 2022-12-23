@@ -22,7 +22,9 @@
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "ScreenMixin",
+    "SynchronizeRecipesS2CPacketMixin"
   ],
   "server": [],
   "injectors": {
