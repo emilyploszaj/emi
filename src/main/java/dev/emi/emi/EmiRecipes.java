@@ -27,8 +27,8 @@ public class EmiRecipes {
 	public static Map<EmiRecipeCategory, List<EmiIngredient>> workstations = Maps.newHashMap();
 	public static List<EmiRecipe> recipes = Lists.newArrayList();
 
-	public static Map<Object, Map<EmiRecipeCategory, List<EmiRecipe>>> byInput = Maps.newHashMap();
-	public static Map<Object, Map<EmiRecipeCategory, List<EmiRecipe>>> byOutput = Maps.newHashMap();
+	public static Map<Object, List<EmiRecipe>> byInput = Maps.newHashMap();
+	public static Map<Object, List<EmiRecipe>> byOutput = Maps.newHashMap();
 	public static Map<EmiRecipeCategory, List<EmiRecipe>> byCategory = Maps.newHashMap();
 	public static Map<EmiStack, List<EmiRecipe>> byWorkstation = Maps.newHashMap();
 	public static Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
@@ -47,8 +47,8 @@ public class EmiRecipes {
 
 	public static void bake() {
 		long start = System.currentTimeMillis();
-		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byInput = Maps.newHashMap();
-		Map<Object, Map<EmiRecipeCategory, Set<EmiRecipe>>> byOutput = Maps.newHashMap();
+		Map<Object, Set<EmiRecipe>> byInput = Maps.newHashMap();
+		Map<Object, Set<EmiRecipe>> byOutput = Maps.newHashMap();
 		outer:
 		for (EmiRecipe recipe : recipes) {
 			for (Predicate<EmiRecipe> predicate : invalidators) {
@@ -76,19 +76,19 @@ public class EmiRecipes {
 			}
 			byCategory.put(category, cRecipes);
 			for (EmiRecipe recipe : cRecipes) {
-				getKeys(recipe.getInputs()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
-					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
-				getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput.computeIfAbsent(i, a -> Maps.newHashMap())
-					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
-				getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput.computeIfAbsent(i, a -> Maps.newHashMap())
-					.computeIfAbsent(category, b -> Sets.newLinkedHashSet()).add(recipe));
+				getKeys(recipe.getInputs()).stream().forEach(i -> byInput
+					.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
+				getKeys(recipe.getCatalysts()).stream().forEach(i -> byInput
+					.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
+				getKeys(recipe.getOutputs()).stream().forEach(i -> byOutput
+					.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
 			}
 		}
 		EmiRecipes.byInput = byInput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
-			return m.getValue().entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue().stream().toList()));
+			return m.getValue().stream().toList();
 		}));
 		EmiRecipes.byOutput = byOutput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
-			return m.getValue().entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue().stream().toList()));
+			return m.getValue().stream().toList();
 		}));
 		for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : byCategory.entrySet()) {
 			for (EmiIngredient ingredient : workstations.getOrDefault(entry.getKey(), List.of())) {

@@ -99,7 +99,7 @@ public class EmiPlayerInventory {
 		}
 		Set<EmiRecipe> set = Sets.newHashSet();
 		for (EmiStack stack : inventory.keySet()) {
-			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), Map.of()).values().stream().flatMap(l -> l.stream()).toList());
+			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), List.of()));
 		}
 		return set.stream().filter(r -> !r.hideCraftable() && predicate.test(r) && r.getOutputs().size() > 0)
 			.map(r -> new EmiFavorite(r.getOutputs().get(0), r))

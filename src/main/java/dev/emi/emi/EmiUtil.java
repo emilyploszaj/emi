@@ -1,7 +1,6 @@
 package dev.emi.emi;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -141,7 +140,7 @@ public class EmiUtil {
 		if (ingredient.getEmiStacks().size() == 1) {
 			HandledScreen<?> hs = EmiApi.getHandledScreen();
 			EmiStack stack = ingredient.getEmiStacks().get(0);
-			return EmiRecipes.byOutput.getOrDefault(stack.getKey(), Map.of()).values().stream().flatMap(l -> l.stream()).filter(r -> {
+			return EmiRecipes.byOutput.getOrDefault(stack.getKey(), List.of()).stream().filter(r -> {
 				if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
 					EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
 					return handler != null && (!requireCraftable || handler.canCraft(r, inventory, hs));
@@ -155,8 +154,7 @@ public class EmiUtil {
 	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
 		if (ingredient.getEmiStacks().size() == 1) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
-			return getPreferredRecipe(EmiRecipes.byOutput.getOrDefault(stack.getKey(), Map.of()).values().stream()
-				.flatMap(l -> l.stream()).filter(r -> {
+			return getPreferredRecipe(EmiRecipes.byOutput.getOrDefault(stack.getKey(), List.of()).stream().filter(r -> {
 					if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
 						return !requireCraftable || inventory.canCraft(r);
 					}

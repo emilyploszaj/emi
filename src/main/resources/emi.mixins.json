@@ -18,11 +18,12 @@
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
     "AbstractInventoryScreenMixin",
-    "CreativeInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
     "ItemStackMixin",
+    "KeyboardMixin",
+    "MouseMixin",
     "ScreenMixin",
     "SynchronizeRecipesS2CPacketMixin"
   ],
