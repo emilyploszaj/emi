@@ -1,5 +1,6 @@
 package dev.emi.emi;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,16 +8,18 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.data.EmiData;
+import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
@@ -49,6 +52,10 @@ public class EmiRecipes {
 		long start = System.currentTimeMillis();
 		Map<Object, Set<EmiRecipe>> byInput = Maps.newHashMap();
 		Map<Object, Set<EmiRecipe>> byOutput = Maps.newHashMap();
+
+		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
+
+		invalidators.addAll(EmiData.recipeFilters);
 		outer:
 		for (EmiRecipe recipe : recipes) {
 			for (Predicate<EmiRecipe> predicate : invalidators) {
@@ -71,8 +78,9 @@ public class EmiRecipes {
 		}
 		for (EmiRecipeCategory category : byCategory.keySet()) {
 			List<EmiRecipe> cRecipes = byCategory.get(category);
-			if (category.getSort() != EmiRecipeSorting.none()) {
-				cRecipes = cRecipes.stream().sorted(category.getSort()).collect(Collectors.toList());
+			Comparator<EmiRecipe> sort = EmiRecipeCategoryProperties.getSort(category);
+			if (sort != EmiRecipeSorting.none()) {
+				cRecipes = cRecipes.stream().sorted(sort).collect(Collectors.toList());
 			}
 			byCategory.put(category, cRecipes);
 			for (EmiRecipe recipe : cRecipes) {

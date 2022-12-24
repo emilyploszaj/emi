@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiRecipeHandler;
@@ -21,14 +21,12 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.data.EmiTagExclusionsLoader;
-import dev.emi.emi.data.RecipeDefaultLoader;
+import dev.emi.emi.data.EmiData;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.ModelIdentifier;
@@ -36,7 +34,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.registry.tag.TagKey;
@@ -66,8 +63,7 @@ public class EmiClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		EmiConfig.loadConfig();
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
+		EmiData.init();
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
 			MODELED_TAGS.clear();
 			for (Identifier id : EmiPort.findResources(manager, "models/item/tags", s -> s.endsWith(".json"))) {
@@ -84,6 +80,7 @@ public class EmiClient implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			EmiLog.info("Disconnected from server, EMI data cleared");
 			EmiReloadManager.clear();
 			onServer = false;
 		});
