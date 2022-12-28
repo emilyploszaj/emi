@@ -97,17 +97,27 @@ public class EmiSearch {
 	}
 
 	public static class CompiledQuery {
-		public final List<Query> queries, negatedQuerries;
+		public final Query fullQuery;
 
 		public CompiledQuery(String query) {
-			queries = Lists.newArrayList();
-			negatedQuerries = Lists.newArrayList();
+			List<Query> full = Lists.newArrayList();
+			List<Query> queries = Lists.newArrayList();
 			Matcher matcher = TOKENS.matcher(query);
 			while (matcher.find()) {
 				String q = matcher.group();
+				if (q.equals("|")) {
+					if (!queries.isEmpty()) {
+						full.add(new LogicalAndQuery(queries));
+						queries = Lists.newArrayList();
+					}
+					continue;
+				}
 				boolean negated = q.startsWith("-");
 				if (negated) {
 					q = q.substring(1);
+				}
+				if (q.isEmpty()) {
+					continue;
 				}
 				QueryType type = QueryType.fromString(q);
 				Function<String, Query> constructor = type.queryConstructor;
@@ -135,36 +145,35 @@ public class EmiSearch {
 						regexConstructor = name -> new LogicalOrQuery(regexConstructors.stream().map(c -> c.apply(name)).toList());
 					}
 				}
-				addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries, constructor, regexConstructor);
+				addQuery(q.substring(type.prefix.length()), negated, queries, constructor, regexConstructor);
+			}
+			if (!queries.isEmpty()) {
+				full.add(new LogicalAndQuery(queries));
+			}
+			if (!full.isEmpty()) {
+				fullQuery = new LogicalOrQuery(full);
+			} else {
+				fullQuery = null;
 			}
 		}
 
 		public boolean isEmpty() {
-			return queries.isEmpty() && negatedQuerries.isEmpty();
+			return fullQuery == null;
 		}
 
 		public boolean test(EmiStack stack) {
-			for (int i = 0; i < queries.size(); i++) {
-				Query q = queries.get(i);
-				if (!q.matches(stack)) {
-					return false;
-				}
-			}
-			for (int i = 0; i < negatedQuerries.size(); i++) {
-				Query q = negatedQuerries.get(i);
-				if (q.matches(stack)) {
-					return false;
-				}
-			}
-			return true;
+			return fullQuery.matches(stack);
 		}
 
-		private static void addQuery(String s, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
+		private static void addQuery(String s, boolean negated, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
+			Query q;
 			if (s.length() > 1 && s.startsWith("/") && s.endsWith("/")) {
-				queries.add(regex.apply(s.substring(1, s.length() - 1)));
+				q = regex.apply(s.substring(1, s.length() - 1));
 			} else {
-				queries.add(normal.apply(s));
+				q = normal.apply(s);
 			}
+			q.negated = negated;
+			queries.add(q);
 		}
 	}
 
