@@ -146,7 +146,6 @@ public class EmiReloadManager {
 				} catch (Exception e) {
 					EmiLog.error("Critical error occured during reload:");
 					e.printStackTrace();
-					restart = true;
 				}
 			} while (restart);
 			thread = null;

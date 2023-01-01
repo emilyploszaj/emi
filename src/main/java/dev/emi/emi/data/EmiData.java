@@ -11,8 +11,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -21,6 +24,7 @@ import net.minecraft.util.JsonHelper;
 public class EmiData {
 	public static Map<String, EmiRecipeCategoryProperties> categoryPriorities = Map.of();
 	public static List<Predicate<EmiRecipe>> recipeFilters = List.of();
+	public static List<IndexStackData> stackData;
 	
 	public static void init() {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
@@ -104,5 +108,31 @@ public class EmiData {
 						}
 					}
 				}, list -> recipeFilters = list));
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+			new EmiDataLoader<List<IndexStackData>>(
+				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
+				(list, json) -> {
+					List<IndexStackData.Added> added = Lists.newArrayList();
+					List<EmiIngredient> removed = Lists.newArrayList();
+					if (JsonHelper.hasArray(json, "added")) {
+						for (JsonElement el : json.getAsJsonArray("added")) {
+							if (el.isJsonObject()) {
+								JsonObject obj = el.getAsJsonObject();
+								EmiIngredient stack = EmiStackSerializer.deserialize(obj.get("stack"));
+								EmiIngredient after = EmiStack.EMPTY;
+								if (obj.has("after")) {
+									after = EmiStackSerializer.deserialize(obj.get("after"));
+								}
+								added.add(new IndexStackData.Added(stack, after));
+							}
+						}
+					}
+					if (JsonHelper.hasArray(json, "removed")) {
+						for (JsonElement el : json.getAsJsonArray("removed")) {
+							removed.add(EmiStackSerializer.deserialize(el));
+						}
+					}
+					list.add(new IndexStackData(added, removed));
+				}, list -> stackData = list));
 	}
 }
