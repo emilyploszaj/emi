@@ -77,7 +77,7 @@ task apiJar(type: Jar) {
 	dependsOn remapJar
 	from zipTree(remapJar.archivePath)
 	include 'fabric.mod.json'
-	include 'dev/emi/api/**'
+	include 'dev/emi/emi/api/**'
 }
 
 task apiSourcesJar(type: Jar) {
@@ -85,11 +85,11 @@ task apiSourcesJar(type: Jar) {
 	dependsOn remapSourcesJar
 	from zipTree(remapSourcesJar.archivePath)
 	include 'fabric.mod.json'
-	include 'dev/emi/api/**'
+	include 'dev/emi/emi/api/**'
 }
 
-build.dependsOn apiSourcesJar
 build.dependsOn apiJar
+build.dependsOn apiSourcesJar
 
 jar {
 	from "LICENSE"
@@ -98,12 +98,10 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-			afterEvaluate {
-				artifact remapJar
-			}
+			artifact remapJar
+			artifact remapSourcesJar
+			artifact apiJar
+			artifact apiSourcesJar
 		}
 	}
 	setupRepositories(repositories)
