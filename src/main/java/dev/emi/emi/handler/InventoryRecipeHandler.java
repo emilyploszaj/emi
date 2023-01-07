@@ -7,19 +7,19 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 
-public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHandler> {
+public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScreenHandler> {
 	public static final Text TOO_SMALL = EmiPort.translatable("emi.too_small");
 
 	@Override
@@ -52,8 +52,7 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 	}
 
 	@Override
-	public List<Slot> getCraftingSlots(EmiRecipe recipe, HandledScreen<PlayerScreenHandler> screen) {
-		PlayerScreenHandler handler = screen.getScreenHandler();
+	public List<Slot> getCraftingSlots(EmiRecipe recipe, PlayerScreenHandler handler) {
 		if (recipe instanceof EmiCraftingRecipe craf && craf.shapeless) {
 			List<Slot> list = Lists.newArrayList();
 			list.add(handler.getSlot(1));
@@ -82,27 +81,29 @@ public class InventoryRecipeHandler implements EmiRecipeHandler<PlayerScreenHand
 	}
 
 	@Override
-	public boolean canCraft(EmiRecipe recipe, EmiPlayerInventory inventory, HandledScreen<PlayerScreenHandler> screen) {
-		ScreenHandler sh = screen.getScreenHandler();
+	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
+		ScreenHandler sh = context.getScreenHandler();
 		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
 			if (recipe instanceof EmiCraftingRecipe crafting) {
 				return crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())
-					&& EmiRecipeHandler.super.canCraft(recipe, inventory, screen);
+					&& StandardRecipeHandler.super.canCraft(recipe, context);
 			}
 		}
 		return false;
 	}
 
 	@Override
-	public Text getInvalidReason(EmiRecipe recipe, EmiPlayerInventory inventory, HandledScreen<PlayerScreenHandler> screen) {
-		ScreenHandler sh = screen.getScreenHandler();
-		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
-			if (recipe instanceof EmiCraftingRecipe crafting) {
-				if (!crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())) {
-					return TOO_SMALL;
+	public List<TooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
+		if (!canCraft(recipe, context)) {
+			ScreenHandler sh = context.getScreenHandler();
+			if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
+				if (recipe instanceof EmiCraftingRecipe crafting) {
+					if (!crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())) {
+						return List.of(TooltipComponent.of(EmiPort.ordered(TOO_SMALL)));
+					}
 				}
 			}
 		}
-		return EmiRecipeHandler.super.getInvalidReason(recipe, inventory, screen);
+		return StandardRecipeHandler.super.getTooltip(recipe, context);
 	}
 }

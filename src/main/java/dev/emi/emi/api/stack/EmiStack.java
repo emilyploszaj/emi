@@ -155,7 +155,12 @@ public abstract class EmiStack implements EmiIngredient {
 
 	@Override
 	public String toString() {
-		return "EmiStack[key=" + getKey() + ", nbt=" + getNbt() + "amount=" + getAmount() + "]";
+		String s = "" + getKey();
+		NbtCompound nbt = getNbt();
+		if (nbt != null) {
+			s += nbt;
+		}
+		return s + " x" + getAmount();
 	}
 
 	public static EmiStack of(ItemStack stack) {

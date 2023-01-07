@@ -100,7 +100,7 @@ public class BoMScreen extends Screen {
 
 			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
 			nodeHeight = getNodeHeight(BoM.tree.goal);
-			playerInv = new EmiPlayerInventory(client.player);
+			playerInv = EmiPlayerInventory.of(client.player);
 			BoM.tree.calculateProgress(playerInv);
 			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.tree.costs.stream()
 				.collect(Collectors.toMap(c -> c.ingredient, c -> c));

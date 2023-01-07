@@ -18,8 +18,12 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.ListEmiIngredient;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
@@ -68,6 +72,15 @@ public class EmiRecipes {
 			if (!categories.contains(category)) {
 				EmiReloadLog.warn("Recipe " + id + " loaded with unregistered category: " + category.getId());
 			}
+			if (EmiConfig.logNonTagIngredients && recipe.supportsRecipeTree()) {
+				Set<EmiIngredient> seen = new ObjectArraySet<>(0);
+				for (EmiIngredient ingredient : recipe.getInputs()) {
+					if (ingredient instanceof ListEmiIngredient && !seen.contains(ingredient)) {
+						EmiReloadLog.warn("Recipe " + recipe.getId() + " uses non-tag ingredient: " + ingredient);
+						seen.add(ingredient);
+					}
+				}
+			}
 			byCategory.computeIfAbsent(category, a -> Lists.newArrayList()).add(recipe);
 			if (id != null) {
 				if (byId.containsKey(id)) {
@@ -77,6 +90,10 @@ public class EmiRecipes {
 			}
 		}
 		for (EmiRecipeCategory category : byCategory.keySet()) {
+			String key = EmiUtil.translateId("emi.category.", category.getId());
+			if (category.getName().equals(EmiPort.translatable(key)) && !I18n.hasTranslation(key)) {
+				EmiReloadLog.warn("Untranslated recipe category " + category.getId());
+			}
 			List<EmiRecipe> cRecipes = byCategory.get(category);
 			Comparator<EmiRecipe> sort = EmiRecipeCategoryProperties.getSort(category);
 			if (sort != EmiRecipeSorting.none()) {

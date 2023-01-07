@@ -116,6 +116,7 @@
 
   "config.emi.dev.dev_mode": "Dev Mode",
   "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",
+  "config.emi.dev.log_non_tag_ingredients": "Log Non-Tag Ingredients",
   "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
   "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
   "config.emi.dev.highlight_exclusion_areas": "Highlight Exclusion Areas",

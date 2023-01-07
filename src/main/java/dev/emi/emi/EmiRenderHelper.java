@@ -6,15 +6,21 @@ import org.apache.commons.compress.utils.Lists;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
+import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
@@ -175,9 +181,10 @@ public class EmiRenderHelper {
 		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, BACKGROUND);
-		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 0, 0, 4, 1);
+		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 27, 0, 4, 1);
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
 		renderRecipeBackground(recipe, matrices, x, y);
 
@@ -204,9 +211,6 @@ public class EmiRenderHelper {
 		RenderSystem.applyModelViewMatrix();
 
 		recipe.addWidgets(holder);
-		if (showMissing) {
-			EmiClient.getAvailable(recipe);
-		}
 		float delta = MinecraftClient.getInstance().getTickDelta();
 		for (Widget widget : widgets) {
 			widget.render(matrices, -1000, -1000, delta);
@@ -215,7 +219,16 @@ public class EmiRenderHelper {
 			DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
 		}
 
-		EmiClient.availableForCrafting.clear();
+		if (showMissing) {
+			HandledScreen hs = EmiApi.getHandledScreen();
+			EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
+			if (handler != null) {
+				handler.render(recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), widgets, matrices);
+			} else if (EmiScreenManager.lastPlayerInventory != null) {
+				StandardRecipeHandler.renderMissing(recipe, EmiScreenManager.lastPlayerInventory, widgets, matrices);
+			}
+		}
+
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
 

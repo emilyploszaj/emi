@@ -47,6 +47,24 @@ public class EmiApi {
 	}
 
 	/**
+	 * @return Current search text
+	 */
+	public static String getSearchText() {
+		return EmiScreenManager.search.getText();
+	}
+
+	/**
+	 * Sets the current search to the provided query
+	 */
+	public static void setSearchText(String text) {
+		EmiScreenManager.search.setText(text);
+	}
+
+	public static boolean isSearchFocused() {
+		return EmiScreenManager.search.isFocused();
+	}
+
+	/**
 	 * Gets the currently hovered EmiIngredient at the provided screen coordinates,
 	 * or {@link EmiStack#EMPTY} if none.
 	 * @param includeStandard Whether to include the EmiIngredient representation of
@@ -149,6 +167,7 @@ public class EmiApi {
 		}
 	}
 
+	@Deprecated
 	public static boolean performFill(EmiRecipe recipe, EmiFillAction action, int amount) {
 		HandledScreen<?> hs = getHandledScreen();
 		if (hs != null) {

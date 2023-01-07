@@ -13,6 +13,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.EmiSearch.CompiledQuery;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -51,8 +52,8 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	@Inject(at = @At("TAIL"), method = "drawSlot")
 	private void drawSlot(MatrixStack matrices, Slot slot, CallbackInfo info) {
 		if (EmiScreenManager.search.highlight) {
-			CompiledQuery query = new CompiledQuery(EmiScreenManager.search.getText());
-			if (!query.test(EmiStack.of(slot.getStack()))) {
+			CompiledQuery query = EmiSearch.compiledQuery;
+			if (query != null && !query.test(EmiStack.of(slot.getStack()))) {
 				matrices.push();
 				matrices.translate(0, 0, 300);
 				DrawableHelper.fill(matrices, slot.x - 1, slot.y - 1, slot.x + 17, slot.y + 17, 0x77000000);

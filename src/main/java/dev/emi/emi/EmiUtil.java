@@ -8,9 +8,10 @@ import java.util.stream.Stream;
 import org.lwjgl.glfw.GLFW;
 
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
@@ -140,10 +141,11 @@ public class EmiUtil {
 		if (ingredient.getEmiStacks().size() == 1) {
 			HandledScreen<?> hs = EmiApi.getHandledScreen();
 			EmiStack stack = ingredient.getEmiStacks().get(0);
+			EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
 			return EmiRecipes.byOutput.getOrDefault(stack.getKey(), List.of()).stream().filter(r -> {
 				if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
 					EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
-					return handler != null && (!requireCraftable || handler.canCraft(r, inventory, hs));
+					return handler != null && (!requireCraftable || handler.canCraft(r, context));
 				}
 				return false;
 			}).toList();

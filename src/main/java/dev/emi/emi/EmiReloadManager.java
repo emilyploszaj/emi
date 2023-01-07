@@ -1,7 +1,10 @@
 package dev.emi.emi;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
@@ -87,17 +90,18 @@ public class EmiReloadManager {
 						.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 						.toList();
 					if (EmiConfig.logUntranslatedTags) {
-						boolean warned = false;
+						List<String> tags = Lists.newArrayList();
 						for (TagKey<Item> tag : EmiClient.itemTags) {
 							String translation = EmiUtil.translateId("tag.", tag.id());
 							if (!I18n.hasTranslation(translation)) {
-								warned = true;
-								EmiReloadLog.warn("No translation for tag #" + tag.id());
+								tags.add(tag.id().toString());
 							}
 						}
-						if (warned) {
-							EmiReloadLog.warn("Tag warning can be disabled in the config");
-							EmiReloadLog.warn("EMI docs describe how to add a translation or exclude tags.");
+						if (!tags.isEmpty()) {
+							for (String tag : tags.stream().sorted().toList()) {
+								EmiReloadLog.warn("Untranslated tag #" + tag);
+							}
+							EmiReloadLog.info(" Tag warning can be disabled in the config, EMI docs describe how to add a translation or exclude tags.");
 						}
 					}
 					EmiComparisonDefaults.comparisons = new HashMap<>();

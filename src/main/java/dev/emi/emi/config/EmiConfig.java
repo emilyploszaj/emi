@@ -256,6 +256,12 @@ public class EmiConfig {
 	@ConfigValue("ui.vertical-margin")
 	public static int verticalMargin = 20;
 
+	@Comment("The minimum width of the recipe screen in pixels. "
+		+ "Controls how many tabs there can be, and where the page switching buttons go."
+		+ "The default is 176, the width of most screens.")
+	@ConfigValue("ui.minimum-recipe-screen-width")
+	public static int minimumRecipeScreenWidth = 176;
+
 	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
 	@ConfigValue("ui.miscraft-prevention")
 	public static boolean miscraftPrevention = true;
@@ -400,6 +406,10 @@ public class EmiConfig {
 	@Comment("Whether to log untranslated tags as warnings.")
 	@ConfigValue("dev.log-untranslated-tags")
 	public static boolean logUntranslatedTags = FabricLoader.getInstance().isDevelopmentEnvironment();
+
+	@Comment("Whether to log ingredients that don't have a representative tag as warnings.")
+	@ConfigValue("dev.log-non-tag-ingredients")
+	public static boolean logNonTagIngredients = false;
 
 	@Comment("Whether hovering the output of a recipe should show the recipe's EMI ID.")
 	@ConfigValue("dev.show-recipe-ids")

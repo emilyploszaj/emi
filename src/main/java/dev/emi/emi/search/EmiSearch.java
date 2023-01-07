@@ -29,6 +29,7 @@ public class EmiSearch {
 	public static Thread thread;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
+	public static volatile CompiledQuery compiledQuery;
 	public static SuffixArray<EmiStack> names, tooltips, mods;
 
 	public static void bake() {
@@ -162,7 +163,11 @@ public class EmiSearch {
 		}
 
 		public boolean test(EmiStack stack) {
-			return fullQuery.matches(stack);
+			if (fullQuery == null) {
+				return true;
+			} else {
+				return fullQuery.matches(stack);
+			}
 		}
 
 		private static void addQuery(String s, boolean negated, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
@@ -187,6 +192,7 @@ public class EmiSearch {
 				do {
 					query = EmiSearch.query;
 					CompiledQuery compiled = new CompiledQuery(query);
+					compiledQuery = compiled;
 					List<? extends EmiIngredient> source = EmiScreenManager.getSearchSource();
 					if (compiled.isEmpty()) {
 						stacks = source;

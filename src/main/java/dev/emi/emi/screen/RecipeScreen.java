@@ -9,7 +9,6 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
@@ -18,7 +17,11 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.widget.RecipeFillButtonWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -27,7 +30,6 @@ import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
-import dev.emi.emi.widget.RecipeFillButtonWidget;
 import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -85,6 +87,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	protected void init() {
 		super.init();
+		minimumWidth = Math.max(EmiConfig.minimumRecipeScreenWidth, 56);
+		backgroundWidth = minimumWidth;
 		backgroundHeight = height - 52 - EmiConfig.verticalMargin;
 		x = (this.width - backgroundWidth) / 2;
 		y = (this.height - backgroundHeight) / 2 + 1;
@@ -158,6 +162,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		this.arrows.get(5).y = this.y + 18;
 	}
 
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackground(matrices);
@@ -196,23 +201,15 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (!workstations.isEmpty()) {
 			int size = Math.min(workstations.size(), (backgroundHeight + 6 - getWorkstationsY()) / 18 - 1);
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + getWorkstationsY() - 3, 24, 6 + 18 * size, 27, 0, 3, 1);
+			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + getWorkstationsY() - 3, 24, 6 + 18 * size, 36, 0, 3, 1);
 		}
 		if (resolve != null) {
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + 7, 24, 24, 27, 0, 3, 1);
+			EmiRenderHelper.drawNinePatch(matrices, x - 21, y + 7, 24, 24, 36, 0, 3, 1);
 		}
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
-			for (Widget widget : group.widgets) {
-				if (widget instanceof RecipeFillButtonWidget) {
-					if (widget.getBounds().contains(mx, my)) {
-						EmiClient.getAvailable(group.recipe());
-						break;
-					}
-				}
-			}
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
 			view.translate(group.x(), group.y(), 0);
@@ -220,9 +217,22 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			for (Widget widget : group.widgets) {
 				widget.render(matrices, mx, my, delta);
 			}
+			for (Widget widget : group.widgets) {
+				if (widget instanceof RecipeFillButtonWidget) {
+					if (widget.getBounds().contains(mx, my)) {
+						HandledScreen hs = EmiApi.getHandledScreen();
+						EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(group.recipe, hs);
+						if (handler != null) {
+							handler.render(group.recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), group.widgets, matrices);
+						} else if (EmiScreenManager.lastPlayerInventory != null) {
+							StandardRecipeHandler.renderMissing(group.recipe, EmiScreenManager.lastPlayerInventory, group.widgets, matrices);
+						}
+						break;
+					}
+				}
+			}
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
-			EmiClient.availableForCrafting.clear();
 		}
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
@@ -329,7 +339,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			for (List<EmiRecipe> list : recipes) {
 				for (EmiRecipe r : list) {
 					int w = r.getDisplayWidth();
-					if (r.supportsRecipeTree() || EmiRecipeFiller.isSupported(r)) {
+					if (r.supportsRecipeTree() || EmiRecipeFiller.isSupported(r) || EmiConfig.recipeScreenshotButton) {
 						w += 26;
 					}
 					width = Math.max(width, w);
