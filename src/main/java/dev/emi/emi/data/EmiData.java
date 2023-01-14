@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -202,7 +203,7 @@ public class EmiData {
 
 	private static Stream<JsonElement> getArrayOrSingleton(JsonObject json, String key) {
 		if (JsonHelper.hasArray(json, key)) {
-			return json.getAsJsonArray(key).asList().stream();
+			return StreamSupport.stream(json.getAsJsonArray(key).spliterator(), false);
 		}
 		return Stream.of(json.get(key));
 	}
