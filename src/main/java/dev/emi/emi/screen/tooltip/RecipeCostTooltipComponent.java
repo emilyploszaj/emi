@@ -15,11 +15,12 @@ import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Matrix4f;
 
 public class RecipeCostTooltipComponent implements TooltipComponent {
 	private static final Text COST = EmiPort.translatable("emi.cost_per");
-	private final MaterialTree tree;
+	public final MaterialTree tree;
 
 	public RecipeCostTooltipComponent(EmiRecipe recipe) {
 		tree = new MaterialTree(recipe);
@@ -84,6 +85,6 @@ public class RecipeCostTooltipComponent implements TooltipComponent {
 
 	@Override
 	public void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix, Immediate vertexConsumers) {
-		textRenderer.draw(COST, x, y, 0xffffff, true, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+		textRenderer.draw(COST, x, y, Formatting.GRAY.getColorValue(), true, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
 	}
 }

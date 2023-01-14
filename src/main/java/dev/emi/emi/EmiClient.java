@@ -1,42 +1,35 @@
 package dev.emi.emi;
 
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.apache.commons.compress.utils.Lists;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.apache.commons.compress.utils.Lists;
-
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiRecipeHandler;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.data.EmiTagExclusionsLoader;
-import dev.emi.emi.data.RecipeDefaultLoader;
+import dev.emi.emi.data.EmiData;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.tag.TagKey;
@@ -48,26 +41,11 @@ public class EmiClient implements ClientModInitializer {
 	public static boolean onServer = false;
 	public static Set<Identifier> excludedTags = Sets.newHashSet();
 	public static List<TagKey<Item>> itemTags = List.of();
-	public static Map<EmiIngredient, Boolean> availableForCrafting = Maps.newHashMap();
-
-	public static void getAvailable(EmiRecipe recipe) {
-		availableForCrafting = new IdentityHashMap<>();
-		MinecraftClient client = MinecraftClient.getInstance();
-		List<Boolean> list = new EmiPlayerInventory(client.player).getCraftAvailability(recipe);
-		List<EmiIngredient> inputs = recipe.getInputs();
-		if (list.size() != inputs.size()) {
-			return;
-		}
-		for (int i = 0; i < list.size(); i++) {
-			availableForCrafting.put(inputs.get(i), list.get(i));
-		}
-	}
 
 	@Override
 	public void onInitializeClient() {
 		EmiConfig.loadConfig();
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
+		EmiData.init();
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
 			MODELED_TAGS.clear();
 			for (Identifier id : EmiPort.findResources(manager, "models/item/tags", s -> s.endsWith(".json"))) {
@@ -84,6 +62,7 @@ public class EmiClient implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			EmiLog.info("Disconnected from server, EMI data cleared");
 			EmiReloadManager.clear();
 			onServer = false;
 		});
@@ -166,14 +145,14 @@ public class EmiClient implements ClientModInitializer {
 		}
 	}
 	
-	public static <T extends ScreenHandler> void sendFillRecipe(EmiRecipeHandler<T> handler, HandledScreen<T> screen,
+	public static <T extends ScreenHandler> void sendFillRecipe(StandardRecipeHandler<T> handler, HandledScreen<T> screen,
 			int syncId, int action, List<ItemStack> stacks, EmiRecipe recipe) {
 		T screenHandler = screen.getScreenHandler();
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(handler.getInputSources(screenHandler), buf);
-		List<Slot> crafting = handler.getCraftingSlots(recipe, screen);
+		List<Slot> crafting = handler.getCraftingSlots(recipe, screenHandler);
 		buf.writeVarInt(crafting.size());
 		for (Slot s : crafting) {
 			buf.writeVarInt(s == null ? -1 : s.id);

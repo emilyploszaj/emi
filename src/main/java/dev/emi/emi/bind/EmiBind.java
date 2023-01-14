@@ -8,9 +8,13 @@ import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class EmiBind {
 	public static final int MAX_BINDS = 4;
@@ -45,6 +49,20 @@ public class EmiBind {
 		}
 		if (!boundKeys.get(boundKeys.size() - 1).isUnbound() && boundKeys.size() < MAX_BINDS) {
 			boundKeys.add(new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
+		}
+	}
+
+	public boolean isBound() {
+		return boundKeys.size() > 0;
+	}
+
+	public Text getBindText() {
+		if (!isBound()) {
+			return EmiPort.literal("[]", Formatting.GOLD);
+		} else {
+			return EmiPort.literal("[", Formatting.GOLD)
+				.append(boundKeys.get(0).getKeyText(Formatting.GOLD))
+				.append(EmiPort.literal("]", Formatting.GOLD));
 		}
 	}
 
@@ -161,6 +179,28 @@ public class EmiBind {
 
 		public boolean isUnbound() {
 			return key == InputUtil.UNKNOWN_KEY;
+		}
+
+		public MutableText getKeyText(Formatting formatting) {
+			MutableText text = EmiPort.literal("", formatting);
+			appendModifiers(text, modifiers());
+			EmiPort.append(text, key().getLocalizedText());
+			return text;
+		}
+	
+		private void appendModifiers(MutableText text, int modifiers) {
+			if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
+				EmiPort.append(text, EmiPort.translatable("key.keyboard.control"));
+				EmiPort.append(text, EmiPort.literal(" + "));
+			}
+			if ((modifiers & EmiUtil.ALT_MASK) > 0) {
+				EmiPort.append(text, EmiPort.translatable("key.keyboard.alt"));
+				EmiPort.append(text, EmiPort.literal(" + "));
+			}
+			if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
+				EmiPort.append(text, EmiPort.translatable("key.keyboard.shift"));
+				EmiPort.append(text, EmiPort.literal(" + "));
+			}
 		}
 	}
 }

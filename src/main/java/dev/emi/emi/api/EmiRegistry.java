@@ -140,8 +140,16 @@ public interface EmiRegistry {
 	}
 
 	/**
+	 * @deprecated Use alternate {@link addRecipeHandler}
+	 */
+	@Deprecated
+	default <T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, EmiRecipeHandler<T> handler) {
+		addRecipeHandler(type, (dev.emi.emi.api.recipe.handler.EmiRecipeHandler<T>) handler);
+	}
+
+	/**
 	 * Adds a recipe handler to a specified type of screen handler.
 	 * Recipe handlers are responsible for filling recipes automatically.
 	 */
-	<T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, EmiRecipeHandler<T> handler);
+	<T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, dev.emi.emi.api.recipe.handler.EmiRecipeHandler<T> handler);
 }

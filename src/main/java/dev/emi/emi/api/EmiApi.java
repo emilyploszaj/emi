@@ -3,6 +3,7 @@ package dev.emi.emi.api;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
@@ -43,6 +44,24 @@ public class EmiApi {
 
 	public static boolean isCheatMode() {
 		return EmiConfig.cheatMode;
+	}
+
+	/**
+	 * @return Current search text
+	 */
+	public static String getSearchText() {
+		return EmiScreenManager.search.getText();
+	}
+
+	/**
+	 * Sets the current search to the provided query
+	 */
+	public static void setSearchText(String text) {
+		EmiScreenManager.search.setText(text);
+	}
+
+	public static boolean isSearchFocused() {
+		return EmiScreenManager.search.isFocused();
 	}
 
 	/**
@@ -111,24 +130,19 @@ public class EmiApi {
 		} else if (stack instanceof ListEmiIngredient list) {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))));
 		} else if (stack.getEmiStacks().size() == 1) {
-			setPages(pruneSources(EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), Map.of()),
-				stack.getEmiStacks().get(0)));
+			setPages(mapRecipes(pruneSources(
+				EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), List.of()),
+				stack.getEmiStacks().get(0))));
 		}
 	}
 
 	public static void displayUses(EmiIngredient stack) {
 		if (!stack.isEmpty()) {
 			EmiStack zero = stack.getEmiStacks().get(0);
-			Map<EmiRecipeCategory, List<EmiRecipe>> map = Maps.newHashMap();
-			for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry
-					: pruneUses(EmiRecipes.byInput.getOrDefault(zero.getKey(), Map.of()), stack).entrySet()) {
-				List<EmiRecipe> list = Lists.newArrayList();
-				list.addAll(entry.getValue());
-				map.put(entry.getKey(), list);
-			}
-			for (EmiRecipe recipe : EmiRecipes.byWorkstation.getOrDefault(zero, List.of())) {
-				map.computeIfAbsent(recipe.getCategory(), (r) -> Lists.newArrayList()).add(recipe);
-			}
+			Map<EmiRecipeCategory, List<EmiRecipe>> map
+				= mapRecipes(Stream.concat(
+						pruneUses(EmiRecipes.byInput.getOrDefault(zero.getKey(), List.of()), stack).stream(),
+						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
 			setPages(map);
 		}
 	}
@@ -153,6 +167,7 @@ public class EmiApi {
 		}
 	}
 
+	@Deprecated
 	public static boolean performFill(EmiRecipe recipe, EmiFillAction action, int amount) {
 		HandledScreen<?> hs = getHandledScreen();
 		if (hs != null) {
@@ -171,22 +186,39 @@ public class EmiApi {
 		}
 	}
 
-	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneSources(Map<EmiRecipeCategory, List<EmiRecipe>> map,
-			EmiStack context) {
-		return map.entrySet().stream().map(e -> {
-			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
-				r.getOutputs().stream().anyMatch(i -> i.isEqual(context))).toList());
-		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+	private static List<EmiRecipe> pruneSources(List<EmiRecipe> list, EmiStack context) {
+		return list.stream().filter(r -> {
+			return r.getOutputs().stream().anyMatch(i -> i.isEqual(context));
+		}).toList();
 	}
 
-	private static Map<EmiRecipeCategory, List<EmiRecipe>> pruneUses(Map<EmiRecipeCategory, List<EmiRecipe>> map,
-			EmiIngredient context) {
-		return map.entrySet().stream().map(e -> {
-			return Maps.immutableEntry(e.getKey(), e.getValue().stream().filter(r -> 
-					r.getInputs().stream().anyMatch(i -> containsAll(i, context))
-					|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context))
-				).toList());
-		}).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+	private static List<EmiRecipe> pruneUses(List<EmiRecipe> list, EmiIngredient context) {
+		return list.stream().filter(r -> {
+			return r.getInputs().stream().anyMatch(i -> containsAll(i, context))
+				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context));
+		}).sorted((a, b) -> getSmallestPresence(a, context) - getSmallestPresence(b, context)).toList();
+	}
+
+	private static int getSmallestPresence(EmiRecipe recipe, EmiIngredient context) {
+		int ideal = context.getEmiStacks().size();
+		int smallestPresence = Integer.MAX_VALUE;
+		for (EmiIngredient i : recipe.getInputs()) {
+			if (containsAll(i, context)) {
+				smallestPresence = Math.min(smallestPresence, i.getEmiStacks().size());
+				if (smallestPresence <= ideal) {
+					break;
+				}
+			}
+		}
+		return smallestPresence;
+	}
+
+	private static Map<EmiRecipeCategory, List<EmiRecipe>> mapRecipes(List<EmiRecipe> list) {
+		Map<EmiRecipeCategory, List<EmiRecipe>> map = Maps.newHashMap();
+		for (EmiRecipe recipe : list) {
+			map.computeIfAbsent(recipe.getCategory(), k -> Lists.newArrayList()).add(recipe);
+		}
+		return map;
 	}
 
 	private static boolean containsAll(EmiIngredient collection, EmiIngredient ingredient) {

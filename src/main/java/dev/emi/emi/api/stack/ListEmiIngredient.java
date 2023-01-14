@@ -39,6 +39,11 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
+	public String toString() {
+		return "Ingredient" + getEmiStacks();
+	}
+
+	@Override
 	public List<EmiStack> getEmiStacks() {
 		return fullList;
 	}

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -15,6 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -30,11 +32,15 @@ import net.minecraft.text.Text;
 
 @Mixin(AbstractInventoryScreen.class)
 public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> extends HandledScreen<T> {
+	@Unique
+	private static boolean hasInventoryTabs = FabricLoader.getInstance().isModLoaded("inventorytabs");
 	
 	private AbstractInventoryScreenMixin() { super(null, null, null); }
 
 	@Shadow
-	abstract Text getStatusEffectDescription(StatusEffectInstance effect);
+	private Text getStatusEffectDescription(StatusEffectInstance effect) {
+		throw new UnsupportedOperationException();
+	}
 
 	@Inject(at = @At("HEAD"), method = "drawStatusEffects", cancellable = true)
 	private void drawStatusEffects(MatrixStack matrices, int mouseX, int mouseY, CallbackInfo info) {
@@ -46,7 +52,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 				info.cancel();
 			}
 			int y = this.y - 34;
-			if (((Object) this) instanceof CreativeInventoryScreen) {
+			if (((Object) this) instanceof CreativeInventoryScreen || hasInventoryTabs) {
 				y -= 28;
 			}
 			int xOff = 34;

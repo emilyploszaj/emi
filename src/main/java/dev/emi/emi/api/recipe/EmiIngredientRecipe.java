@@ -114,7 +114,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		}
 
 		@Override
-		protected EmiIngredient getStack() {
+		public EmiIngredient getStack() {
 			return manager.getStack(offset);
 		}
 

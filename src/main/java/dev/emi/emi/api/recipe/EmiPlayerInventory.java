@@ -16,7 +16,9 @@ import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiStackList;
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -34,6 +36,7 @@ public class EmiPlayerInventory {
 	private final Comparison nbt = Comparison.builder().amount(false).nbt(true).build();
 	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
+	@Deprecated
 	public EmiPlayerInventory(PlayerEntity entity) {
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
 		if (screen != null && screen.getScreenHandler() != null) {
@@ -42,14 +45,15 @@ public class EmiPlayerInventory {
 			}
 			List<EmiRecipeHandler<?>> handlers = (List) EmiRecipeFiller.getAllHandlers(screen);
 			if (!handlers.isEmpty()) {
-				// TODO this only supports slots from the first one
-				List<Slot> slots = ((EmiRecipeHandler) handlers.get(0)).getInputSources(screen.getScreenHandler());
-				for (Slot slot : slots) {
-					if (slot.canTakeItems(entity)) {
-						addStack(slot.getStack());
+				if (handlers.get(0) instanceof StandardRecipeHandler standard) {
+					List<Slot> slots = standard.getInputSources(screen.getScreenHandler());
+					for (Slot slot : slots) {
+						if (slot.canTakeItems(entity)) {
+							addStack(slot.getStack());
+						}
 					}
+					return;
 				}
-				return;
 			}
 		}
 
@@ -59,8 +63,29 @@ public class EmiPlayerInventory {
 		}
 	}
 
+	public EmiPlayerInventory(List<EmiStack> stacks) {
+		for (EmiStack stack : stacks) {
+			addStack(stack);
+		}
+	}
+
+	public static EmiPlayerInventory of(PlayerEntity entity) {
+		HandledScreen<?> screen = EmiApi.getHandledScreen();
+		if (screen != null) {
+			List<EmiRecipeHandler<?>> handlers = (List) EmiRecipeFiller.getAllHandlers(screen);
+			if (!handlers.isEmpty()) {
+				return handlers.get(0).getInventory((HandledScreen) screen);
+			}
+		}
+		return new EmiPlayerInventory(entity);
+	}
+
 	private void addStack(ItemStack is) {
 		EmiStack stack = EmiStack.of(is).comparison(c -> none);
+		addStack(stack);
+	}
+
+	private void addStack(EmiStack stack) {
 		if (!stack.isEmpty()) {
 			if (inventory.containsKey(stack)) {
 				for (EmiStack other : inventory.keySet()) {
@@ -79,11 +104,12 @@ public class EmiPlayerInventory {
 		HandledScreen screen = EmiApi.getHandledScreen();
 		List<EmiRecipeHandler> handlers = EmiRecipeFiller.getAllHandlers(screen);
 		if (!handlers.isEmpty()) {
+			EmiCraftContext context = new EmiCraftContext(screen, this, EmiCraftContext.Type.CRAFTABLE);
 			return r -> {
 				for (int i = 0; i < handlers.size(); i++) {
 					EmiRecipeHandler handler = handlers.get(i);
 					if (handler.supportsRecipe(r)) {
-						return handler.canCraft(r, EmiPlayerInventory.this, screen);
+						return handler.canCraft(r, context);
 					}
 				}
 				return false;
@@ -99,10 +125,10 @@ public class EmiPlayerInventory {
 		}
 		Set<EmiRecipe> set = Sets.newHashSet();
 		for (EmiStack stack : inventory.keySet()) {
-			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), Map.of()).values().stream().flatMap(l -> l.stream()).toList());
+			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), List.of()));
 		}
 		return set.stream().filter(r -> !r.hideCraftable() && predicate.test(r) && r.getOutputs().size() > 0)
-			.map(r -> new EmiFavorite(r.getOutputs().get(0), r))
+			.map(r -> new EmiFavorite.Craftable(r.getOutputs().get(0), r))
 			.sorted((a, b) -> Integer.compare(
 				EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
 				EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE)

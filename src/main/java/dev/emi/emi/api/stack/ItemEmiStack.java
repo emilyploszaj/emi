@@ -2,6 +2,8 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
@@ -92,7 +94,13 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		MinecraftClient client = MinecraftClient.getInstance();
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
+			MatrixStack view = RenderSystem.getModelViewStack();
+			view.push();
+			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
+			RenderSystem.applyModelViewMatrix();
 			client.getItemRenderer().renderInGui(stack, x, y);
+			view.pop();
+			RenderSystem.applyModelViewMatrix();
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
