@@ -107,15 +107,18 @@ public class EmiRecipeFiller {
 					}
 					for (int e = 0; e < emiStacks.size(); e++) {
 						EmiStack stack = emiStacks.get(e);
-						ItemStack item = stack.getItemStack();
-						DiscoveredItem di = new DiscoveredItem(stack, item, 0, (int) ingredient.getAmount(), item.getMaxCount());
+						slotLoop:
 						for (Slot s : slots) {
-							if (ItemStack.canCombine(item, s.getStack())) {
-								di.amount += s.getStack().getCount();
+							ItemStack ss = s.getStack();
+							if (EmiStack.of(s.getStack()).isEqual(stack)) {
+								for (DiscoveredItem di : d) {
+									if (ItemStack.canCombine(ss, di.stack)) {
+										di.amount += ss.getCount();
+										continue slotLoop;
+									}
+								}
+								d.add(new DiscoveredItem(stack, ss, ss.getCount(), (int) ingredient.getAmount(), ss.getMaxCount()));
 							}
-						}
-						if (di != null) {
-							d.add(di);
 						}
 					}
 					DiscoveredItem biggest = null;

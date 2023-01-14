@@ -131,16 +131,22 @@ public class EmiRenderHelper {
 	}
 
 	public static void renderIngredient(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
-		RenderSystem.disableDepthTest();
+		RenderSystem.enableDepthTest();
+		matrices.push();
+		matrices.translate(0, 0, 200);
 		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 		DrawableHelper.drawTexture(matrices, x, y, 8, 252, 4, 4, 256, 256);
+		matrices.pop();
 	}
 
 	public static void renderTag(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
-		RenderSystem.disableDepthTest();
 		if (ingredient.getEmiStacks().size() > 1) {
+			RenderSystem.enableDepthTest();
+			matrices.push();
+			matrices.translate(0, 0, 200);
 			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 			DrawableHelper.drawTexture(matrices, x, y + 12, 0, 252, 4, 4, 256, 256);
+			matrices.pop();
 		}
 	}
 
@@ -161,16 +167,19 @@ public class EmiRenderHelper {
 	}
 
 	public static void renderCatalyst(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
-		RenderSystem.disableDepthTest();
+		RenderSystem.enableDepthTest();
+		matrices.push();
+		matrices.translate(0, 0, 200);
 		RenderSystem.setShaderTexture(0, WIDGETS);
 		DrawableHelper.drawTexture(matrices, x + 12, y, 12, 252, 4, 4, 256, 256);
+		matrices.pop();
 		return;
 	}
 
 	public static void renderRecipeFavorite(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
 		matrices.push();
 		matrices.translate(0, 0, 200);
-		RenderSystem.disableDepthTest();
+		RenderSystem.enableDepthTest();
 		RenderSystem.setShaderTexture(0, WIDGETS);
 		DrawableHelper.drawTexture(matrices, x + 12, y, 16, 252, 4, 4, 256, 256);
 		matrices.pop();

@@ -213,15 +213,22 @@ public class SlotWidget extends Widget {
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
 			list.add(supplier.get());
 		}
-		if (getRecipe() != null) {
+		EmiRecipe recipe = getRecipe();
+		if (recipe != null) {
+			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(recipe.getId().toString(), Formatting.GRAY))));
+			}
+			if (EmiConfig.favorite.isBound()) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
+			}
 			if (RecipeScreen.resolve != null) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve", Formatting.GREEN))));
 			}
-			if (getRecipe().getId() != null && EmiConfig.showRecipeIds) {
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(getRecipe().getId().toString()))));
-			}
-			if (EmiConfig.showCostPerBatch && getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
-				list.add(new RecipeCostTooltipComponent(getRecipe()));
+			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
+				RecipeCostTooltipComponent rctc = new RecipeCostTooltipComponent(recipe);
+				if (!rctc.tree.fractionalCosts.isEmpty()) {
+					list.add(rctc);
+				}
 			}
 		}
 		return list;

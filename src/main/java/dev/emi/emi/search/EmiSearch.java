@@ -9,13 +9,17 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.EmiAlias;
+import dev.emi.emi.data.EmiData;
 import dev.emi.emi.screen.EmiScreenManager;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -30,12 +34,13 @@ public class EmiSearch {
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
 	public static volatile CompiledQuery compiledQuery;
-	public static SuffixArray<EmiStack> names, tooltips, mods;
+	public static SuffixArray<EmiStack> names, tooltips, mods, aliases;
 
 	public static void bake() {
 		SuffixArray<EmiStack> names = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
+		SuffixArray<EmiStack> aliases = new SuffixArray<EmiStack>();
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
@@ -65,13 +70,28 @@ public class EmiSearch {
 				}
 			}
 		}
+		for (EmiAlias alias : EmiData.aliases) {
+			for (String key : alias.keys()) {
+				if (!I18n.hasTranslation(key)) {
+					EmiReloadLog.warn("Untranslated alias " + key);
+				}
+				String text = I18n.translate(key).toLowerCase();
+				for (EmiIngredient ing : alias.stacks()) {
+					for (EmiStack stack : ing.getEmiStacks()) {
+						aliases.add(stack, text);
+					}
+				}
+			}
+		}
 		EmiConfig.appendItemModId = old;
 		names.build();
 		tooltips.build();
 		mods.build();
+		aliases.build();
 		EmiSearch.names = names;
 		EmiSearch.tooltips = tooltips;
 		EmiSearch.mods = mods;
+		EmiSearch.aliases = aliases;
 	}
 
 	public static void update() {
@@ -141,6 +161,8 @@ public class EmiSearch {
 						constructors.add(QueryType.TAG.queryConstructor);
 						regexConstructors.add(QueryType.TAG.regexQueryConstructor);
 					}
+					// TODO add config
+					constructors.add(AliasQuery::new);
 					if (constructors.size() > 1) {
 						constructor = name -> new LogicalOrQuery(constructors.stream().map(c -> c.apply(name)).toList());
 						regexConstructor = name -> new LogicalOrQuery(regexConstructors.stream().map(c -> c.apply(name)).toList());

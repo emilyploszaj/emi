@@ -164,10 +164,16 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(ItemStack stack) {
+		if (stack.isEmpty()) {
+			return EmiStack.EMPTY;
+		}
 		return new ItemEmiStack(stack);
 	}
 
 	public static EmiStack of(ItemStack stack, long amount) {
+		if (stack.isEmpty()) {
+			return EmiStack.EMPTY;
+		}
 		return new ItemEmiStack(stack, amount);
 	}
 
@@ -181,12 +187,12 @@ public abstract class EmiStack implements EmiIngredient {
 
 	@Deprecated
 	public static EmiStack of(ItemVariant item) {
-		return new ItemEmiStack(item, 1);
+		return of(item.toStack(), 1);
 	}
 
 	@Deprecated
 	public static EmiStack of(ItemVariant item, long amount) {
-		return new ItemEmiStack(item, amount);
+		return of(item.toStack(), amount);
 	}
 
 	@Deprecated

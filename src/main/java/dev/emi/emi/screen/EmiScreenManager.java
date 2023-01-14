@@ -60,6 +60,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -575,7 +576,7 @@ public class EmiScreenManager {
 			EmiDragDropHandlers.render(screen, draggedStack, matrices, mouseX, mouseY, delta);
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
-			view.translate(0, 0, 200);
+			view.translate(0, 0, 400);
 			RenderSystem.applyModelViewMatrix();
 			draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 			view.pop();
@@ -584,7 +585,23 @@ public class EmiScreenManager {
 	}
 
 	private static void renderCurrentTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
-		if (draggedStack.isEmpty()) {
+		ItemStack cursor = ItemStack.EMPTY;
+		if (client.currentScreen instanceof HandledScreen<?> handled) {
+			cursor = handled.getScreenHandler().getCursorStack();
+		}
+		SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
+		if (EmiConfig.cheatMode && !cursor.isEmpty() && panel != null && panel.getType() == SidebarType.INDEX
+				&& panel.space.containsNotExcluded(lastMouseX, lastMouseY)) {
+			List<TooltipComponent> list = List.of(
+				TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.delete_stack")))
+			);
+			if (panel != null && panel.space.rtl) {
+				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
+			} else {
+				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
+			}
+		}
+		if (cursor.isEmpty() && draggedStack.isEmpty()) {
 			client.getProfiler().swap("hover");
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
@@ -607,7 +624,6 @@ public class EmiScreenManager {
 					}
 				}
 			}
-			SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
 			if (panel != null && panel.space.rtl) {
 				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
 			} else {
@@ -848,7 +864,11 @@ public class EmiScreenManager {
 		}
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
-		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+		}
+		if (client.currentScreen.getFocused() instanceof TextFieldWidget) {
+			return false;
+		}
+		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
 			return true;
 		} else {

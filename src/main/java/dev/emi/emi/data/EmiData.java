@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -11,20 +12,27 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiStackSerializer;
+import dev.emi.emi.api.recipe.EmiInfoRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
+import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class EmiData {
 	public static Map<String, EmiRecipeCategoryProperties> categoryPriorities = Map.of();
 	public static List<Predicate<EmiRecipe>> recipeFilters = List.of();
-	public static List<IndexStackData> stackData;
+	public static List<IndexStackData> stackData = List.of();
+	public static List<EmiAlias> aliases = List.of();
+	public static List<EmiRecipe> recipes = List.of();
 	
 	public static void init() {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
@@ -32,13 +40,29 @@ public class EmiData {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
 			new EmiDataLoader<Map<String, EmiRecipeCategoryProperties>>(
 				new Identifier("emi:category_properties"), "category/properties", Maps::newHashMap,
-				(map, json) -> {
+				(map, json, id) -> {
 					for (String k : json.keySet()) {
 						if (JsonHelper.hasJsonObject(json, k)) {
 							EmiRecipeCategoryProperties props = map.computeIfAbsent(k, s -> new EmiRecipeCategoryProperties());
 							JsonObject val = json.getAsJsonObject(k);
 							if (JsonHelper.hasNumber(val, "order")) {
 								props.order = val.get("order").getAsInt();
+							}
+							if (JsonHelper.hasJsonObject(val, "icon")) {
+								JsonObject icon = val.getAsJsonObject("icon");
+								if (JsonHelper.hasString(icon, "texture")) {
+									props.icon = new EmiTexture(new Identifier(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
+								} else if (JsonHelper.hasString(icon, "stack")) {
+									props.icon = EmiStackSerializer.deserialize(icon.get("stack"));
+								}
+							}
+							if (JsonHelper.hasJsonObject(val, "simplified_icon")) {
+								JsonObject icon = val.getAsJsonObject("simplified_icon");
+								if (JsonHelper.hasString(icon, "texture")) {
+									props.simplified = new EmiTexture(new Identifier(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
+								} else if (JsonHelper.hasString(icon, "stack")) {
+									props.simplified = EmiStackSerializer.deserialize(icon.get("stack"));
+								}
 							}
 							if (JsonHelper.hasString(val, "sort")) {
 								switch (JsonHelper.getString(val, "sort")) {
@@ -59,7 +83,7 @@ public class EmiData {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
 			new EmiDataLoader<List<Predicate<EmiRecipe>>>(
 				new Identifier("emi:recipe_filters"), "recipe/filters", Lists::newArrayList,
-				(list, json) -> {
+				(list, json, oid) -> {
 					JsonArray arr = JsonHelper.getArray(json, "filters", new JsonArray());
 					for (JsonElement el : arr) {
 						if (el.isJsonObject()) {
@@ -111,7 +135,7 @@ public class EmiData {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
 			new EmiDataLoader<List<IndexStackData>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
-				(list, json) -> {
+				(list, json, id) -> {
 					List<IndexStackData.Added> added = Lists.newArrayList();
 					List<EmiIngredient> removed = Lists.newArrayList();
 					if (JsonHelper.hasArray(json, "added")) {
@@ -134,5 +158,52 @@ public class EmiData {
 					}
 					list.add(new IndexStackData(added, removed));
 				}, list -> stackData = list));
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+			new EmiDataLoader<List<EmiAlias>>(
+				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
+				(list, json, id) -> {
+					if (JsonHelper.hasArray(json, "aliases")) {
+						for (JsonElement el : json.getAsJsonArray("aliases")) {
+							if (el.isJsonObject()) {
+								JsonObject obj = el.getAsJsonObject();
+								list.add(new EmiAlias(
+									getArrayOrSingleton(obj, "stacks").map(e -> EmiStackSerializer.deserialize(e)).toList(),
+									getArrayOrSingleton(obj, "text").map(e -> e.getAsString()).toList()));
+							}
+						}
+					}
+				}, list -> aliases = list));
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+			new EmiDataLoader<List<EmiRecipe>>(
+				new Identifier("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
+				(list, json, oid) -> {
+					String s = JsonHelper.getString(json, "type", "");
+					Identifier id = new Identifier("emi:/generated/" + oid.getPath());
+					if (s.equals("emi:info")) {
+						list.add(new EmiInfoRecipe(getArrayOrSingleton(json, "stacks").map(EmiStackSerializer::deserialize).toList(),
+							getArrayOrSingleton(json, "text").map(t -> (Text) EmiPort.translatable(t.getAsString())).toList(),
+							id));
+					} else if (s.equals("emi:world_interaction")) {
+						EmiWorldInteractionRecipe.Builder builder = EmiWorldInteractionRecipe.builder();
+						getArrayOrSingleton(json, "left").map(EmiStackSerializer::deserialize).forEach(
+							i -> builder.leftInput(i)
+						);
+						getArrayOrSingleton(json, "right").map(EmiStackSerializer::deserialize).forEach(
+							i -> builder.rightInput(i, false)
+						);
+						getArrayOrSingleton(json, "output").map(EmiStackSerializer::deserialize).forEach(
+							i -> builder.output(i.getEmiStacks().get(0))
+						);
+						builder.id(id);
+						list.add(builder.build());
+					}
+				}, list -> recipes = list));
+	}
+
+	private static Stream<JsonElement> getArrayOrSingleton(JsonObject json, String key) {
+		if (JsonHelper.hasArray(json, key)) {
+			return json.getAsJsonArray(key).asList().stream();
+		}
+		return Stream.of(json.get(key));
 	}
 }

@@ -1,7 +1,6 @@
 package dev.emi.emi.data;
 
 import java.io.InputStreamReader;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,11 +23,11 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 	private final Identifier id;
 	private final String path;
 	private final Supplier<T> baseSupplier;
-	private final BiConsumer<T, JsonObject> prepare;
+	private final DataConsumer<T> prepare;
 	private final Consumer<T> apply;
 
 	public EmiDataLoader(Identifier id, String path, Supplier<T> baseSupplier,
-			BiConsumer<T, JsonObject> prepare, Consumer<T> apply) {
+			DataConsumer<T> prepare, Consumer<T> apply) {
 		this.id = id;
 		this.path = path;
 		this.baseSupplier = baseSupplier;
@@ -47,7 +46,7 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 				try {
 					InputStreamReader reader = new InputStreamReader(EmiPort.getInputStream(resource));
 					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
-					prepare.accept(t, json);
+					prepare.accept(t, json, id);
 				} catch (Exception e) {
 					EmiLog.error("Error loading data for " + this.id + " in " + id);
 					e.printStackTrace();
@@ -65,5 +64,9 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 	@Override
 	public Identifier getFabricId() {
 		return id;
+	}
+
+	public static interface DataConsumer<T> {
+		void accept(T t, JsonObject json, Identifier id);
 	}
 }

@@ -30,6 +30,7 @@ import net.minecraft.client.font.TextHandler;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
+import net.minecraft.util.Util;
 
 public class EmiConfig {
 	private static final Map<Class<?>, Setter> SETTERS = Maps.newHashMap();
@@ -38,6 +39,7 @@ public class EmiConfig {
 	private static final Map<String, List<String>> unparsed = Maps.newHashMap();
 	public static final Map<String, Predicate<?>> FILTERS = Maps.newHashMap();
 	public static final String DEFAULT_CONFIG;
+	public static boolean useGlobalConfig = false;
 	public static String startupConfig;
 
 	// General
@@ -76,6 +78,12 @@ public class EmiConfig {
 	@ConfigValue("ui.show-hover-overlay")
 	public static boolean showHoverOverlay = true;
 
+	@ConfigGroup("ui.mod-id")
+	@Comment("Whether to add mod name to tooltips")
+	@ConfigValue("ui.append-mod-id")
+	public static boolean appendModId = true;
+
+	@ConfigGroupEnd
 	@Comment("Whether to add mod name to item tooltips, in case another mod provides behavior")
 	@ConfigValue("ui.append-item-mod-id")
 	public static boolean appendItemModId = true;
@@ -257,10 +265,23 @@ public class EmiConfig {
 	public static int verticalMargin = 20;
 
 	@Comment("The minimum width of the recipe screen in pixels. "
-		+ "Controls how many tabs there can be, and where the page switching buttons go."
+		+ "Controls how many tabs there can be, and where the page switching buttons go. "
 		+ "The default is 176, the width of most screens.")
 	@ConfigValue("ui.minimum-recipe-screen-width")
 	public static int minimumRecipeScreenWidth = 176;
+
+	@ConfigFilter("ui.workstation-location")
+	private static Predicate<SidebarSide> workstationLocationFilter = side -> {
+		return side != SidebarSide.TOP;
+	};
+	@Comment("Where to show workstations in the recipe screen")
+	@ConfigValue("ui.workstation-location")
+	public static SidebarSide workstationLocation = SidebarSide.LEFT;
+
+	@Comment("Display cost per batch when hovering a recipe output")
+	@ConfigValue("ui.show-cost-per-batch")
+	public static boolean showCostPerBatch = true;
+
 
 	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
 	@ConfigValue("ui.miscraft-prevention")
@@ -274,11 +295,6 @@ public class EmiConfig {
 		+ " with shaders or other mods.")
 	@ConfigValue("ui.use-batched-renderer")
 	public static boolean useBatchedRenderer = true;
-
-	@Comment("Display cost per batch when hovering a recipe output")
-	@ConfigValue("ui.show-cost-per-batch")
-	public static boolean showCostPerBatch = true;
-
 	@ConfigGroup("ui.recipe-buttons")
 	@Comment("Whether recipes should have a button to set as default.")
 	@ConfigValue("ui.recipe-default-button")
@@ -427,6 +443,13 @@ public class EmiConfig {
 
 	public static void loadConfig() {
 		try {
+			File global = new File(getGlobalFolder(), "global.css");
+			if (global.exists() && global.isFile()) {
+				QDCSS css = QDCSS.load(global);
+				if (css.containsKey("global.use-global") && css.get("global.use-global").get().equals("true")) {
+					useGlobalConfig = true;
+				}
+			}
 			File config = getConfigFile();
 			if (config.exists() && config.isFile()) {
 				QDCSS css = QDCSS.load(config);
@@ -438,6 +461,28 @@ public class EmiConfig {
 			writeConfig();
 		} catch (Exception e) {
 			EmiLog.error("Error reading config");
+			e.printStackTrace();
+		}
+	}
+
+	public static void setGlobalState(boolean useGlobal) {
+		try {
+			File folder = getGlobalFolder();
+			folder.mkdirs();
+			File global = new File(folder, "global.css");
+			FileWriter writer = new FileWriter(global);
+			writer.write("#global {\n\tuse-global: " + useGlobal + ";\n}\n");
+			writer.close();
+			useGlobalConfig = useGlobal;
+			File emi = getConfigFile();
+			if (!emi.exists()) {
+				emi.createNewFile();
+				writeConfig();
+			} else {
+				loadConfig();
+			}
+		} catch (Exception e) {
+			EmiLog.error("Error writing global config");
 			e.printStackTrace();
 		}
 	}
@@ -540,7 +585,23 @@ public class EmiConfig {
 			}
 			EmiLog.error("System property 'emi.config' set to '" + s + "' but does not point to real file, using default config.");
 		}
+		if (useGlobalConfig) {
+			File f = new File(getGlobalFolder(), "emi.css");
+			if (f.exists() && f.isFile()) {
+				return f;
+			}
+		}
 		return new File(FabricLoader.getInstance().getConfigDir().toFile(), "emi.css");
+	}
+
+	private static File getGlobalFolder() {
+		String s = switch (Util.getOperatingSystem()) {
+			case WINDOWS -> System.getenv("APPDATA") + "/.minecraft";
+			case OSX -> System.getProperty("user.home") + "/Library/Application Support/minecraft";
+			default -> System.getProperty("user.home") + "/.minecraft";
+		};
+
+		return new File(s + "/global/emi");
 	}
 
 	private static void assignField(QDCSS css, String annot, Field field) throws IllegalAccessException {

@@ -141,8 +141,10 @@ public class FluidEmiStack extends EmiStack {
 			list.add(TooltipComponent.of(EmiPort.ordered(getAmountText(amount))));
 		}
 		String namespace = EmiPort.getFluidRegistry().getId(fluid.getFluid()).getNamespace();
-		String mod = EmiUtil.getModName(namespace);
-		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+		if (EmiConfig.appendModId) {
+			String mod = EmiUtil.getModName(namespace);
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+		}
 		if (!getRemainder().isEmpty()) {
 			list.add(new RemainderTooltipComponent(this));
 		}

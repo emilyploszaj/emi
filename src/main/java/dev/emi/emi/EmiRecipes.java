@@ -56,6 +56,7 @@ public class EmiRecipes {
 		long start = System.currentTimeMillis();
 		Map<Object, Set<EmiRecipe>> byInput = Maps.newHashMap();
 		Map<Object, Set<EmiRecipe>> byOutput = Maps.newHashMap();
+		recipes.addAll(EmiData.recipes);
 
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 

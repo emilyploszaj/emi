@@ -196,7 +196,21 @@ public class EmiApi {
 		return list.stream().filter(r -> {
 			return r.getInputs().stream().anyMatch(i -> containsAll(i, context))
 				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context));
-		}).toList();
+		}).sorted((a, b) -> getSmallestPresence(a, context) - getSmallestPresence(b, context)).toList();
+	}
+
+	private static int getSmallestPresence(EmiRecipe recipe, EmiIngredient context) {
+		int ideal = context.getEmiStacks().size();
+		int smallestPresence = Integer.MAX_VALUE;
+		for (EmiIngredient i : recipe.getInputs()) {
+			if (containsAll(i, context)) {
+				smallestPresence = Math.min(smallestPresence, i.getEmiStacks().size());
+				if (smallestPresence <= ideal) {
+					break;
+				}
+			}
+		}
+		return smallestPresence;
 	}
 
 	private static Map<EmiRecipeCategory, List<EmiRecipe>> mapRecipes(List<EmiRecipe> list) {

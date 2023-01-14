@@ -54,7 +54,7 @@ public class KeyboardMixin {
 						}
 					}
 					if (consume) {
-						info.cancel();;
+						info.cancel();
 					}
 				}
 			}

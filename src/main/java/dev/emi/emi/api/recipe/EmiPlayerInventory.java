@@ -128,7 +128,7 @@ public class EmiPlayerInventory {
 			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), List.of()));
 		}
 		return set.stream().filter(r -> !r.hideCraftable() && predicate.test(r) && r.getOutputs().size() > 0)
-			.map(r -> new EmiFavorite(r.getOutputs().get(0), r))
+			.map(r -> new EmiFavorite.Craftable(r.getOutputs().get(0), r))
 			.sorted((a, b) -> Integer.compare(
 				EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
 				EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE)

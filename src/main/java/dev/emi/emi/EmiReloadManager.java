@@ -46,8 +46,9 @@ public class EmiReloadManager {
 			if (thread != null && thread.isAlive()) {
 				restart = true;
 			} else {
+				clear = false;
 				thread = new Thread(new ReloadWorker());
-				thread.setDaemon(true);
+				thread.setDaemon(false);
 				thread.start();
 			}
 		}
@@ -141,11 +142,11 @@ public class EmiReloadManager {
 					}
 					EmiRecipes.bake();
 					BoM.reload();
-					EmiReloadLog.bake();
 					EmiPersistentData.load();
 					EmiSearch.bake();
 					// Update search
 					EmiScreenManager.search.update();
+					EmiReloadLog.bake();
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 				} catch (Exception e) {
 					EmiLog.error("Critical error occured during reload:");

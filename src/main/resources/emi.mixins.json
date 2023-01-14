@@ -23,6 +23,7 @@
     "HoeItemMixin",
     "ItemStackMixin",
     "KeyboardMixin",
+    "MinecraftClientMixin",
     "MouseMixin",
     "ScreenMixin",
     "SynchronizeRecipesS2CPacketMixin"
