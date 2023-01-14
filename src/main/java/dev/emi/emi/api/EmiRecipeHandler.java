@@ -86,6 +86,11 @@ public interface EmiRecipeHandler<T extends ScreenHandler> extends StandardRecip
 		return !onlyDisplayWhenApplicable(recipe);
 	}
 
+	@Override
+	default boolean canCraft(EmiRecipe recipe, EmiCraftContext<T> context) {
+		return canCraft(recipe, context.getInventory(), context.getScreen());
+	}
+
 	default boolean canCraft(EmiRecipe recipe, EmiPlayerInventory inventory, HandledScreen<T> screen) {
 		return inventory.canCraft(recipe);
 	}
