@@ -195,17 +195,19 @@ public class EmiSearchWidget extends TextFieldWidget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.setEditable(EmiConfig.enabled);
-		matrices.push();
 		String lower = getText().toLowerCase();
 
 		boolean dinnerbone = lower.contains("dinnerbone");
 		accumulatedSpin = MathHelper.clamp(accumulatedSpin + (dinnerbone ? 1 : -1) * (System.currentTimeMillis() - lastRender), 0, 500);
 		lastRender = System.currentTimeMillis();
 		long deg = accumulatedSpin * -180 / 500;
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.push();
 		if (deg != 0) {
-			matrices.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
-			matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
-			matrices.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
+			view.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
+			view.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
+			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
+			RenderSystem.applyModelViewMatrix();
 		}
 
 		if (lower.contains("jeb_")) {
@@ -226,6 +228,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			}
 		}
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		matrices.pop();
+		view.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 }

@@ -6,13 +6,13 @@ import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-public class CraftingRecipeHandler implements EmiRecipeHandler<CraftingScreenHandler> {
+public class CraftingRecipeHandler implements StandardRecipeHandler<CraftingScreenHandler> {
 
 	@Override
 	public List<Slot> getInputSources(CraftingScreenHandler handler) {

@@ -3,104 +3,53 @@
   "key.keyboard.alt": "Alt",
   "key.keyboard.shift": "Maj",
 
-  "config.emi.group.general": "Général",
-  "config.emi.group.ui": "Interface",
-  "config.emi.group.binds": "Raccourcis",
-  "config.emi.group.dev": "Développeur",
-
-  "config.emi.general.enabled": " Afficher EMI",
-  "config.emi.tooltip.general.enabled": "Permet de cacher EMI\n§cAttention: N'oubliez pas le raccourci§r\n§cclavier pour re-afficher EMI§r\n(normalement c'est §6CTRL+o§r)",
-
-  "config.emi.general.cheat_mode": " Mode triche",
-  "config.emi.tooltip.general.cheat_mode": "Un peu comme le mode créatif",
-
-  "config.emi.ui.move_effects": " Effets de potions",
-  "config.emi.tooltip.ui.move_effects": "Change la position de\nla liste des effets de potions\n(à gauche, ou à droite)",
-
-  "config.emi.ui.center_search_bar": " Barre de recherche",
-  "config.emi.tooltip.ui.center_search_bar": "Change la position de\nla barre de recherche\n(au milieu, ou à droite)",
-
-  "config.emi.ui.show_hover_overlay": " Coloration des stacks",
-  "config.emi.tooltip.ui.show_hover_overlay": "Permet d'afficher du gris\nquand votre souris passe\nau dessus d'un stack",
-
-  "config.emi.ui.append_item_mod_id": " Noms des mods",
-  "config.emi.tooltip.ui.append_item_mod_id": "Ajoute sous chaque objet\nle nom du mod d'où il est issu",
-
-  "config.emi.ui.empty_search_craftable": " Barre de recherche vide",
-  "config.emi.tooltip.ui.empty_search_craftable": "Si la barre de recherche\nest vide alors seulement\nles recettes possibles\nseront affichées",
-
-  "config.emi.ui.max_favorite_columns": " Nombre de colonnes (gauche)",
-  "config.emi.tooltip.ui.max_favorite_columns": "Nombre maximal de colonnes\npour les favoris",
-
-  "config.emi.ui.max_index_columns": " Nombre de colonnes (droite)",
-  "config.emi.tooltip.ui.max_index_columns": "Nombre maximal de colonnes\npour la liste des objets",
-
-  "config.emi.ui.vertical_margin": " Marge verticale",
-  "config.emi.tooltip.ui.vertical_margin": "La quantité d'espace vide\nen haut et en bas de EMI",
-
-  "config.emi.ui.miscraft_prevention": " Protection contre les accidents",
-  "config.emi.tooltip.ui.miscraft_prevention": "En théorie :\nVous empêche de faire des\ncatastrophes, comme fabriquer\nplus d'objets que nécessaire",
-
-  "config.emi.ui.fluid_unit": " Unités (fluides)",
-  "config.emi.tooltip.ui.fluid_unit": "L'unité pour mesurer\nle volume des fluides",
-
-  "config.emi.ui.show_cost_per_batch": " Afficher le coût unitaire",
-  "config.emi.tooltip.ui.show_cost_per_batch": "Permet de masquer la liste\ndes ingrédients",
-
-  "config.emi.ui.recipe_default_button": " Afficher le bouton (défaut)",
-  "config.emi.tooltip.ui.recipe_default_button": "Permet de masquer le bouton\n\"Définir par défaut\"",
-
-  "config.emi.ui.recipe_tree_button": " Afficher le bouton (graphe)",
-  "config.emi.tooltip.ui.recipe_tree_button": "Permet de masquer le bouton\n\"Voir graphe\"",
-
-  "config.emi.ui.recipe_fill_button": " Afficher le bouton (utiliser)",
-  "config.emi.tooltip.ui.recipe_fill_button": "Permet de masquer le bouton\n\"Utiliser les ingrédients\"",
-
-  "config.emi.ui.use_batched_renderer": " Optimisation graphique",
-  "config.emi.tooltip.ui.use_batched_renderer": "Permet d'utiliser une optimisation\nde rendu. Les résultats seront plus\nrapides, mais peut être incompatible\navec certains shaders/mods",
-
-  "key.emi.toggle_visibility": " Afficher EMI",
+  "key.emi.toggle_visibility": "Afficher EMI",
   "config.emi.tooltip.binds.toggle_visibility": "Permet de cacher ou d'afficher EMI",
 
-  "key.emi.focus_search": " Barre de recherche",
+  "key.emi.focus_search": "Barre de recherche",
   "config.emi.tooltip.binds.focus_search": "Place votre curseur\ndans la barre de recherche",
 
-  "key.emi.view_recipes": " Voir recettes",
+  "key.emi.clear_search": "Vider la barre",
+  "config.emi.tooltip.binds.clear_search": "Permet de vider\nla barre de recherche",
+
+  "key.emi.view_recipes": "Voir recettes",
   "config.emi.tooltip.binds.view_recipes": "Affiche la liste des recettes",
 
-  "key.emi.view_uses": " Voir usages",
+  "key.emi.view_uses": "Voir usages",
   "config.emi.tooltip.binds.view_uses": "Affiche la liste des usages",
 
-  "key.emi.favorite": " Favori",
+  "key.emi.favorite": "Favori",
   "config.emi.tooltip.binds.favorite": "Mettre en favori",
 
-  "_info.set_default": "Quand j'ai traduit ce fichier, le truc set_default était absent du fichier de config",
-  "key.emi.set_default": " Par défaut",
+  "key.emi.set_default": "Par défaut",
   "config.emi.tooltip.binds.set_default": "Mettre en recette par défaut",
 
-  "key.emi.view_stack_tree": " Voir ce graphe",
-  "config.emi.tooltip.binds.view_stack_tree": "Permet de voir le graphe d'un objet spécifique",
+  "key.emi.view_stack_tree": "Voir ce graphe",
+  "config.emi.tooltip.binds.view_stack_tree": "Permet de voir le graphe\nd'un objet spécifique",
 
-  "key.emi.view_tree": " Voir le graphe actif",
+  "key.emi.view_tree": "Voir le graphe actif",
   "config.emi.tooltip.binds.view_tree": "Permet de voir le graphe actif",
 
-  "key.emi.back": " Retour",
-  "config.emi.tooltip.binds.back": "Permet de retourner une page en arrière",
+  "key.emi.back": "Retour",
+  "config.emi.tooltip.binds.back": "Permet de retourner\nune page en arrière",
 
-  "key.emi.craft_one": " Fabriquer 1",
+  "key.emi.craft_one": "Fabriquer 1",
   "config.emi.tooltip.binds.craft_one": "Place les ingrédients\npour fabriquer un objet",
 
-  "key.emi.craft_all": " Fabriquer tout",
+  "key.emi.craft_all": "Fabriquer tout",
   "config.emi.tooltip.binds.craft_all": "Place les ingrédients\npour fabriquer tout les objets",
 
-  "key.emi.craft_one_to_inventory": " Fabriquer 1 (inventaire)",
+  "key.emi.craft_one_to_inventory": "Fabriquer 1 (inventaire)",
   "config.emi.tooltip.binds.craft_one_to_inventory": "Fabrique un objet",
 
-  "key.emi.craft_all_to_inventory": " Fabriquer tout (inventaire)",
-  "config.emi.tooltip.binds.craft_all_to_inventory": "fabrique tout les objets",
+  "key.emi.craft_all_to_inventory": "Fabriquer tout (inventaire)",
+  "config.emi.tooltip.binds.craft_all_to_inventory": "Fabrique tout les objets",
 
-  "key.emi.craft_one_to_cursor": " Fabriquer 1 (curseur)",
+  "key.emi.craft_one_to_cursor": "Fabriquer 1 (curseur)",
   "config.emi.tooltip.binds.craft_one_to_cursor": "Fabrique un objet\nle place dans votre curseur",
+
+  "key.emi.show_craft": "Afficher recette",
+  "config.emi.tooltip.binds.show_craft": "Affiche la recette qui serait utilisée",
 
   "key.emi.cheat_one_to_inventory": "Tricher 1 (inventaire)",
   "config.emi.tooltip.binds.cheat_one_to_inventory": "Crée un objet",
@@ -114,17 +63,215 @@
   "key.emi.cheat_stack_to_cursor": "Tricher 64 (curseur)",
   "config.emi.tooltip.binds.cheat_stack_to_cursor": "Crée un stack de cet objet\nle place dans votre curseur",
 
-  "config.emi.dev.dev_mode": " Mode développeur",
-  "config.emi.tooltip.dev.dev_mode": "Vous n'en n'aurez pas besoin\nmais vous pouvez l'utiliser si vous voulez",
+  "emi.align.horizontal.left": "Gauche",
+  "emi.align.horizontal.center": "Centre",
+  "emi.align.horizontal.right": "Droite",
+  "emi.align.vertical.top": "Haut",
+  "emi.align.vertical.center": "Milieu",
+  "emi.align.vertical.bottom": "Bas",
 
-  "config.emi.dev.log_untranslated_tags": " Mémorise les erreurs",
-  "config.emi.tooltip.dev.log_untranslated_tags": "Les erreurs seront stockées dans les logs",
+  "emi.sidebar.type.none": "Rien",
+  "emi.sidebar.type.index": "Tout",
+  "emi.sidebar.type.craftables": "Fabricable",
+  "emi.sidebar.type.favorites": "Favori",
+  "emi.sidebar.type.chess": "Échecs",
 
-  "config.emi.dev.show_recipe_ids": " Montrer les IDs des recettes",
-  "config.emi.tooltip.dev.show_recipe_ids": "(plutôt explicite)",
+  "emi.sidebar.theme.transparent": "Transparent",
+  "emi.sidebar.theme.vanilla": "Vanilla",
+  "emi.sidebar.theme.modern": "Moderne",
 
-  "config.emi.dev.highlight_defaulted": " Indiquer les recettes par défaut",
-  "config.emi.tooltip.dev.highlight_defaulted": "Montre quels sont les objets\nqui ont une \"recette par défaut\"",
+  "emi.header.visible": "Visible",
+  "emi.header.invisible": "Invisible",
+  "emi.sidebar.size.columns": "Colonnes",
+  "emi.sidebar.size.rows": "Lignes",
+  "emi.sidebar.margins.top": "Haut",
+  "emi.sidebar.margins.right": "Droite",
+  "emi.sidebar.margins.bottom": "Bas",
+  "emi.sidebar.margins.left": "Gauche",
+
+  "config.emi.group.general": "Général",
+  "config.emi.group.general.search": "Rechercher",
+  "config.emi.group.ui": "Interface",
+  "config.emi.group.ui.left_sidebar": "Onglets à gauche",
+  "config.emi.group.ui.right_sidebar": "Onglets à droite",
+  "config.emi.group.ui.top_sidebar": "Onglets en haut",
+  "config.emi.group.ui.bottom_sidebar": "Onglets en bas",
+  "config.emi.group.ui.recipe_buttons": "Boutons supplémentaires",
+  "config.emi.group.binds": "Raccourcis",
+  "config.emi.group.dev": "Développeur",
+
+  "config.emi.group.ui.recipe-buttons": "Boutons supplémentaires",
+  "config.emi.group.binds.crafts": "Fabriquer",
+  "config.emi.group.binds.cheats": "Tricher",
+
+  "config.emi.general.enabled": "Afficher EMI",
+  "config.emi.tooltip.general.enabled": "Permet de cacher EMI\n§cAttention: N'oubliez pas le raccourci§r\n§cclavier pour re-afficher EMI§r\n(normalement c'est §6CTRL+o§r)",
+
+  "config.emi.general.cheat_mode": "Mode triche",
+  "config.emi.tooltip.general.cheat_mode": "C'est comme le mode créatif\nmais en pas pareil",
+
+  "config.emi.general.search_tooltip_by_default": "Description",
+  "config.emi.tooltip.general.search_tooltip_by_default": "Rechercher dans\nla description des objets",
+
+  "config.emi.general.search_mod_name_by_default": "Nom de mod",
+  "config.emi.tooltip.general.search_mod_name_by_default": "Rechercher dans\nle nom des mods",
+
+  "config.emi.general.search_tags_by_default": "Tags",
+  "config.emi.tooltip.general.search_tags_by_default": "Rechercher dans\nle nom des tags",
+
+  "config.emi.ui.move_effects": "Effets de potions",
+  "config.emi.tooltip.ui.move_effects": "Change la position de\nla liste des effets de potions\n(à §6gauche§r, ou à §6droite§r)",
+
+  "config.emi.ui.center_search_bar": "Barre de recherche",
+  "config.emi.tooltip.ui.center_search_bar": "Change la position de\nla barre de recherche\n(au §6milieu§r, ou à §6droite§r)",
+
+  "config.emi.ui.show_hover_overlay": "Coloration du choix",
+  "config.emi.tooltip.ui.show_hover_overlay": "Permet d'afficher du gris\nquand votre souris passe\nau dessus d'un objet",
+
+  "config.emi.ui.append_item_mod_id": "Nom des mods",
+  "config.emi.tooltip.ui.append_item_mod_id": "Ajoute sous chaque objet\nle nom du mod d'où il est issu", 
+
+  "config.emi.ui.search_sidebar_focus": "Onglet visible (recherche)",
+  "config.emi.tooltip.ui.search_sidebar_focus": "Quel onglet sera priorisé quand la\nbarre de recherche est utilisée",
+
+  "config.emi.ui.empty_search_sidebar_focus": "Onglet visible (défaut)",
+  "config.emi.tooltip.ui.empty_search_sidebar_focus": "Quel onglet sera priorisé quand la\nbarre de recherche n'est pas utilisée",
+  
+  "config.emi.ui.left_sidebar_pages": "Onglets",
+  "config.emi.tooltip.ui.left_sidebar_pages": "Liste d'onglets",
+
+  "config.emi.ui.left_sidebar_size": "Dimensions",
+  "config.emi.tooltip.ui.left_sidebar_size": "Nombre de lignes/colonnes",
+
+  "config.emi.ui.left_sidebar_margins": "Marges",
+  "config.emi.tooltip.ui.left_sidebar_margins": "Comment placer les marges",
+
+  "config.emi.ui.left_sidebar_align": "Alignements",
+  "config.emi.tooltip.ui.left_sidebar_align": "Comment placer les onglets",
+
+  "config.emi.ui.left_sidebar_header": "En-tête",
+  "config.emi.tooltip.ui.left_sidebar_header": "Afficher le compteur de pages",
+
+  "config.emi.ui.left_sidebar_theme": "Thème",
+  "config.emi.tooltip.ui.left_sidebar_theme": "Le thème de l'onglet",
+
+  "config.emi.ui.right_sidebar_pages": "Onglets",
+  "config.emi.tooltip.ui.right_sidebar_pages": "Liste d'onglets",
+
+  "config.emi.ui.right_sidebar_size": "Dimensions",
+  "config.emi.tooltip.ui.right_sidebar_size": "Nombre de lignes/colonnes",
+
+  "config.emi.ui.right_sidebar_margins": "Marges",
+  "config.emi.tooltip.ui.right_sidebar_margins": "Comment placer les marges",
+
+  "config.emi.ui.right_sidebar_align": "Alignements",
+  "config.emi.tooltip.ui.right_sidebar_align": "Comment placer les onglets",
+
+  "config.emi.ui.right_sidebar_header": "En-tête",
+  "config.emi.tooltip.ui.right_sidebar_header": "Afficher le compteur de pages",
+
+  "config.emi.ui.right_sidebar_theme": "Thème",
+  "config.emi.tooltip.ui.right_sidebar_theme": "Le thème de l'onglet",
+
+  "config.emi.ui.top_sidebar_pages": "Onglets",
+  "config.emi.tooltip.ui.top_sidebar_pages": "Liste d'onglets",
+
+  "config.emi.ui.top_sidebar_size": "Dimensions",
+  "config.emi.tooltip.ui.top_sidebar_size": "Nombre de lignes/colonnes",
+
+  "config.emi.ui.top_sidebar_margins": "Marges",
+  "config.emi.tooltip.ui.top_sidebar_margins": "Comment placer les marges",
+
+  "config.emi.ui.top_sidebar_align": "Alignements",
+  "config.emi.tooltip.ui.top_sidebar_align": "Comment placer les onglets",
+
+  "config.emi.ui.top_sidebar_header": "En-tête",
+  "config.emi.tooltip.ui.top_sidebar_header": "Afficher le compteur de pages",
+
+  "config.emi.ui.top_sidebar_theme": "Thème",
+  "config.emi.tooltip.ui.top_sidebar_theme": "Le thème de l'onglet",
+
+  "config.emi.ui.bottom_sidebar_pages": "Onglets",
+  "config.emi.tooltip.ui.bottom_sidebar_pages": "Liste d'onglets",
+
+  "config.emi.ui.bottom_sidebar_size": "Dimensions",
+  "config.emi.tooltip.ui.bottom_sidebar_size": "Nombre de lignes/colonnes",
+
+  "config.emi.ui.bottom_sidebar_margins": "Marges",
+  "config.emi.tooltip.ui.bottom_sidebar_margins": "Comment placer les marges",
+
+  "config.emi.ui.bottom_sidebar_align": "Alignements",
+  "config.emi.tooltip.ui.bottom_sidebar_align": "Comment placer les onglets",
+
+  "config.emi.ui.bottom_sidebar_header": "En-tête",
+  "config.emi.tooltip.ui.bottom_sidebar_header": "Afficher le compteur de pages",
+
+  "config.emi.ui.bottom_sidebar_theme": "Thème",
+  "config.emi.tooltip.ui.bottom_sidebar_theme": "Le thème de l'onglet",
+
+  "config.emi.ui.vertical_margin": "Marge verticale",
+  "config.emi.tooltip.ui.vertical_margin": "La quantité d'espace vide\nen haut et en bas de EMI",
+
+  "config.emi.ui.miscraft_prevention": "Protection contre les accidents",
+  "config.emi.tooltip.ui.miscraft_prevention": "§6En théorie§r :\nVous empêche de faire des\ncatastrophes, comme fabriquer\nplus d'objets que nécessaire",
+
+  "config.emi.ui.fluid_unit": "Unités (fluides)",
+  "config.emi.tooltip.ui.fluid_unit": "L'unité pour mesurer\nle volume des fluides",
+
+  "config.emi.ui.show_cost_per_batch": "Afficher le coût unitaire",
+  "config.emi.tooltip.ui.show_cost_per_batch": "Permet de masquer la\nliste des ingrédients",
+
+  "config.emi.ui.recipe_default_button": "Afficher le bouton (défaut)",
+  "config.emi.tooltip.ui.recipe_default_button": "Permet de masquer le bouton\n\"§6Définir par défaut§r\"",
+
+  "config.emi.ui.recipe_tree_button": "Afficher le bouton (graphe)",
+  "config.emi.tooltip.ui.recipe_tree_button": "Permet de masquer le bouton\n\"§6Voir graphe§r\"",
+
+  "config.emi.ui.recipe_fill_button": "Afficher le bouton (utiliser)",
+  "config.emi.tooltip.ui.recipe_fill_button": "Permet de masquer le bouton\n\"§6Utiliser les ingrédients§r\"",
+
+  "config.emi.ui.recipe_screenshot_button": "Afficher le bouton (capture)",
+  "config.emi.tooltip.ui.recipe_screenshot_button": "Permet de masquer le bouton\n\"§6Faire une capture§r\"",
+
+  "config.emi.ui.recipe_screenshot_scale": "Ratio de la capture",
+  "config.emi.tooltip.ui.recipe_screenshot_scale": "Permet de changer la\ntaille de la capture selon\nun facteur de votre choix",
+
+  "config.emi.ui.use_batched_renderer": "Optimisation graphique",
+  "config.emi.tooltip.ui.use_batched_renderer": "Permet d'utiliser une optimisation de\nrendu. Les résultats seront affichés\nplus rapidement, mais malheureusement\ncette optimisation pourrait être\n§cincompatible avec certains shaders/mods§r",
+
+  "config.emi.dev.dev_mode": "Mode développeur",
+  "config.emi.tooltip.dev.dev_mode": "Vous n'en n'aurez pas besoin, mais\nvous pouvez l'utiliser si vous voulez",
+
+  "config.emi.dev.log_untranslated_tags": "Mémoriser les erreurs",
+  "config.emi.tooltip.dev.log_untranslated_tags": "Les erreurs seront sauvegardées\ndans les logs",
+
+  "config.emi.dev.show_recipe_ids": "Afficher les IDs des recettes",
+  "config.emi.tooltip.dev.show_recipe_ids": "(le titre est plutôt explicite)",
+
+  "config.emi.dev.highlight_defaulted": "Afficher les recettes par défaut",
+  "config.emi.tooltip.dev.highlight_defaulted": "Met en valeur les objets\nqui ont une \"recette par défaut\"",
+
+  "config.emi.dev.highlight_exclusion_areas": "Afficher les zones d'exclusion",
+  "config.emi.tooltip.dev.highlight_exclusion_areas": "Permet d'afficher les\nzones d'exclusion",
+
+  "config.emi.presets.sidebars": "Onglets",
+  "config.emi.presets.binds": "Raccourcis",
+  "config.emi.presets.restore": "Restaurer",
+
+  "config.emi.presets.empty_search_craftable": "Dictionnaire",
+  "config.emi.tooltip.presets.empty_search_craftable": "Utilise les onglets §6fabricable§r et §6tout§r\nAffiche §6fabricable§r par défaut\nAffiche §6tout§r lors d'une recherche",
+
+  "config.emi.presets.recipe_book_plus": "Livre de recettes",
+  "config.emi.tooltip.presets.recipe_book_plus": "Utilise les onglets §6fabricable§r et §6favori§r\nAffiche §6fabricable§r à droite\nAffiche §6favori§r à gauche",
+
+  "config.emi.presets.author_binds": "Raccourcis du créateur",
+  "config.emi.tooltip.presets.author_binds": "Les raccourcis clavier du créateur,\nla spécialité du chef",
+
+  "config.emi.presets.backup": "Session",
+  "config.emi.tooltip.presets.backup": "Restaure les paramètres afin de\ncorrespondre aux paramètres que\nvous aviez quand vous avez lancé le jeu",
+
+  "config.emi.presets.defaults": "Défaut",
+  "config.emi.tooltip.presets.defaults": "Restaure les paramètres afin de\ncorrespondre aux paramètres par défaut",
 
   "emi.unit.liters": "litres",
   "emi.unit.millibuckets": "milli-seaux",
@@ -133,6 +280,10 @@
   "emi.fluid.amount.millibuckets": "%s mS",
   "emi.fluid.amount.droplets": "%s g",
 
+  "emi.reloading": "EMI redémarre ...",
+  "emi.reloading.waiting": "En attente du serveur ...",
+  "emi.search": "Chercher dans EMI ...",
+  "emi.search_config": "Chercher dans les paramètres ...",
   "emi.inapplicable": "Contexte §cinadapté§r",
   "emi.not_enough_ingredients": "Pas assez d'ingrédients",
   "emi.too_small": "Grille trop petite",
@@ -143,15 +294,16 @@
   "emi.cost_per": "Coût unitaire",
   "emi.leftovers": "Restes",
   "emi.view_all_recipes": "Voir toutes les recettes",
-  "emi.tree_welcome": "Bienvenue dans %s",
-  "emi.no_tree": "Vous n'avez pas encore défini de graphe",
-  "emi.random_tree": "Vous voulez-vous en voir un au hasard ?",
+  "emi.no_tree": "Vous n'avez pas encore défini de graphe ...",
+  "emi.random_tree": "Voulez-vous en voir un au hasard ?",
   "emi.random_tree_input": "Appuyez sur §6[ctrl + r]",
 
+  "tooltip.emi.accepts": "Accepte:",
   "tooltip.emi.fill_recipe": "Utiliser les ingrédients",
   "tooltip.emi.fill_recipe_no_server": "EMI n'est pas installé sur ce serveur",
   "tooltip.emi.set_default": "Définir par défaut",
   "tooltip.emi.view_tree": "Voir graphe",
+  "tooltip.emi.recipe_screenshot": "Faire une capture",
   "tooltip.emi.resolution": "Choix de la recette pour cet ingrédient",
   "tooltip.emi.select_resolution": "Cliquez sur §6le résultat§r pour le choisir sur §dune recette§r",
   "tooltip.emi.default_resolution": "Cliquez sur §6définir par défaut§r pour la choisir §apartout§r",
@@ -165,15 +317,40 @@
   "tooltip.emi.synfav.fully_craftable": "§aPossible§r de tout faire §a(%1$s)§r\n§6Cliquez§r pour en fabriquer",
 
   "tooltip.emi.bom.batch_size": "Quantité: %s\nScrollez pour changer\nMaintenez §6[shift]§r pour changer par 16",
-  "tooltip.emi.bom.mode.view": "§6Voir§r le graphe actif",
-  "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans le graphe, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
+  "tooltip.emi.bom.mode.view": "§6Assistant de fabrication§r\n(Désactivé)\n\nClic gauche pour l'activer",
+  "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans cette liste, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
+  "tooltip.emi.bom.help": "Le graphe liste les ingrédients et les recettes\nVous pouvez déplacer/zoomer ce graphe\n\nClic gauche sur un noeud permet de modifier une recette\nMaintenir §6[Maj]§r permet de choisir automatiquement une recette\n\nClic droit un un noeud permet de le masquer temporairement\nMaintenir §6[Maj]§r permet de supprimer le noeud\n\nLe graphe est généré selon vos recettes par défaut\n\nLe bouton \"§acoeur§r\" permet de mettre des recettes en favoris\nSi vous utilisez l'§6assistant de fabrication§r alors\n\ndes §bfavoris temporaires§r seront placés dans l'onglet\ndes favoris afin de vous guider dans votre fabrication",
   
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Sous la lave",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Proche de la lave",
 
   "screen.emi.recipe": "Recette",
   "screen.emi.com": "Graphe",
-  "screen.emi.config": "Config",
+  "screen.emi.config": "Configuration",
+  "screen.emi.presets": "Configurations suggérées",
+
+  "screen.emi.config.reset": "Annuler %s changement(s)",
+
+  "emi.chess.piece.white_pawn": "Pion blanc",
+  "emi.chess.piece.white_rook": "Tour blanche",
+  "emi.chess.piece.white_knight": "Cavalier blanc",
+  "emi.chess.piece.white_bishop": "Fou blanc",
+  "emi.chess.piece.white_queen": "Reine blanche",
+  "emi.chess.piece.white_king": "Roi blanc",
+  "emi.chess.piece.black_pawn": "Pion noir",
+  "emi.chess.piece.black_rook": "Tour noire",
+  "emi.chess.piece.black_knight": "Cavalier noir",
+  "emi.chess.piece.black_bishop": "Fou noir",
+  "emi.chess.piece.black_queen": "Reine noire",
+  "emi.chess.piece.black_king": "Roi noir",
+  "emi.chess.tooltip.invite": "Utilisez votre barre de rechercher pour inviter un joueur aux échecs",
+  "emi.chess.tooltip.accept": "Jouer aux échecs avec %s",
+  "emi.chess.tooltip.decline": "Clic droit pour refuser l'invitation de %s",
+  "emi.chess.tooltip.restart": "Clic droit pour recommencer",
+  "emi.chess.multiplayer.invited": "%s vous invite à jouer aux échecs",
+  "emi.chess.multiplayer.accepted": "%s accepte de jouer avec vous",
+  "emi.chess.multiplayer.cancelled": "%s refuse de jouer avec vous",
+  "emi.chess.multiplayer.unavailable": "%s ne peut pas jouer actuellement",
 
   "emi.cooking.experience": "%s XP",
   "emi.cooking.time": "%s secondes",
@@ -183,15 +360,15 @@
   "emi.category.minecraft.smelting": "Cuisson",
   "emi.category.minecraft.blasting": "Fonderie",
   "emi.category.minecraft.smoking": "Fumage",
-  "emi.category.minecraft.campfire_cooking": "Barbecue",
+  "emi.category.minecraft.campfire_cooking": "Feu de camp",
   "emi.category.minecraft.stonecutting": "Découpage",
   "emi.category.minecraft.smithing": "Amélioration",
   "emi.category.emi.anvil_repairing": "Réparation",
   "emi.category.minecraft.brewing": "Alchimie",
   "emi.category.emi.grinding": "Meule",
   "emi.category.emi.world_interaction": "Interaction",
+  "emi.category.emi.info": "Info",
   "emi.category.emi.tag": "Tags",
-
   "emi.category.emi.ingredient": "Ingrédients",
 
   "tag.minecraft.logs": "Bûches",
@@ -203,9 +380,9 @@
   "tag.minecraft.crimson_stems": "Tiges carmin",
   "tag.minecraft.warped_stems": "Tiges biscornues",
   "tag.minecraft.acacia_logs": "Bûches d'acacia",
-  "tag.minecraft.logs_that_burn": "Bois inflammables",
+  "tag.minecraft.logs_that_burn": "Bois inflammable",
   "tag.minecraft.planks": "Planches",
-  "tag.minecraft.non_flammable_wood": "Bois ignifugés",
+  "tag.minecraft.non_flammable_wood": "Bois ignifugé",
 
   "tag.minecraft.coal_ores": "Minerais de charbon",
   "tag.minecraft.copper_ores": "Minerais de cuivre",
@@ -213,7 +390,7 @@
   "tag.minecraft.emerald_ores": "Minerais d'émeraude",
   "tag.minecraft.gold_ores": "Minerais d'or",
   "tag.minecraft.iron_ores": "Minerais de fer",
-  "tag.minecraft.lapis_ores": "Minerais de lapis Lazuli",
+  "tag.minecraft.lapis_ores": "Minerais de lapis lazuli",
   "tag.minecraft.redstone_ores": "Minerais de redstone",
 
   "tag.minecraft.anvil": "Enclumes",
@@ -229,24 +406,28 @@
   "tag.minecraft.coals": "Charbons",
 
   "tag.minecraft.creeper_drop_music_discs": "Disques (Creeper)",
-  "tag.minecraft.dirt": "Terre",
+  "tag.minecraft.creeper_igniters": "Déclenche les Creepers",
+
+  "tag.minecraft.dirt": "Terres",
   "tag.minecraft.doors": "Portes",
   "tag.minecraft.fences": "Barrières",
+  "tag.minecraft.fence_gates": "Portillons",
   "tag.minecraft.fishes": "Poissons",
   "tag.minecraft.flowers": "Fleurs",
   "tag.minecraft.fox_food": "Nourriture des renards",
-  "tag.minecraft.freeze_immune_wearables": "Immunisé au froid",
-  "tag.minecraft.ignored_by_piglin_babies": "Ignoré par les bébés Piglins",
+  "tag.minecraft.freeze_immune_wearables": "Protection contre le froid",
 
+  "tag.minecraft.ignored_by_piglin_babies": "Ignoré par les bébés Piglins",
   "tag.minecraft.leaves": "Feuilles",
   "tag.minecraft.lectern_books": "Compatible avec pupitres",
-  "tag.minecraft.music_discs": "Disques",
-  "tag.minecraft.occludes_vibration_signals": "Absorbe les sons",
+  "tag.minecraft.music_discs": "Disques de musique",
+  "tag.minecraft.occludes_vibration_signals": "Isolation phonique",
   "tag.minecraft.piglin_food": "Nourriture des Piglins",
   "tag.minecraft.piglin_loved": "Adoré des Piglins",
   "tag.minecraft.piglin_repellents": "Détesté des Piglins",
+
   "tag.minecraft.rails": "Rails",
-  "tag.minecraft.sand": "Sable",
+  "tag.minecraft.sand": "Sables",
   "tag.minecraft.saplings": "Pousses",
   "tag.minecraft.signs": "Panneaux",
   "tag.minecraft.slabs": "Dalles",
@@ -254,9 +435,9 @@
   "tag.minecraft.soul_fire_base_blocks": "Sol des âmes",
   "tag.minecraft.stairs": "Escaliers",
 
-  "tag.minecraft.stone_bricks": "Pierre taillée",
+  "tag.minecraft.stone_bricks": "Pierres taillées",
   "tag.minecraft.stone_crafting_materials": "Pierres",
-  "tag.minecraft.stone_tool_materials": "Pierre",
+  "tag.minecraft.stone_tool_materials": "Pierres",
 
   "tag.minecraft.tall_flowers": "Grandes fleurs",
   "tag.minecraft.terracotta": "Terre cuite",
@@ -271,30 +452,27 @@
   "tag.minecraft.wooden_stairs": "Escaliers en bois",
   "tag.minecraft.wooden_trapdoors": "Trappes en bois",
 
-  "tag.minecraft.wool": "Laine",
+  "tag.minecraft.wool": "Laines",
   "tag.minecraft.wart_blocks": "Blocs de verrues",
   "tag.minecraft.wool_carpets": "Tapis en laine",
   "tag.minecraft.mangrove_logs": "Bûches de palétuvier",
   "tag.minecraft.compasses": "Compas",
   "tag.minecraft.chest_boats": "Bateaux en bois",
-  "tag.minecraft.overworld_natural_logs": "Bûches (naturelles)",
+  "tag.minecraft.overworld_natural_logs": "Bûches (Overworld)",
 
   "tag.c.stone": "Roche",
   "tag.c.cobblestone": "Pierres",
   "tag.c.sandstone": "Grès",
 
-  "tag.c.glass_blocks": "Verre",
-  "tag.c.stained_glass": "Verre coloré",
+  "tag.c.glass_blocks": "Verres",
+  "tag.c.stained_glass": "Verres colorés",
   "tag.c.stained_glass_panes": "Vitres colorées",
-
-  "tag.c.glass": "Verre",
-  "tag.c.glass.colorless": "Verre non-coloré",
-  "tag.c.glass.silica": "Verre (Silica)",
-
+  "tag.c.glass": "Verres",
+  "tag.c.glass.colorless": "Verres non-colorés",
+  "tag.c.glass.silica": "Verres (Silica)",
   "tag.c.quartz_blocks": "Blocs de quartz",
-
   "tag.c.glass_panes": "Vitres",
-	"tag.c.glass.tinted": "Verre teinté",
+	"tag.c.glass.tinted": "Verres teintés",
 	"tag.c.glass_panes.colorless": "Vitres non-colorées",
 
   "tag.c.raw_materials": "Matériaux bruts",
@@ -306,10 +484,10 @@
   "tag.c.plates": "Plaques de pression",
   "tag.c.dusts": "Poudres",
   "tag.c.storage_blocks": "Blocs de stockage",
-
   "tag.c.seeds": "Graines",
   "tag.c.crops": "Plantations",
   "tag.c.heads": "Têtes",
+
   "tag.c.dyes": "Colorants",
   "tag.c.mushrooms": "Champignons",
   "tag.c.fence_gates": "Portillons",
@@ -319,8 +497,8 @@
   "tag.c.ores_in_ground.stone": "Minerais (roche)",
   "tag.c.ores_in_ground.deepslate": "Minerais (abîmes)",
   "tag.c.ores_in_ground.netherrack": "Minerais (Nether)",
-
   "tag.c.storage_blocks.coal": "Blocs de charbon (stockage)",
+
   "tag.c.raw_materials.copper": "Cuivre brut",
   "tag.c.copper_dusts": "Poudres de cuivre",
   "tag.c.dusts.copper": "Poudres de cuivre",
@@ -329,7 +507,7 @@
   "tag.c.copper_nuggets": "Pépites de cuivre",
   "tag.c.nuggets.copper": "Pépites de cuivre",
   "tag.c.plates.copper": "Plaques de cuivre",
-  "tag.c.raw_copper_ores": "Minerai de cuivre",
+  "tag.c.raw_copper_ores": "Minerais de cuivre",
   "tag.c.raw_copper_blocks": "Blocs de cuivre brut",
   "tag.c.copper_blocks": "Blocs de cuivre",
   "tag.c.storage_blocks.raw_copper": "Blocs de cuivre brut (stockage)",
@@ -357,7 +535,6 @@
   "tag.c.gold_nuggets": "Pépites d'or",
   "tag.c.nuggets.gold": "Pépites d'or",
   "tag.c.plates.gold": "Plaques d'or",
-
   "tag.c.raw_gold_ores": "Minerais d'or brut",
   "tag.c.raw_gold_blocks": "Blocs d'or brut",
   "tag.c.gold_blocks": "Blocs d'or",
@@ -366,8 +543,8 @@
 
   "tag.c.gems.amethyst": "Améthystes",
   "tag.c.amethyst_dusts": "Poudre d'améthyste",
-
   "tag.c.storage_blocks.amethyst": "Blocs d'améthyste (stockage)",
+
   "tag.c.storage_blocks.diamond": "Blocs de diamant (stockage)",
   "tag.c.storage_blocks.emerald": "Blocs d'émeraude (stockage)",
   "tag.c.storage_blocks.lapis": "Blocs de lapis lazuli (stockage)",
@@ -388,7 +565,7 @@
   "tag.c.emeralds": "Émeraudes",
   "tag.c.ender_pearl_dusts": "Poudres de perles de l'Ender",
   "tag.c.ender_pearls": "Perles de l'Ender",
-  "tag.c.gems.diamond": "Diamonds",
+  "tag.c.gems.diamond": "Diamants",
   "tag.c.gems.emerald": "Émeraudes",
   "tag.c.gems.lapis": "Lapis Lazuli",
   "tag.c.gems.prismarine": "Prismarine",
@@ -410,7 +587,7 @@
   "tag.c.barrels.wooden": "Tonneaux en bois",
 
   "tag.c.white_dyes": "Colorants blancs",
-  "tag.c.orange_dyes": "Colorants oranges",
+  "tag.c.orange_dyes": "Colorants orange",
   "tag.c.magenta_dyes": "Colorants magenta",
   "tag.c.light_blue_dyes": "Colorants bleu clair",
   "tag.c.yellow_dyes": "Colorants jaunes",
@@ -421,27 +598,27 @@
   "tag.c.cyan_dyes": "Colorants cyan",
   "tag.c.purple_dyes": "Colorants violets",
   "tag.c.blue_dyes": "Colorants bleus",
-  "tag.c.brown_dyes": "Colorants marrons",
+  "tag.c.brown_dyes": "Colorants marron",
   "tag.c.green_dyes": "Colorants verts",
   "tag.c.red_dyes": "Colorants rouges",
   "tag.c.black_dyes": "Colorants noirs",
 
-  "tag.c.glass.white": "Verre blanc",
-  "tag.c.glass.orange": "Verre orange",
-  "tag.c.glass.magenta": "Verre magenta",
-  "tag.c.glass.light_blue": "Verre bleu clair",
-  "tag.c.glass.yellow": "Verre jaune",
-  "tag.c.glass.lime": "Verre vert clair",
-  "tag.c.glass.pink": "Verre rose",
-  "tag.c.glass.gray": "Verre gris",
-  "tag.c.glass.light_gray": "Verre gris clair",
-  "tag.c.glass.cyan": "Verre cyan",
-  "tag.c.glass.purple": "Verre violet",
-  "tag.c.glass.blue": "Verre bleu",
-  "tag.c.glass.brown": "Verre marron",
-  "tag.c.glass.green": "Verre vert",
-  "tag.c.glass.red": "Verre rouge",
-  "tag.c.glass.black": "Verre noir",
+  "tag.c.glass.white": "Verres blancs",
+  "tag.c.glass.orange": "Verres orange",
+  "tag.c.glass.magenta": "Verres magenta",
+  "tag.c.glass.light_blue": "Verres bleu clair",
+  "tag.c.glass.yellow": "Verres jaunes",
+  "tag.c.glass.lime": "Verres vert clair",
+  "tag.c.glass.pink": "Verres roses",
+  "tag.c.glass.gray": "Verres gris",
+  "tag.c.glass.light_gray": "Verres gris clair",
+  "tag.c.glass.cyan": "Verres cyan",
+  "tag.c.glass.purple": "Verres violets",
+  "tag.c.glass.blue": "Verres bleus",
+  "tag.c.glass.brown": "Verres marron",
+  "tag.c.glass.green": "Verres verts",
+  "tag.c.glass.red": "Verres rouges",
+  "tag.c.glass.black": "Verres noirs",
 
   "tag.c.glass_panes.white": "Vitres blanches",
   "tag.c.glass_panes.orange": "Vitres orange",
@@ -464,7 +641,7 @@
   "tag.c.bookshelves": "Bibliothèques",
   "tag.c.bows": "Arcs",
   "tag.c.buckets.honey": "Miel",
-  "tag.c.chests.ender": "Ender Chests",
+  "tag.c.chests.ender": "Coffres de l'Ender",
   "tag.c.chests.trapped": "Coffres piégés",
   "tag.c.chests.wooden": "Coffres en bois",
   "tag.c.circuits": "Circuits",
@@ -472,25 +649,26 @@
   "tag.c.crops.carrot": "Carottes",
   "tag.c.crops.nether_wart": "Verrues du Nether",
   "tag.c.crops.potato": "Pommes de terre",
-  "tag.c.crops.wheat": "Blé",
+  "tag.c.crops.wheat": "Blés",
   "tag.c.eggs": "Oeufs",
 
   "tag.c.empty_buckets": "Seaux vides",
-  "tag.c.enchanting_fuels": "Carburant d'enchantement",
+  "tag.c.enchanting_fuels": "Carburants d'enchantement",
   "tag.c.end_stones": "Pierres de l'End",
   "tag.c.feathers": "Plumes",
   "tag.c.fences.nether_brick": "Barrières en briques du Nether",
-  "tag.c.foods": "Nourriture",
-  "tag.c.gravel": "Gravier",
-  "tag.c.gunpowder": "Poudre à cannon",
+  "tag.c.foods": "Nourritures",
+  "tag.c.gravel": "Graviers",
+  "tag.c.gunpowder": "Poudres à canon",
   "tag.c.hoes": "Houes",
   "tag.c.lava_buckets": "Seaux de lave",
-  "tag.c.leather": "Cuir",
+  "tag.c.leather": "Cuirs",
   "tag.c.milk_bottles": "Fioles de lait",
   "tag.c.milk_buckets": "Seaux de lait",
+
   "tag.c.nether_stars": "Étoiles du Nether",
   "tag.c.netherrack": "Netherrack",
-  "tag.c.obsidian": "Obsidienne",
+  "tag.c.obsidian": "Obsidiennes",
   "tag.c.pickaxes": "Pioches",
   "tag.c.potions": "Potions",
 
@@ -499,10 +677,11 @@
   "tag.c.red_sandstone_stairs": "Escaliers en grès rouge",
   "tag.c.rods.blaze": "Bâtons de Blaze",
   "tag.c.rods.wooden": "Bâtons en bois",
-  "tag.c.sand.colorless": "Sable",
-  "tag.c.sand.red": "Sable rouge",
+  "tag.c.sand.colorless": "Sables",
+  "tag.c.sand.red": "Sables rouge",
   "tag.c.sandstone_slabs": "Dalles en grès",
   "tag.c.sandstone_stairs": "Escaliers en grès",
+
   "tag.c.seeds.beetroot": "Graines de betterave",
   "tag.c.seeds.melon": "Graines de pastèque",
   "tag.c.seeds.pumpkin": "Graines de citrouille",

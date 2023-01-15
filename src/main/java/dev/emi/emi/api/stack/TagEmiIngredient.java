@@ -10,6 +10,7 @@ import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
@@ -140,8 +141,10 @@ public class TagEmiIngredient implements EmiIngredient {
 		} else {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id))));
 		}
-		String mod = EmiUtil.getModName(id.getNamespace());
-		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+		if (EmiConfig.appendModId) {
+			String mod = EmiUtil.getModName(id.getNamespace());
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+		}
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
 			if (!stack.getRemainder().isEmpty()) {

@@ -12,8 +12,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -35,7 +35,8 @@ public class ResolutionButtonWidget extends ButtonWidget {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		super.render(matrices, mouseX, mouseY, delta);
 		if (this.isHovered()) {
-			FakeScreen.INSTANCE.renderTooltip(matrices, List.of(
+			MinecraftClient client = MinecraftClient.getInstance();
+			client.currentScreen.renderTooltip(matrices, List.of(
 				EmiPort.translatable("tooltip.emi.resolution"),
 				EmiPort.translatable("tooltip.emi.select_resolution"),
 				EmiPort.translatable("tooltip.emi.default_resolution"),

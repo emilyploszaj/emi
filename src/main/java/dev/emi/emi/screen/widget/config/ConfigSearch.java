@@ -40,7 +40,7 @@ public class ConfigSearch {
 
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (button == 1 && isHovered()) {
+			if (button == 1 && isMouseOver(mouseX, mouseY)) {
 				this.setText("");
 				this.setTextFieldFocused(true);
 				return true;

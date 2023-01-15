@@ -10,9 +10,11 @@ import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
-import dev.emi.emi.api.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -36,7 +38,7 @@ public class EmiRecipeFiller {
 	public static boolean isSupported(EmiRecipe recipe) {
 		for (List<EmiRecipeHandler<?>> list : handlers.values()) {
 			for (EmiRecipeHandler<?> handler : list) {
-				if (handler.supportsRecipe(recipe) && !handler.onlyDisplayWhenApplicable(recipe)) {
+				if (handler.supportsRecipe(recipe) && handler.alwaysDisplaySupport(recipe)) {
 					return true;
 				}
 			}
@@ -73,22 +75,25 @@ public class EmiRecipeFiller {
 	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen, EmiFillAction action, int amount) {
 		EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 		if (handler != null && handler.supportsRecipe(recipe)) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
-			if (handler.canCraft(recipe, inv, screen)) {
-				return handler.performFill(recipe, screen, action, amount);
+			EmiPlayerInventory inv = handler.getInventory(screen);
+			EmiCraftContext<T> context = new EmiCraftContext<T>(screen, inv, EmiCraftContext.Type.FILL_BUTTON, switch (action) {
+				case FILL -> EmiCraftContext.Destination.NONE;
+				case QUICK_MOVE -> EmiCraftContext.Destination.INVENTORY;
+				case CURSOR -> EmiCraftContext.Destination.CURSOR;
+			}, amount);
+			if (handler.canCraft(recipe, context)) {
+				return handler.craft(recipe, context);
 			}
 		}
 		return false;
 	}
 	
-	public static <T extends ScreenHandler> @Nullable List<ItemStack> getStacks(EmiRecipe recipe, HandledScreen<T> screen, int amount) {
+	public static <T extends ScreenHandler> @Nullable List<ItemStack> getStacks(StandardRecipeHandler<T> handler, EmiRecipe recipe, HandledScreen<T> screen, int amount) {
 		try {
 			T screenHandler = screen.getScreenHandler();
-			EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 			if (handler != null) {
 				List<Slot> slots = handler.getInputSources(screenHandler);
-				List<Slot> craftingSlots = handler.getCraftingSlots(recipe, screen);
+				List<Slot> craftingSlots = handler.getCraftingSlots(recipe, screenHandler);
 				List<EmiIngredient> ingredients = recipe.getInputs();
 				List<DiscoveredItem> discovered = Lists.newArrayList();
 				Object2IntMap<EmiStack> weightDivider = new Object2IntOpenHashMap<>();
@@ -102,15 +107,18 @@ public class EmiRecipeFiller {
 					}
 					for (int e = 0; e < emiStacks.size(); e++) {
 						EmiStack stack = emiStacks.get(e);
-						ItemStack item = stack.getItemStack();
-						DiscoveredItem di = new DiscoveredItem(stack, item, 0, (int) ingredient.getAmount(), item.getMaxCount());
+						slotLoop:
 						for (Slot s : slots) {
-							if (ItemStack.canCombine(item, s.getStack())) {
-								di.amount += s.getStack().getCount();
+							ItemStack ss = s.getStack();
+							if (EmiStack.of(s.getStack()).isEqual(stack)) {
+								for (DiscoveredItem di : d) {
+									if (ItemStack.canCombine(ss, di.stack)) {
+										di.amount += ss.getCount();
+										continue slotLoop;
+									}
+								}
+								d.add(new DiscoveredItem(stack, ss, ss.getCount(), (int) ingredient.getAmount(), ss.getMaxCount()));
 							}
-						}
-						if (di != null) {
-							d.add(di);
 						}
 					}
 					DiscoveredItem biggest = null;
@@ -161,7 +169,7 @@ public class EmiRecipeFiller {
 						maxAmount = Math.min(maxAmount, ui.max);
 					}
 				}
-				maxAmount = Math.min(maxAmount, amount + batchesAlreadyPresent(recipe, handler, screenHandler));
+				maxAmount = Math.min(maxAmount, amount + batchesAlreadyPresent(recipe, handler, screen));
 
 				if (maxAmount == 0) {
 					return null;
@@ -187,10 +195,10 @@ public class EmiRecipeFiller {
 		return null;
 	}
 
-	public static <T extends ScreenHandler> int batchesAlreadyPresent(EmiRecipe recipe, EmiRecipeHandler<T> handler, T screenHandler) {
+	public static <T extends ScreenHandler> int batchesAlreadyPresent(EmiRecipe recipe, StandardRecipeHandler<T> handler, HandledScreen<T> screen) {
 		List<EmiIngredient> inputs = recipe.getInputs();
 		List<ItemStack> stacks = Lists.newArrayList();
-		for (Slot slot : handler.getInputSources(screenHandler)) {
+		for (Slot slot : handler.getInputSources(screen.getScreenHandler())) {
 			stacks.add(slot.getStack());
 		}
 		long amount = Long.MAX_VALUE;
@@ -224,10 +232,9 @@ public class EmiRecipeFiller {
 		return 0;
 	}
 	
-	public static <T extends ScreenHandler> boolean clientFill(EmiRecipe recipe, HandledScreen<T> screen,
-			List<ItemStack> stacks, EmiFillAction action) {
+	public static <T extends ScreenHandler> boolean clientFill(StandardRecipeHandler<T> handler, EmiRecipe recipe,
+			HandledScreen<T> screen, List<ItemStack> stacks, EmiCraftContext.Destination destination) {
 		T screenHandler = screen.getScreenHandler();
-		EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 		if (handler != null && screenHandler.getCursorStack().isEmpty()) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			ClientPlayerInteractionManager manager = client.interactionManager;
@@ -239,7 +246,7 @@ public class EmiRecipeFiller {
 				}
 			}
 			List<Slot> inputs = handler.getInputSources(screenHandler);
-			List<Slot> slots = handler.getCraftingSlots(recipe, screen);
+			List<Slot> slots = handler.getCraftingSlots(recipe, screenHandler);
 			outer:
 			for (int i = 0; i < stacks.size(); i++) {
 				ItemStack stack = stacks.get(i);
@@ -280,9 +287,9 @@ public class EmiRecipeFiller {
 			}
 			Slot slot = handler.getOutputSlot(screenHandler);
 			if (slot != null) {
-				if (action == EmiFillAction.CURSOR) {
+				if (destination == EmiCraftContext.Destination.CURSOR) {
 					manager.clickSlot(screenHandler.syncId, slot.id, 0, SlotActionType.PICKUP, player);
-				} else if (action == EmiFillAction.QUICK_MOVE) {
+				} else if (destination == EmiCraftContext.Destination.INVENTORY) {
 					manager.clickSlot(screenHandler.syncId, slot.id, 0, SlotActionType.QUICK_MOVE, player);
 				}
 			}

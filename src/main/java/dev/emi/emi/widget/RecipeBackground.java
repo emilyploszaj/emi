@@ -27,6 +27,6 @@ public class RecipeBackground extends Widget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		RenderSystem.setShaderTexture(0, TEXTURE);
-		EmiRenderHelper.drawNinePatch(matrices, x, y, width, height, 0, 0, 4, 1);
+		EmiRenderHelper.drawNinePatch(matrices, x, y, width, height, 27, 0, 4, 1);
 	}
 }

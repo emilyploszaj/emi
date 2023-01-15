@@ -60,6 +60,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -112,7 +113,7 @@ public class EmiScreenManager {
 	}
 
 	public static void recalculate() {
-		EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
+		EmiPlayerInventory inv = EmiPlayerInventory.of(client.player);
 		if (!inv.isEqual(lastPlayerInventory)) {
 			lastPlayerInventory = inv;
 			craftables = lastPlayerInventory.getCraftables();
@@ -185,10 +186,11 @@ public class EmiScreenManager {
 			}
 			spaceExclusion.addAll(exclusion);
 
+			int topCenter = EmiConfig.topSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.topSidebarTheme.horizontalPadding;
 			int topSpaceBottom = switch (EmiConfig.topSidebarAlign.horizontal) {
-				case LEFT -> Math.max(panels.get(0).getBounds().top(), top);
+				case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.topSidebarMargins.left() + topCenter, top, screen.height, true);
 				case CENTER -> top;
-				case RIGHT -> Math.max(panels.get(1).getBounds().top(), top);
+				case RIGHT -> getVerticalConstraint(panels.get(1), right - EmiConfig.topSidebarMargins.right() + topCenter, top, screen.height, true);
 			};
 			boolean topRtl = EmiConfig.topSidebarAlign.horizontal == Horizontal.RIGHT;
 
@@ -198,10 +200,11 @@ public class EmiScreenManager {
 					EmiConfig.topSidebarTheme,
 					EmiConfig.topSidebarHeader == HeaderType.VISIBLE, panels.get(2));
 
+			int bottomCenter = EmiConfig.bottomSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.bottomSidebarTheme.horizontalPadding;
 			int bottomSpaceTop = switch (EmiConfig.bottomSidebarAlign.horizontal) {
-				case LEFT -> Math.min(panels.get(0).getBounds().bottom(), bottom);
+				case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.bottomSidebarMargins.left() + bottomCenter, bottom, 0, false);
 				case CENTER -> bottom;
-				case RIGHT -> Math.min(panels.get(1).getBounds().bottom(), bottom);
+				case RIGHT -> getVerticalConstraint(panels.get(1), EmiConfig.bottomSidebarMargins.right() + bottomCenter, bottom, 0, false);
 			};
 			boolean bottomRtl = EmiConfig.bottomSidebarAlign.horizontal == Horizontal.RIGHT;
 
@@ -213,6 +216,16 @@ public class EmiScreenManager {
 
 			updateSidebarButtons();
 		}
+	}
+
+	private static int getVerticalConstraint(SidebarPanel panel, int cx, int def, int max, boolean top) {
+		if (panel.isVisible()) {
+			Bounds bounds = panel.getBounds();
+			if (bounds.x() <= cx && bounds.right() >= cx) {
+				return top ? Math.max(def, bounds.top()) : Math.min(def, bounds.bottom());
+			}
+		}
+		return max;
 	}
 
 	private static ScreenSpace createScreenSpace(Screen screen, List<Bounds> exclusion, boolean rtl,
@@ -406,9 +419,9 @@ public class EmiScreenManager {
 		}
 		if (!ignoreLastHoveredCraftable) {
 			if (lastHoveredCraftable != null) {
-				EmiPlayerInventory inv = new EmiPlayerInventory(client.player);
 				if (lastHoveredCraftable.getRecipeContext() == null
-						|| (!lastHoveredCraftableSturdy && !inv.canCraft(lastHoveredCraftable.getRecipeContext()))) {
+						|| (!lastHoveredCraftableSturdy && lastPlayerInventory != null &&
+							!lastPlayerInventory.canCraft(lastHoveredCraftable.getRecipeContext()))) {
 					lastHoveredCraftable = null;
 				} else {
 					return lastHoveredCraftable;
@@ -563,7 +576,7 @@ public class EmiScreenManager {
 			EmiDragDropHandlers.render(screen, draggedStack, matrices, mouseX, mouseY, delta);
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
-			view.translate(0, 0, 200);
+			view.translate(0, 0, 400);
 			RenderSystem.applyModelViewMatrix();
 			draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 			view.pop();
@@ -572,7 +585,23 @@ public class EmiScreenManager {
 	}
 
 	private static void renderCurrentTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
-		if (draggedStack.isEmpty()) {
+		ItemStack cursor = ItemStack.EMPTY;
+		if (client.currentScreen instanceof HandledScreen<?> handled) {
+			cursor = handled.getScreenHandler().getCursorStack();
+		}
+		SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
+		if (EmiConfig.cheatMode && !cursor.isEmpty() && panel != null && panel.getType() == SidebarType.INDEX
+				&& panel.space.containsNotExcluded(lastMouseX, lastMouseY)) {
+			List<TooltipComponent> list = List.of(
+				TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.delete_stack")))
+			);
+			if (panel != null && panel.space.rtl) {
+				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
+			} else {
+				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
+			}
+		}
+		if (cursor.isEmpty() && draggedStack.isEmpty()) {
 			client.getProfiler().swap("hover");
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
@@ -595,7 +624,6 @@ public class EmiScreenManager {
 					}
 				}
 			}
-			SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
 			if (panel != null && panel.space.rtl) {
 				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
 			} else {
@@ -614,15 +642,15 @@ public class EmiScreenManager {
 			int color = 0xFFFFFF;
 			String title = "EMI Dev Mode";
 			int off = -16;
-			if (EmiReloadLog.WARNINGS.size() > 0) {
+			if (!EmiReloadLog.warnings.isEmpty()) {
 				color = 0xFF0000;
 				off = -11;
-				String warnCount = EmiReloadLog.WARNINGS.size() + " Warnings";
+				String warnCount = EmiReloadLog.warningCount + " Warnings";
 				client.textRenderer.drawWithShadow(matrices, warnCount, 48, screen.height - 21, color);
 				int width = Math.max(client.textRenderer.getWidth(title), client.textRenderer.getWidth(warnCount));
 				if (mouseX >= 48 && mouseX < width + 48 && mouseY > screen.height - 28) {
-					screen.renderTooltip(matrices, Stream.concat(Stream.of("See log for more information"),
-							EmiReloadLog.WARNINGS.stream()).map(s -> {
+					screen.renderTooltip(matrices, Stream.concat(Stream.of(" EMI detected some issues, see log for full details"),
+							EmiReloadLog.warnings.stream()).map(s -> {
 								String a = s;
 								if (a.length() > 10 && client.textRenderer.getWidth(a) > screen.width - 20) {
 									a = client.textRenderer.trimToWidth(a, screen.width - 30) + "...";
@@ -660,13 +688,13 @@ public class EmiScreenManager {
 	}
 
 	public static void addWidgets(Screen screen) {
-		// force recalculation
+		// Force recalculation
 		lastWidth = -1;
 		lastPlayerInventory = null;
 		recalculate();
 		if (EmiConfig.centerSearchBar) {
 			search.x = (screen.width - 160) / 2;
-			search.y = screen.height - 22;
+			search.y = screen.height - 21;
 			search.setWidth(160);
 		} else {
 			search.x = panels.get(1).space.tx;
@@ -836,7 +864,11 @@ public class EmiScreenManager {
 		}
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
-		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+		}
+		if (client.currentScreen.getFocused() instanceof TextFieldWidget tfw && tfw.isFocused()) {
+			return false;
+		}
+		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
 			return true;
 		} else {

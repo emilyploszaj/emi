@@ -46,10 +46,16 @@
   "emi.sidebar.margins.right": "Right",
   "emi.sidebar.margins.bottom": "Bottom",
   "emi.sidebar.margins.left": "Left",
+  "emi.sidebar.none": "None",
+  "emi.sidebar.left": "Left",
+  "emi.sidebar.right": "Right",
+  "emi.sidebar.top": "Top",
+  "emi.sidebar.bottom": "Bottom",
 
   "config.emi.group.general": "General",
   "config.emi.group.general.search": "Search",
   "config.emi.group.ui": "UI",
+  "config.emi.group.ui.mod_id": "Mod ID",
   "config.emi.group.ui.left_sidebar": "Left Sidebar",
   "config.emi.group.ui.right_sidebar": "Right Sidebar",
   "config.emi.group.ui.top_sidebar": "Top Sidebar",
@@ -71,6 +77,7 @@
   "config.emi.ui.move_effects": "Move Effects",
   "config.emi.ui.center_search_bar": "Center Search Bar",
   "config.emi.ui.show_hover_overlay": "Show Hover Overlay",
+  "config.emi.ui.append_mod_id": "Append Mod ID",
   "config.emi.ui.append_item_mod_id": "Append Item Mod ID",
   "config.emi.ui.search_sidebar_focus": "Search Sidebar Focus",
   "config.emi.ui.empty_search_sidebar_focus": "Empty Search Sidebar Focus",
@@ -104,6 +111,8 @@
   "config.emi.ui.bottom_sidebar_theme": "Theme",
 
   "config.emi.ui.vertical_margin": "Vertical Margin",
+  "config.emi.ui.minimum_recipe_screen_width": "Minimum Recipe Screen Width",
+  "config.emi.ui.workstation_location": "Workstation Location",
   "config.emi.ui.miscraft_prevention": "Miscraft Prevention",
   "config.emi.ui.fluid_unit": "Fluid Unit",
   "config.emi.ui.show_cost_per_batch": "Show Cost Per Batch",
@@ -116,6 +125,7 @@
 
   "config.emi.dev.dev_mode": "Dev Mode",
   "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",
+  "config.emi.dev.log_non_tag_ingredients": "Log Non-Tag Ingredients",
   "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
   "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
   "config.emi.dev.highlight_exclusion_areas": "Highlight Exclusion Areas",
@@ -143,14 +153,16 @@
   "emi.reloading.waiting": "Waiting for recipe data from server...",
   "emi.search": "Search EMI...",
   "emi.search_config": "Search config...",
+  "emi.delete_stack": "§cDelete held stack",
   "emi.inapplicable": "Current workstation does not support recipe",
   "emi.not_enough_ingredients": "Not enough ingredients to craft",
   "emi.too_small": "Crafting grid too small to fit ingredients",
+  "emi.favorite_recipe": "Press %s to favorite recipe",
   "emi.resolve": "Resolve recipe for this recipe tree",
   "emi.page": "Page %s of %s",
   "emi.page.short": "%s/%s",
   "emi.total_cost": "Total Cost",
-  "emi.cost_per": "Cost Per Batch",
+  "emi.cost_per": "Cost per batch:",
   "emi.leftovers": "Leftovers",
   "emi.view_all_recipes": "Click to view all recipes",
   "emi.tree_welcome": "Welcome to %s",
@@ -171,6 +183,8 @@
   "tooltip.emi.config": "%s Config",
   "tooltip.emi.recipe_tree": "Recipe Tree",
 
+  "tooltip.emi.config.global": "Toggle using a global EMI config between all game instances instead of a separate config per game instance",
+
   "tooltip.emi.synfav.uncraftable": "Unable to craft §cany§r batches",
   "tooltip.emi.synfav.partially_craftable": "Able to craft §dsome§r batches\n§6Interact§r to craft as many as possible",
   "tooltip.emi.synfav.fully_craftable": "Able to craft §aall %1$s§r batches\n§6Interact§r to craft up to §9%1$s§r batches",
@@ -184,7 +198,6 @@
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Adjacent to lava",
 
   "screen.emi.recipe": "Recipe",
-  "screen.emi.com": "Recipe Tree",
   "screen.emi.config": "Config",
   "screen.emi.presets": "Config Presets",
 
@@ -230,6 +243,8 @@
   
   "emi.category.emi.tag": "Tags",
   "emi.category.emi.ingredient": "Ingredients",
+
+  "alias.emi.workbench": "Workbench",
 
   "tag.minecraft.logs": "Logs",
   "tag.minecraft.oak_logs": "Oak Logs",

@@ -18,11 +18,15 @@
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
     "AbstractInventoryScreenMixin",
-    "CreativeInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "KeyboardMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "ScreenMixin",
+    "SynchronizeRecipesS2CPacketMixin"
   ],
   "server": [],
   "injectors": {

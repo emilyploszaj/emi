@@ -14,7 +14,9 @@ public class LogicalOrQuery extends Query {
 	@Override
 	public boolean matches(EmiStack stack) {
 		for (int i = 0; i < queries.size(); i++) {
-			if (queries.get(i).matches(stack)) {
+			Query q = queries.get(i);
+			boolean success = !q.negated;
+			if (q.matches(stack) == success) {
 				return true;
 			}
 		}
