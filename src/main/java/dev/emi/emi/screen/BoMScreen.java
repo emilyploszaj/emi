@@ -35,6 +35,8 @@ import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -669,7 +671,11 @@ public class BoMScreen extends Screen {
 				drawLine(matrices, lx, ly, hx, ly);
 				drawLine(matrices, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
-				cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
+				if (EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
+					batcher.render(b, matrices, x - 18 + midOffset, y - 8, delta);
+				} else {
+					cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
+				}
 				xo = 11;
 				matrices.pop();
 			}
