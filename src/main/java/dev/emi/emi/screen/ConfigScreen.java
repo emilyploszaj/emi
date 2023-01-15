@@ -26,6 +26,7 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 import dev.emi.emi.config.IntGroup;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.config.SidebarPages;
+import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
 import dev.emi.emi.screen.widget.config.ConfigSearch;
@@ -48,9 +49,11 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 public class ConfigScreen extends Screen {
+	private static final int maxWidth = 240;
 	private Screen last;
 	private ConfigSearch search;
 	public ListWidget list;
@@ -87,7 +90,6 @@ public class ConfigScreen extends Screen {
 		ConfigValue annot = field.getAnnotation(ConfigValue.class);
 		String key = "config.emi.tooltip." + annot.value().replace('-', '_');
 		Comment comment = field.getAnnotation(Comment.class);
-		final int maxWidth = 240;
 		if (I18n.hasTranslation(key)) {
 			text = (List<TooltipComponent>) (Object) Arrays.stream(I18n.translate(key).split("\n"))
 				.map(s -> client.textRenderer.wrapLines(StringVisitable.plain(s), maxWidth))
@@ -140,9 +142,17 @@ public class ConfigScreen extends Screen {
 		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
 		}));
-		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 52, w / 2 - 2, 20, EmiPort.translatable("screen.emi.presets"), button -> {
+		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 52, w / 2 - 24, 20, EmiPort.translatable("screen.emi.presets"), button -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			client.setScreen(new ConfigPresetScreen(this));
+		}));
+		this.addDrawableChild(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 64, () -> true, widget -> {
+			EmiConfig.setGlobalState(!EmiConfig.useGlobalConfig);
+			ConfigScreen.this.resize(client, width, height);
+		}, () -> (EmiConfig.useGlobalConfig ? 40 : 0), () -> {
+			return (List<Text>) (Object) Arrays.stream(I18n.translate("tooltip.emi.config.global").split("\n"))
+				.map(s -> client.textRenderer.getTextHandler().wrapLines(StringVisitable.plain(s), maxWidth, Style.EMPTY))
+				.flatMap(l -> l.stream()).map(v -> EmiPort.literal(v.getString())).toList();
 		}));
 		this.addDrawableChild(resetButton);
 		this.addSelectableChild(search.field);

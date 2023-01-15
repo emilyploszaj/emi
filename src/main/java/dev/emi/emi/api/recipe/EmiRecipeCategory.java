@@ -12,6 +12,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -62,11 +64,11 @@ public class EmiRecipeCategory implements EmiRenderable {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta) {
-		icon.render(matrices, x, y, delta);
+		EmiRecipeCategoryProperties.getIcon(this).render(matrices, x, y, delta);
 	}
 
 	public void renderSimplified(MatrixStack matrices, int x, int y, float delta) {
-		simplified.render(matrices, x, y, delta);
+		EmiRecipeCategoryProperties.getSimplifiedIcon(this).render(matrices, x, y, delta);
 	}
 
 	public List<TooltipComponent> getTooltip() {
@@ -75,8 +77,10 @@ public class EmiRecipeCategory implements EmiRenderable {
 		if (EmiUtil.showAdvancedTooltips()) {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(id.toString(), Formatting.DARK_GRAY))));
 		}
-		list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
-			Formatting.BLUE, Formatting.ITALIC))));
+		if (EmiConfig.appendModId) {
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
+				Formatting.BLUE, Formatting.ITALIC))));
+		}
 		return list;
 	}
 

@@ -63,20 +63,33 @@ processResources {
 	}
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
 	classifier = "sources"
 	from sourceSets.main.allSource
 }
+
+task apiJar(type: Jar) {
+	classifier = "api"
+	dependsOn remapJar
+	from zipTree(remapJar.archivePath)
+	include 'fabric.mod.json'
+	include 'dev/emi/emi/api/**'
+}
+
+task apiSourcesJar(type: Jar) {
+	classifier = "api-sources"
+	dependsOn remapSourcesJar
+	from zipTree(remapSourcesJar.archivePath)
+	include 'fabric.mod.json'
+	include 'dev/emi/emi/api/**'
+}
+
+build.dependsOn apiJar
+build.dependsOn apiSourcesJar
 
 jar {
 	from "LICENSE"
@@ -85,12 +98,10 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-			afterEvaluate {
-				artifact remapJar
-			}
+			artifact remapJar
+			artifact remapSourcesJar
+			artifact apiJar
+			artifact apiSourcesJar
 		}
 	}
 	setupRepositories(repositories)

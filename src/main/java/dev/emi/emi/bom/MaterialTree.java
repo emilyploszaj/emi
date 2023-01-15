@@ -60,7 +60,11 @@ public class MaterialTree {
 	public void calculateCost(boolean fractional) {
 		if (fractional) {
 			fractionalCosts.clear();
-			calculateFractionalCost(fractionalCosts, batches * goal.amount, goal);
+			Map<EmiStack, FractionalMaterialCost> fractionalRemainders = Maps.newHashMap();
+			calculateFractionalCost(fractionalCosts, fractionalRemainders, batches * goal.amount, goal);
+			// Calculate twice with the remainders of the last to remove temporary costs per batch
+			fractionalCosts.clear();
+			calculateFractionalCost(fractionalCosts, fractionalRemainders, batches * goal.amount, goal);
 		} else {
 			costs.clear();
 			remainders.clear();
@@ -184,27 +188,73 @@ public class MaterialTree {
 		if (node.ingredient.getEmiStacks().size() == 1) {
 			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
 			if (!r.isEmpty()) {
-				addRemainder(remainders, r, amount);
+				addRemainder(remainders, r, r.getAmount() * amount);
 			}
 		}
 	}
 
-	private void calculateFractionalCost(List<FractionalMaterialCost> costs, float amount, MaterialNode node) {
+	private void addFractionalRemainder(Map<EmiStack, FractionalMaterialCost> remainders, EmiStack stack, float amount) {
+		stack = stack.copy().setAmount(1);
+		if (amount > 0) {
+			if (remainders.containsKey(stack)) {
+				remainders.get(stack).amount += amount;
+			} else {
+				remainders.put(stack, new FractionalMaterialCost(stack, amount));
+			}
+		}
+	}
+
+	private float getFractionalRemainder(Map<EmiStack, FractionalMaterialCost> remainders, EmiStack stack, float desired) {
+		if (remainders.containsKey(stack)) {
+			FractionalMaterialCost remainder = remainders.get(stack);
+			if (remainder.amount >= desired) {
+				remainder.amount -= desired;
+				if (remainder.amount == 0) {
+					remainders.remove(stack);
+				}
+				return desired;
+			} else {
+				remainders.remove(stack);
+				return remainder.amount;
+			}
+		}
+		return 0;
+	}
+
+	private void calculateFractionalCost(List<FractionalMaterialCost> costs, Map<EmiStack, FractionalMaterialCost> remainders, float amount, MaterialNode node) {
 		EmiRecipe recipe = node.recipe;
+		List<EmiStack> ingredientStacks = node.ingredient.getEmiStacks();
+		for (int i = 0; i < ingredientStacks.size(); i++) {
+			amount -= getFractionalRemainder(remainders, ingredientStacks.get(i), amount);
+		}
+		if (amount <= 0) {
+			return;
+		}
 		if (recipe != null) {
-			float newAmount = amount / node.divisor;
+			amount = amount / node.divisor;
 
 			for (MaterialNode n : node.children) {
-				calculateFractionalCost(costs, newAmount * n.amount, n);
+				calculateFractionalCost(costs, remainders, amount * n.amount, n);
+			}
+
+			EmiStack stack = node.ingredient.getEmiStacks().get(0);
+			for (EmiStack es : recipe.getOutputs()) {
+				if (!stack.equals(es)) {
+					addFractionalRemainder(remainders, es, amount * es.getAmount());
+				}
 			}
 		} else {
 			for (FractionalMaterialCost cost : costs) {
 				if (EmiIngredient.areEqual(cost.ingredient, node.ingredient)) {
 					cost.amount += amount;
-					return;
+					break;
 				}
 			}
 			costs.add(new FractionalMaterialCost(node.ingredient, amount));
+		}
+		if (node.ingredient.getEmiStacks().size() == 1) {
+			EmiStack stack = node.ingredient.getEmiStacks().get(0).getRemainder();
+			addFractionalRemainder(remainders, stack, stack.getAmount() * amount);
 		}
 	}
 }

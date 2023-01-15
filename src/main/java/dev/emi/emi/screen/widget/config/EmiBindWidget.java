@@ -6,14 +6,12 @@ import java.util.function.Supplier;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.ConfigScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -36,18 +34,9 @@ public class EmiBindWidget extends ConfigEntryWidget {
 		buttons.clear();
 		for (int i = 0; i < bind.boundKeys.size(); i++) {
 			final int j = i;
-			ButtonWidget widget = new ButtonWidget(0, 0, 200, 20, getKeyText(bind.boundKeys.get(i), Formatting.RESET), button -> {
+			ButtonWidget widget = EmiPort.newButton(0, 0, 200, 20, bind.boundKeys.get(i).getKeyText(Formatting.RESET), button -> {
 				screen.setActiveBind(bind, j);
-			}) {
-
-				@Override
-				protected MutableText getNarrationMessage() {
-					if (j < bind.boundKeys.size() && bind.boundKeys.get(j).isUnbound()) {
-						return EmiPort.translatable("narrator.controls.unbound", bindName);
-					}
-					return EmiPort.translatable("narrator.controls.bound", bindName, super.getNarrationMessage());
-				}
-			};
+			});
 			buttons.add(widget);
 		}
 	}
@@ -68,8 +57,9 @@ public class EmiBindWidget extends ConfigEntryWidget {
 				if (screen.lastModifier == 0) {
 					button.setMessage(EmiPort.literal("...", Formatting.YELLOW));
 				} else {
-					button.setMessage(getKeyText(new ModifiedKey(InputUtil.Type.KEYSYM
-						.createFromCode(screen.lastModifier), screen.activeModifiers), Formatting.YELLOW));
+					button.setMessage(new ModifiedKey(InputUtil.Type.KEYSYM
+						.createFromCode(screen.lastModifier), screen.activeModifiers)
+						.getKeyText(Formatting.YELLOW));
 				}
 			} else if (i < bind.boundKeys.size()) {
 				if (bind.boundKeys.get(i).isUnbound() && i > 0) {
@@ -78,7 +68,7 @@ public class EmiBindWidget extends ConfigEntryWidget {
 					button.y = y;
 					button.setMessage(EmiPort.literal("+", Formatting.AQUA));
 				} else {
-					button.setMessage(getKeyText(bind.boundKeys.get(i), Formatting.RESET));
+					button.setMessage(bind.boundKeys.get(i).getKeyText(Formatting.RESET));
 				}
 			}
 			h += 24;
@@ -96,27 +86,5 @@ public class EmiBindWidget extends ConfigEntryWidget {
 			size -= 24;
 		}
 		return size - 4;
-	}
-
-	private MutableText getKeyText(ModifiedKey key, Formatting formatting) {
-		MutableText text = EmiPort.literal("", formatting);
-		appendModifiers(text, key.modifiers());
-		EmiPort.append(text, key.key().getLocalizedText());
-		return text;
-	}
-
-	private void appendModifiers(MutableText text, int modifiers) {
-		if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
-			EmiPort.append(text, EmiPort.translatable("key.keyboard.control"));
-			EmiPort.append(text, EmiPort.literal(" + "));
-		}
-		if ((modifiers & EmiUtil.ALT_MASK) > 0) {
-			EmiPort.append(text, EmiPort.translatable("key.keyboard.alt"));
-			EmiPort.append(text, EmiPort.literal(" + "));
-		}
-		if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
-			EmiPort.append(text, EmiPort.translatable("key.keyboard.shift"));
-			EmiPort.append(text, EmiPort.literal(" + "));
-		}
 	}
 }

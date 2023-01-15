@@ -7,17 +7,27 @@ import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 
 public class EmiReloadLog {
-	private static List<String> PENDING_WARNINGS = Lists.newArrayList();
-	public static List<String> WARNINGS = List.of();
+	private static List<String> pendingWarnings = Lists.newArrayList();
+	public static List<String> warnings = List.of();
+	private static int pendingWarningCount;
+	public static int warningCount;
 
 	public static void bake() {
-		WARNINGS = PENDING_WARNINGS;
-		PENDING_WARNINGS = Lists.newArrayList();
+		warnings = pendingWarnings;
+		warningCount = pendingWarningCount;
+		pendingWarnings = Lists.newArrayList();
+		pendingWarningCount = 0;
 	}
 
 	public static void warn(String warning) {
-		PENDING_WARNINGS.add(warning);
+		pendingWarnings.add(warning);
 		EmiLog.error(warning);
+		pendingWarningCount++;
+	}
+
+	public static void info(String info) {
+		pendingWarnings.add(info);
+		EmiLog.info(info);
 	}
 
 	public static void error(Exception e) {

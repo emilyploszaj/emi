@@ -20,10 +20,9 @@ public class GeneratedSlotWidget extends SlotWidget {
 		this.stackSupplier = stackSupplier;
 		this.unique = unique;
 	}
-
+	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
+	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (!getStack().isEmpty()) {
 			int off = 1;
 			if (output) {
@@ -31,10 +30,11 @@ public class GeneratedSlotWidget extends SlotWidget {
 			}
 			EmiRender.renderIngredientIcon(getStack(), matrices, x + off, y + off);
 		}
+		super.drawOverlay(matrices, mouseX, mouseY, delta);
 	}
 	
 	@Override
-	protected EmiIngredient getStack() {
+	public EmiIngredient getStack() {
 		long time = System.currentTimeMillis() / INCREMENT;
 		if (stack == null || time > lastGenerate) {
 			lastGenerate = time;

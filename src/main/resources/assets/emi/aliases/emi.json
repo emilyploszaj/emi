@@ -1,0 +1,8 @@
+{
+  "aliases": [
+    {
+      "stacks": "item:minecraft:crafting_table",
+      "text": "alias.emi.workbench"
+    }
+  ]
+}

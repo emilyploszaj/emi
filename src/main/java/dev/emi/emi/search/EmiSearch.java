@@ -9,13 +9,17 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.EmiAlias;
+import dev.emi.emi.data.EmiData;
 import dev.emi.emi.screen.EmiScreenManager;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -29,12 +33,14 @@ public class EmiSearch {
 	public static Thread thread;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
-	public static SuffixArray<EmiStack> names, tooltips, mods;
+	public static volatile CompiledQuery compiledQuery;
+	public static SuffixArray<EmiStack> names, tooltips, mods, aliases;
 
 	public static void bake() {
 		SuffixArray<EmiStack> names = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
+		SuffixArray<EmiStack> aliases = new SuffixArray<EmiStack>();
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
@@ -64,13 +70,28 @@ public class EmiSearch {
 				}
 			}
 		}
+		for (EmiAlias alias : EmiData.aliases) {
+			for (String key : alias.keys()) {
+				if (!I18n.hasTranslation(key)) {
+					EmiReloadLog.warn("Untranslated alias " + key);
+				}
+				String text = I18n.translate(key).toLowerCase();
+				for (EmiIngredient ing : alias.stacks()) {
+					for (EmiStack stack : ing.getEmiStacks()) {
+						aliases.add(stack, text);
+					}
+				}
+			}
+		}
 		EmiConfig.appendItemModId = old;
 		names.build();
 		tooltips.build();
 		mods.build();
+		aliases.build();
 		EmiSearch.names = names;
 		EmiSearch.tooltips = tooltips;
 		EmiSearch.mods = mods;
+		EmiSearch.aliases = aliases;
 	}
 
 	public static void update() {
@@ -97,17 +118,27 @@ public class EmiSearch {
 	}
 
 	public static class CompiledQuery {
-		public final List<Query> queries, negatedQuerries;
+		public final Query fullQuery;
 
 		public CompiledQuery(String query) {
-			queries = Lists.newArrayList();
-			negatedQuerries = Lists.newArrayList();
+			List<Query> full = Lists.newArrayList();
+			List<Query> queries = Lists.newArrayList();
 			Matcher matcher = TOKENS.matcher(query);
 			while (matcher.find()) {
 				String q = matcher.group();
+				if (q.equals("|")) {
+					if (!queries.isEmpty()) {
+						full.add(new LogicalAndQuery(queries));
+						queries = Lists.newArrayList();
+					}
+					continue;
+				}
 				boolean negated = q.startsWith("-");
 				if (negated) {
 					q = q.substring(1);
+				}
+				if (q.isEmpty()) {
+					continue;
 				}
 				QueryType type = QueryType.fromString(q);
 				Function<String, Query> constructor = type.queryConstructor;
@@ -130,41 +161,46 @@ public class EmiSearch {
 						constructors.add(QueryType.TAG.queryConstructor);
 						regexConstructors.add(QueryType.TAG.regexQueryConstructor);
 					}
+					// TODO add config
+					constructors.add(AliasQuery::new);
 					if (constructors.size() > 1) {
 						constructor = name -> new LogicalOrQuery(constructors.stream().map(c -> c.apply(name)).toList());
 						regexConstructor = name -> new LogicalOrQuery(regexConstructors.stream().map(c -> c.apply(name)).toList());
 					}
 				}
-				addQuery(q.substring(type.prefix.length()), negated ? negatedQuerries : queries, constructor, regexConstructor);
+				addQuery(q.substring(type.prefix.length()), negated, queries, constructor, regexConstructor);
+			}
+			if (!queries.isEmpty()) {
+				full.add(new LogicalAndQuery(queries));
+			}
+			if (!full.isEmpty()) {
+				fullQuery = new LogicalOrQuery(full);
+			} else {
+				fullQuery = null;
 			}
 		}
 
 		public boolean isEmpty() {
-			return queries.isEmpty() && negatedQuerries.isEmpty();
+			return fullQuery == null;
 		}
 
 		public boolean test(EmiStack stack) {
-			for (int i = 0; i < queries.size(); i++) {
-				Query q = queries.get(i);
-				if (!q.matches(stack)) {
-					return false;
-				}
+			if (fullQuery == null) {
+				return true;
+			} else {
+				return fullQuery.matches(stack);
 			}
-			for (int i = 0; i < negatedQuerries.size(); i++) {
-				Query q = negatedQuerries.get(i);
-				if (q.matches(stack)) {
-					return false;
-				}
-			}
-			return true;
 		}
 
-		private static void addQuery(String s, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
+		private static void addQuery(String s, boolean negated, List<Query> queries, Function<String, Query> normal, Function<String, Query> regex) {
+			Query q;
 			if (s.length() > 1 && s.startsWith("/") && s.endsWith("/")) {
-				queries.add(regex.apply(s.substring(1, s.length() - 1)));
+				q = regex.apply(s.substring(1, s.length() - 1));
 			} else {
-				queries.add(normal.apply(s));
+				q = normal.apply(s);
 			}
+			q.negated = negated;
+			queries.add(q);
 		}
 	}
 
@@ -178,6 +214,7 @@ public class EmiSearch {
 				do {
 					query = EmiSearch.query;
 					CompiledQuery compiled = new CompiledQuery(query);
+					compiledQuery = compiled;
 					List<? extends EmiIngredient> source = EmiScreenManager.getSearchSource();
 					if (compiled.isEmpty()) {
 						stacks = source;

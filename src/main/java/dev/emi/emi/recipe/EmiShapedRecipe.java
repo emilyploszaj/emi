@@ -19,6 +19,9 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 		super(padIngredients(recipe), EmiStack.of(recipe.getOutput()),
 			recipe.getId(), false);
 		for (int i = 0; i < input.size(); i++) {
+			if (input.get(i).isEmpty()) {
+				continue;
+			}
 			CraftingInventory inv = new CraftingInventory(new ScreenHandler(null, -1) {
 
 				@Override

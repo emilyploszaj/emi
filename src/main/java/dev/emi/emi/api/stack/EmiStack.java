@@ -155,14 +155,25 @@ public abstract class EmiStack implements EmiIngredient {
 
 	@Override
 	public String toString() {
-		return "EmiStack[key=" + getKey() + ", nbt=" + getNbt() + "amount=" + getAmount() + "]";
+		String s = "" + getKey();
+		NbtCompound nbt = getNbt();
+		if (nbt != null) {
+			s += nbt;
+		}
+		return s + " x" + getAmount();
 	}
 
 	public static EmiStack of(ItemStack stack) {
+		if (stack.isEmpty()) {
+			return EmiStack.EMPTY;
+		}
 		return new ItemEmiStack(stack);
 	}
 
 	public static EmiStack of(ItemStack stack, long amount) {
+		if (stack.isEmpty()) {
+			return EmiStack.EMPTY;
+		}
 		return new ItemEmiStack(stack, amount);
 	}
 
@@ -176,12 +187,12 @@ public abstract class EmiStack implements EmiIngredient {
 
 	@Deprecated
 	public static EmiStack of(ItemVariant item) {
-		return new ItemEmiStack(item, 1);
+		return of(item.toStack(), 1);
 	}
 
 	@Deprecated
 	public static EmiStack of(ItemVariant item, long amount) {
-		return new ItemEmiStack(item, amount);
+		return of(item.toStack(), amount);
 	}
 
 	@Deprecated

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -46,7 +45,7 @@ public class SlotWidget extends Widget {
 		this.y = y;
 	}
 
-	protected EmiIngredient getStack() {
+	public EmiIngredient getStack() {
 		return stack;
 	}
 
@@ -173,22 +172,31 @@ public class SlotWidget extends Widget {
 				}
 			}
 		}
-		
-		if (getRecipe() == null && EmiClient.availableForCrafting.containsKey(getStack()) && !getStack().isEmpty()) {
-			if (EmiClient.availableForCrafting.get(getStack())) {
-				//DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x4400FF00);
-			} else {
-				DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
-			}
-		}
+
 		int xOff = (width - 16) / 2;
 		int yOff = (height - 16) / 2;
 		getStack().render(matrices, bounds.x() + xOff, bounds.y() + yOff, delta);
+
+		drawOverlay(matrices, mouseX, mouseY, delta);
+	}
+
+	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		Bounds bounds = getBounds();
+		int width = bounds.width();
+		int height = bounds.height();
+		int xOff = (width - 16) / 2;
+		int yOff = (height - 16) / 2;
 		if (catalyst) {
 			EmiRender.renderCatalystIcon(getStack(), matrices, x + xOff, y + yOff);
 		}
 
-		if (EmiConfig.showHoverOverlay && bounds.contains(mouseX, mouseY)) {
+		if (bounds.contains(mouseX, mouseY)) {
+			drawSlotHighlight(matrices, bounds);
+		}
+	}
+
+	public void drawSlotHighlight(MatrixStack matrices, Bounds bounds) {
+		if (EmiConfig.showHoverOverlay) {
 			RenderSystem.disableDepthTest();
 			EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
 			RenderSystem.enableDepthTest();
@@ -205,15 +213,22 @@ public class SlotWidget extends Widget {
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
 			list.add(supplier.get());
 		}
-		if (getRecipe() != null) {
+		EmiRecipe recipe = getRecipe();
+		if (recipe != null) {
+			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(recipe.getId().toString(), Formatting.GRAY))));
+			}
+			if (EmiConfig.favorite.isBound()) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
+			}
 			if (RecipeScreen.resolve != null) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve", Formatting.GREEN))));
 			}
-			if (getRecipe().getId() != null && EmiConfig.showRecipeIds) {
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(getRecipe().getId().toString()))));
-			}
-			if (EmiConfig.showCostPerBatch && getRecipe().supportsRecipeTree() && !(getRecipe() instanceof EmiResolutionRecipe)) {
-				list.add(new RecipeCostTooltipComponent(getRecipe()));
+			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
+				RecipeCostTooltipComponent rctc = new RecipeCostTooltipComponent(recipe);
+				if (!rctc.tree.fractionalCosts.isEmpty()) {
+					list.add(rctc);
+				}
 			}
 		}
 		return list;

@@ -35,6 +35,8 @@ import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -55,6 +57,7 @@ public class BoMScreen extends Screen {
 	private static final int NODE_HORIZONTAL_SPACING = 8;
 	private static final int NODE_VERTICAL_SPACING = 20;
 	private static final int COST_HORIZONTAL_SPACING = 8;
+	private static StackBatcher batcher = new StackBatcher();
 	private static int zoom = 0;
 	private Bounds batches = new Bounds(-24, -50, 48, 26);
 	private Bounds mode = new Bounds(-24, -50, 16, 16);
@@ -70,7 +73,7 @@ public class BoMScreen extends Screen {
 	private double scrollAcc = 0;
 
 	public BoMScreen(HandledScreen<?> old) {
-		super(EmiPort.translatable("screen.emi.bom"));
+		super(EmiPort.translatable("screen.emi.recipe_tree"));
 		this.old = old;
 	}
 
@@ -100,7 +103,7 @@ public class BoMScreen extends Screen {
 
 			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
 			nodeHeight = getNodeHeight(BoM.tree.goal);
-			playerInv = new EmiPlayerInventory(client.player);
+			playerInv = EmiPlayerInventory.of(client.player);
 			BoM.tree.calculateProgress(playerInv);
 			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.tree.costs.stream()
 				.collect(Collectors.toMap(c -> c.ingredient, c -> c));
@@ -151,6 +154,7 @@ public class BoMScreen extends Screen {
 		} else {
 			nodes = Lists.newArrayList();
 		}
+		batcher.repopulate();
 	}
 
 	@Override
@@ -180,6 +184,7 @@ public class BoMScreen extends Screen {
 		viewMatrices.translate(offX, offY, 0);
 		RenderSystem.applyModelViewMatrix();
 		if (BoM.tree != null) {
+			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16,
 					-1);
@@ -206,6 +211,7 @@ public class BoMScreen extends Screen {
 			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 			drawTexture(matrices, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			batcher.draw();
 		} else {
 			drawCenteredText(matrices, textRenderer,
 					EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
@@ -514,7 +520,7 @@ public class BoMScreen extends Screen {
 		}
 
 		public void render(MatrixStack matrices) {
-			cost.ingredient.render(matrices, x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
+			batcher.render(cost.ingredient, matrices, x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
 			EmiRenderHelper.renderAmount(matrices, x, y, getAmountText());
 		}
 
@@ -665,13 +671,17 @@ public class BoMScreen extends Screen {
 				drawLine(matrices, lx, ly, hx, ly);
 				drawLine(matrices, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
-				cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
+				if (EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
+					batcher.render(b, matrices, x - 18 + midOffset, y - 8, delta);
+				} else {
+					cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
+				}
 				xo = 11;
 				matrices.pop();
 			}
-			node.ingredient.render(matrices, x + xo - 8 + midOffset, y - 8, 0);
+			batcher.render(node.ingredient, matrices, x + xo - 8 + midOffset, y - 8, 0);
 			EmiRenderHelper.renderAmount(matrices, x + xo - 8 + midOffset, y - 8,
-					node.ingredient.getAmountText(amount));
+				node.ingredient.getAmountText(amount));
 		}
 
 		public Hover getHover(int mouseX, int mouseY) {

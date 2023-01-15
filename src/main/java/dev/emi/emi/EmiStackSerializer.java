@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.jetbrains.annotations.Nullable;
@@ -128,6 +129,29 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 			try {
 				return BY_ID.get(id).toStack(object);
 			} catch (Exception e) {
+			}
+		}
+		return EmiStack.EMPTY;
+	}
+
+	public static EmiIngredient deserialize(JsonElement el) {
+		if (el.isJsonObject()) {
+			return deserialize(el.getAsJsonObject());
+		} else if (JsonHelper.isString(el)) {
+			String s = el.getAsString();
+			String[] parts = s.split(":");
+			Identifier stackId;
+			if (parts.length <= 2) {
+				stackId = new Identifier(s);
+			} else if (parts.length == 3) {
+				stackId = new Identifier(parts[1], parts[2]);
+				if (parts[0].equals("item")) {
+					return EmiStack.of(EmiPort.getItemRegistry().get(stackId));
+				} else if (parts[0].equals("fluid")) {
+					return EmiStack.of(EmiPort.getFluidRegistry().get(stackId));
+				}
+			} else {
+				return EmiStack.EMPTY;
 			}
 		}
 		return EmiStack.EMPTY;

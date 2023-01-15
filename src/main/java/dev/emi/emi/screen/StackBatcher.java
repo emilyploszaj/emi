@@ -121,33 +121,53 @@ public class StackBatcher {
 		}
 	}
 
-	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
-		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled()) {
-			if (populated) return;
+	public void render(Batchable batchable, MatrixStack matrices, int x, int y, float delta) {
+		if (!populated) {
 			try {
-				b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
-				if (sodiumSpriteHandle != null && !stack.isEmpty()) {
-					ItemStack is = stack.getEmiStacks().get(0).getItemStack();
-					MinecraftClient client = MinecraftClient.getInstance();
-					BakedModel model = client.getItemRenderer().getModels().getModel(is);
-					if (model != null) {
-						List<BakedQuad> quads = EmiPort.getQuads(model);
-						for (BakedQuad quad : quads) {
-							if (quad != null) {
-								spritesToUpdate.add(quad.getSprite());
+				batchable.renderForBatch(batchable.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
+			} catch (Throwable t) {
+				if (EmiConfig.devMode) {
+					EmiLog.error("Batchable threw exception during batched rendering. See log for info");
+					t.printStackTrace();
+				}
+				batchable.setUnbatchable();
+			}
+		}
+	}
+
+	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
+		render(stack, matrices, x, y, delta, -1 ^ EmiIngredient.RENDER_AMOUNT);
+	}
+
+	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta, int flags) {
+		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled() && (flags & EmiIngredient.RENDER_ICON) != 0) {
+			if (!populated) {
+				try {
+					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
+					if (sodiumSpriteHandle != null && !stack.isEmpty()) {
+						ItemStack is = stack.getEmiStacks().get(0).getItemStack();
+						MinecraftClient client = MinecraftClient.getInstance();
+						BakedModel model = client.getItemRenderer().getModels().getModel(is);
+						if (model != null) {
+							List<BakedQuad> quads = EmiPort.getQuads(model);
+							for (BakedQuad quad : quads) {
+								if (quad != null) {
+									spritesToUpdate.add(quad.getSprite());
+								}
 							}
 						}
 					}
+				} catch (Throwable t) {
+					if (EmiConfig.devMode) {
+						EmiLog.error("Stack threw exception during batched rendering. See log for info");
+						t.printStackTrace();
+					}
+					b.setUnbatchable();
 				}
-			} catch (Throwable t) {
-				if (EmiConfig.devMode) {
-					EmiLog.error("Stack threw exception during batched rendering. See log for info");
-					t.printStackTrace();
-				}
-				b.setUnbatchable();
 			}
+			stack.render(matrices, x, y, delta, flags & (~EmiIngredient.RENDER_ICON));
 		} else {
-			stack.render(matrices, x, y, delta, -1 ^ EmiIngredient.RENDER_AMOUNT);
+			stack.render(matrices, x, y, delta, flags);
 		}
 	}
 
@@ -167,6 +187,7 @@ public class StackBatcher {
 			bake();
 			populated = true;
 		}
+		RenderSystem.enableDepthTest();
 		DiffuseLighting.enableGuiDepthLighting();
 		Matrix4f mat = RenderSystem.getModelViewMatrix().copy();
 		mat.multiply(Matrix4f.scale(1, -1, 1));
