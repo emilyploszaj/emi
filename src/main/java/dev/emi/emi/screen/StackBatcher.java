@@ -121,6 +121,20 @@ public class StackBatcher {
 		}
 	}
 
+	public void render(Batchable batchable, MatrixStack matrices, int x, int y, float delta) {
+		if (!populated) {
+			try {
+				batchable.renderForBatch(batchable.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
+			} catch (Throwable t) {
+				if (EmiConfig.devMode) {
+					EmiLog.error("Batchable threw exception during batched rendering. See log for info");
+					t.printStackTrace();
+				}
+				batchable.setUnbatchable();
+			}
+		}
+	}
+
 	public void render(EmiIngredient stack, MatrixStack matrices, int x, int y, float delta) {
 		render(stack, matrices, x, y, delta, -1 ^ EmiIngredient.RENDER_AMOUNT);
 	}

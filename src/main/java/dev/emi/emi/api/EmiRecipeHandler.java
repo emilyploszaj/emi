@@ -120,6 +120,15 @@ public interface EmiRecipeHandler<T extends ScreenHandler> extends StandardRecip
 		return false;
 	}
 
+	@Override
+	default boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
+		return performFill(recipe, context.getScreen(), switch (context.getDestination()) {
+			case NONE -> EmiFillAction.FILL;
+			case INVENTORY -> EmiFillAction.QUICK_MOVE;
+			case CURSOR -> EmiFillAction.CURSOR;
+		}, context.getAmount());
+	}
+
 	@Deprecated
 	default List<ItemStack> mutateFill(EmiRecipe recipe, HandledScreen<T> screen, List<ItemStack> stacks) {
 		return stacks;

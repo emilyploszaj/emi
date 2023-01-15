@@ -865,7 +865,7 @@ public class EmiScreenManager {
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
 		}
-		if (client.currentScreen.getFocused() instanceof TextFieldWidget) {
+		if (client.currentScreen.getFocused() instanceof TextFieldWidget tfw && tfw.isFocused()) {
 			return false;
 		}
 		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
