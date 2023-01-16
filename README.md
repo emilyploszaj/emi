@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
-	modImplementation "dev.emi:emi:${emi_version}"
+	modCompileOnly "dev.emi:emi:${emi_version}:api"
+	modLocalRuntime "dev.emi:emi:${emi_version}"
 }
 ```

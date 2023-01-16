@@ -77,6 +77,8 @@ task apiJar(type: Jar) {
 	dependsOn remapJar
 	from zipTree(remapJar.archivePath)
 	include 'fabric.mod.json'
+	include 'emi.mixins.json'
+	include 'emi.accesswidener'
 	include 'dev/emi/emi/api/**'
 }
 
@@ -85,6 +87,8 @@ task apiSourcesJar(type: Jar) {
 	dependsOn remapSourcesJar
 	from zipTree(remapSourcesJar.archivePath)
 	include 'fabric.mod.json'
+	include 'emi.mixins.json'
+	include 'emi.accesswidener'
 	include 'dev/emi/emi/api/**'
 }
 
