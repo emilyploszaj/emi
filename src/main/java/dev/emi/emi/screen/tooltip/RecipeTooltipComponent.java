@@ -13,6 +13,7 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	private final EmiRecipe recipe;
 	private final boolean showMissing;
 	private int overlayColor = -1;
+	private int width = 0, height = 0;
 
 	public RecipeTooltipComponent(EmiRecipe recipe) {
 		this(recipe, false);
@@ -26,16 +27,21 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	public RecipeTooltipComponent(EmiRecipe recipe, boolean showMissing) {
 		this.recipe = recipe;
 		this.showMissing = showMissing;
+		try {
+			width = recipe.getDisplayWidth() + 8;
+			height = recipe.getDisplayHeight() + 8;
+		} catch (Exception e) {
+		}
 	}
 
 	@Override
 	public int getHeight() {
-		return recipe.getDisplayHeight() + 8;
+		return height;
 	}
 
 	@Override
 	public int getWidth(TextRenderer var1) {
-		return recipe.getDisplayWidth() + 8;
+		return width;
 	}
 
 	@Override

@@ -203,6 +203,9 @@
 
   "screen.emi.config.reset": "Revert %s change(s)",
 
+  "emi.error.recipe.initialize": "Error Initializing",
+  "emi.error.recipe.render": "Error Rendering",
+
   "emi.chess.piece.white_pawn": "White Pawn",
   "emi.chess.piece.white_rook": "White Rook",
   "emi.chess.piece.white_knight": "White Knight",

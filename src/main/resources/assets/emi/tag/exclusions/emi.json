@@ -4,6 +4,7 @@
     "minecraft:cluster_max_harvestables",
     "minecraft:completes_find_tree_tutorial",
     "minecraft:dampens_vibrations",
+    "c:hidden_from_recipe_viewers",
     "c:ore_bearing_ground/stone",
     "c:ore_bearing_ground/deepslate",
     "c:ore_bearing_ground/netherrack",
