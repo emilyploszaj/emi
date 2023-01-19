@@ -57,6 +57,7 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -865,8 +866,12 @@ public class EmiScreenManager {
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
 		}
-		if (client.currentScreen.getFocused() instanceof TextFieldWidget tfw && tfw.isFocused()) {
-			return false;
+		if (client.currentScreen.children() != null) {
+			for (Element e : client.currentScreen.children()) {
+				if (e instanceof TextFieldWidget tfw && tfw.isActive() && tfw.visible) {
+					return false;
+				}
+			}
 		}
 		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();

@@ -244,13 +244,15 @@ public class MaterialTree {
 				}
 			}
 		} else {
-			for (FractionalMaterialCost cost : costs) {
-				if (EmiIngredient.areEqual(cost.ingredient, node.ingredient)) {
-					cost.amount += amount;
-					break;
+			outer : {
+				for (FractionalMaterialCost cost : costs) {
+					if (EmiIngredient.areEqual(cost.ingredient, node.ingredient)) {
+						cost.amount += amount;
+						break outer;
+					}
 				}
+				costs.add(new FractionalMaterialCost(node.ingredient, amount));
 			}
-			costs.add(new FractionalMaterialCost(node.ingredient, amount));
 		}
 		if (node.ingredient.getEmiStacks().size() == 1) {
 			EmiStack stack = node.ingredient.getEmiStacks().get(0).getRemainder();
