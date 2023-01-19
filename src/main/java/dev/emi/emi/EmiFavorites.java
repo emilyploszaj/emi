@@ -55,6 +55,9 @@ public class EmiFavorites {
 				}
 				if (JsonHelper.hasJsonObject(json, "stack")) {
 					EmiIngredient ingredient = EmiStackSerializer.deserialize(JsonHelper.getObject(json, "stack"));
+					if (ingredient.isEmpty()) {
+						continue;
+					}
 					if (ingredient instanceof EmiStack es) {
 						ingredient = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
 					}
@@ -84,6 +87,9 @@ public class EmiFavorites {
 			favorite = fav;
 		} else {
 			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
+			if (stack.isEmpty()) {
+				return;
+			}
 			for (int i = 0; i < favorites.size(); i++) {
 				EmiFavorite fav = favorites.get(i);
 				if (fav.getRecipe() == null && fav.getStack().equals(stack)) {

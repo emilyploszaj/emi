@@ -1,5 +1,8 @@
 package dev.emi.emi;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -22,9 +25,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.tag.TagKey;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryEntryList.Named;
@@ -134,6 +142,31 @@ public class EmiUtil {
 			}
 		}
 		return recipes.get(0);
+	}
+
+	public static List<String> getStackTrace(Throwable t) {
+		StringWriter writer = new StringWriter();
+		t.printStackTrace(new PrintWriter(writer, true));
+		return Arrays.asList(writer.getBuffer().toString().split("\n"));
+	}
+
+	public static CraftingInventory getCraftingInventory() {
+		return new CraftingInventory(new ScreenHandler(null, -1) {
+
+			@Override
+			public boolean canUse(PlayerEntity player) {
+				return false;
+			}
+
+			@Override
+			public ItemStack transferSlot(PlayerEntity player, int index) {
+				return ItemStack.EMPTY;
+			}
+
+			@Override
+			public void onContentChanged(Inventory inventory) {
+			}
+		}, 3, 3);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})

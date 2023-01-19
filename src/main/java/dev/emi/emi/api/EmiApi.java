@@ -238,7 +238,7 @@ public class EmiApi {
 		recipes = recipes.entrySet().stream().filter(e -> !e.getValue().isEmpty())
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
-			if (client.currentScreen == null) {
+			if (getHandledScreen() == null) {
 				client.setScreen(new InventoryScreen(client.player));
 			}
 			if (client.currentScreen instanceof HandledScreen<?> hs) {

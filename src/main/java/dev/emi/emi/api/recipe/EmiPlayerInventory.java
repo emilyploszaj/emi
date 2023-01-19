@@ -67,6 +67,12 @@ public class EmiPlayerInventory {
 		for (EmiStack stack : stacks) {
 			addStack(stack);
 		}
+		HandledScreen<?> screen = EmiApi.getHandledScreen();
+		if (screen != null && screen.getScreenHandler() != null) {
+			if (screen.getScreenHandler().getCursorStack() != null) {
+				addStack(screen.getScreenHandler().getCursorStack());
+			}
+		}
 	}
 
 	public static EmiPlayerInventory of(PlayerEntity entity) {

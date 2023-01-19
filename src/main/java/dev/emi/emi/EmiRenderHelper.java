@@ -195,59 +195,63 @@ public class EmiRenderHelper {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
-		renderRecipeBackground(recipe, matrices, x, y);
+		try {
+			renderRecipeBackground(recipe, matrices, x, y);
 
-		List<Widget> widgets = Lists.newArrayList();
-		WidgetHolder holder = new WidgetHolder() {
+			List<Widget> widgets = Lists.newArrayList();
+			WidgetHolder holder = new WidgetHolder() {
 
-			public int getWidth() {
-				return recipe.getDisplayWidth();
+				public int getWidth() {
+					return recipe.getDisplayWidth();
+				}
+
+				public int getHeight() {
+					return recipe.getDisplayHeight();
+				}
+
+				public <T extends Widget> T add(T widget) {
+					widgets.add(widget);
+					return widget;
+				}
+			};
+
+			MatrixStack view = RenderSystem.getModelViewStack();
+			view.push();
+			view.translate(x + 4, y + 4, 0);
+			RenderSystem.applyModelViewMatrix();
+
+			recipe.addWidgets(holder);
+			float delta = MinecraftClient.getInstance().getTickDelta();
+			for (Widget widget : widgets) {
+				widget.render(matrices, -1000, -1000, delta);
+			}
+			if (overlayColor != -1) {
+				DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
 			}
 
-			public int getHeight() {
-				return recipe.getDisplayHeight();
+			if (showMissing) {
+				HandledScreen hs = EmiApi.getHandledScreen();
+				EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
+				if (handler != null) {
+					handler.render(recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), widgets, matrices);
+				} else if (EmiScreenManager.lastPlayerInventory != null) {
+					StandardRecipeHandler.renderMissing(recipe, EmiScreenManager.lastPlayerInventory, widgets, matrices);
+				}
 			}
 
-			public <T extends Widget> T add(T widget) {
-				widgets.add(widget);
-				return widget;
-			}
-		};
+			view.pop();
+			RenderSystem.applyModelViewMatrix();
 
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
-		view.translate(x + 4, y + 4, 0);
-		RenderSystem.applyModelViewMatrix();
-
-		recipe.addWidgets(holder);
-		float delta = MinecraftClient.getInstance().getTickDelta();
-		for (Widget widget : widgets) {
-			widget.render(matrices, -1000, -1000, delta);
+			// Force translucency to match that of the recipe background
+			RenderSystem.disableBlend();
+			RenderSystem.colorMask(false, false, false, true);
+			RenderSystem.disableDepthTest();
+			renderRecipeBackground(recipe, matrices, x, y);
+			RenderSystem.enableDepthTest();
+			RenderSystem.colorMask(true, true, true, true);
+			// Blend should be off by default
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if (overlayColor != -1) {
-			DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
-		}
-
-		if (showMissing) {
-			HandledScreen hs = EmiApi.getHandledScreen();
-			EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
-			if (handler != null) {
-				handler.render(recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), widgets, matrices);
-			} else if (EmiScreenManager.lastPlayerInventory != null) {
-				StandardRecipeHandler.renderMissing(recipe, EmiScreenManager.lastPlayerInventory, widgets, matrices);
-			}
-		}
-
-		view.pop();
-		RenderSystem.applyModelViewMatrix();
-
-		// Force translucency to match that of the recipe background
-		RenderSystem.disableBlend();
-		RenderSystem.colorMask(false, false, false, true);
-		RenderSystem.disableDepthTest();
-		renderRecipeBackground(recipe, matrices, x, y);
-		RenderSystem.enableDepthTest();
-		RenderSystem.colorMask(true, true, true, true);
-		// Blend should be off by default
 	}
 }

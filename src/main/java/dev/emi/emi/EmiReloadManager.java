@@ -119,7 +119,7 @@ public class EmiReloadManager {
 						try {
 							plugin.getEntrypoint().register(registry);
 						} catch (Exception e) {
-							EmiReloadLog.warn("[emi] Exception loading plugin provided by " + plugin.getProvider().getMetadata().getId());
+							EmiReloadLog.warn("Exception loading plugin provided by " + plugin.getProvider().getMetadata().getId());
 							EmiReloadLog.error(e);
 							if (restart) {
 								continue outer;
