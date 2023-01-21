@@ -233,7 +233,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				for (Widget widget : group.widgets) {
 					widget.render(matrices, mx, my, delta);
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 				group.error(e);
 			}
@@ -278,7 +278,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 				group.error(e);
 			}
@@ -403,7 +403,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 							w += 26;
 						}
 						width = Math.max(width, w);
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						e.printStackTrace();
 					}
 				}
@@ -461,7 +461,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					if (EmiConfig.recipeScreenshotButton) {
 						widgets.add(new RecipeScreenshotButtonWidget(-5 - 12, by - 14 * lbutton++, r));
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					widgets.clear();
 					widgets.add(new RecipeBackground(-4, -4, rWidth + 8, rHeight + 8));
 					widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.initialize")),
@@ -510,7 +510,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 				group.error(e);
 			}
@@ -583,7 +583,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 				group.error(e);
 			}
@@ -676,7 +676,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			this.height = height;
 		}
 
-		public void error(Exception e) {
+		public void error(Throwable e) {
 			List<Widget> widgets = Lists.newArrayList();
 			if (!this.widgets.isEmpty()) {
 				widgets.add(this.widgets.get(0));

@@ -30,7 +30,7 @@ public class EmiReloadLog {
 		EmiLog.info(info);
 	}
 
-	public static void error(Exception e) {
+	public static void error(Throwable e) {
 		e.printStackTrace();
 		StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer, true));

@@ -107,7 +107,7 @@ public class EmiScreenshotRecorder {
 				Text text = EmiPort.literal(filename,
 					Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
 				messageReceiver.accept(EmiPort.translatable("screenshot.success", text));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				EmiLog.error("Failed to write screenshot");
 				e.printStackTrace();
 				messageReceiver.accept(EmiPort.translatable("screenshot.failure", e.getMessage()));

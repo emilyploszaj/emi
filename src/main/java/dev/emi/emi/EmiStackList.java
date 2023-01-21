@@ -48,7 +48,7 @@ public class EmiStackList {
 					fs.getName();
 					fs.getTooltip();
 					stacks.add(fs);
-				} catch (Exception e) {
+				} catch (Throwable e) {
 				}
 			}
 		}

@@ -250,7 +250,7 @@ public class EmiRenderHelper {
 			RenderSystem.enableDepthTest();
 			RenderSystem.colorMask(true, true, true, true);
 			// Blend should be off by default
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}

@@ -117,7 +117,7 @@ public class EmiReloadManager {
 						long start = System.currentTimeMillis();
 						try {
 							plugin.getEntrypoint().register(registry);
-						} catch (Exception e) {
+						} catch (Throwable e) {
 							EmiReloadLog.warn("Exception loading plugin provided by " + plugin.getProvider().getMetadata().getId());
 							EmiReloadLog.error(e);
 							if (restart) {
@@ -148,7 +148,7 @@ public class EmiReloadManager {
 					EmiScreenManager.search.update();
 					EmiReloadLog.bake();
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					EmiLog.error("Critical error occured during reload:");
 					e.printStackTrace();
 				}

@@ -1028,13 +1028,13 @@ public class EmiScreenManager {
 				return false;
 			}
 			ItemStack is = stack.getItemStack().copy();
+			is.setCount(amount);
 			if (mode == 1 && client.player.getAbilities().creativeMode) {
 				client.player.currentScreenHandler.setCursorStack(is);
 				return true;
 			}
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			buf.writeByte(mode);
-			is.setCount(amount);
 			buf.writeItemStack(is);
 			ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
 			return true;
