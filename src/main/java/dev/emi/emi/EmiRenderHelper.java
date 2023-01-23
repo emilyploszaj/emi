@@ -33,6 +33,7 @@ public class EmiRenderHelper {
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
 	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
 	public static final Identifier GRID = new Identifier("emi", "textures/gui/grid.png");
+	public static final Identifier CONFIG = new Identifier("emi", "textures/gui/config.png");
 	public static final Identifier PIECES = new Identifier("emi", "textures/gui/pieces.png");
 
 	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {

@@ -81,10 +81,16 @@ public abstract class ConfigEntryWidget extends Entry {
 	}
 
 	public boolean isVisible() {
-		if (!getSearchableText().toLowerCase().contains(search.get().toLowerCase())) {
-			return false;
+		String s = search.get().toLowerCase();
+		if (getSearchableText().toLowerCase().contains(s)) {
+			return true;
 		}
-		return true;
+		for (GroupNameWidget g : parentGroups) {
+			if (g.text.getString().toLowerCase().contains(s)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

@@ -24,7 +24,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiReloadManager;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiStackProviders;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
@@ -53,11 +52,13 @@ import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.emi.sidebar.EmiSidebars;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -86,7 +87,6 @@ public class EmiScreenManager {
 	// The last stack that was used to draw a tooltip, cleared each frame
 	public static ItemStack lastStackTooltipRendered;
 	public static EmiPlayerInventory lastPlayerInventory;
-	public static List<EmiIngredient> craftables = List.of();
 	public static int lastMouseX, lastMouseY;
 	// The stack that was clicked on, for determining when a drag properly starts
 	public static EmiIngredient pressedStack = EmiStack.EMPTY;
@@ -117,7 +117,7 @@ public class EmiScreenManager {
 		EmiPlayerInventory inv = EmiPlayerInventory.of(client.player);
 		if (!inv.isEqual(lastPlayerInventory)) {
 			lastPlayerInventory = inv;
-			craftables = lastPlayerInventory.getCraftables();
+			EmiSidebars.craftables = lastPlayerInventory.getCraftables();
 			SidebarPanel panel = getSearchPanel();
 			panel.batcher.repopulate();
 			if (panel.getType() == SidebarType.CRAFTABLES) {
@@ -402,7 +402,7 @@ public class EmiScreenManager {
 	}
 
 	public static List<? extends EmiIngredient> getSearchSource() {
-		return SidebarPanel.getFromSidebarType(getSearchPanel().getType());
+		return EmiSidebars.getStacks(getSearchPanel().getType());
 	}
 
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick) {
@@ -873,12 +873,8 @@ public class EmiScreenManager {
 		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
 			return true;
 		}
-		if (client.currentScreen.children() != null) {
-			for (Element e : client.currentScreen.children()) {
-				if (e instanceof TextFieldWidget tfw && tfw.isActive() && tfw.visible) {
-					return false;
-				}
-			}
+		if (hasFocusedTextField(client.currentScreen, 10)) {
+			return false;
 		}
 		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
@@ -891,6 +887,20 @@ public class EmiScreenManager {
 			}
 			if (genericInteraction(bind -> bind.matchesKey(keyCode, scanCode))) {
 				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean hasFocusedTextField(ParentElement parent, int depthBail) {
+		if (depthBail <= 0) {
+			return false;
+		}
+		for (Element e : client.currentScreen.children()) {
+			if (e instanceof TextFieldWidget tfw && tfw.isActive() && tfw.visible) {
+				return true;
+			} else if (e instanceof ParentElement p) {
+				return hasFocusedTextField(p, depthBail - 1);
 			}
 		}
 		return false;
@@ -1175,21 +1185,8 @@ public class EmiScreenManager {
 			if (isSearch() && getType() != SidebarType.CHESS) {
 				return searchedStacks;
 			} else {
-				return getFromSidebarType(getType());
+				return EmiSidebars.getStacks(getType());
 			}
-		}
-
-		public static List<? extends EmiIngredient> getFromSidebarType(SidebarType type) {
-			if (type != null) {
-				return switch (type) {
-					case NONE -> List.of();
-					case INDEX -> EmiStackList.stacks;
-					case CRAFTABLES -> lastPlayerInventory == null ? List.of() : craftables;
-					case FAVORITES -> EmiFavorites.favoriteSidebar;
-					case CHESS -> EmiChess.SIDEBAR;
-				};
-			}
-			return List.of();
 		}
 
 		public void updateWidgetPosition() {

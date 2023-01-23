@@ -88,8 +88,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 
 	public static class Craftable extends EmiFavorite {
 
-		public Craftable(EmiIngredient stack, @Nullable EmiRecipe recipe) {
-			super(stack, recipe);
+		public Craftable(EmiRecipe recipe) {
+			super(recipe.getOutputs().isEmpty() ? EmiStack.EMPTY : recipe.getOutputs().get(0), recipe);
 		}
 
 		@Override
