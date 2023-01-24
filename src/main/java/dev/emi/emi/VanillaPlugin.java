@@ -81,6 +81,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ArmorItem;
@@ -585,7 +586,7 @@ public class VanillaPlugin implements EmiPlugin {
 		EmiPort.getFluidRegistry().streamEntries().forEach(entry -> {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
-			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR) {
+			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR && fluid instanceof FlowableFluid) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
 					new Identifier("emi", "fill_bucket/" + EmiUtil.subId(fluid)), false));
 			}

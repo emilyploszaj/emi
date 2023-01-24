@@ -110,7 +110,7 @@ public class EmiScreenManager {
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 
 	private static boolean isDisabled() {
-		return EmiReloadManager.isReloading() || !EmiConfig.enabled;
+		return !EmiReloadManager.isLoaded() || !EmiConfig.enabled;
 	}
 
 	public static void recalculate() {
@@ -485,10 +485,17 @@ public class EmiScreenManager {
 			panel.updateWidgetVisibility();
 		}
 		if (isDisabled()) {
-			if (EmiReloadManager.isReloading()) {
-				client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading"), 4, screen.height - 16, -1);
-				if (!EmiReloadManager.receivedInitialData) {
-					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 26, -1);
+			if (!EmiReloadManager.isLoaded()) {
+				if (EmiReloadManager.getStatus() == -1) {
+					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.error"), 4, screen.height - 16, -1);
+				} else if (EmiReloadManager.getStatus() == 0) {
+					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 16, -1);
+				} else {
+					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading"), 4, screen.height - 16, -1);
+					client.textRenderer.drawWithShadow(matrices, EmiReloadManager.reloadStep, 4, screen.height - 26, -1);
+					if (System.currentTimeMillis() > EmiReloadManager.reloadWorry) {
+						client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.worry"), 4, screen.height - 36, -1);
+					}
 				}
 			}
 			client.getProfiler().pop();
@@ -1042,15 +1049,13 @@ public class EmiScreenManager {
 			ItemStack is = stack.getItemStack();
 			if (!is.isEmpty()) {
 				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
-				String command = "/give @s " + id;
+				String command = "give @s " + id;
 				if (is.hasNbt()) {
 					command += is.getNbt().toString();
 				}
 				command += " " + amount;
-				if (command.length() < 256) {
-					// client.world.sendPacket(new ChatMessageC2SPacket(command));
-					return true;
-				}
+				client.player.networkHandler.sendChatCommand(command);
+				return true;
 			}
 			return false;
 		}

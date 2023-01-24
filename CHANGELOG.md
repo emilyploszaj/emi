@@ -1,9 +1,7 @@
 ### Tweaks
-* (API) Recipes can now be displayed from non-handled screens
+* Tweaked bucketing world interaction recipe
+* Added more information about EMI reload status
 
 ### Fixes
-* Fixed rare workstation overlap
-* Fixed cursor stack not being counted in certain recipe handlers
-* Fixed cost per batch counting
-* Fixed favorites loading empty stacks
-* Fixed API artifact
+* Fixed client only stack cheating
+* Fixed certain exceptions not being properly handled
