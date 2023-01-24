@@ -150,7 +150,9 @@
   "emi.fluid.amount.droplets": "%s d",
 
   "emi.reloading": "EMI Reloading...",
-  "emi.reloading.waiting": "Waiting for recipe data from server...",
+  "emi.reloading.waiting": "EMI waiting for recipe data from server...",
+  "emi.reloading.error": "§cEMI experienced a critical exception while reloading, check log",
+  "emi.reloading.worry": "§cExperiencing delay, is everything alright?",
   "emi.search": "Search EMI...",
   "emi.search_config": "Search config...",
   "emi.delete_stack": "§cDelete held stack",
