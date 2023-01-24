@@ -1049,12 +1049,12 @@ public class EmiScreenManager {
 			ItemStack is = stack.getItemStack();
 			if (!is.isEmpty()) {
 				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
-				String command = "give @s " + id;
+				String command = "/give @s " + id;
 				if (is.hasNbt()) {
 					command += is.getNbt().toString();
 				}
 				command += " " + amount;
-				client.player.sendCommand(command);
+				client.player.sendChatMessage(command);
 				return true;
 			}
 			return false;
