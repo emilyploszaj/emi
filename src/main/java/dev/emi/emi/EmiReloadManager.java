@@ -19,18 +19,21 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.tag.TagKey;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.text.Text;
 
 public class EmiReloadManager {
-	private static volatile boolean clear = false, restart = false, populated = false;
+	private static volatile boolean clear = false, restart = false;
+	// 0 - empty, 1 - reloading, 2 - loaded, -1 - error
+	private static volatile int status = 0;
 	private static Thread thread;
-	public static volatile boolean receivedInitialData;
+	public static volatile Text reloadStep = EmiPort.literal("");
+	public static volatile long reloadWorry = Long.MAX_VALUE;
 
 	public static void clear() {
 		synchronized (EmiReloadManager.class) {
 			clear = true;
-			populated = false;
-			receivedInitialData = false;
+			status = 0;
+			reloadWorry = Long.MAX_VALUE;
 			if (thread != null && thread.isAlive()) {
 				restart = true;
 			} else {
@@ -43,7 +46,8 @@ public class EmiReloadManager {
 	
 	public static void reload() {
 		synchronized (EmiReloadManager.class) {
-			receivedInitialData = true;
+			step(EmiPort.literal("Starting Reload"));
+			status = 1;
 			if (thread != null && thread.isAlive()) {
 				restart = true;
 			} else {
@@ -55,8 +59,21 @@ public class EmiReloadManager {
 		}
 	}
 
-	public static boolean isReloading() {
-		return !populated || (thread != null && thread.isAlive());
+	public static void step(Text text) {
+		step(text, 5_000);
+	}
+
+	public static void step(Text text, long worry) {
+		reloadStep = text;
+		reloadWorry = System.currentTimeMillis() + worry;
+	}
+
+	public static boolean isLoaded() {
+		return status == 2 && (thread == null || !thread.isAlive());
+	}
+
+	public static int getStatus() {
+		return status;
 	}
 	
 	private static class ReloadWorker implements Runnable {
@@ -71,6 +88,7 @@ public class EmiReloadManager {
 					}
 					long reloadStart = System.currentTimeMillis();
 					restart = false;
+					step(EmiPort.literal("Clearing data"));
 					EmiRecipes.clear();
 					EmiStackList.clear();
 					EmiExclusionAreas.clear();
@@ -87,7 +105,8 @@ public class EmiReloadManager {
 						break;
 					}
 	
-					EmiClient.itemTags = Registry.ITEM.streamTags()
+					step(EmiPort.literal("Processing tags"));
+					EmiClient.itemTags = EmiPort.getItemRegistry().streamTags()
 						.filter(key -> !EmiClient.excludedTags.contains(key.id()))
 						.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 						.toList();
@@ -106,6 +125,7 @@ public class EmiReloadManager {
 							EmiReloadLog.info(" Tag warning can be disabled in the config, EMI docs describe how to add a translation or exclude tags.");
 						}
 					}
+					step(EmiPort.literal("Constructing index"));
 					EmiComparisonDefaults.comparisons = new HashMap<>();
 					EmiStackList.reload();
 					if (restart) {
@@ -115,11 +135,13 @@ public class EmiReloadManager {
 					for (EntrypointContainer<EmiPlugin> plugin : FabricLoader.getInstance()
 							.getEntrypointContainers("emi", EmiPlugin.class).stream()
 							.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList()) {
+						String id = plugin.getProvider().getMetadata().getName();
+						step(EmiPort.literal("Loading plugin from " + id), 10_000);
 						long start = System.currentTimeMillis();
 						try {
 							plugin.getEntrypoint().register(registry);
-						} catch (Exception e) {
-							EmiReloadLog.warn("Exception loading plugin provided by " + plugin.getProvider().getMetadata().getId());
+						} catch (Throwable e) {
+							EmiReloadLog.warn("Exception loading plugin provided by " + id);
 							EmiReloadLog.error(e);
 							if (restart) {
 								continue outer;
@@ -135,13 +157,16 @@ public class EmiReloadManager {
 					if (restart) {
 						continue;
 					}
-					populated = true;
+					step(EmiPort.literal("Baking index"));
 					EmiStackList.bake();
+					step(EmiPort.literal("Registering late recipes"), 10_000);
 					Consumer<EmiRecipe> registerLateRecipe = registry::addRecipe;
 					for (Consumer<Consumer<EmiRecipe>> consumer : EmiRecipes.lateRecipes) {
 						consumer.accept(registerLateRecipe);
 					}
+					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
+					step(EmiPort.literal("Finishing up"));
 					BoM.reload();
 					EmiPersistentData.load();
 					EmiSearch.bake();
@@ -149,9 +174,11 @@ public class EmiReloadManager {
 					EmiScreenManager.search.update();
 					EmiReloadLog.bake();
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
-				} catch (Exception e) {
+					status = 2;
+				} catch (Throwable e) {
 					EmiLog.error("Critical error occured during reload:");
 					e.printStackTrace();
+					status = -1;
 				}
 			} while (restart);
 			thread = null;
