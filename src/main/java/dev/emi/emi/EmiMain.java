@@ -146,7 +146,7 @@ public class EmiMain implements ModInitializer {
 			}
 		});
 		ServerPlayNetworking.registerGlobalReceiver(CREATE_ITEM, (server, player, networkHandler, buf, sender) -> {
-			if (player.hasPermissionLevel(2) && player.currentScreenHandler != null) {
+			if ((player.hasPermissionLevel(2) || player.isCreative()) && player.currentScreenHandler != null) {
 				int mode = buf.readByte();
 				ItemStack stack = buf.readItemStack();
 				server.execute(() -> {
