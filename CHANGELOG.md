@@ -1,7 +1,6 @@
 ### Tweaks
-* Tweaked bucketing world interaction recipe
-* Added more information about EMI reload status
+* Tweaked how centered effects are drawn to reuse vanilla codepaths when possible
+* Tweaked how certain cheat interactions work without op to be more convenient
 
 ### Fixes
-* Fixed client only stack cheating
-* Fixed certain exceptions not being properly handled
+* Fixed certain global config serialization issues
