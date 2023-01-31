@@ -1030,23 +1030,22 @@ public class EmiScreenManager {
 	}
 
 	private static boolean give(EmiStack stack, int amount, int mode) {
+		if (stack.getItemStack().isEmpty()) {
+			return false;
+		}
+		ItemStack is = stack.getItemStack().copy();
+		is.setCount(amount);
+		if (mode == 1 && client.player.getAbilities().creativeMode) {
+			client.player.currentScreenHandler.setCursorStack(is);
+			return true;
+		}
 		if (EmiClient.onServer) {
-			if (stack.getItemStack().isEmpty()) {
-				return false;
-			}
-			ItemStack is = stack.getItemStack().copy();
-			is.setCount(amount);
-			if (mode == 1 && client.player.getAbilities().creativeMode) {
-				client.player.currentScreenHandler.setCursorStack(is);
-				return true;
-			}
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			buf.writeByte(mode);
 			buf.writeItemStack(is);
 			ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
 			return true;
 		} else {
-			ItemStack is = stack.getItemStack();
 			if (!is.isEmpty()) {
 				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
 				String command = "/give @s " + id;

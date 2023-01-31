@@ -586,10 +586,7 @@ public class EmiConfig {
 			EmiLog.error("System property 'emi.config' set to '" + s + "' but does not point to real file, using default config.");
 		}
 		if (useGlobalConfig) {
-			File f = new File(getGlobalFolder(), "emi.css");
-			if (f.exists() && f.isFile()) {
-				return f;
-			}
+			return new File(getGlobalFolder(), "emi.css");
 		}
 		return new File(FabricLoader.getInstance().getConfigDir().toFile(), "emi.css");
 	}
