@@ -54,7 +54,12 @@ public class EmiRecipeFiller {
 	public static <T extends ScreenHandler> List<EmiRecipeHandler<T>> getAllHandlers(HandledScreen<T> screen) {
 		if (screen != null) {
 			T screenHandler = screen.getScreenHandler();
-			ScreenHandlerType<?> type = screenHandler.getType();
+			ScreenHandlerType<?> type;
+			try {
+				type = screenHandler.getType();
+			} catch (UnsupportedOperationException e) {
+				type = null;
+			}
 			if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
 				return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
 			}
