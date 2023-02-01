@@ -18,7 +18,6 @@ import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.mixin.accessor.ScreenHandlerAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
@@ -55,7 +54,7 @@ public class EmiRecipeFiller {
 	public static <T extends ScreenHandler> List<EmiRecipeHandler<T>> getAllHandlers(HandledScreen<T> screen) {
 		if (screen != null) {
 			T screenHandler = screen.getScreenHandler();
-			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
+			ScreenHandlerType<?> type = screenHandler.getType();
 			if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
 				return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
 			}
@@ -87,7 +86,7 @@ public class EmiRecipeFiller {
 		}
 		return false;
 	}
-	
+
 	public static <T extends ScreenHandler> @Nullable List<ItemStack> getStacks(StandardRecipeHandler<T> handler, EmiRecipe recipe, HandledScreen<T> screen, int amount) {
 		try {
 			T screenHandler = screen.getScreenHandler();
@@ -174,7 +173,7 @@ public class EmiRecipeFiller {
 				if (maxAmount == 0) {
 					return null;
 				}
-				
+
 				List<ItemStack> desired = Lists.newArrayList();
 				for (int i = 0; i < discovered.size(); i++) {
 					DiscoveredItem di = discovered.get(i);
@@ -231,7 +230,7 @@ public class EmiRecipeFiller {
 		}
 		return 0;
 	}
-	
+
 	public static <T extends ScreenHandler> boolean clientFill(StandardRecipeHandler<T> handler, EmiRecipe recipe,
 			HandledScreen<T> screen, List<ItemStack> stacks, EmiCraftContext.Destination destination) {
 		T screenHandler = screen.getScreenHandler();
