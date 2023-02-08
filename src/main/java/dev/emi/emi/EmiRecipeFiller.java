@@ -56,7 +56,7 @@ public class EmiRecipeFiller {
 			T screenHandler = screen.getScreenHandler();
 			ScreenHandlerType<?> type;
 			try {
-				type = screenHandler.getType();
+				type = screenHandler instanceof PlayerScreenHandler ? null : screenHandler.getType();
 			} catch (UnsupportedOperationException e) {
 				type = null;
 			}
