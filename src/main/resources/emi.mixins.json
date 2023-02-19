@@ -2,9 +2,7 @@
   "required": true,
   "package": "dev.emi.emi.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "accessor.ScreenHandlerAccessor"
-  ],
+  "mixins": [],
   "client": [
     "accessor.AxeItemAccessor",
     "accessor.CraftingResultSlotAccessor",

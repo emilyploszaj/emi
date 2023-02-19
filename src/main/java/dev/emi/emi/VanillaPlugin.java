@@ -489,7 +489,7 @@ public class VanillaPlugin implements EmiPlugin {
 			if (EmiClient.HOE_ACTIONS.containsKey(consumer)) {
 				Block b = entry.getKey();
 				Identifier id = new Identifier("emi", "tilling/" + EmiUtil.subId(b));
-				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer);
+				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer).stream().map(EmiStack::of).toList();
 				if (list.size() == 1) {
 					addRecipeSafe(registry, () -> basicWorld(EmiStack.of(b), hoes, list.get(0), id));
 				} else if (list.size() == 2) {

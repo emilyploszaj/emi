@@ -45,12 +45,12 @@ public class KeyboardMixin {
 			if (window == client.getWindow().getHandle()) {
 				Screen screen = client.currentScreen;
 				if (screen instanceof HandledScreen<?> hs && this.client.getOverlay() == null) {
-					boolean consume = true;
+					boolean consume = false;
 					if (Character.charCount(codePoint) == 1) {
-						consume &= EmiScreenManager.search.charTyped((char) codePoint, modifiers);
+						consume = EmiScreenManager.search.charTyped((char) codePoint, modifiers) || consume;
 					} else {
 						for (char c : Character.toChars(codePoint)) {
-							consume &= EmiScreenManager.search.charTyped(c, modifiers);
+							consume = EmiScreenManager.search.charTyped(c, modifiers) || consume;
 						}
 					}
 					if (consume) {
