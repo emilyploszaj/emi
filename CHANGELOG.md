@@ -1,6 +1,6 @@
 ### Tweaks
-* Tweaked how centered effects are drawn to reuse vanilla codepaths when possible
-* Tweaked how certain cheat interactions work without op to be more convenient
+* Tweaked the way EMI identifies screens for recipe handlers
 
 ### Fixes
-* Fixed certain global config serialization issues
+* Fixed extremely niche breakage of creative inventory and EMI index due to premature BlockItem resolution
+* Fixed some disabled focus consumption

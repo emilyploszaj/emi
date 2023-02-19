@@ -153,7 +153,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (!isMouseOver(mouseX, mouseY)) {
+		if (!isMouseOver(mouseX, mouseY) || !EmiConfig.enabled) {
 			setFocused(false);
 			return false;
 		} else {
