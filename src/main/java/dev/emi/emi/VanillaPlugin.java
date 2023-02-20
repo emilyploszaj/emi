@@ -120,6 +120,7 @@ import net.minecraft.recipe.ShulkerBoxColoringRecipe;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.recipe.SmokingRecipe;
+import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
@@ -326,6 +327,18 @@ public class VanillaPlugin implements EmiPlugin {
 				}
 			} else if (recipe instanceof MapCloningRecipe map) {
 				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
+			} else if (!(recipe instanceof SpecialCraftingRecipe)) {
+				try {
+					if (!recipe.getIngredients().isEmpty() && !recipe.getOutput().isEmpty()) {
+						boolean shapeless = recipe.fits(1, recipe.getIngredients().size()) && recipe.fits(recipe.getIngredients().size(), 1);
+						List<EmiIngredient> input = recipe.getIngredients().stream().map(EmiIngredient::of).toList();
+						EmiShapedRecipe.setRemainders(input, recipe);
+						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(recipe.getOutput()), recipe.getId(), shapeless));
+					}
+				} catch (Exception e) {
+					EmiReloadLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
+					EmiReloadLog.error(e);
+				}
 			}
 		}
 

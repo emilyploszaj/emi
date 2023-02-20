@@ -22,7 +22,6 @@ import dev.emi.emi.data.EmiData;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.ModelIdentifier;
@@ -60,12 +59,6 @@ public class EmiClient implements ClientModInitializer {
 					}
 				}
 			}
-		});
-
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			EmiLog.info("Disconnected from server, EMI data cleared");
-			EmiReloadManager.clear();
-			onServer = false;
 		});
 
 		ClientPlayNetworking.registerGlobalReceiver(EmiMain.PING, (client, handler, buf, sender) -> {
