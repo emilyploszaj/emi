@@ -21,6 +21,7 @@
     "HoeItemMixin",
     "ItemStackMixin",
     "KeyboardMixin",
+    "MinecraftClientGameMixin",
     "MinecraftClientMixin",
     "MouseMixin",
     "ScreenMixin",
