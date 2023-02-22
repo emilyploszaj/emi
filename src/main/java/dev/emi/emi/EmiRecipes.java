@@ -41,6 +41,7 @@ public class EmiRecipes {
 	public static Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
 	
 	public static void clear() {
+		lateRecipes.clear();
 		invalidators.clear();
 		categories.clear();
 		workstations.clear();
