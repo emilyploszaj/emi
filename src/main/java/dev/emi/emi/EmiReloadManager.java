@@ -162,7 +162,15 @@ public class EmiReloadManager {
 					step(EmiPort.literal("Registering late recipes"), 10_000);
 					Consumer<EmiRecipe> registerLateRecipe = registry::addRecipe;
 					for (Consumer<Consumer<EmiRecipe>> consumer : EmiRecipes.lateRecipes) {
-						consumer.accept(registerLateRecipe);
+						try {
+							consumer.accept(registerLateRecipe);
+						} catch (Exception e) {
+							EmiReloadLog.warn("Exception loading late recipes for plugins:");
+							EmiReloadLog.error(e);
+							if (restart) {
+								continue outer;
+							}
+						}
 					}
 					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
