@@ -1,10 +1,8 @@
 package dev.emi.emi.sidebar;
 
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +12,7 @@ import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiPersistentData;
 import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiStackList;
+import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -25,18 +24,31 @@ import net.minecraft.util.JsonHelper;
 
 public class EmiSidebars {
 	public static List<EmiIngredient> craftables = List.of();
+	public static List<EmiIngredient> lookupHistory = Lists.newArrayList();
 	public static List<EmiIngredient> craftHistory = Lists.newArrayList();
-	public static Set<SidebarType> dirty = Sets.newHashSet();
 
 	public static List<? extends EmiIngredient> getStacks(SidebarType type) {
 		return switch (type) {
 			case INDEX -> EmiStackList.stacks;
 			case CRAFTABLES -> craftables;
 			case FAVORITES -> EmiFavorites.favoriteSidebar;
+			case LOOKUP_HISTORY -> lookupHistory;
 			case CRAFT_HISTORY -> craftHistory;
 			case CHESS -> EmiChess.SIDEBAR;
 			default -> List.of();
 		};
+	}
+
+	public static void lookup(EmiIngredient stack) {
+		if (!stack.isEmpty()) {
+			if (lookupHistory.size() >= 1 && lookupHistory.get(0).equals(stack)) {
+				return;
+			}
+			lookupHistory.remove(stack);
+			lookupHistory.add(0, stack);
+			EmiPersistentData.save();
+			EmiScreenManager.repopulatePanels(SidebarType.LOOKUP_HISTORY);
+		}
 	}
 
 	public static void craft(EmiRecipe recipe) {
@@ -48,12 +60,22 @@ public class EmiSidebars {
 			craftHistory.removeIf(i -> i instanceof EmiFavorite.Craftable c && c.getRecipe().equals(recipe));
 			craftHistory.add(0, stack);
 			EmiPersistentData.save();
-			EmiScreenManager.forPanel(SidebarType.CRAFT_HISTORY, p -> p.batcher.repopulate());
+			EmiScreenManager.repopulatePanels(SidebarType.CRAFT_HISTORY);
 		}
 	}
 
 	public static void save(JsonObject json) {
 		JsonArray arr = new JsonArray();
+		for (int i = 0; i < 1024; i++) {
+			if (i >= lookupHistory.size()) {
+				break;
+			}
+			EmiIngredient stack = lookupHistory.get(i);
+			arr.add(EmiStackSerializer.serialize(stack));
+		}
+		json.add("lookup_history", arr);
+
+		arr = new JsonArray();
 		for (int i = 0; i < 1024; i++) {
 			if (i >= craftHistory.size()) {
 				break;
@@ -64,11 +86,20 @@ public class EmiSidebars {
 				arr.add(recipe.getId().toString());
 			}
 		}
-		System.out.println(arr);
 		json.add("craft_history", arr);
 	}
 
 	public static void load(JsonObject json) {
+		lookupHistory.clear();
+		if (JsonHelper.hasArray(json, "lookup_history")) {
+			for (JsonElement el : JsonHelper.getArray(json, "lookup_history")) {
+				EmiIngredient stack = EmiStackSerializer.deserialize(el);
+				if (!stack.isEmpty()) {
+					lookupHistory.add(stack);
+				}
+			}
+		}
+
 		craftHistory.clear();
 		if (JsonHelper.hasArray(json, "craft_history")) {
 			for (JsonElement el : JsonHelper.getArray(json, "craft_history")) {

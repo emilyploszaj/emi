@@ -33,6 +33,14 @@ public class EmptyEmiStack extends EmiStack {
 	public EmiStack copy() {
 		return EMPTY;
 	}
+	
+	public EmiStack setAmount(long amount) {
+		return this;
+	}
+	
+	public EmiStack setChance(float chance) {
+		return this;
+	}
 
 	@Override
 	public boolean isEmpty() {

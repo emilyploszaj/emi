@@ -34,6 +34,8 @@
   "emi.sidebar.type.index": "Index",
   "emi.sidebar.type.craftables": "Craftables",
   "emi.sidebar.type.favorites": "Favorites",
+  "emi.sidebar.type.lookup_history": "Lookup History",
+  "emi.sidebar.type.craft_history": "Crafting History",
   "emi.sidebar.type.chess": "Chess",
   "emi.sidebar.theme.transparent": "Transparent",
   "emi.sidebar.theme.vanilla": "Vanilla",
@@ -83,6 +85,7 @@
   "config.emi.ui.empty_search_sidebar_focus": "Empty Search Sidebar Focus",
 
   "config.emi.ui.left_sidebar_pages": "Pages",
+  "config.emi.ui.left_sidebar_subpanels": "Subpanels",
   "config.emi.ui.left_sidebar_size": "Size",
   "config.emi.ui.left_sidebar_margins": "Margins",
   "config.emi.ui.left_sidebar_align": "Align",
@@ -90,6 +93,7 @@
   "config.emi.ui.left_sidebar_theme": "Theme",
 
   "config.emi.ui.right_sidebar_pages": "Pages",
+  "config.emi.ui.right_sidebar_subpanels": "Subpanels",
   "config.emi.ui.right_sidebar_size": "Size",
   "config.emi.ui.right_sidebar_margins": "Margins",
   "config.emi.ui.right_sidebar_align": "Align",
@@ -97,6 +101,7 @@
   "config.emi.ui.right_sidebar_theme": "Theme",
 
   "config.emi.ui.top_sidebar_pages": "Pages",
+  "config.emi.ui.top_sidebar_subpanels": "Subpanels",
   "config.emi.ui.top_sidebar_size": "Size",
   "config.emi.ui.top_sidebar_margins": "Margins",
   "config.emi.ui.top_sidebar_align": "Align",
@@ -104,6 +109,7 @@
   "config.emi.ui.top_sidebar_theme": "Theme",
 
   "config.emi.ui.bottom_sidebar_pages": "Pages",
+  "config.emi.ui.bottom_sidebar_subpanels": "Subpanels",
   "config.emi.ui.bottom_sidebar_size": "Size",
   "config.emi.ui.bottom_sidebar_margins": "Margins",
   "config.emi.ui.bottom_sidebar_align": "Align",
@@ -149,6 +155,7 @@
   "emi.fluid.amount.millibuckets": "%s mB",
   "emi.fluid.amount.droplets": "%s d",
 
+  "emi.disabled": "EMI disabled! Toggle with",
   "emi.reloading": "EMI Reloading...",
   "emi.reloading.waiting": "EMI waiting for recipe data from server...",
   "emi.reloading.error": "§cEMI experienced a critical exception while reloading, check log",
@@ -171,6 +178,8 @@
   "emi.no_tree": "You haven't set a recipe tree to view yet...",
   "emi.random_tree": "Perhaps you'd like to see a random one?",
   "emi.random_tree_input": "Press §6[ctrl + r]",
+  "tooltip.emi.chance.consume": "Consumption chance: %s%%",
+  "tooltip.emi.chance.produce": "Production chance: %s%%",
   "tooltip.emi.accepts": "Accepts:",
   "tooltip.emi.fill_recipe": "Fill Recipe",
   "tooltip.emi.fill_recipe_no_server": "Cannot Fill Recipe without EMI on server",
@@ -544,6 +553,7 @@
   "tag.c.seeds.pumpkin": "Pumpkin Seeds",
   "tag.c.seeds.wheat": "Wheat Seeds",
   "tag.c.shears": "Shears",
+  "tag.c.shields": "Shields",
   "tag.c.shovels": "Shovels",
   "tag.c.shulker_boxes": "Shulker Boxes",
   "tag.c.skulls": "Skulls",

@@ -27,6 +27,7 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 import dev.emi.emi.config.IntGroup;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.config.SidebarPages;
+import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
@@ -41,6 +42,7 @@ import dev.emi.emi.screen.widget.config.IntWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
 import dev.emi.emi.screen.widget.config.ScreenAlignWidget;
 import dev.emi.emi.screen.widget.config.SidebarPagesWidget;
+import dev.emi.emi.screen.widget.config.SidebarSubpanelsWidget;
 import dev.emi.emi.screen.widget.config.SubGroupNameWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -233,6 +235,8 @@ public class ConfigScreen extends Screen {
 						entry = new ScreenAlignWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (field.getType() == SidebarPages.class) {
 						entry = new SidebarPagesWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
+					} else if (field.getType() == SidebarSubpanels.class) {
+						entry = new SidebarSubpanelsWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (IntGroup.class.isAssignableFrom(field.getType())) {
 						entry = new IntGroupWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {

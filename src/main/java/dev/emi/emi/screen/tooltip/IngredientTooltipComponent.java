@@ -54,20 +54,12 @@ public class IngredientTooltipComponent implements TooltipComponent {
 		int sw = getStackWidth();
 		for (int i = 0; i < ingredients.size() && i < MAX_DISPLAYED; i++) {
 			ingredients.get(i).render(matrices, x + i % sw * 18, y + i / sw * 18, MinecraftClient.getInstance().getTickDelta());
-			/*
-			if (!ingredient.isEmpty()) {
-				EmiRenderHelper.renderTag(ingredient, matrices, x + i % 8 * 18, y + i / 8 * 18);
-				EmiRenderHelper.renderRemainder(ingredient, matrices, x + i % 8 * 18, y + i / 8 * 18);
-			}*/
 		}
 		if (ingredients.size() > MAX_DISPLAYED) {
 			EmiPort.setPositionColorTexShader();
 			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			matrices.push();
-			matrices.translate(0, 0, z);
 			DrawableHelper.drawTexture(matrices, x + getWidth(textRenderer) - 14, y + getHeight() - 8, 0, 192, 9, 3, 256, 256);
-			matrices.pop();
 		}
 		matrices.pop();
 	}

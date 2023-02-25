@@ -29,7 +29,7 @@ public class RecipeTooltipComponent implements TooltipComponent {
 		this.showMissing = showMissing;
 		try {
 			width = recipe.getDisplayWidth() + 8;
-			height = recipe.getDisplayHeight() + 8;
+			height = recipe.getDisplayHeight() + 8 + 2;
 		} catch (Exception e) {
 		}
 	}

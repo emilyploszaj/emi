@@ -12,6 +12,7 @@
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
     "accessor.SmithingRecipeAccessor",
+    "api.EmiIngredientMixin",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",

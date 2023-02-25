@@ -31,8 +31,28 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
+	public EmiIngredient copy() {
+		return new EmiFavorite(stack, recipe);
+	}
+
+	@Override
 	public long getAmount() {
 		return stack.getAmount();
+	}
+
+	@Override
+	public EmiIngredient setAmount(long amount) {
+		return this;
+	}
+
+	@Override
+	public float getChance() {
+		return 1;
+	}
+
+	@Override
+	public EmiIngredient setChance(float chance) {
+		return this;
 	}
 
 	public EmiRecipe getRecipe() {

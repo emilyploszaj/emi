@@ -255,6 +255,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
+		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, delta);
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (categoryHovered) {
