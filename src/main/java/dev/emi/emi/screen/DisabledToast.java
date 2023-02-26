@@ -6,7 +6,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,7 +14,7 @@ public class DisabledToast implements Toast {
 
 	@Override
 	public Visibility draw(MatrixStack matrices, ToastManager manager, long time) {
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		manager.drawTexture(matrices, 0, 0, 0, 0, this.getWidth(), this.getHeight());
