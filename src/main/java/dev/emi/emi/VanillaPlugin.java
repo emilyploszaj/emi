@@ -137,7 +137,7 @@ import net.minecraft.util.Identifier;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
-		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208));
+		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.identifier());
 
 	// composting, fuel
 	

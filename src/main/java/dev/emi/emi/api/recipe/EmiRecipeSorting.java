@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 import dev.emi.emi.EmiStackList;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.util.Identifier;
 
 @ApiStatus.Experimental
 public class EmiRecipeSorting {
@@ -16,6 +17,23 @@ public class EmiRecipeSorting {
 
 	public static Comparator<EmiRecipe> none() {
 		return NONE;
+	}
+
+	public static Comparator<EmiRecipe> identifier() {
+		return (ar, br) -> {
+			Identifier a = ar.getId(); 
+			Identifier b = br.getId(); 
+			if (a == null) {
+				if (b == null) {
+					return 0;
+				} else {
+					return 1;
+				}
+			} else if (b == null) {
+				return -1;
+			}
+			return a.compareTo(b);
+		};
 	}
 	
 	public static Comparator<EmiRecipe> compareOutputThenInput() {
