@@ -148,7 +148,7 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 				Identifier stackId = new Identifier(m.group(2), m.group(3));
 				try {
 					String g4 = m.group(4);
-					if (!g4.isEmpty()) {
+					if (g4 != null) {
 						nbt = StringNbtReader.parse(g4);
 					}
 				} catch (Exception e) {

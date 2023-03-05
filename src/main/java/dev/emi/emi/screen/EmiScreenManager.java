@@ -1195,7 +1195,9 @@ public class EmiScreenManager {
 			if (isSearch()) {
 				EmiSearch.search(search.getText());
 			}
-			space.batcher.repopulate();
+			if (space != null) {
+				space.batcher.repopulate();
+			}
 		}
 
 		public void setType(SidebarType type) {
