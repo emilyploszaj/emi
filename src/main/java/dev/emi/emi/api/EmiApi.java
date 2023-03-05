@@ -24,6 +24,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
@@ -135,6 +136,7 @@ public class EmiApi {
 			setPages(mapRecipes(pruneSources(
 				EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), List.of()),
 				stack.getEmiStacks().get(0))));
+			focusRecipe(BoM.getRecipe(stack.getEmiStacks().get(0)));
 		}
 	}
 
