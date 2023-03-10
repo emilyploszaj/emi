@@ -116,6 +116,9 @@ public class EmiFavorites {
 		if (stack instanceof EmiFavorite.Synthetic) {
 			return;
 		}
+		if (stack instanceof EmiFavorite.Craftable craftable) {
+			stack = craftable.stack;
+		}
 		if (stack instanceof EmiFavorite f) {
 			if (!favorites.remove(f)) {
 				favorites.add(f);
