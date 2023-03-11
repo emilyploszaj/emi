@@ -76,9 +76,19 @@ public class EmiCraftingRecipe implements EmiRecipe {
 		if (shapeless) {
 			widgets.addTexture(EmiTexture.SHAPELESS, 97, 0);
 		}
+		int sOff = 0;
+		if (!shapeless) {
+			if (canFit(1, 3)) {
+				sOff -= 1;
+			}
+			if (canFit(3, 1)) {
+				sOff -= 3;
+			}
+		}
 		for (int i = 0; i < 9; i++) {
-			if (i < input.size()) {
-				widgets.addSlot(input.get(i), i % 3 * 18, i / 3 * 18);
+			int s = i + sOff;
+			if (s >= 0 && s < input.size()) {
+				widgets.addSlot(input.get(s), i % 3 * 18, i / 3 * 18);
 			} else {
 				widgets.addSlot(EmiStack.of(ItemStack.EMPTY), i % 3 * 18, i / 3 * 18);
 			}

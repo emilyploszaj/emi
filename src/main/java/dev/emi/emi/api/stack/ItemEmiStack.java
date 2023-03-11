@@ -2,13 +2,13 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
-import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
@@ -59,6 +59,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public EmiStack copy() {
 		EmiStack e = new ItemEmiStack(stack.copy(), amount);
+		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
 		return e;
@@ -98,7 +99,11 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			view.push();
 			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
 			RenderSystem.applyModelViewMatrix();
-			client.getItemRenderer().renderInGui(stack, x, y);
+			ItemRenderer itemRenderer = client.getItemRenderer();
+			float zOffset = itemRenderer.zOffset;
+			itemRenderer.zOffset = 0;
+			itemRenderer.renderInGui(stack, x, y);
+			itemRenderer.zOffset = zOffset;
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
@@ -156,18 +161,15 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public List<TooltipComponent> getTooltip() {
 		ItemStack stack = getItemStack();
+		List<TooltipComponent> list = Lists.newArrayList();
 		if (!isEmpty()) {
-			List<TooltipComponent> list = FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
+			list.addAll(FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack));
 			//String namespace = EmiPort.getItemRegistry().getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
 			//list.add(TooltipComponent.of(EmiLang.literal(mod, Formatting.BLUE, Formatting.ITALIC)));
-			if (!getRemainder().isEmpty()) {
-				list.add(new RemainderTooltipComponent(this));
-			}
-			return list;
-		} else {
-			return List.of();
+			list.addAll(super.getTooltip());
 		}
+		return list;
 	}
 
 	@Override

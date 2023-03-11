@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
@@ -26,9 +27,11 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 import dev.emi.emi.config.IntGroup;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.config.SidebarPages;
+import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
+import dev.emi.emi.screen.widget.config.ConfigJumpButton;
 import dev.emi.emi.screen.widget.config.ConfigSearch;
 import dev.emi.emi.screen.widget.config.EmiBindWidget;
 import dev.emi.emi.screen.widget.config.EmiNameWidget;
@@ -39,6 +42,7 @@ import dev.emi.emi.screen.widget.config.IntWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
 import dev.emi.emi.screen.widget.config.ScreenAlignWidget;
 import dev.emi.emi.screen.widget.config.SidebarPagesWidget;
+import dev.emi.emi.screen.widget.config.SidebarSubpanelsWidget;
 import dev.emi.emi.screen.widget.config.SubGroupNameWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -130,7 +134,7 @@ public class ConfigScreen extends Screen {
 
 		list = new ListWidget(client, width, height, 40, height - 60);
 		this.addDrawable(new EmiNameWidget(width / 2, 16));
-		int w = Math.min(400, width - 40);
+		int w = Math.min(400, width - 40) / 4 * 4;
 		int x = (width - w) / 2;
 		search = new ConfigSearch(x + 3, height - 51, w / 2 - 4, 18);
 		this.addDrawable(search.field);
@@ -156,6 +160,7 @@ public class ConfigScreen extends Screen {
 		}));
 		this.addDrawableChild(resetButton);
 		this.addSelectableChild(search.field);
+
 		try {
 			String lastGroup = "";
 			GroupNameWidget lastGroupWidget = null;
@@ -172,7 +177,7 @@ public class ConfigScreen extends Screen {
 					if (!group.equals(lastGroup)) {
 						lastGroup = group;
 						Text text = EmiPort.translatable("config.emi.group." + group.replace('-', '_'));
-						lastGroupWidget = new GroupNameWidget(text);
+						lastGroupWidget = new GroupNameWidget(group, text);
 						if (collapsed.contains(text.getString())) {
 							lastGroupWidget.collapsed = true;
 						}
@@ -182,7 +187,7 @@ public class ConfigScreen extends Screen {
 					if (configGroup != null) {
 						currentGroup = configGroup;
 						Text text = EmiPort.translatable("config.emi.group." + configGroup.value().replace('-', '_'));
-						currentSubGroupWidget = new SubGroupNameWidget(text);
+						currentSubGroupWidget = new SubGroupNameWidget(configGroup.value(), text);
 						if (collapsed.contains(text.getString())) {
 							currentSubGroupWidget.collapsed = true;
 						}
@@ -230,6 +235,8 @@ public class ConfigScreen extends Screen {
 						entry = new ScreenAlignWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (field.getType() == SidebarPages.class) {
 						entry = new SidebarPagesWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
+					} else if (field.getType() == SidebarSubpanels.class) {
+						entry = new SidebarSubpanelsWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (IntGroup.class.isAssignableFrom(field.getType())) {
 						entry = new IntGroupWidget(translation, getFieldTooltip(field), searchSupplier, objectMutator(field));
 					} else if (ConfigEnum.class.isAssignableFrom(field.getType())) {
@@ -262,7 +269,58 @@ public class ConfigScreen extends Screen {
 		this.addSelectableChild(list);
 		list.setScrollAmount(scroll);
 		search.setText(query);
+		addJumpButtons();
 		updateChanges();
+	}
+
+	private void addJumpButtons() {
+		List<String> jumps = Lists.newArrayList(
+			"general", "general.search",
+			"ui", "ui.left-sidebar", "ui.right-sidebar", "ui.top-sidebar", "ui.bottom-sidebar",
+			"binds", "binds.crafts", "binds.cheats",
+			"dev"
+		);
+		List<List<String>> removes = List.of(
+			List.of("binds.cheats"),
+			List.of("general.search"),
+			List.of("ui.top-sidebar", "ui.bottom-sidebar"),
+			List.of("binds.crafts"),
+			List.of("ui.left-sidebar", "ui.right-sidebar")
+		);
+		int space = list.getLogicalHeight() - 10;
+		for (List<String> r : removes) {
+			if (jumps.size() * 16 > space) {
+				jumps.removeAll(r);
+			}
+		}
+		int y = 40 + (list.getLogicalHeight() - jumps.size() * 16) / 2;
+		int u = 0, v = -16;
+		for (String s : jumps) {
+			boolean newGroup = !s.contains(".");
+			if (newGroup) {
+				v += 16;
+				u = 0;
+			} else {
+				u += 16;
+			}
+			this.addDrawableChild(new ConfigJumpButton(
+				2 + (newGroup ? 0 : 8), y, u, v, w -> jump(s),
+				List.of(EmiPort.translatable("config.emi.group." + s.replace('-', '_')))));
+			y += 16;
+		}
+	}
+
+	public void jump(String jump) {
+		for (ListWidget.Entry e : list.children()) {
+			if (e instanceof ConfigEntryWidget c) {
+				for (GroupNameWidget p : c.parentGroups) {
+					if (p.id.equals(jump)) {
+						list.centerScrollOn(e);
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")

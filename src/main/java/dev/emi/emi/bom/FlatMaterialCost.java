@@ -10,4 +10,8 @@ public class FlatMaterialCost {
 		this.ingredient = ingredient;
 		this.amount = amount;
 	}
+
+	public long getEffectiveAmount() {
+		return amount;
+	}
 }

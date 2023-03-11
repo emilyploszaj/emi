@@ -134,11 +134,16 @@ public class EmiPlayerInventory {
 			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), List.of()));
 		}
 		return set.stream().filter(r -> !r.hideCraftable() && predicate.test(r) && r.getOutputs().size() > 0)
-			.map(r -> new EmiFavorite.Craftable(r.getOutputs().get(0), r))
-			.sorted((a, b) -> Integer.compare(
-				EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
-				EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE)
-			)).collect(Collectors.toList());
+			.map(r -> new EmiFavorite.Craftable(r))
+			.sorted((a, b) -> {
+				int i = Integer.compare(
+					EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
+					EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE));
+				if (i != 0) {
+					return i;
+				}
+				return Long.compare(a.getAmount(), b.getAmount());
+			}).collect(Collectors.toList());
 	}
 
 	public List<Boolean> getCraftAvailability(EmiRecipe recipe) {

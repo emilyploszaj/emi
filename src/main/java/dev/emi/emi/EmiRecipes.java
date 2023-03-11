@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
@@ -57,7 +58,7 @@ public class EmiRecipes {
 		long start = System.currentTimeMillis();
 		Map<Object, Set<EmiRecipe>> byInput = Maps.newHashMap();
 		Map<Object, Set<EmiRecipe>> byOutput = Maps.newHashMap();
-		recipes.addAll(EmiData.recipes);
+		recipes.addAll(EmiData.recipes.stream().map(Supplier::get).toList());
 
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 

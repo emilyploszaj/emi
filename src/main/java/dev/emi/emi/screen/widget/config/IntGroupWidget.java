@@ -38,9 +38,9 @@ public class IntGroupWidget extends ConfigEntryWidget {
 
 	public int getSpacing() {
 		if (group.values.size() > 2) {
-			return 12;
+			return 19;
 		} else {
-			return 24;
+			return 20;
 		}
 	}
 
@@ -48,7 +48,7 @@ public class IntGroupWidget extends ConfigEntryWidget {
 		if (group.values.size() > 2) {
 			return 40;
 		} else {
-			return 75;
+			return 99;
 		}
 	}
 
@@ -70,7 +70,11 @@ public class IntGroupWidget extends ConfigEntryWidget {
 		int es = edits.size();
 		for (int i = 0; i < es; i++) {
 			int fromRight = es - i;
-			edits.get(i).setPosition(x + width - w * fromRight - spacing * (fromRight - 1), y);
+			int extra = 0;
+			if (es > 2 && i < 2) {
+				extra = -1;
+			}
+			edits.get(i).setPosition(x + width - w * fromRight - spacing * (fromRight - 1) + extra, y);
 		}
 	}
 }
