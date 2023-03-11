@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.sidebar.EmiSidebars;
 import net.minecraft.util.JsonHelper;
 
 public class EmiPersistentData {
@@ -18,6 +19,7 @@ public class EmiPersistentData {
 		try {
 			JsonObject json = new JsonObject();
 			json.add("favorites", EmiFavorites.save());
+			EmiSidebars.save(json);
 			json.add("recipe_defaults", BoM.saveAdded());
 			FileWriter writer = new FileWriter(FILE);
 			GSON.toJson(json, writer);
@@ -37,6 +39,7 @@ public class EmiPersistentData {
 			if (JsonHelper.hasArray(json, "favorites")) {
 				EmiFavorites.load(JsonHelper.getArray(json, "favorites"));
 			}
+			EmiSidebars.load(json);
 			if (JsonHelper.hasJsonObject(json, "recipe_defaults")) {
 				BoM.loadAdded(JsonHelper.getObject(json, "recipe_defaults"));
 			}

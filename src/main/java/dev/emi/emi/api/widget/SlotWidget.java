@@ -20,6 +20,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
+import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -165,10 +166,11 @@ public class SlotWidget extends Widget {
 				DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), width, height, u, v, width, height, 256, 256);
 			} else {
 				RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+				int v = getStack().getChance() != 1 ? bounds.height() : 0;
 				if (output) {
-					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 26, 26, 18, 0, 26, 26, 256, 256);
+					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 26, 26, 18, v, 26, 26, 256, 256);
 				} else {
-					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 18, 18, 0, 0, 18, 18, 256, 256);
+					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 18, 18, 0, v, 18, 18, 256, 256);
 				}
 			}
 		}
@@ -213,6 +215,9 @@ public class SlotWidget extends Widget {
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
 			list.add(supplier.get());
 		}
+		if (getStack().getChance() != 1) {
+			list.add(EmiTooltip.chance((recipe != null ? "produce" : "consume"), getStack().getChance()));
+		}
 		EmiRecipe recipe = getRecipe();
 		if (recipe != null) {
 			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
@@ -226,7 +231,7 @@ public class SlotWidget extends Widget {
 			}
 			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
 				RecipeCostTooltipComponent rctc = new RecipeCostTooltipComponent(recipe);
-				if (!rctc.tree.fractionalCosts.isEmpty()) {
+				if (rctc.shouldDisplay()) {
 					list.add(rctc);
 				}
 			}

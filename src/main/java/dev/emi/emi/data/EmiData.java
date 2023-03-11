@@ -3,6 +3,7 @@ package dev.emi.emi.data;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -33,7 +34,7 @@ public class EmiData {
 	public static List<Predicate<EmiRecipe>> recipeFilters = List.of();
 	public static List<IndexStackData> stackData = List.of();
 	public static List<EmiAlias> aliases = List.of();
-	public static List<EmiRecipe> recipes = List.of();
+	public static List<Supplier<EmiRecipe>> recipes = List.of();
 	
 	public static void init() {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
@@ -175,13 +176,13 @@ public class EmiData {
 					}
 				}, list -> aliases = list));
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
-			new EmiDataLoader<List<EmiRecipe>>(
+			new EmiDataLoader<List<Supplier<EmiRecipe>>>(
 				new Identifier("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
 				(list, json, oid) -> {
 					String s = JsonHelper.getString(json, "type", "");
 					Identifier id = new Identifier("emi:/generated/" + oid.getPath());
 					if (s.equals("emi:info")) {
-						list.add(new EmiInfoRecipe(getArrayOrSingleton(json, "stacks").map(EmiStackSerializer::deserialize).toList(),
+						list.add(() -> new EmiInfoRecipe(getArrayOrSingleton(json, "stacks").map(EmiStackSerializer::deserialize).toList(),
 							getArrayOrSingleton(json, "text").map(t -> (Text) EmiPort.translatable(t.getAsString())).toList(),
 							id));
 					} else if (s.equals("emi:world_interaction")) {
@@ -196,7 +197,7 @@ public class EmiData {
 							i -> builder.output(i.getEmiStacks().get(0))
 						);
 						builder.id(id);
-						list.add(builder.build());
+						list.add(() -> builder.build());
 					}
 				}, list -> recipes = list));
 	}

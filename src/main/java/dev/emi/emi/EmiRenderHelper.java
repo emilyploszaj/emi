@@ -33,6 +33,8 @@ public class EmiRenderHelper {
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
 	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
 	public static final Identifier GRID = new Identifier("emi", "textures/gui/grid.png");
+	public static final Identifier DASH = new Identifier("emi", "textures/gui/dash.png");
+	public static final Identifier CONFIG = new Identifier("emi", "textures/gui/config.png");
 	public static final Identifier PIECES = new Identifier("emi", "textures/gui/pieces.png");
 
 	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
@@ -107,9 +109,9 @@ public class EmiRenderHelper {
 	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {
 		matrices.push();
 		matrices.translate(0, 0, 100);
-        RenderSystem.colorMask(true, true, true, false);
+		RenderSystem.colorMask(true, true, true, false);
 		DrawableHelper.fill(matrices, x, y, x + w, y + h, -2130706433);
-        RenderSystem.colorMask(true, true, true, true);
+		RenderSystem.colorMask(true, true, true, true);
 		matrices.pop();
 	}
 
@@ -157,9 +159,12 @@ public class EmiRenderHelper {
 				if (remainder.equals(ingredient)) {
 					renderCatalyst(ingredient, matrices, x, y);
 				} else {
-					RenderSystem.disableDepthTest();
+					RenderSystem.enableDepthTest();
+					matrices.push();
+					matrices.translate(0, 0, 200);
 					RenderSystem.setShaderTexture(0, WIDGETS);
 					DrawableHelper.drawTexture(matrices, x + 12, y, 4, 252, 4, 4, 256, 256);
+					matrices.pop();
 				}
 				return;
 			}

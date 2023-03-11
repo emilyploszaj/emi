@@ -2,9 +2,10 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.ApiStatus;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
@@ -37,12 +38,15 @@ public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
 	public final TagKey<Item> key;
-	private final long amount;
+	private long amount;
+	private float chance = 1;
 
+	@ApiStatus.Internal
 	public TagEmiIngredient(TagKey<Item> key, long amount) {
 		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
 	}
 
+	@ApiStatus.Internal
 	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks, long amount) {
 		this.id = key.id();
 		this.key = key;
@@ -61,6 +65,13 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
+	public EmiIngredient copy() {
+		EmiIngredient stack = new TagEmiIngredient(key, amount);
+		stack.setChance(chance);
+		return stack;
+	}
+
+	@Override
 	public List<EmiStack> getEmiStacks() {
 		return stacks;
 	}
@@ -68,6 +79,23 @@ public class TagEmiIngredient implements EmiIngredient {
 	@Override
 	public long getAmount() {
 		return amount;
+	}
+
+	@Override
+	public EmiIngredient setAmount(long amount) {
+		this.amount = amount;
+		return this;
+	}
+
+	@Override
+	public float getChance() {
+		return chance;
+	}
+
+	@Override
+	public EmiIngredient setChance(float chance) {
+		this.chance = chance;
+		return this;
 	}
 
 	@Override
@@ -85,6 +113,7 @@ public class TagEmiIngredient implements EmiIngredient {
 					
 				MatrixStack vs = RenderSystem.getModelViewStack();
 				vs.push();
+				vs.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
 				vs.translate(x, y, 100.0f);
 				vs.translate(8.0, 8.0, 0.0);
 				vs.scale(1.0f, -1.0f, 1.0f);

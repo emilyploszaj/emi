@@ -31,8 +31,28 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
+	public EmiIngredient copy() {
+		return new EmiFavorite(stack, recipe);
+	}
+
+	@Override
 	public long getAmount() {
 		return stack.getAmount();
+	}
+
+	@Override
+	public EmiIngredient setAmount(long amount) {
+		return this;
+	}
+
+	@Override
+	public float getChance() {
+		return 1;
+	}
+
+	@Override
+	public EmiIngredient setChance(float chance) {
+		return this;
 	}
 
 	public EmiRecipe getRecipe() {
@@ -46,6 +66,9 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		if (recipe != null) {
+			flags |= EmiIngredient.RENDER_AMOUNT;
+		}
 		stack.render(matrices, x, y, delta, flags);
 		if ((flags & EmiIngredient.RENDER_INGREDIENT) > 0 && recipe != null) {
 			EmiRenderHelper.renderRecipeFavorite(stack, matrices, x, y);
@@ -88,8 +111,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 
 	public static class Craftable extends EmiFavorite {
 
-		public Craftable(EmiIngredient stack, @Nullable EmiRecipe recipe) {
-			super(stack, recipe);
+		public Craftable(EmiRecipe recipe) {
+			super(recipe.getOutputs().isEmpty() ? EmiStack.EMPTY : recipe.getOutputs().get(0), recipe);
 		}
 
 		@Override
@@ -127,7 +150,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 				color = 0xea842a;
 			}
 			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x44000000 | color);
-			stack.render(matrices, x, y, delta, flags);
+			stack.render(matrices, x, y, delta, flags & (~EmiIngredient.RENDER_AMOUNT));
 			if (recipe != null) {
 				EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal("" + amount));
 			} else {

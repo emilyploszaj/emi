@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.EmiRecipes;
@@ -60,7 +61,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	private List<SizedButtonWidget> arrows;
 	private List<WidgetGroup> currentPage = Lists.newArrayList();
 	private int buttonOff = 0, tabOff = 0;
-	private Widget hoveredWidget = null;
+	private Widget hoveredWidget = null, pressedSlot = null;
 	private ResolutionButtonWidget resolutionButton;
 	private double scrollAcc = 0;
 	private int minimumWidth = 176;
@@ -254,6 +255,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
+		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, delta);
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (categoryHovered) {
@@ -494,6 +496,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		int mx = (int) mouseX;
 		int my = (int) mouseY;
+		pressedSlot = null;
 		if (mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY <= y + 5 + 12) {
 			EmiApi.displayAllRecipes();
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
@@ -505,8 +508,12 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				int oy = my - group.y();
 				for (Widget widget : group.widgets) {
 					if (widget.getBounds().contains(ox, oy)) {
-						if (widget.mouseClicked(ox, oy, button)) {
-							return true;
+						if (widget instanceof SlotWidget slot) {
+							pressedSlot = widget;
+						} else {
+							if (widget.mouseClicked(ox, oy, button)) {
+								return true;
+							}
 						}
 					}
 				}
@@ -532,6 +539,24 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (EmiScreenManager.mouseReleased(mouseX, mouseY, button)) {
 			return true;
 		}
+		if (pressedSlot instanceof SlotWidget slot) {
+			WidgetGroup group = getGroup(slot);
+			if (group != null) {
+				try {
+					int ox = ((int) mouseX) - group.x();
+					int oy = ((int) mouseY) - group.y();
+					if (slot.getBounds().contains(ox, oy)) {
+						if (slot.mouseClicked(ox, oy, button)) {
+							return true;
+						}
+					}
+				} catch (Throwable e) {
+					e.printStackTrace();
+					group.error(e);
+				}
+			}
+			pressedSlot = null;
+		}
 		return super.mouseReleased(mouseX, mouseY, button);
 	}
 
@@ -539,6 +564,22 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		if (EmiScreenManager.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
 			return true;
+		}
+		if (pressedSlot instanceof SlotWidget slot) {
+			WidgetGroup group = getGroup(slot);
+			if (group != null) {
+				int ox = ((int) mouseX) - group.x();
+				int oy = ((int) mouseY) - group.y();
+				if (!slot.getBounds().contains(ox, oy) && button == 0) {
+					EmiIngredient stack = slot.getStack();
+					if (slot.getRecipe() != null) {
+						stack = new EmiFavorite.Craftable(slot.getRecipe());
+					}
+					EmiScreenManager.pressedStack = stack;
+					EmiScreenManager.draggedStack = stack;
+					pressedSlot = null;
+				}
+			}
 		}
 		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 	}
@@ -594,6 +635,15 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			setPage(tabPage, tab + 1, 0);
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	public WidgetGroup getGroup(Widget widget) {
+		for (WidgetGroup group : currentPage) {
+			if (group.widgets.contains(widget)) {
+				return group;
+			}
+		}
+		return null;
 	}
 
 	@Override

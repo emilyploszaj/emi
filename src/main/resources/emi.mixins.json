@@ -12,11 +12,13 @@
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
     "accessor.SmithingRecipeAccessor",
+    "api.EmiIngredientMixin",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
     "AbstractInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
+    "CraftingResultSlotMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
     "ItemStackMixin",
@@ -25,7 +27,8 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "ScreenMixin",
-    "SynchronizeRecipesS2CPacketMixin"
+    "SynchronizeRecipesS2CPacketMixin",
+    "ToastManagerMixin"
   ],
   "server": [],
   "injectors": {
