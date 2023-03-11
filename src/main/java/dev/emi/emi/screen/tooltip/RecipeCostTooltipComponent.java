@@ -3,8 +3,6 @@ package dev.emi.emi.screen.tooltip;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
-
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
