@@ -22,9 +22,9 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class EmiStackList {
-	private static final TagKey<Item> ITEM_HIDDEN = TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier("c:hidden_from_recipe_viewers"));
-	private static final TagKey<Block> BLOCK_HIDDEN = TagKey.of(EmiPort.getBlockRegistry().getKey(), new Identifier("c:hidden_from_recipe_viewers"));
-	private static final TagKey<Fluid> FLUID_HIDDEN = TagKey.of(EmiPort.getFluidRegistry().getKey(), new Identifier("c:hidden_from_recipe_viewers"));
+	private static final TagKey<Item> ITEM_HIDDEN = TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier("c", "hidden_from_recipe_viewers"));
+	private static final TagKey<Block> BLOCK_HIDDEN = TagKey.of(EmiPort.getBlockRegistry().getKey(), new Identifier("c", "hidden_from_recipe_viewers"));
+	private static final TagKey<Fluid> FLUID_HIDDEN = TagKey.of(EmiPort.getFluidRegistry().getKey(), new Identifier("c", "hidden_from_recipe_viewers"));
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = List.of();
 	public static Object2IntMap<EmiStack> indices = new Object2IntOpenHashMap<>();
@@ -48,7 +48,7 @@ public class EmiStackList {
 					fs.getName();
 					fs.getTooltip();
 					stacks.add(fs);
-				} catch (Exception e) {
+				} catch (Throwable e) {
 				}
 			}
 		}

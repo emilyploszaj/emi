@@ -81,6 +81,7 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ArmorItem;
@@ -119,6 +120,7 @@ import net.minecraft.recipe.ShulkerBoxColoringRecipe;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.recipe.SmokingRecipe;
+import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
@@ -135,7 +137,7 @@ import net.minecraft.util.Identifier;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
-		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208));
+		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.identifier());
 
 	// composting, fuel
 	
@@ -163,7 +165,7 @@ public class VanillaPlugin implements EmiPlugin {
 		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
 			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
 		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
-				EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.none());
+			EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.none());
 		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
 			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.none());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
@@ -325,6 +327,18 @@ public class VanillaPlugin implements EmiPlugin {
 				}
 			} else if (recipe instanceof MapCloningRecipe map) {
 				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
+			} else if (!(recipe instanceof SpecialCraftingRecipe)) {
+				try {
+					if (!recipe.getIngredients().isEmpty() && !recipe.getOutput().isEmpty()) {
+						boolean shapeless = recipe.fits(1, recipe.getIngredients().size()) && recipe.fits(recipe.getIngredients().size(), 1);
+						List<EmiIngredient> input = recipe.getIngredients().stream().map(EmiIngredient::of).toList();
+						EmiShapedRecipe.setRemainders(input, recipe);
+						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(recipe.getOutput()), recipe.getId(), shapeless));
+					}
+				} catch (Exception e) {
+					EmiReloadLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
+					EmiReloadLog.error(e);
+				}
 			}
 		}
 
@@ -352,7 +366,8 @@ public class VanillaPlugin implements EmiPlugin {
 				if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().getRepairIngredient() != null
 						&& !ai.getMaterial().getRepairIngredient().isEmpty()) {
 					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
-				} else if (i instanceof ToolItem ti && !ti.getMaterial().getRepairIngredient().isEmpty()) {
+				} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
+						&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
 					addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
 				}
 			}
@@ -488,7 +503,7 @@ public class VanillaPlugin implements EmiPlugin {
 			if (EmiClient.HOE_ACTIONS.containsKey(consumer)) {
 				Block b = entry.getKey();
 				Identifier id = new Identifier("emi", "tilling/" + EmiUtil.subId(b));
-				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer);
+				List<EmiStack> list = EmiClient.HOE_ACTIONS.get(consumer).stream().map(EmiStack::of).toList();
 				if (list.size() == 1) {
 					addRecipeSafe(registry, () -> basicWorld(EmiStack.of(b), hoes, list.get(0), id));
 				} else if (list.size() == 2) {
@@ -585,7 +600,7 @@ public class VanillaPlugin implements EmiPlugin {
 		EmiPort.getFluidRegistry().streamEntries().forEach(entry -> {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
-			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR) {
+			if (fluid.isStill(fluid.getDefaultState()) && bucket != Items.AIR && fluid instanceof FlowableFluid) {
 				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
 					new Identifier("emi", "fill_bucket/" + EmiUtil.subId(fluid)), false));
 			}
@@ -616,7 +631,7 @@ public class VanillaPlugin implements EmiPlugin {
 	private static void addRecipeSafe(EmiRegistry registry, Supplier<EmiRecipe> supplier) {
 		try {
 			registry.addRecipe(supplier.get());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			EmiReloadLog.warn("Exception when parsing EMI recipe (no ID available)");
 			EmiReloadLog.error(e);
 		}
@@ -625,7 +640,7 @@ public class VanillaPlugin implements EmiPlugin {
 	private static void addRecipeSafe(EmiRegistry registry, Supplier<EmiRecipe> supplier, Recipe<?> recipe) {
 		try {
 			registry.addRecipe(supplier.get());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			EmiReloadLog.warn("Exception when parsing vanilla recipe " + recipe.getId());
 			EmiReloadLog.error(e);
 		}

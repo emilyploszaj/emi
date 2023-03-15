@@ -24,12 +24,14 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
+import dev.emi.emi.sidebar.EmiSidebars;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -120,6 +122,7 @@ public class EmiApi {
 	}
 	
 	public static void displayRecipes(EmiIngredient stack) {
+		EmiSidebars.lookup(stack);
 		if (stack instanceof TagEmiIngredient tag) {
 			for (EmiRecipe recipe : EmiRecipes.byCategory.getOrDefault(VanillaPlugin.TAG, List.of())) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
@@ -133,10 +136,12 @@ public class EmiApi {
 			setPages(mapRecipes(pruneSources(
 				EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), List.of()),
 				stack.getEmiStacks().get(0))));
+			focusRecipe(BoM.getRecipe(stack.getEmiStacks().get(0)));
 		}
 	}
 
 	public static void displayUses(EmiIngredient stack) {
+		EmiSidebars.lookup(stack);
 		if (!stack.isEmpty()) {
 			EmiStack zero = stack.getEmiStacks().get(0);
 			Map<EmiRecipeCategory, List<EmiRecipe>> map
@@ -238,7 +243,7 @@ public class EmiApi {
 		recipes = recipes.entrySet().stream().filter(e -> !e.getValue().isEmpty())
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
-			if (client.currentScreen == null) {
+			if (getHandledScreen() == null) {
 				client.setScreen(new InventoryScreen(client.player));
 			}
 			if (client.currentScreen instanceof HandledScreen<?> hs) {

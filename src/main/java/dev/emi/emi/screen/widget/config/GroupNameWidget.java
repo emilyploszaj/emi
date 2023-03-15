@@ -16,11 +16,13 @@ import net.minecraft.text.Text;
 
 public class GroupNameWidget extends Entry {
 	protected static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+	public final String id;
 	public final Text text;
 	public final List<ConfigEntryWidget> children = Lists.newArrayList();
 	public boolean collapsed = false;
 
-	public GroupNameWidget(Text text) {
+	public GroupNameWidget(String id, Text text) {
+		this.id = id;
 		this.text = text;
 	}
 

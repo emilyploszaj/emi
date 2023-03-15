@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.DrawableWidget.DrawableWidgetConsumer;
 import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public interface WidgetHolder {
@@ -44,6 +45,10 @@ public interface WidgetHolder {
 
 	default DrawableWidget addDrawable(int x, int y, int width, int height, DrawableWidgetConsumer consumer) {
 		return add(new DrawableWidget(x, y, width, height, consumer));
+	}
+
+	default TextWidget addText(Text text, int x, int y, int color, boolean shadow) {
+		return addText(text.asOrderedText(), x, y, color, shadow);
 	}
 
 	default TextWidget addText(OrderedText text, int x, int y, int color, boolean shadow) {

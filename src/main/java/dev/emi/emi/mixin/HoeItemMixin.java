@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.emi.emi.EmiClient;
-import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemConvertible;
@@ -20,12 +19,12 @@ public class HoeItemMixin {
 
 	@Inject(at = @At("RETURN"), method = "createTillAction")
 	private static void createTillAction(BlockState result, CallbackInfoReturnable<Consumer<ItemUsageContext>> info) {
-		EmiClient.HOE_ACTIONS.put(info.getReturnValue(), List.of(EmiStack.of(result.getBlock())));
+		EmiClient.HOE_ACTIONS.put(info.getReturnValue(), List.of(result.getBlock()));
 	}
 
 	@Inject(at = @At("RETURN"), method = "createTillAndDropAction")
 	private static void createTillAndDropAction(BlockState result, ItemConvertible droppedItem,
 			CallbackInfoReturnable<Consumer<ItemUsageContext>> info) {
-		EmiClient.HOE_ACTIONS.put(info.getReturnValue(), List.of(EmiStack.of(droppedItem), EmiStack.of(result.getBlock())));
+		EmiClient.HOE_ACTIONS.put(info.getReturnValue(), List.of(droppedItem, result.getBlock()));
 	}
 }

@@ -12,7 +12,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -59,6 +58,7 @@ public class FluidEmiStack extends EmiStack {
 	@Override
 	public EmiStack copy() {
 		EmiStack e = new FluidEmiStack(fluid, amount);
+		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
 		return e;
@@ -145,9 +145,7 @@ public class FluidEmiStack extends EmiStack {
 			String mod = EmiUtil.getModName(namespace);
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
 		}
-		if (!getRemainder().isEmpty()) {
-			list.add(new RemainderTooltipComponent(this));
-		}
+		list.addAll(super.getTooltip());
 		return list;
 	}
 

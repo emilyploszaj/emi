@@ -51,6 +51,8 @@ public class TagTooltipComponent implements TooltipComponent {
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
 		int sw = getStackWidth();
+		matrices.push();
+		matrices.translate(0, 0, z);
 		for (int i = 0; i < stacks.size() && i < MAX_DISPLAYED; i++) {
 			stacks.get(i).render(matrices, x + i % sw * 18, y + i / sw * 18, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
 		}
@@ -58,10 +60,8 @@ public class TagTooltipComponent implements TooltipComponent {
 			EmiPort.setPositionColorTexShader();
 			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			matrices.push();
-			matrices.translate(0, 0, z);
 			DrawableHelper.drawTexture(matrices, x + getWidth(textRenderer) - 14, y + getHeight() - 8, 0, 192, 9, 3, 256, 256);
-			matrices.pop();
 		}
+		matrices.pop();
 	}
 }

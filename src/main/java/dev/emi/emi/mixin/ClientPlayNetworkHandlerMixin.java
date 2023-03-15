@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.emi.emi.EmiLog;
@@ -23,7 +24,8 @@ public class ClientPlayNetworkHandlerMixin {
 	@Unique
 	private int infoMask = 0;
 
-	@Inject(at = @At("RETURN"), method = "onSynchronizeRecipes")
+	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/recipe/RecipeManager.setRecipes(Ljava/lang/Iterable;)V",
+		shift = Shift.AFTER), method = "onSynchronizeRecipes")
 	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
 		infoMask |= 1;
 		if (infoMask == 3) {
@@ -35,7 +37,8 @@ public class ClientPlayNetworkHandlerMixin {
 		}
 	}
 
-	@Inject(at = @At("RETURN"), method = "onSynchronizeTags")
+	@Inject(at = @At(value = "INVOKE", target = "java/util/Map.forEach(Ljava/util/function/BiConsumer;)V",
+		shift = Shift.AFTER), method = "onSynchronizeTags")
 	private void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
 		infoMask |= 2;
 		if (infoMask == 3) {

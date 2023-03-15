@@ -113,11 +113,12 @@ public class EmiConfig {
 	@ConfigValue("ui.left-sidebar-pages")
 	public static SidebarPages leftSidebarPages = new SidebarPages(List.of(
 		new SidebarPages.SidebarPage(SidebarType.FAVORITES)
-	), () -> {
-		return EmiConfig.leftSidebarSize.values.getInt(0) == 8
-			&& EmiConfig.leftSidebarSize.values.getInt(1) == 8
-			&& EmiConfig.leftSidebarTheme == SidebarTheme.MODERN;
-	});
+	), SidebarSettings.LEFT);
+
+	@Comment("The subpanels in the left sidebar")
+	@ConfigValue("ui.left-sidebar-subpanels")
+	public static SidebarSubpanels leftSidebarSubpanels = new SidebarSubpanels(List.of(
+	), SidebarSettings.LEFT);
 	
 	@Comment("How many columns and rows of ingredients to limit the left sidebar to")
 	@ConfigValue("ui.left-sidebar-size")
@@ -153,11 +154,12 @@ public class EmiConfig {
 	public static SidebarPages rightSidebarPages = new SidebarPages(List.of(
 		new SidebarPages.SidebarPage(SidebarType.INDEX),
 		new SidebarPages.SidebarPage(SidebarType.CRAFTABLES)
-	), () -> {
-		return EmiConfig.rightSidebarSize.values.getInt(0) == 8
-			&& EmiConfig.rightSidebarSize.values.getInt(1) == 8
-			&& EmiConfig.rightSidebarTheme == SidebarTheme.MODERN;
-	});
+	), SidebarSettings.RIGHT);
+
+	@Comment("The subpanels in the right sidebar")
+	@ConfigValue("ui.right-sidebar-subpanels")
+	public static SidebarSubpanels rightSidebarSubpanels = new SidebarSubpanels(List.of(
+	), SidebarSettings.RIGHT);
 
 	@Comment("How many columns and rows of ingredients to limit the right sidebar to")
 	@ConfigValue("ui.right-sidebar-size")
@@ -190,11 +192,12 @@ public class EmiConfig {
 	@Comment("The pages in the top sidebar")
 	@ConfigValue("ui.top-sidebar-pages")
 	public static SidebarPages topSidebarPages = new SidebarPages(List.of(
-	), () -> {
-		return EmiConfig.topSidebarSize.values.getInt(0) == 8
-			&& EmiConfig.topSidebarSize.values.getInt(1) == 8
-			&& EmiConfig.topSidebarTheme == SidebarTheme.MODERN;
-	});
+	), SidebarSettings.TOP);
+
+	@Comment("The subpanels in the top sidebar")
+	@ConfigValue("ui.top-sidebar-subpanels")
+	public static SidebarSubpanels topSidebarSubpanels = new SidebarSubpanels(List.of(
+	), SidebarSettings.TOP);
 
 	@Comment("How many columns and rows of ingredients to limit the top sidebar to")
 	@ConfigValue("ui.top-sidebar-size")
@@ -227,11 +230,12 @@ public class EmiConfig {
 	@Comment("The pages in the bottom sidebar")
 	@ConfigValue("ui.bottom-sidebar-pages")
 	public static SidebarPages bottomSidebarPages = new SidebarPages(List.of(
-	), () -> {
-		return EmiConfig.bottomSidebarSize.values.getInt(0) == 8
-			&& EmiConfig.bottomSidebarSize.values.getInt(1) == 8
-			&& EmiConfig.bottomSidebarTheme == SidebarTheme.MODERN;
-	});
+	), SidebarSettings.BOTTOM);
+
+	@Comment("The subpanels in the bottom sidebar")
+	@ConfigValue("ui.bottom-sidebar-subpanels")
+	public static SidebarSubpanels bottomSidebarSubpanels = new SidebarSubpanels(List.of(
+	), SidebarSettings.BOTTOM);
 
 	@Comment("How many columns and rows of ingredients to limit the bottom sidebar to")
 	@ConfigValue("ui.bottom-sidebar-size")
@@ -586,10 +590,7 @@ public class EmiConfig {
 			EmiLog.error("System property 'emi.config' set to '" + s + "' but does not point to real file, using default config.");
 		}
 		if (useGlobalConfig) {
-			File f = new File(getGlobalFolder(), "emi.css");
-			if (f.exists() && f.isFile()) {
-				return f;
-			}
+			return new File(getGlobalFolder(), "emi.css");
 		}
 		return new File(FabricLoader.getInstance().getConfigDir().toFile(), "emi.css");
 	}
@@ -702,6 +703,28 @@ public class EmiConfig {
 					return "none";
 				} else {
 					return field.pages.stream().map(p -> p.type.getName()).collect(Collectors.joining(", "));
+				}
+			});
+		defineType(SidebarSubpanels.class,
+			(css, annot, field) -> {
+				String[] parts = css.get(annot).get().split(",");
+				SidebarSubpanels subpanels = (SidebarSubpanels) field.get(null);
+				subpanels.subpanels.clear();
+				for (String s : parts) {
+					String[] subparts = s.trim().split("\\s+");
+					SidebarType type = SidebarType.fromName(subparts[0].toLowerCase());
+					int rows = subparts.length > 1 ? Integer.parseInt(subparts[1]) : 1;
+					if (rows >= 1) {
+						subpanels.subpanels.add(new SidebarSubpanels.Subpanel(type, rows));
+					}
+				}
+				subpanels.unique();
+			},
+			(SidebarSubpanels field) -> {
+				if (field.subpanels.isEmpty()) {
+					return "none";
+				} else {
+					return field.subpanels.stream().map(p -> p.type.getName() + " " + p.rows).collect(Collectors.joining(", "));
 				}
 			});
 		defineType(IntGroup.class, (css, annot, field) -> {

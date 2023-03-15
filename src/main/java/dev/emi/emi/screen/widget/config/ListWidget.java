@@ -68,7 +68,11 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	public int getRowWidth() {
-		return Math.min(400, width - 40);
+		return Math.min(400, width - 60);
+	}
+
+	public int getLogicalHeight() {
+		return bottom - top;
 	}
 
 	@Nullable
@@ -262,8 +266,15 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		RenderSystem.disableBlend();
 	}
 
-	protected void centerScrollOn(Entry entry) {
-		this.setScrollAmount(this.children().indexOf(entry) * entry.getHeight() + entry.getHeight() / 2 - (this.bottom - this.top) / 2);
+	public void centerScrollOn(Entry entry) {
+		int i = 0;
+		for (Entry e : this.children()) {
+			if (e == entry) {
+				this.setScrollAmount(i - 42);
+				return;
+			}
+			i += getEntryHeight(e);
+		}
 	}
 
 	protected void ensureVisible(Entry entry) {

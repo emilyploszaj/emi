@@ -1,5 +1,6 @@
 package dev.emi.emi.mixin;
 
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,6 +20,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 
@@ -32,6 +34,19 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	@Inject(at = @At(value = "TAIL"), method = "init")
 	private void init(CallbackInfo info) {
 		EmiScreenManager.addWidgets(this);
+	}
+
+	@Intrinsic @Override
+	public void renderBackground(MatrixStack matrices, int vOffset) {
+		super.renderBackground(matrices, vOffset);
+	}
+
+	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;I)V")
+	private void renderBackground(MatrixStack matrices, int vOffset, CallbackInfo info) {
+		Window window = client.getWindow();
+		int mouseX = (int) (client.mouse.getX() * window.getScaledWidth() / window.getWidth());
+		int mouseY = (int) (client.mouse.getY() * window.getScaledHeight() / window.getHeight());
+		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, client.getTickDelta());
 	}
 
 	@Inject(at = @At(value = "INVOKE",

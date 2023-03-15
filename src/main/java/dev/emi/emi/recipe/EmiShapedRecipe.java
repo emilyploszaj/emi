@@ -4,36 +4,28 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.screen.ScreenHandler;
 
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
 	public EmiShapedRecipe(ShapedRecipe recipe) {
-		super(padIngredients(recipe), EmiStack.of(recipe.getOutput()),
-			recipe.getId(), false);
+		super(padIngredients(recipe), EmiStack.of(recipe.getOutput()), recipe.getId(), false);
+		setRemainders(input, recipe);
+	}
+
+	public static void setRemainders(List<EmiIngredient> input, CraftingRecipe recipe) {
+		CraftingInventory inv = EmiUtil.getCraftingInventory();
 		for (int i = 0; i < input.size(); i++) {
 			if (input.get(i).isEmpty()) {
 				continue;
 			}
-			CraftingInventory inv = new CraftingInventory(new ScreenHandler(null, -1) {
-
-				@Override
-				public boolean canUse(PlayerEntity player) {
-					return false;
-				}
-
-				@Override
-				public ItemStack quickMove(PlayerEntity player, int index) {
-					return null;
-				}
-			}, 3, 3);
 			for (int j = 0; j < input.size(); j++) {
 				if (j == i) {
 					continue;
@@ -50,6 +42,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 					stack.setRemainder(EmiStack.of(remainder));
 				}
 			}
+			inv.clear();
 		}
 	}
 

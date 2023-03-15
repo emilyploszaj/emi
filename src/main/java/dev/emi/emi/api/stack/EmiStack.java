@@ -5,7 +5,10 @@ import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
+
 import dev.emi.emi.EmiComparisonDefaults;
+import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -25,6 +28,7 @@ public abstract class EmiStack implements EmiIngredient {
 	private EmiStack remainder = EMPTY;
 	protected Comparison comparison = Comparison.DEFAULT_COMPARISON;
 	protected long amount = 1;
+	protected float chance = 1;
 
 	@Override
 	public List<EmiStack> getEmiStacks() {
@@ -58,6 +62,15 @@ public abstract class EmiStack implements EmiIngredient {
 	
 	public EmiStack setAmount(long amount) {
 		this.amount = amount;
+		return this;
+	}
+
+	public float getChance() {
+		return chance;
+	}
+	
+	public EmiStack setChance(float chance) {
+		this.chance = chance;
 		return this;
 	}
 
@@ -139,7 +152,13 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract List<Text> getTooltipText();
 
-	public abstract List<TooltipComponent> getTooltip();
+	public List<TooltipComponent> getTooltip() {
+		List<TooltipComponent> list = Lists.newArrayList();
+		if (!getRemainder().isEmpty()) {
+			list.add(new RemainderTooltipComponent(this));
+		}
+		return list;
+	}
 
 	public abstract Text getName();
 

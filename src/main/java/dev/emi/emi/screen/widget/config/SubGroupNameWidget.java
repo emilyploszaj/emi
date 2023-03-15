@@ -8,8 +8,8 @@ import net.minecraft.text.Text;
 public class SubGroupNameWidget extends GroupNameWidget {
 	public GroupNameWidget parent;
 
-	public SubGroupNameWidget(Text text) {
-		super(text);
+	public SubGroupNameWidget(String id, Text text) {
+		super(id, text);
 	}
 
 	@Override

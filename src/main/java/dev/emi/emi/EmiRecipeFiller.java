@@ -18,7 +18,7 @@ import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.mixin.accessor.ScreenHandlerAccessor;
+import dev.emi.emi.sidebar.EmiSidebars;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
@@ -55,7 +55,12 @@ public class EmiRecipeFiller {
 	public static <T extends ScreenHandler> List<EmiRecipeHandler<T>> getAllHandlers(HandledScreen<T> screen) {
 		if (screen != null) {
 			T screenHandler = screen.getScreenHandler();
-			ScreenHandlerType<?> type = ((ScreenHandlerAccessor) screenHandler).emi$getType();
+			ScreenHandlerType<?> type;
+			try {
+				type = screenHandler instanceof PlayerScreenHandler ? null : screenHandler.getType();
+			} catch (UnsupportedOperationException e) {
+				type = null;
+			}
 			if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
 				return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
 			}
@@ -82,12 +87,13 @@ public class EmiRecipeFiller {
 				case CURSOR -> EmiCraftContext.Destination.CURSOR;
 			}, amount);
 			if (handler.canCraft(recipe, context)) {
+				EmiSidebars.craft(recipe);
 				return handler.craft(recipe, context);
 			}
 		}
 		return false;
 	}
-	
+
 	public static <T extends ScreenHandler> @Nullable List<ItemStack> getStacks(StandardRecipeHandler<T> handler, EmiRecipe recipe, HandledScreen<T> screen, int amount) {
 		try {
 			T screenHandler = screen.getScreenHandler();
@@ -174,7 +180,7 @@ public class EmiRecipeFiller {
 				if (maxAmount == 0) {
 					return null;
 				}
-				
+
 				List<ItemStack> desired = Lists.newArrayList();
 				for (int i = 0; i < discovered.size(); i++) {
 					DiscoveredItem di = discovered.get(i);
@@ -231,7 +237,7 @@ public class EmiRecipeFiller {
 		}
 		return 0;
 	}
-	
+
 	public static <T extends ScreenHandler> boolean clientFill(StandardRecipeHandler<T> handler, EmiRecipe recipe,
 			HandledScreen<T> screen, List<ItemStack> stacks, EmiCraftContext.Destination destination) {
 		T screenHandler = screen.getScreenHandler();

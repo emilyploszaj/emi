@@ -19,7 +19,8 @@ public class MinecraftClientMixin {
 		CompletableFuture<Void> future = info.getReturnValue();
 		if (future != null) {
 			future.thenRunAsync(() -> {
-				if (EmiReloadManager.receivedInitialData) {
+				MinecraftClient client = MinecraftClient.getInstance();
+				if (client.world != null && client.world.getRecipeManager() != null) {
 					EmiReloadManager.reload();
 				}
 			}, Executors.newFixedThreadPool(1));

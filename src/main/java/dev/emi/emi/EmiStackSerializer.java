@@ -2,12 +2,14 @@ package dev.emi.emi;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -19,13 +21,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Util;
-import net.minecraft.registry.entry.RegistryEntryList.Named;
 
 public interface EmiStackSerializer<T extends EmiIngredient> {
+	public static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	public static final Map<Class<?>, EmiStackSerializer<?>> BY_CLASS = Maps.newHashMap();
 	public static final Map<Identifier, EmiStackSerializer<?>> BY_ID = Maps.newHashMap();
 
@@ -138,19 +141,30 @@ public interface EmiStackSerializer<T extends EmiIngredient> {
 			return deserialize(el.getAsJsonObject());
 		} else if (JsonHelper.isString(el)) {
 			String s = el.getAsString();
-			String[] parts = s.split(":");
-			Identifier stackId;
-			if (parts.length <= 2) {
-				stackId = new Identifier(s);
-			} else if (parts.length == 3) {
-				stackId = new Identifier(parts[1], parts[2]);
-				if (parts[0].equals("item")) {
-					return EmiStack.of(EmiPort.getItemRegistry().get(stackId));
-				} else if (parts[0].equals("fluid")) {
-					return EmiStack.of(EmiPort.getFluidRegistry().get(stackId));
+			Matcher m = STACK_REGEX.matcher(s);
+			if (m.matches()) {
+				NbtCompound nbt = null;
+				String type = m.group(1);
+				Identifier stackId = new Identifier(m.group(2), m.group(3));
+				try {
+					String g4 = m.group(4);
+					if (g4 != null) {
+						nbt = StringNbtReader.parse(g4);
+					}
+				} catch (Exception e) {
+					EmiLog.error("Error parsing NBT in deserialized stack");
+					e.printStackTrace();
+					return EmiStack.EMPTY;
 				}
-			} else {
-				return EmiStack.EMPTY;
+				if (type.equals("item")) {
+					ItemStack stack = new ItemStack(EmiPort.getItemRegistry().get(stackId));
+					if (nbt != null) {
+						stack.setNbt(nbt);
+					}
+					return EmiStack.of(stack);
+				} else if (type.equals("fluid")) {
+					return EmiStack.of(EmiPort.getFluidRegistry().get(stackId), nbt);
+				}
 			}
 		}
 		return EmiStack.EMPTY;

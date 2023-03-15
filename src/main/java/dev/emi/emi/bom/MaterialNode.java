@@ -10,9 +10,10 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 
 public class MaterialNode {
-	public EmiIngredient ingredient;
+	public final EmiIngredient ingredient;
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
+	public float consumeChance = 1, produceChance = 1;
 	public long amount = 1;
 	public long divisor = 1;
 	// Should these be decoupled from material nodes?
@@ -22,10 +23,7 @@ public class MaterialNode {
 
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();
-		if (ingredient instanceof EmiStack s) {
-			ingredient = s.copy().setAmount(1);
-		}
-		this.ingredient = ingredient;
+		this.ingredient = ingredient.copy().setAmount(1).setChance(1);
 	}
 
 	public MaterialNode(MaterialNode node) {
@@ -58,6 +56,7 @@ public class MaterialNode {
 	}
 
 	public void defineRecipe(EmiRecipe recipe) {
+		produceChance = 1;
 		if (recipe == null) {
 			return;
 		}
@@ -66,6 +65,7 @@ public class MaterialNode {
 		for (EmiStack stack : recipe.getOutputs()) {
 			if (stack.equals(ingredient)) {
 				divisor = stack.getAmount();
+				produceChance = stack.getChance();
 				break;
 			}
 		}
@@ -79,7 +79,9 @@ public class MaterialNode {
 				}
 			}
 			if (!i.isEmpty()) {
-				children.add(new MaterialNode(i));
+				MaterialNode node = new MaterialNode(i);
+				node.consumeChance = i.getChance();
+				children.add(node);
 			}
 		}
 	}

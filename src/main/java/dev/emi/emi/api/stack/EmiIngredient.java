@@ -38,7 +38,15 @@ public interface EmiIngredient extends EmiRenderable {
 		return true;
 	}
 
+	EmiIngredient copy();
+
 	long getAmount();
+
+	EmiIngredient setAmount(long amount);
+
+	float getChance();
+
+	EmiIngredient setChance(float chance);
 
 	@Override
 	default void render(MatrixStack matrices, int x, int y, float delta) {
@@ -88,7 +96,7 @@ public interface EmiIngredient extends EmiRenderable {
 	public static EmiIngredient of(Ingredient ingredient) {
 		return of(ingredient, 1);
 	}
-	
+
 	public static EmiIngredient of(Ingredient ingredient, long amount) {
 		if (ingredient == null) {
 			return EmiStack.EMPTY;
