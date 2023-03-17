@@ -280,7 +280,7 @@ public class EmiConfig {
 	};
 	@Comment("Where to show workstations in the recipe screen")
 	@ConfigValue("ui.workstation-location")
-	public static SidebarSide workstationLocation = SidebarSide.LEFT;
+	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
 
 	@Comment("Display cost per batch when hovering a recipe output")
 	@ConfigValue("ui.show-cost-per-batch")

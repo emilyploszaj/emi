@@ -47,13 +47,11 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	@Override
 	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
 		MatrixStack view = RenderSystem.getModelViewStack();
-		itemRenderer.zOffset -= z;
 		view.push();
 		view.translate(0, 0, z);
 		RenderSystem.applyModelViewMatrix();
 		EmiRenderHelper.renderRecipe(recipe, matrices, x, y, showMissing, overlayColor);
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
-		itemRenderer.zOffset += z;
 	}
 }
