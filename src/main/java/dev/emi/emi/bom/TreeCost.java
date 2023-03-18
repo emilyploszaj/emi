@@ -224,15 +224,17 @@ public class TreeCost {
 					addRemainder(es, minBatches * es.getAmount(), chance);
 				}
 			}
+
+			for (MaterialNode n : node.children) {
+				if (n.ingredient.getEmiStacks().size() == 1) {
+					EmiStack r = n.ingredient.getEmiStacks().get(0).getRemainder();
+					if (!r.isEmpty()) {
+						addRemainder(r, minBatches * n.amount * r.getAmount(), produced.consume(n.consumeChance));
+					}
+				}
+			}
 		} else {
 			addCost(node.ingredient, amount, node.amount, chance);
-		}
-
-		if (node.ingredient.getEmiStacks().size() == 1) {
-			EmiStack r = node.ingredient.getEmiStacks().get(0).getRemainder();
-			if (!r.isEmpty()) {
-				addRemainder(r, effectiveCrafts, chance);
-			}
 		}
 	}
 

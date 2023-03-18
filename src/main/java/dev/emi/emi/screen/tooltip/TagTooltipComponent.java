@@ -10,12 +10,10 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-public class TagTooltipComponent implements TooltipComponent {
+public class TagTooltipComponent implements EmiTooltipComponent {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/widgets.png");
 	private static final int MAX_DISPLAYED = 63;
 	private final List<EmiStack> stacks;
@@ -47,21 +45,18 @@ public class TagTooltipComponent implements TooltipComponent {
 	public int getWidth(TextRenderer textRenderer) {
 		return 18 * getStackWidth();
 	}
-	
+
 	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
+	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
 		int sw = getStackWidth();
-		matrices.push();
-		matrices.translate(0, 0, z);
 		for (int i = 0; i < stacks.size() && i < MAX_DISPLAYED; i++) {
-			stacks.get(i).render(matrices, x + i % sw * 18, y + i / sw * 18, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
+			stacks.get(i).render(matrices, i % sw * 18, i / sw * 18, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
 		}
 		if (stacks.size() > MAX_DISPLAYED) {
 			EmiPort.setPositionColorTexShader();
 			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			DrawableHelper.drawTexture(matrices, x + getWidth(textRenderer) - 14, y + getHeight() - 8, 0, 192, 9, 3, 256, 256);
+			DrawableHelper.drawTexture(matrices, getWidth(render.text) - 14, getHeight() - 8, 0, 192, 9, 3, 256, 256);
 		}
-		matrices.pop();
 	}
 }

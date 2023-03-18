@@ -29,7 +29,7 @@ public class GroupNameWidget extends Entry {
 	@Override
 	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
-		DrawableHelper.drawCenteredTextWithShadow(matrices, CLIENT.textRenderer, EmiPort.ordered(text), x + width / 2, y + 3, -1);
+		EmiPort.drawCenteredText(matrices, CLIENT.textRenderer, text, x + width / 2, y + 3, -1, true);
 		if (hovered || collapsed) {
 			String collapse = "[-]";
 			int cx = x + width / 2 - CLIENT.textRenderer.getWidth(text) / 2 - 20;

@@ -202,8 +202,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			int extraWidth = client.textRenderer.getWidth("...");
 			text = EmiPort.literal(client.textRenderer.trimToWidth(text, (minimumWidth - 40) - extraWidth).getString() + "...");
 		}
-		drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor);
-		drawCenteredText(matrices, textRenderer,EmiRenderHelper.getPageText(this.page + 1, tab.recipes.size(), minimumWidth - 40),
+		EmiPort.drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor);
+		EmiPort.drawCenteredText(matrices, textRenderer,EmiRenderHelper.getPageText(this.page + 1, tab.recipes.size(), minimumWidth - 40),
 			x + backgroundWidth / 2, y + 21, 0xffffff);
 
 		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());

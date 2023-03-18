@@ -4,19 +4,16 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class RemainderTooltipComponent implements TooltipComponent {
+public class RemainderTooltipComponent implements EmiTooltipComponent {
 	public List<Remainder> remainders = Lists.newArrayList();
 
 	public RemainderTooltipComponent(EmiIngredient ingredient) {
@@ -43,30 +40,26 @@ public class RemainderTooltipComponent implements TooltipComponent {
 	public int getWidth(TextRenderer var1) {
 		return 18 * 3;
 	}
-	
-	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		matrices.push();
-		matrices.translate(0, 0, z);
-		for (int i = 0; i < remainders.size(); i++) {
-			Remainder remainder = remainders.get(i);
-			remainder.inputs.get(0).render(matrices, x, y + 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
-			remainder.remainder.render(matrices, x + 18 * 2, y + 18 * i, MinecraftClient.getInstance().getTickDelta(), -1);
-		}
-		matrices.pop();
-	}
 
 	@Override
-	public void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix, Immediate vertexConsumers) {
+	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
+		for (int i = 0; i < remainders.size(); i++) {
+			Remainder remainder = remainders.get(i);
+			remainder.inputs.get(0).render(matrices, 0, 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
+			remainder.remainder.render(matrices, 18 * 2, 18 * i, MinecraftClient.getInstance().getTickDelta(), -1);
+		}
+	}
+	
+	@Override
+	public void drawTooltipText(TextRenderData text) {
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
 			boolean chanced = remainder.remainder.getChance() != 1;
-			textRenderer.draw("->", x + 20, y + 5 + i * 18 - (chanced ? 4 : 0), 0xffffff, true, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+			text.draw(EmiPort.literal("->"), 20, 5 + i * 18 - (chanced ? 4 : 0), 0xffffff, true);
 			if (chanced) {
-				String text = EmiTooltip.TEXT_FORMAT.format(remainder.remainder.getChance() * 100) + "%";
-				int tx = textRenderer.getWidth(text);
-				textRenderer.draw(text, x + 27 - tx / 2, y + 9 + i * 18, Formatting.GOLD.getColorValue(),
-					true, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+				Text t = EmiPort.literal(EmiTooltip.TEXT_FORMAT.format(remainder.remainder.getChance() * 100) + "%");
+				int tx = text.renderer.getWidth(t);
+				text.draw(t, 27 - tx / 2, 9 + i * 18, Formatting.GOLD.getColorValue(), false);
 			}
 		}
 	}

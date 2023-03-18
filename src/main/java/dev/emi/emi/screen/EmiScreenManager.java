@@ -294,7 +294,7 @@ public class EmiScreenManager {
 			case RIGHT -> hr;
 		};
 		int vt = yMin + headerOffset;
-		int vb = yMax - th * ENTRY_SIZE;
+		int vb = yMax - th * ENTRY_SIZE - subpanelHeight;
 		int ty = switch (align.vertical) {
 			case TOP -> vt;
 			case CENTER -> MathHelper.clamp(cy - (th * ENTRY_SIZE - headerOffset + subpanelHeight + theme.verticalPadding / 2) / 2, vt, vb);
@@ -488,7 +488,7 @@ public class EmiScreenManager {
 	private static void updateMouse(int mouseX, int mouseY) {
 		if (lastHoveredCraftable != null) {
 			ScreenSpace space = getHoveredSpace(mouseX, mouseY);
-			if (space != null && space.getType() == SidebarType.CRAFTABLES) {
+			if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
 				int offset = space.getRawOffsetFromMouse(mouseX, mouseY);
 				if (offset != lastHoveredCraftableOffset) {
 					lastHoveredCraftable = null;
@@ -755,7 +755,7 @@ public class EmiScreenManager {
 			search.y = screen.height - 21;
 			search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
 		}
-		search.setTextFieldFocused(false);
+		EmiPort.focus(search, false);
 
 		emi.x = 2;
 		emi.y = screen.height - 22;
@@ -959,7 +959,7 @@ public class EmiScreenManager {
 		if (function.apply(EmiConfig.focusSearch)) {
 			if (client.currentScreen != null) {
 				client.currentScreen.setFocused(search);
-				search.setTextFieldFocused(true);
+				EmiPort.focus(search, true);
 				searchBreak = true;
 			}
 		}
@@ -1057,7 +1057,7 @@ public class EmiScreenManager {
 			if (context != null) {
 				if (EmiConfig.miscraftPrevention) {
 					ScreenSpace space = getHoveredSpace(lastMouseX, lastMouseY);
-					if (space != null && space.getType() == SidebarType.CRAFTABLES) {
+					if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
 						lastHoveredCraftableOffset = space.getRawOffsetFromMouse(lastMouseX, lastMouseY);
 						if (lastHoveredCraftableOffset != -1) {
 							lastHoveredCraftableSturdy = lastHoveredCraftable != null;
@@ -1299,7 +1299,7 @@ public class EmiScreenManager {
 				if (w > maxLeft) {
 					x += (w - maxLeft);
 				}
-				DrawableHelper.drawCenteredText(matrices, client.textRenderer, text, x, space.ty - 15, 0xFFFFFF);
+				EmiPort.drawCenteredText(matrices, client.textRenderer, text, x, space.ty - 15, 0xFFFFFF);
 				if (totalPages > 1 && space.tw > 2) {
 					int scrollLeft = space.tx + 18;
 					int scrollWidth = space.tw * ENTRY_SIZE - 36;
