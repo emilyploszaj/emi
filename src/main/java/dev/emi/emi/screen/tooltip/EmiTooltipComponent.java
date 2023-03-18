@@ -1,7 +1,5 @@
 package dev.emi.emi.screen.tooltip;
 
-import org.joml.Matrix4f;
-
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -10,6 +8,7 @@ import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Matrix4f;
 
 public interface EmiTooltipComponent extends TooltipComponent {
 
