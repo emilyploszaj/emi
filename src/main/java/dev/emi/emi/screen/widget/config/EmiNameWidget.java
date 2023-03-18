@@ -13,7 +13,6 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 
@@ -122,8 +121,8 @@ public class EmiNameWidget implements Drawable {
 			parts[2] = transformString(rand, parts[2], p);
 		}
 
-		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer,
-			EmiPort.ordered(EmiPort.append(
+		EmiPort.drawCenteredText(matrices, client.textRenderer,
+			EmiPort.append(
 				EmiPort.append(
 					EmiPort.append(
 						EmiPort.append(
@@ -131,6 +130,6 @@ public class EmiNameWidget implements Drawable {
 							EmiPort.literal("  ")),
 						EmiPort.literal(parts[1], Style.EMPTY.withColor(0x7bfca2))),
 					EmiPort.literal("  ")),
-				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc)))), x, y, -1);
+				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc))), x, y, -1, true);
 	}
 }

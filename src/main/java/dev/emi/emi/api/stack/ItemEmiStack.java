@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
@@ -112,7 +113,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			if (amount != 1) {
 				count += amount;
 			}
-			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stack, x, y, count);
+			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRender.renderRemainderIcon(this, matrices, x, y);

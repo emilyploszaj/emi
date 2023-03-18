@@ -223,7 +223,6 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			RenderSystem.blendFuncSeparate(
 				GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE
 			);
-			RenderSystem.disableTexture();
 			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			n = 4;
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -239,7 +238,6 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		}
 
 		if ((o = this.getMaxScroll()) > 0) {
-			RenderSystem.disableTexture();
 			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
 			m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
@@ -262,7 +260,6 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			bufferBuilder.vertex(i, n, 0.0).color(192, 192, 192, 255).next();
 			tessellator.draw();
 		}
-		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 
@@ -317,7 +314,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		for (Entry e : this.children) {
 			for (Element el : e.children()) {
 				if (el instanceof TextFieldWidget tfw) {
-					tfw.setTextFieldFocused(false);
+					EmiPort.focus(tfw, false);
 				}
 			}
 		}
@@ -474,7 +471,6 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			if (this.renderSelection && this.isSelectedEntry(j)) {
 				p = this.left + this.width / 2 - o / 2;
 				int q = this.left + this.width / 2 + o / 2;
-				RenderSystem.disableTexture();
 				RenderSystem.setShader(GameRenderer::getPositionProgram);
 				float f = this.isFocused() ? 1.0f : 0.5f;
 				RenderSystem.setShaderColor(f, f, f, 1.0f);
@@ -491,7 +487,6 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				bufferBuilder.vertex(q - 1, m - 1, 0.0).next();
 				bufferBuilder.vertex(p + 1, m - 1, 0.0).next();
 				tessellator.draw();
-				RenderSystem.enableTexture();
 			}
 			p = this.getRowLeft();
 			((Entry)entry).render(matrices, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
@@ -530,7 +525,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return this.getRowTop(index) + this.getEntry(index).getHeight();
 	}
 
-	protected boolean isFocused() {
+	public boolean isFocused() {
 		return false;
 	}
 

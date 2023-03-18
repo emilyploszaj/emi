@@ -6,9 +6,9 @@ import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -91,8 +91,7 @@ public class ListEmiIngredient implements EmiIngredient {
 			if (amount != 1) {
 				count += amount;
 			}
-			MinecraftClient client = MinecraftClient.getInstance();
-			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, fullList.get(0).getItemStack(), x, y, count);
+			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
 			EmiRender.renderIngredientIcon(this, matrices, x, y);

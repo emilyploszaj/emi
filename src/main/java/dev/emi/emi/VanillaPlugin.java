@@ -329,11 +329,11 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
 			} else if (!(recipe instanceof SpecialCraftingRecipe)) {
 				try {
-					if (!recipe.getIngredients().isEmpty() && !recipe.getOutput().isEmpty()) {
+					if (!recipe.getIngredients().isEmpty() && !EmiPort.getOutput(recipe).isEmpty()) {
 						boolean shapeless = recipe.fits(1, recipe.getIngredients().size()) && recipe.fits(recipe.getIngredients().size(), 1);
 						List<EmiIngredient> input = recipe.getIngredients().stream().map(EmiIngredient::of).toList();
 						EmiShapedRecipe.setRemainders(input, recipe);
-						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(recipe.getOutput()), recipe.getId(), shapeless));
+						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(EmiPort.getOutput(recipe)), recipe.getId(), shapeless));
 					}
 				} catch (Exception e) {
 					EmiReloadLog.warn("Exception when parsing vanilla recipe " + recipe.getId());

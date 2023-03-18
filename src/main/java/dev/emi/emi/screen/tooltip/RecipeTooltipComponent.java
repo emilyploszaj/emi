@@ -1,15 +1,11 @@
 package dev.emi.emi.screen.tooltip;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class RecipeTooltipComponent implements TooltipComponent {
+public class RecipeTooltipComponent implements EmiTooltipComponent {
 	private final EmiRecipe recipe;
 	private final boolean showMissing;
 	private int overlayColor = -1;
@@ -40,18 +36,12 @@ public class RecipeTooltipComponent implements TooltipComponent {
 	}
 
 	@Override
-	public int getWidth(TextRenderer var1) {
+	public int getWidth(TextRenderer textRenderer) {
 		return width;
 	}
 
 	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
-		view.translate(0, 0, z);
-		RenderSystem.applyModelViewMatrix();
-		EmiRenderHelper.renderRecipe(recipe, matrices, x, y, showMissing, overlayColor);
-		view.pop();
-		RenderSystem.applyModelViewMatrix();
+	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
+		EmiRenderHelper.renderRecipe(recipe, matrices, 0, 0, showMissing, overlayColor);
 	}
 }

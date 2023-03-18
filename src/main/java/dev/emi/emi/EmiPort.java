@@ -19,18 +19,24 @@ import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget.PressAction;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.Resource;
@@ -171,5 +177,25 @@ public final class EmiPort {
 
 	public static ButtonWidget newButton(int x, int y, int w, int h, Text name, PressAction action) {
 		return ButtonWidget.builder(name, action).position(x, y).size(w, h).build();
+	}
+
+	public static ItemStack getOutput(Recipe<?> recipe) {
+		return recipe.getOutput();
+	}
+
+	public static void focus(TextFieldWidget widget, boolean focused) {
+		widget.setTextFieldFocused(focused);
+	}
+
+	public static void drawCenteredText(MatrixStack matrices, TextRenderer renderer, Text text, int x, int y, int color) {
+		drawCenteredText(matrices, renderer, text, x, y, color, false);
+	}
+
+	public static void drawCenteredText(MatrixStack matrices, TextRenderer renderer, Text text, int x, int y, int color, boolean shadow) {
+		if (shadow) {
+			DrawableHelper.drawCenteredTextWithShadow(matrices, renderer, text.asOrderedText(), x, y, color);
+		} else {
+			DrawableHelper.drawCenteredText(matrices, renderer, text, x, y, color);
+		}
 	}
 }

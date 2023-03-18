@@ -215,11 +215,9 @@ public class BoMScreen extends Screen {
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
-			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16,
-					-1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
 			if (hasRemainders) {
-				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0,
-						cy - 16 + 40, -1);
+				EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40, -1);
 			}
 			for (Cost cost : costs) {
 				cost.render(matrices);
@@ -242,11 +240,10 @@ public class BoMScreen extends Screen {
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			batcher.draw();
 		} else {
-			drawCenteredText(matrices, textRenderer,
-					EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
 		}
 
 		viewMatrices.pop();

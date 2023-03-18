@@ -15,7 +15,6 @@ import dev.emi.emi.config.EmiConfig.ConfigValue;
 import dev.emi.emi.screen.widget.config.EmiNameWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -164,7 +163,7 @@ public class ConfigPresetScreen extends Screen {
 
 		@Override
 		public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
-			DrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, EmiPort.ordered(text), x + width / 2, y + 3, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, text, x + width / 2, y + 3, -1, true);
 		}
 
 		@Override

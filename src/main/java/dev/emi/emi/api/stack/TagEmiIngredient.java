@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
@@ -148,7 +149,7 @@ public class TagEmiIngredient implements EmiIngredient {
 			if (amount != 1) {
 				count += amount;
 			}
-			client.getItemRenderer().renderGuiItemOverlay(client.textRenderer, stacks.get(0).getItemStack(), x, y, count);
+			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
 			EmiRender.renderTagIcon(this, matrices, x, y);
