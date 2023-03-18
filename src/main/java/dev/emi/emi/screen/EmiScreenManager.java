@@ -488,7 +488,7 @@ public class EmiScreenManager {
 	private static void updateMouse(int mouseX, int mouseY) {
 		if (lastHoveredCraftable != null) {
 			ScreenSpace space = getHoveredSpace(mouseX, mouseY);
-			if (space != null && space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY) {
+			if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
 				int offset = space.getRawOffsetFromMouse(mouseX, mouseY);
 				if (offset != lastHoveredCraftableOffset) {
 					lastHoveredCraftable = null;
@@ -1057,7 +1057,7 @@ public class EmiScreenManager {
 			if (context != null) {
 				if (EmiConfig.miscraftPrevention) {
 					ScreenSpace space = getHoveredSpace(lastMouseX, lastMouseY);
-					if (space != null && space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY) {
+					if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
 						lastHoveredCraftableOffset = space.getRawOffsetFromMouse(lastMouseX, lastMouseY);
 						if (lastHoveredCraftableOffset != -1) {
 							lastHoveredCraftableSturdy = lastHoveredCraftable != null;
