@@ -3,6 +3,7 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -20,7 +21,7 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -95,8 +96,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		MinecraftClient client = MinecraftClient.getInstance();
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
+			MatrixStack view = RenderSystem.getModelViewStack();
+			view.push();
+			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
+			RenderSystem.applyModelViewMatrix();
 			ItemRenderer itemRenderer = client.getItemRenderer();
-			itemRenderer.renderInGui(matrices, stack, x, y);
+			float zOffset = itemRenderer.zOffset;
+			itemRenderer.zOffset = 0;
+			itemRenderer.renderInGui(stack, x, y);
+			itemRenderer.zOffset = zOffset;
+			view.pop();
+			RenderSystem.applyModelViewMatrix();
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
@@ -137,7 +147,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			matrices.translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
 			matrices.translate(8.0, 8.0, 0.0);
 			matrices.scale(16.0f, 16.0f, 16.0f);
-			ir.renderItem(stack, ModelTransformationMode.GUI, false, matrices, vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
+			ir.renderItem(stack, ModelTransformation.Mode.GUI, false, matrices, vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
 		} finally {
 			matrices.pop();
 		}

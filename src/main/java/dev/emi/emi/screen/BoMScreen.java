@@ -188,7 +188,7 @@ public class BoMScreen extends Screen {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackgroundTexture(matrices);
+		this.renderBackgroundTexture(0);
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		float scale = getScale();

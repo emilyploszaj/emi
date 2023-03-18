@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.EmiScreen;
@@ -35,12 +37,12 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	}
 
 	@Intrinsic @Override
-	public void renderBackground(MatrixStack matrices) {
-		super.renderBackground(matrices);
+	public void renderBackground(MatrixStack matrices, int vOffset) {
+		super.renderBackground(matrices, vOffset);
 	}
 
-	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V")
-	private void renderBackground(MatrixStack matrices, CallbackInfo info) {
+	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;I)V")
+	private void renderBackground(MatrixStack matrices, int vOffset, CallbackInfo info) {
 		Window window = client.getWindow();
 		int mouseX = (int) (client.mouse.getX() * window.getScaledWidth() / window.getWidth());
 		int mouseY = (int) (client.mouse.getY() * window.getScaledHeight() / window.getHeight());
@@ -52,11 +54,14 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 			shift = Shift.AFTER),
 		method = "render")
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
-		matrices.push();
-		matrices.translate(-x, -y, 0.0);
+		MatrixStack viewStack = RenderSystem.getModelViewStack();
+		viewStack.push();
+		viewStack.translate(-x, -y, 0.0);
+		RenderSystem.applyModelViewMatrix();
 		EmiPort.setPositionTexShader();
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
-		matrices.pop();
+		viewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 
 	@Inject(at = @At("TAIL"), method = "drawSlot")

@@ -180,12 +180,11 @@ public final class EmiPort {
 	}
 
 	public static ItemStack getOutput(Recipe<?> recipe) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return recipe.getOutput(client.player.world.getRegistryManager());
+		return recipe.getOutput();
 	}
 
 	public static void focus(TextFieldWidget widget, boolean focused) {
-		widget.setFocused(focused);
+		widget.setTextFieldFocused(focused);
 	}
 
 	public static void drawCenteredText(MatrixStack matrices, TextRenderer renderer, Text text, int x, int y, int color) {
@@ -196,7 +195,7 @@ public final class EmiPort {
 		if (shadow) {
 			DrawableHelper.drawCenteredTextWithShadow(matrices, renderer, text.asOrderedText(), x, y, color);
 		} else {
-			renderer.draw(matrices, text, x - renderer.getWidth(text) / 2, y, color);
+			DrawableHelper.drawCenteredText(matrices, renderer, text, x, y, color);
 		}
 	}
 }

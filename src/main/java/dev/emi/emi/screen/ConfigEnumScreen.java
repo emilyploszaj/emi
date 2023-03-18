@@ -49,7 +49,7 @@ public class ConfigEnumScreen<T> extends Screen {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderBackgroundTexture(matrices);
+		this.renderBackgroundTexture(0);
 		list.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		ListWidget.Entry entry = list.getHoveredEntry();

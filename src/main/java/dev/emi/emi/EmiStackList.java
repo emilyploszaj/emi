@@ -38,7 +38,7 @@ public class EmiStackList {
 	public static void reload() {
 		List<EmiStack> stacks = Lists.newLinkedList();
 		MinecraftClient client = MinecraftClient.getInstance();
-		ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.player.world.getRegistryManager());
+		ItemGroups.updateDisplayParameters(client.player.networkHandler.getEnabledFeatures(), false);
 		stacks.addAll(ItemGroups.getSearchGroup().getDisplayStacks().stream().map(EmiStack::of).toList());
 		for (int i = 0; i < EmiPort.getFluidRegistry().size(); i++) {
 			Fluid fluid = EmiPort.getFluidRegistry().get(i);

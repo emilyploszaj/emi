@@ -143,7 +143,7 @@ public class StackBatcher {
 		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled() && (flags & EmiIngredient.RENDER_ICON) != 0) {
 			if (!populated) {
 				try {
-					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y-this.y, z, delta);
+					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, matrices, x-this.x, -y+this.y, z, delta);
 					if (sodiumSpriteHandle != null && !stack.isEmpty()) {
 						ItemStack is = stack.getEmiStacks().get(0).getItemStack();
 						MinecraftClient client = MinecraftClient.getInstance();
