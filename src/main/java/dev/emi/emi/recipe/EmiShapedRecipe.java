@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -16,7 +17,7 @@ import net.minecraft.recipe.ShapedRecipe;
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
 	public EmiShapedRecipe(ShapedRecipe recipe) {
-		super(padIngredients(recipe), EmiStack.of(recipe.getOutput()), recipe.getId(), false);
+		super(padIngredients(recipe), EmiStack.of(EmiPort.getOutput(recipe)), recipe.getId(), false);
 		setRemainders(input, recipe);
 	}
 

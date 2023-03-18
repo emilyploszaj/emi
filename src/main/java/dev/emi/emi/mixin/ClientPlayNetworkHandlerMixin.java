@@ -49,4 +49,9 @@ public class ClientPlayNetworkHandlerMixin {
 			EmiLog.info("Tags synchronized, waiting for recipes to reload EMI...");
 		}
 	}
+
+	@Inject(at = @At("RETURN"), method = "onGameJoin")
+	private void onGameJoin(CallbackInfo info) {
+		EmiLog.info("Joining server, EMI waiting for data from server...");
+	}
 }

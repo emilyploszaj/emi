@@ -415,7 +415,7 @@ public class ConfigScreen extends Screen {
 			}
 			if (this.getFocused() instanceof TextFieldWidget tfw && tfw.isFocused()) {
 				if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-					tfw.setTextFieldFocused(false);
+					EmiPort.focus(tfw, false);
 					return true;
 				}
 			} else {

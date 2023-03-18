@@ -2,6 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -20,7 +21,7 @@ public class EmiStonecuttingRecipe implements EmiRecipe {
 	public EmiStonecuttingRecipe(StonecuttingRecipe recipe) {
 		this.id = recipe.getId();
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
-		output = EmiStack.of(recipe.getOutput());
+		output = EmiStack.of(EmiPort.getOutput(recipe));
 	}
 
 	@Override

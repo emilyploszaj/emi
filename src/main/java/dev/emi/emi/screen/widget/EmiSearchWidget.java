@@ -142,7 +142,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	}
 
 	@Override
-	protected void setFocused(boolean focused) {
+	public void setFocused(boolean focused) {
 		isFocused = focused;
 	}
 
@@ -168,7 +168,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 					}
 				} else if (button == 1) {
 					this.setText("");
-					this.setTextFieldFocused(true);
+					this.setFocused(true);
 				}
 			}
 			return b;
@@ -184,7 +184,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			}
 			if ((EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
 					|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {
-				this.setTextFieldFocused(false);
+				this.setFocused(false);
 				this.setFocused(false);
 				return true;
 			}
@@ -198,7 +198,12 @@ public class EmiSearchWidget extends TextFieldWidget {
 		String lower = getText().toLowerCase();
 
 		boolean dinnerbone = lower.contains("dinnerbone");
-		accumulatedSpin = MathHelper.clamp(accumulatedSpin + (dinnerbone ? 1 : -1) * (System.currentTimeMillis() - lastRender), 0, 500);
+		accumulatedSpin += (dinnerbone ? 1 : -1) * (System.currentTimeMillis() - lastRender);
+		if (accumulatedSpin < 0) {
+			accumulatedSpin = 0;
+		} else if (accumulatedSpin > 500) {
+			accumulatedSpin = 500;
+		}
 		lastRender = System.currentTimeMillis();
 		long deg = accumulatedSpin * -180 / 500;
 		MatrixStack view = RenderSystem.getModelViewStack();

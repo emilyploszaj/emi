@@ -215,11 +215,9 @@ public class BoMScreen extends Screen {
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
-			DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16,
-					-1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
 			if (hasRemainders) {
-				DrawableHelper.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0,
-						cy - 16 + 40, -1);
+				EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40, -1);
 			}
 			for (Cost cost : costs) {
 				cost.render(matrices);
@@ -242,11 +240,10 @@ public class BoMScreen extends Screen {
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			batcher.draw();
 		} else {
-			drawCenteredText(matrices, textRenderer,
-					EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
-			drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
+			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
 		}
 
 		viewMatrices.pop();
@@ -397,25 +394,23 @@ public class BoMScreen extends Screen {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
-	private static boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
+	private boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
 		EmiPlayerInventory inv = EmiScreenManager.lastPlayerInventory;
 		if (inv != null) {
 			List<EmiStack> stacks = hover.stack.getEmiStacks();
 			if (stacks.size() > 1) {
-				for (EmiStack invStack : inv.inventory.values()) {
-					for (EmiStack stack : stacks) {
-						if (stack.equals(invStack)) {
-							consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
-							return true;
-						}
+				for (EmiStack stack : stacks) {
+					if (inv.inventory.containsKey(stack)) {
+						consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+						return true;
 					}
 				}
 				for (EmiStack stack : stacks) {
-					EmiRecipe recipe = EmiUtil.getRecipeResolution(stack, inv, true);
-					if (recipe != null) {
-						consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
-						consumer.accept(stack, recipe);
-						return true;
+					for (Cost cost : costs) {
+						if (cost.cost.ingredient.equals(stack)) {
+							consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+							return true;
+						}
 					}
 				}
 				consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stacks.get(0)));
@@ -577,7 +572,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class Hover {
+	private class Hover {
 		public EmiIngredient stack;
 		public MaterialNode node, resolve;
 		public EmiRecipeCategory category;
@@ -636,7 +631,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class Node {
+	private class Node {
 		public Node parent = null;
 		public MaterialNode resolution = null;
 		public MaterialNode node;
@@ -776,7 +771,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class TreeVolume {
+	private class TreeVolume {
 		public List<Width> widths = Lists.newArrayList();
 		public List<Node> nodes = Lists.newArrayList();
 

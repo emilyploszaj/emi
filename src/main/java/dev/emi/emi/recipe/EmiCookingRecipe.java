@@ -28,7 +28,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 		this.id = recipe.getId();
 		this.category = category;
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
-		output = EmiStack.of(recipe.getOutput());
+		output = EmiStack.of(EmiPort.getOutput(recipe));
 		if (input.getEmiStacks().get(0).getItemStack().isOf(Items.WET_SPONGE)) {
 			input.getEmiStacks().get(0).setRemainder(EmiStack.of(Fluids.WATER, 81_000));
 		}

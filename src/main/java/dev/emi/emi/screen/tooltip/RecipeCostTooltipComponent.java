@@ -15,16 +15,12 @@ import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialTree;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Matrix4f;
 
-public class RecipeCostTooltipComponent implements TooltipComponent {
+public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 	private static final Text COST = EmiPort.translatable("emi.cost_per");
 	private final List<Node> nodes = Lists.newArrayList();
 	public final MaterialTree tree;
@@ -95,21 +91,18 @@ public class RecipeCostTooltipComponent implements TooltipComponent {
 	public int getWidth(TextRenderer textRenderer) {
 		return Math.max(textRenderer.getWidth(COST), maxWidth);
 	}
-	
+
 	@Override
-	public void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
-		matrices.push();
-		matrices.translate(x, y, z);
+	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
 		for (Node node : nodes) {
 			node.stack.render(matrices, node.x, node.y, MinecraftClient.getInstance().getTickDelta());
 			EmiRenderHelper.renderAmount(matrices, node.x, node.y, node.text);
 		}
-		matrices.pop();
 	}
 
 	@Override
-	public void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix, Immediate vertexConsumers) {
-		textRenderer.draw(COST, x, y, Formatting.GRAY.getColorValue(), true, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+	public void drawTooltipText(TextRenderData text) {
+		text.draw(COST, 0, 0, Formatting.GRAY.getColorValue(), true);
 	}
 
 	private static class Node {
