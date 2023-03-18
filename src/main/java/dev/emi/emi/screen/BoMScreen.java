@@ -397,25 +397,23 @@ public class BoMScreen extends Screen {
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
-	private static boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
+	private boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
 		EmiPlayerInventory inv = EmiScreenManager.lastPlayerInventory;
 		if (inv != null) {
 			List<EmiStack> stacks = hover.stack.getEmiStacks();
 			if (stacks.size() > 1) {
-				for (EmiStack invStack : inv.inventory.values()) {
-					for (EmiStack stack : stacks) {
-						if (stack.equals(invStack)) {
-							consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
-							return true;
-						}
+				for (EmiStack stack : stacks) {
+					if (inv.inventory.containsKey(stack)) {
+						consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+						return true;
 					}
 				}
 				for (EmiStack stack : stacks) {
-					EmiRecipe recipe = EmiUtil.getRecipeResolution(stack, inv, true);
-					if (recipe != null) {
-						consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
-						consumer.accept(stack, recipe);
-						return true;
+					for (Cost cost : costs) {
+						if (cost.cost.ingredient.equals(stack)) {
+							consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stack));
+							return true;
+						}
 					}
 				}
 				consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stacks.get(0)));
@@ -577,7 +575,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class Hover {
+	private class Hover {
 		public EmiIngredient stack;
 		public MaterialNode node, resolve;
 		public EmiRecipeCategory category;
@@ -636,7 +634,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class Node {
+	private class Node {
 		public Node parent = null;
 		public MaterialNode resolution = null;
 		public MaterialNode node;
@@ -776,7 +774,7 @@ public class BoMScreen extends Screen {
 		}
 	}
 
-	private static class TreeVolume {
+	private class TreeVolume {
 		public List<Width> widths = Lists.newArrayList();
 		public List<Node> nodes = Lists.newArrayList();
 
