@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
@@ -20,9 +21,9 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	}
 
 	@Override
-	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer, int z) {
+	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer) {
 		matrices.push();
-		matrices.translate(x, y, z);
+		matrices.translate(x, y, 0);
 		drawTooltip(matrices, new TooltipRenderData(textRenderer, itemRenderer, x, y));
 		matrices.pop();
 	}
@@ -51,7 +52,7 @@ public interface EmiTooltipComponent extends TooltipComponent {
 		}
 
 		public void draw(Text text, int x, int y, int color, boolean shadow) {
-			renderer.draw(text, x + this.x, y + this.y, color, shadow, matrix, vertexConsumers, false, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+			renderer.draw(text, x + this.x, y + this.y, color, shadow, matrix, vertexConsumers, TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
 		}
 	}
 

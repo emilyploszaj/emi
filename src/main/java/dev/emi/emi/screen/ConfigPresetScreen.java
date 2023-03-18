@@ -72,7 +72,7 @@ public class ConfigPresetScreen extends Screen {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderBackgroundTexture(0);
+		this.renderBackgroundTexture(matrices);
 		list.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {

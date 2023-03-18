@@ -10,7 +10,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import dev.emi.emi.mixin.accessor.SmithingRecipeAccessor;
+import dev.emi.emi.mixin.accessor.LegacySmithingRecipeAccessor;
 import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.util.Identifier;
 
@@ -22,8 +22,8 @@ public class EmiSmithingRecipe implements EmiRecipe {
 	
 	public EmiSmithingRecipe(SmithingRecipe recipe) {
 		this.id = recipe.getId();
-		input = EmiIngredient.of(((SmithingRecipeAccessor) recipe).getBase());
-		addition = EmiIngredient.of(((SmithingRecipeAccessor) recipe).getAddition());
+		input = EmiIngredient.of(((LegacySmithingRecipeAccessor) recipe).getBase());
+		addition = EmiIngredient.of(((LegacySmithingRecipeAccessor) recipe).getAddition());
 		output = EmiStack.of(EmiPort.getOutput(recipe));
 	}
 

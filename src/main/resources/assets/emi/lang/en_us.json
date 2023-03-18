@@ -338,6 +338,13 @@
   "tag.minecraft.compasses": "Compasses",
   "tag.minecraft.chest_boats": "Chest Boats",
   "tag.minecraft.overworld_natural_logs": "Natural Overworld Logs",
+  "tag.minecraft.axes": "Axes",
+  "tag.minecraft.hoes": "Hoes",
+  "tag.minecraft.pickaxes": "Pickaxes",
+  "tag.minecraft.shovels": "Shovels",
+  "tag.minecraft.smelts_to_glass": "Smelts to Glass",
+  "tag.minecraft.swords": "Swords",
+  "tag.minecraft.tools": "Tools",
 
   "tag.c.stone": "Stone",
   "tag.c.cobblestone": "Cobblestone",

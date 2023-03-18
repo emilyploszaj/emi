@@ -25,7 +25,7 @@ import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
@@ -122,7 +122,7 @@ public class TagEmiIngredient implements EmiIngredient {
 				RenderSystem.applyModelViewMatrix();
 				
 				MatrixStack ms = new MatrixStack();
-				model.getTransformation().getTransformation(ModelTransformation.Mode.GUI).apply(false, ms);
+				model.getTransformation().getTransformation(ModelTransformationMode.GUI).apply(false, ms);
 				ms.translate(-0.5, -0.5, -0.5);
 				
 				if (!model.isSideLit()) {

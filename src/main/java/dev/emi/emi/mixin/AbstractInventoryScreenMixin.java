@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -104,8 +103,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			this.y = restoreY;
 		}
 		if (hovered != null && size > 1) {
-			List<Text> list = List.of(this.getStatusEffectDescription(hovered),
-				EmiPort.literal(StatusEffectUtil.durationToString(hovered, 1.0f)));
+			List<Text> list = List.of(this.getStatusEffectDescription(hovered), StatusEffectUtil.durationToString(hovered, 1.0f));
 			this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
 		}
 		return true;
