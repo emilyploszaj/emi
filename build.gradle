@@ -52,7 +52,7 @@ dependencies {
 	modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	modCompileOnly "com.terraformersmc:modmenu:5.0.0-alpha.4"
+	modCompileOnly "com.terraformersmc:modmenu:6.1.0-rc.4"
 }
 
 processResources {
