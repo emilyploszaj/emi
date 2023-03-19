@@ -1,6 +1,7 @@
 package dev.emi.emi.api.widget;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.compress.utils.Lists;
@@ -78,6 +79,13 @@ public class SlotWidget extends Widget {
 	public SlotWidget catalyst(boolean catalyst) {
 		this.catalyst = catalyst;
 		return this;
+	}
+
+	/**
+	 * Provides a function for appending {@link TooltipComponent}s to the slot's tooltip.
+	 */
+	public SlotWidget appendTooltip(Function<EmiIngredient, TooltipComponent> function) {
+		return appendTooltip(() -> function.apply(getStack()));
 	}
 
 	/**

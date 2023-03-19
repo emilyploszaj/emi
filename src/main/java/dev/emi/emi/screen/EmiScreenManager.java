@@ -80,6 +80,7 @@ public class EmiScreenManager {
 	private static List<? extends EmiIngredient> searchedStacks = List.of();
 	private static int lastWidth, lastHeight;
 	private static List<Bounds> lastExclusion;
+	private static StackBatcher.ClaimedCollection batchers = new StackBatcher.ClaimedCollection();
 	private static List<SidebarPanel> panels = List.of(
 			new SidebarPanel(SidebarSide.LEFT, EmiConfig.leftSidebarPages),
 			new SidebarPanel(SidebarSide.RIGHT, EmiConfig.rightSidebarPages),
@@ -166,6 +167,8 @@ public class EmiScreenManager {
 			int right = Math.min(screen.width - ENTRY_SIZE * 2, emi.emi$getRight());
 			int top = emi.emi$getTop();
 			int bottom = emi.emi$getBottom();
+
+			batchers.unclaimAll();
 
 			List<Bounds> spaceExclusion = Lists.newArrayList();
 			spaceExclusion.addAll(exclusion);
@@ -1390,7 +1393,7 @@ public class EmiScreenManager {
 	}
 
 	private static class ScreenSpace {
-		public final StackBatcher batcher = new StackBatcher();
+		public final StackBatcher batcher = batchers.claim();
 		private final Supplier<SidebarType> typeSupplier;
 		public final int tx, ty, tw, th;
 		public final int pageSize;
@@ -1451,6 +1454,8 @@ public class EmiScreenManager {
 				batcher.begin(this.tx + PADDING_SIZE, this.ty + PADDING_SIZE, 0);
 				int i = startIndex;
 				List<? extends EmiIngredient> stacks = getStacks();
+				matrices.push();
+				matrices.translate(0, 0, 100);
 				outer: for (int yo = 0; yo < this.th; yo++) {
 					for (int xo = 0; xo < this.getWidth(yo); xo++) {
 						if (i >= stacks.size()) {
@@ -1475,6 +1480,7 @@ public class EmiScreenManager {
 					}
 				}
 				batcher.draw();
+				matrices.pop();
 				if (hx != -1 && hx != -1) {
 					RenderSystem.enableDepthTest();
 					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
