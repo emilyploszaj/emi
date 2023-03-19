@@ -21,6 +21,7 @@ import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.config.EmiConfig;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -42,6 +43,7 @@ import org.joml.Matrix4f;
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
+	private static boolean isSodiumLoaded = FabricLoader.getInstance().isModLoaded("sodium");
 	
 	static {
 		try {
@@ -81,7 +83,7 @@ public class StackBatcher {
 	private int z;
 
 	private static boolean isEnabled() {
-		return EmiConfig.useBatchedRenderer;
+		return EmiConfig.useBatchedRenderer && !isSodiumLoaded;
 	}
 
 	public StackBatcher() {
