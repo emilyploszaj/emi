@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -217,6 +218,35 @@ public class StackBatcher {
 		EmiPort.upload(vb, bldr);
 		buffers.put(layer, vb);
 		bldr.reset();
+	}
+
+	// Apparently BufferBuilder leaks memory in vanilla. Go figure
+	public static class ClaimedCollection {
+		private Set<StackBatcher> claimed = Sets.newHashSet();
+		private List<StackBatcher> unclaimed = Lists.newArrayList();
+
+		public StackBatcher claim() {
+			StackBatcher batcher;
+			if (unclaimed.isEmpty()) {
+				batcher = new StackBatcher();
+			} else {
+				batcher = unclaimed.remove(unclaimed.size() - 1);
+			}
+			claimed.add(batcher);
+			return batcher;
+		}
+
+		public void unclaim(StackBatcher batcher) {
+			claimed.remove(batcher);
+			unclaimed.add(batcher);
+		}
+
+		public void unclaimAll() {
+			for (StackBatcher batcher : claimed) {
+				unclaimed.add(batcher);
+			}
+			claimed.clear();
+		}
 	}
 
 	/*
