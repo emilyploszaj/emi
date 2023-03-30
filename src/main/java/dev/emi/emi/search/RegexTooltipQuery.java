@@ -25,9 +25,8 @@ public class RegexTooltipQuery extends Query {
 			return false;
 		}
 		List<Text> lines = stack.getTooltipText();
-		lines.remove(0);
-		for (Text text : lines) {
-			Matcher m = pattern.matcher(text.getString());
+		for (int i = 1; i < lines.size(); i++) {
+			Matcher m = pattern.matcher(lines.get(i).getString());
 			if (m.find()) {
 				return true;
 			}
