@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "emi"
+version = "${version}"
+displayName = "EMI"
+authors = "Emi"
+description = '''
+A featureful and accessible item and recipe viewer
+'''
+#logoFile = ""
