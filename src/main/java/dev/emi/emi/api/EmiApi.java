@@ -132,10 +132,9 @@ public class EmiApi {
 		} else if (stack instanceof ListEmiIngredient list) {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))), stack);
 		} else if (stack.getEmiStacks().size() == 1) {
-			setPages(mapRecipes(pruneSources(
-				EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), List.of()),
-				stack.getEmiStacks().get(0))), stack);
-			focusRecipe(BoM.getRecipe(stack.getEmiStacks().get(0)));
+			EmiStack es = stack.getEmiStacks().get(0);
+			setPages(mapRecipes(pruneSources(EmiRecipes.byOutput.getOrDefault(es.getKey(), List.of()), es)), stack);
+			focusRecipe(BoM.getRecipe(es));
 		}
 	}
 

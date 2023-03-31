@@ -86,6 +86,11 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof EmiIngredient ingredient && EmiIngredient.areEqual(this, ingredient);
+	}
+
+	@Override
 	public boolean isSideLit() {
 		return stack instanceof Batchable b && b.isSideLit();
 	}
@@ -122,18 +127,21 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	public static class Synthetic extends EmiFavorite {
+		public final long batches;
 		public final long amount;
 		public final int state;
 		public long total;
 
-		public Synthetic(EmiRecipe recipe, long amount, int state) {
+		public Synthetic(EmiRecipe recipe, long batches, int state) {
 			super(recipe.getOutputs().get(0), recipe);
-			this.amount = amount;
+			this.batches = batches;
+			this.amount = batches * recipe.getOutputs().get(0).getAmount();
 			this.state = state;
 		}
 
 		public Synthetic(EmiIngredient ingredient, long needed, long total) {
 			super(ingredient, null);
+			this.batches = needed;
 			this.amount = needed;
 			this.total = total;
 			this.state = -1;
@@ -174,7 +182,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 				key = "tooltip.emi.synfav.fully_craftable";
 			}
 			list.addAll(Arrays
-					.stream(I18n.translate(key, amount).split("\n"))
+					.stream(I18n.translate(key, batches).split("\n"))
 					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList());
 			return list;
 		}

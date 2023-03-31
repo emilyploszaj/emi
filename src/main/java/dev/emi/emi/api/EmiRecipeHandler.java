@@ -53,8 +53,7 @@ public interface EmiRecipeHandler<T extends ScreenHandler> extends StandardRecip
 	
 	@SuppressWarnings("unchecked")
 	default List<Slot> getCraftingSlots(EmiRecipe recipe, T handler) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.currentScreen instanceof HandledScreen<?> hs && hs.getScreenHandler() == handler) {
+		if (EmiApi.getHandledScreen() instanceof HandledScreen<?> hs && hs.getScreenHandler() == handler) {
 			return getCraftingSlots(recipe, (HandledScreen<T>) hs);
 		}
 		return List.of();

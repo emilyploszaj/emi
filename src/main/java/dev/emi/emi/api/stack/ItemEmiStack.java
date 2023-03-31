@@ -97,6 +97,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		if ((flags & RENDER_ICON) != 0) {
 			ItemRenderer itemRenderer = client.getItemRenderer();
 			itemRenderer.renderInGui(matrices, stack, x, y);
+			itemRenderer.renderGuiItemOverlay(matrices, client.textRenderer, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
@@ -118,7 +119,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
+		return unbatchable || stack.hasGlint() || stack.isDamaged() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
 			|| MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	

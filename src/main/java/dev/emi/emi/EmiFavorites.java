@@ -62,7 +62,7 @@ public class EmiFavorites {
 						continue;
 					}
 					if (ingredient instanceof EmiStack es) {
-						ingredient = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
+						ingredient = es.copy();
 					}
 					favorites.add(new EmiFavorite(ingredient, recipe));
 				}
@@ -126,7 +126,7 @@ public class EmiFavorites {
 		} else {
 			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
 			if (stack instanceof EmiStack es) {
-				es = es.copy().comparison(c -> c.copy().nbt(true).amount(false).build());
+				es = es.copy();
 				if (context == null && es instanceof ItemEmiStack ies) {
 					ies.getItemStack().setCount(1);
 				}
