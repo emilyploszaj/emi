@@ -110,45 +110,42 @@ public class EmiApi {
 	}
 
 	public static void displayAllRecipes() {
-		setPages(EmiRecipes.byCategory);
+		setPages(EmiRecipes.byCategory, EmiStack.EMPTY);
 	}
 
 	public static void displayRecipeCategory(EmiRecipeCategory category) {
-		setPages(Map.of(category, EmiRecipes.byCategory.get(category)));
+		setPages(Map.of(category, EmiRecipes.byCategory.get(category)), EmiStack.EMPTY);
 	}
 
 	public static void displayRecipe(EmiRecipe recipe) {
-		setPages(Map.of(recipe.getCategory(), List.of(recipe)));
+		setPages(Map.of(recipe.getCategory(), List.of(recipe)), EmiStack.EMPTY);
 	}
 	
 	public static void displayRecipes(EmiIngredient stack) {
-		EmiSidebars.lookup(stack);
 		if (stack instanceof TagEmiIngredient tag) {
 			for (EmiRecipe recipe : EmiRecipes.byCategory.getOrDefault(VanillaPlugin.TAG, List.of())) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
-					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)));
+					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)), stack);
 					break;
 				}
 			}
 		} else if (stack instanceof ListEmiIngredient list) {
-			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))));
+			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))), stack);
 		} else if (stack.getEmiStacks().size() == 1) {
-			setPages(mapRecipes(pruneSources(
-				EmiRecipes.byOutput.getOrDefault(stack.getEmiStacks().get(0).getKey(), List.of()),
-				stack.getEmiStacks().get(0))));
-			focusRecipe(BoM.getRecipe(stack.getEmiStacks().get(0)));
+			EmiStack es = stack.getEmiStacks().get(0);
+			setPages(mapRecipes(pruneSources(EmiRecipes.byOutput.getOrDefault(es.getKey(), List.of()), es)), stack);
+			focusRecipe(BoM.getRecipe(es));
 		}
 	}
 
 	public static void displayUses(EmiIngredient stack) {
-		EmiSidebars.lookup(stack);
 		if (!stack.isEmpty()) {
 			EmiStack zero = stack.getEmiStacks().get(0);
 			Map<EmiRecipeCategory, List<EmiRecipe>> map
 				= mapRecipes(Stream.concat(
 						pruneUses(EmiRecipes.byInput.getOrDefault(zero.getKey(), List.of()), stack).stream(),
 						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
-			setPages(map);
+			setPages(map, stack);
 		}
 	}
 
@@ -239,10 +236,11 @@ public class EmiApi {
 		return true;
 	}
 
-	private static void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
+	private static void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes, EmiIngredient stack) {
 		recipes = recipes.entrySet().stream().filter(e -> !e.getValue().isEmpty())
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
+			EmiSidebars.lookup(stack);
 			if (getHandledScreen() == null) {
 				client.setScreen(new InventoryScreen(client.player));
 			}
