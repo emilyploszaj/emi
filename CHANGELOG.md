@@ -1,8 +1,8 @@
-### Updated to 1.19.4
-
-### API
-* Added method for appending tooltips on SlotWidgets based on their currently displayed ingredient
+### Tweaks
+* Synthetic favorites display raw amount needed, rather than batch count, to be less confusing
 
 ### Fixes
-* Fixed triggering of vanilla memory leak in EMI rendering code, causing out of memory errors on certain computers
-* Fixed hover overlay intersecting items from certain mods
+* Fixed regex tooltip errors
+* Fixed lookups of favorited damaged tools being overly precise
+* Fixed item bars not being rendered for items in recipes
+* Fixed legacy recipe handler conversion behavior

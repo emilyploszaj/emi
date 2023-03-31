@@ -104,6 +104,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			float zOffset = itemRenderer.zOffset;
 			itemRenderer.zOffset = 0;
 			itemRenderer.renderInGui(stack, x, y);
+			itemRenderer.renderGuiItemOverlay(client.textRenderer, stack, x, y, "");
 			itemRenderer.zOffset = zOffset;
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
@@ -128,7 +129,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
+		return unbatchable || stack.hasGlint() || stack.isDamaged() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
 			|| MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	
