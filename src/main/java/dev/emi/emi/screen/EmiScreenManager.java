@@ -1454,6 +1454,12 @@ public class EmiScreenManager {
 				batcher.begin(this.tx + PADDING_SIZE, this.ty + PADDING_SIZE, 0);
 				int i = startIndex;
 				List<? extends EmiIngredient> stacks = getStacks();
+				int hovered = this.getRawOffsetFromMouse(mouseX, mouseY);
+				if (hovered != -1 && EmiConfig.showHoverOverlay && startIndex + hovered < stacks.size()) {
+					hx = this.getRawX(hovered);
+					hy = this.getRawY(hovered);
+					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
+				}
 				matrices.push();
 				matrices.translate(0, 0, 100);
 				outer: for (int yo = 0; yo < this.th; yo++) {
@@ -1471,20 +1477,10 @@ public class EmiScreenManager {
 								DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
 							}
 						}
-						if (EmiConfig.showHoverOverlay
-								&& mouseX >= cx && mouseY >= cy && mouseX < cx + ENTRY_SIZE
-								&& mouseY < cy + ENTRY_SIZE) {
-							hx = cx;
-							hy = cy;
-						}
 					}
 				}
 				batcher.draw();
 				matrices.pop();
-				if (hx != -1 && hx != -1) {
-					RenderSystem.enableDepthTest();
-					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
-				}
 			}
 		}
 

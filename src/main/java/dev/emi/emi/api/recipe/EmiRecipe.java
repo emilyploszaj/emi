@@ -72,8 +72,8 @@ public interface EmiRecipe {
 
 	/**
 	 * @return Whether the recipe supports the recipe tree.
-	 * 	The basic requirement is having quantifiable inputs and outputs.
-	 * 	Recipes that have random or chanced outputs cannot be accurately modeled in a tree, and should exclude themselves.
+	 * 	Recipes that do not represent a set of inputs producing a set of outputs should exclude themselves.
+	 *  Example for unsupportable recipes are pattern based recipes, like arbitrary dying.
 	 */
 	default boolean supportsRecipeTree() {
 		return !getInputs().isEmpty() && !getOutputs().isEmpty();

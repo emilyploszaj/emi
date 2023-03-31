@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 
 @ApiStatus.Experimental
 public class EmiInfoRecipe implements EmiRecipe {
+	private static final int PADDING = 4;
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	private final List<EmiIngredient> stacks;
 	private final List<OrderedText> text;
@@ -59,7 +60,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 	@Override
 	public int getDisplayHeight() {
 		int stackHeight = ((stacks.size() - 1) / 6 + 1) * 18;
-		return stackHeight + CLIENT.textRenderer.fontHeight * text.size();
+		return stackHeight + CLIENT.textRenderer.fontHeight * text.size() + PADDING;
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 			}
 			widgets.addSlot(stacks.get(i), x + 18, y);
 		}
-		int y = stackHeight * 18;
+		int y = stackHeight * 18 + PADDING;
 		int lineCount = (widgets.getHeight() - y) / CLIENT.textRenderer.fontHeight;
 		PageManager manager = new PageManager(text, lineCount);
 		if (widgets.getHeight() < getDisplayHeight()) {

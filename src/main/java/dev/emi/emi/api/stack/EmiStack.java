@@ -164,7 +164,12 @@ public abstract class EmiStack implements EmiIngredient {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof EmiStack stack && this.isEqual(stack);
+		if (obj instanceof EmiStack stack) {
+			return this.isEqual(stack);
+		} else if (obj instanceof EmiIngredient stack) {
+			return EmiIngredient.areEqual(this, stack);
+		}
+		return false;
 	}
 
 	@Override
