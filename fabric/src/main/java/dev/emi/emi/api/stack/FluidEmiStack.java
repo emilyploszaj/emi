@@ -8,6 +8,7 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiFabric;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
@@ -159,7 +160,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public Text getName() {
-		return EmiPort.fluidName(fluid);
+		return EmiFabric.fluidName(fluid);
 	}
 
 	public static class FluidEntry extends Entry<FluidVariant> {

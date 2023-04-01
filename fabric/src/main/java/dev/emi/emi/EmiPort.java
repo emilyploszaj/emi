@@ -4,17 +4,12 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.brigadier.CommandDispatcher;
 
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
@@ -41,7 +36,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
@@ -92,10 +86,6 @@ public final class EmiPort {
 		return text.asOrderedText();
 	}
 
-	public static Text fluidName(FluidVariant fluid) {
-		return FluidVariantAttributes.getName(fluid);
-	}
-
 	public static Collection<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
 		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
 	}
@@ -106,10 +96,6 @@ public final class EmiPort {
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	public static void registerCommand(Consumer<CommandDispatcher<ServerCommandSource>> consumer) {
-		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> consumer.accept(dispatcher));
 	}
 
 	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {

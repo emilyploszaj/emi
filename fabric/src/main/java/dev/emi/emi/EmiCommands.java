@@ -21,7 +21,7 @@ public class EmiCommands {
 	public static final byte TREE_RESOLUTION = 0x12;
 	
 	public static void init() {
-		EmiPort.registerCommand((dispatcher) -> {
+		EmiFabric.registerCommand((dispatcher) -> {
 			dispatcher.register(literal("emi")
 				.requires(source -> source.hasPermissionLevel(2))
 				.then(
