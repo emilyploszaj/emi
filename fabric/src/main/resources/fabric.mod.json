@@ -28,6 +28,7 @@
     ]
   },
   "mixins": [
+    "emi-common.mixins.json",
     "emi.mixins.json"
   ],
   "accessWidener" : "emi.accesswidener",

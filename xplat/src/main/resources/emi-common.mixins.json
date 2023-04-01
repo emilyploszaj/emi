@@ -3,6 +3,14 @@
   "package": "dev.emi.emi.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "accessor.AxeItemAccessor",
+    "accessor.CraftingResultSlotAccessor",
+    "accessor.HandledScreenAccessor",
+    "accessor.HoeItemAccessor",
+    "accessor.ItemRendererAccessor",
+    "accessor.LegacySmithingRecipeAccessor",
+    "accessor.ScreenAccessor",
+    "accessor.ShovelItemAccessor"
   ],
   "mixins": [
   ],
