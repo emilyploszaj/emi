@@ -19,7 +19,7 @@ public class MaterialNode {
 	// Should these be decoupled from material nodes?
 	public FoldState state = FoldState.EXPANDED;
 	public ProgressState progress = ProgressState.UNSTARTED;
-	public long neededBatches = 0;
+	public long neededBatches = 0, totalNeeded = 0;
 
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();
