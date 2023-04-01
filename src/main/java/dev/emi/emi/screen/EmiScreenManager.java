@@ -1073,7 +1073,7 @@ public class EmiScreenManager {
 				}
 				int amount = all ? Integer.MAX_VALUE : 1;
 				if (stack.getStack() instanceof EmiFavorite.Synthetic syn) {
-					amount = Math.min(amount, (int) syn.amount);
+					amount = Math.min(amount, (int) syn.batches);
 				}
 				if (EmiApi.performFill(context, action, amount)) {
 					MinecraftClient.getInstance().getSoundManager()
