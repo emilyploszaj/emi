@@ -162,22 +162,24 @@ public class EmiFavorites {
 			Map<EmiIngredient, ChanceMaterialCost> chancedCosts = Maps.newHashMap(BoM.tree.cost.chanceCosts);
 			BoM.tree.calculateProgress(inv);
 			Object2LongMap<EmiRecipe> batches = new Object2LongLinkedOpenHashMap<>();
-			countRecipes(batches, BoM.tree.goal);
+			Object2LongMap<EmiRecipe> amounts = new Object2LongLinkedOpenHashMap<>();
+			countRecipes(batches, amounts, BoM.tree.goal);
 			boolean hasSomething = false;
 			for (Object2LongMap.Entry<EmiRecipe> entry : batches.object2LongEntrySet()) {
 				EmiRecipe recipe = entry.getKey();
-				long amount = entry.getLongValue();
+				long amount = amounts.getOrDefault(recipe, 0);
+				long batch = entry.getLongValue();
 				if (amount == 0) {
 					continue;
 				}
 				hasSomething = true;
 				int state = 0;
-				if (inv.canCraft(recipe, amount)) {
+				if (inv.canCraft(recipe, batch)) {
 					state = 2;
 				} else if (inv.canCraft(recipe)) {
 					state = 1;
 				}
-				syntheticFavorites.add(new EmiFavorite.Synthetic(recipe, amount, state));
+				syntheticFavorites.add(new EmiFavorite.Synthetic(recipe, batch, amount, state));
 			}
 			if (!hasSomething) {
 				BoM.craftingMode = false;
@@ -204,9 +206,9 @@ public class EmiFavorites {
 		}
 	}
 
-	public static void countRecipes(Object2LongMap<EmiRecipe> batches, MaterialNode node) {
+	public static void countRecipes(Object2LongMap<EmiRecipe> batches, Object2LongMap<EmiRecipe> amounts, MaterialNode node) {
 		if (node.recipe instanceof EmiResolutionRecipe recipe) {
-			countRecipes(batches, node.children.get(0));
+			countRecipes(batches, amounts, node.children.get(0));
 			return;
 		}
 		// Include empty costs for proper sorting
@@ -218,8 +220,15 @@ public class EmiFavorites {
 				batches.removeLong(node.recipe);
 			}
 			batches.put(node.recipe, amount);
+			amount = node.totalNeeded;
+			if (amounts.containsKey(node.recipe)) {
+				// Remove?
+				amount += amounts.getLong(node.recipe);
+				amounts.removeLong(node.recipe);
+			}
+			amounts.put(node.recipe, amount);
 			for (MaterialNode child : node.children) {
-				countRecipes(batches, child);
+				countRecipes(batches, amounts, child);
 			}
 		}
 	}

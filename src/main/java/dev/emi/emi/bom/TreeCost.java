@@ -156,6 +156,7 @@ public class TreeCost {
 
 	private void complete(MaterialNode node) {
 		node.progress = ProgressState.COMPLETED;
+		node.totalNeeded = 0;
 		node.neededBatches = 0;
 		if (node.children != null) {
 			for (MaterialNode child : node.children) {
@@ -167,6 +168,7 @@ public class TreeCost {
 	private void calculateCost(MaterialNode node, long amount, ChanceState chance, boolean trackProgress) {
 		if (trackProgress) {
 			node.progress = ProgressState.UNSTARTED;
+			node.totalNeeded = 0;
 			node.neededBatches = 0;
 		}
 		EmiRecipe recipe = node.recipe;
@@ -207,9 +209,10 @@ public class TreeCost {
 		
 		long effectiveCrafts = amount;
 		if (recipe != null) {
-			long minBatches = (int) Math.ceil(amount / (float) node.divisor);
+			long minBatches = (long) Math.ceil(amount / (double) node.divisor);
 			effectiveCrafts = minBatches * node.divisor;
 			if (trackProgress) {
+				node.totalNeeded = amount;
 				node.neededBatches = minBatches;
 			}
 			ChanceState produced = chance.produce(node.produceChance);
