@@ -20,12 +20,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiLog;
-import dev.emi.emi.EmiUtil;
-import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.platform.EmiAgnos;
 import it.unimi.dsi.fastutil.ints.IntList;
 import joptsimple.internal.Strings;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.font.TextHandler;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.StringVisitable;
@@ -325,11 +325,11 @@ public class EmiConfig {
 	// Binds
 	@Comment("Toggle the visibility of EMI.")
 	@ConfigValue("binds.toggle-visibility")
-	public static EmiBind toggleVisibility = new EmiBind("key.emi.toggle_visibility", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_O);
+	public static EmiBind toggleVisibility = new EmiBind("key.emi.toggle_visibility", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_O);
 
 	@Comment("Focuse the search bar.")
 	@ConfigValue("binds.focus-search")
-	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiUtil.CONTROL_MASK, GLFW.GLFW_KEY_F);
+	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_F);
 
 	@Comment("Clears the search bar.")
 	@ConfigValue("binds.clear-search")
@@ -374,7 +374,7 @@ public class EmiConfig {
 		+ "Move ingredients for as many results as possible.")
 	@ConfigValue("binds.craft-all")
 	public static EmiBind craftAll = new EmiBind("key.emi.craft_all", 
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.SHIFT_MASK));
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.SHIFT_MASK));
 
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result and put in inventory if possible.")
@@ -390,7 +390,7 @@ public class EmiConfig {
 		+ "Move ingredients for a single result and put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
 
 	@ConfigGroupEnd
 	@Comment("Display the recipe that will be used to craft on a stack with no recipe context.")
@@ -401,17 +401,17 @@ public class EmiConfig {
 	@Comment("Cheat in one of an item into the inventory.")
 	@ConfigValue("binds.cheat-one-to-inventory")
 	public static EmiBind cheatOneToInventory = new EmiBind("key.emi.cheat_one_to_inventory",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiUtil.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiInput.CONTROL_MASK));
 
 	@Comment("Cheat in a stack of an item into the inventory.")
 	@ConfigValue("binds.cheat-stack-to-inventory")
 	public static EmiBind cheatStackToInventory = new EmiBind("key.emi.cheat_stack_to_inventory",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
 	
 	@Comment("Cheat in one of an item into the cursor.")
 	@ConfigValue("binds.cheat-one-to-cursor")
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiUtil.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiInput.CONTROL_MASK));
 	
 	@ConfigGroupEnd
 	@Comment("Cheat in a stack of an item into the cursor.")
@@ -421,11 +421,11 @@ public class EmiConfig {
 	// Dev
 	@Comment("Whether certain development functions should be enabled. Not recommended for general play.")
 	@ConfigValue("dev.dev-mode")
-	public static boolean devMode = FabricLoader.getInstance().isDevelopmentEnvironment();
+	public static boolean devMode = EmiAgnos.isDevelopmentEnvironment();
 
 	@Comment("Whether to log untranslated tags as warnings.")
 	@ConfigValue("dev.log-untranslated-tags")
-	public static boolean logUntranslatedTags = FabricLoader.getInstance().isDevelopmentEnvironment();
+	public static boolean logUntranslatedTags = EmiAgnos.isDevelopmentEnvironment();
 
 	@Comment("Whether to log ingredients that don't have a representative tag as warnings.")
 	@ConfigValue("dev.log-non-tag-ingredients")
@@ -592,7 +592,7 @@ public class EmiConfig {
 		if (useGlobalConfig) {
 			return new File(getGlobalFolder(), "emi.css");
 		}
-		return new File(FabricLoader.getInstance().getConfigDir().toFile(), "emi.css");
+		return new File(EmiAgnos.getConfigDirectory().toFile(), "emi.css");
 	}
 
 	private static File getGlobalFolder() {

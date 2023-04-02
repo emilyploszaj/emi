@@ -27,7 +27,6 @@ import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.ChanceState;
@@ -38,6 +37,8 @@ import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.bom.TreeCost;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
@@ -376,7 +377,7 @@ public class BoMScreen extends Screen {
 				EmiFavorites.addFavorite(hover.stack, hover.node == null ? null : hover.node.recipe);
 			}
 		}
-		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_R) {
+		if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_R) {
 			if (EmiRecipes.recipes.size() > 0) {
 				for (int i = 0; i < 100_000; i++) {
 					EmiRecipe recipe = EmiRecipes.recipes.get(EmiUtil.RANDOM.nextInt(EmiRecipes.recipes.size()));
@@ -387,7 +388,7 @@ public class BoMScreen extends Screen {
 					}
 				}
 			}
-		} else if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
+		} else if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
 			BoM.tree = null;
 			init();
 		}
@@ -437,7 +438,7 @@ public class BoMScreen extends Screen {
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (hover != null) {
 			if (button == 1 && hover.node != null && hover.node.recipe != null) {
-				if (EmiUtil.isShiftDown()) {
+				if (EmiInput.isShiftDown()) {
 					BoM.tree.addResolution(hover.node.ingredient, null);
 				} else if (!(hover.node.recipe instanceof EmiResolutionRecipe)) {
 					if (hover.node.state == FoldState.EXPANDED) {
@@ -450,7 +451,7 @@ public class BoMScreen extends Screen {
 				return true;
 			}
 			if (hover.stack != null) {
-				if (EmiUtil.isShiftDown() && button == 0) {
+				if (EmiInput.isShiftDown() && button == 0) {
 					if (getAutoResolutions(hover, BoM.tree::addResolution)) {
 						recalculateTree();
 					}
@@ -494,7 +495,7 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (BoM.tree != null && batches.contains(mx, my)) {
-			if (EmiUtil.isShiftDown()) {
+			if (EmiInput.isShiftDown()) {
 				amount *= 16;
 			}
 			if (BoM.tree.batches == 1 && amount > 1) {
@@ -600,7 +601,7 @@ public class BoMScreen extends Screen {
 			if (stack != null) {
 				List<TooltipComponent> list = Lists.newArrayList();
 				list.addAll(stack.getTooltip());
-				if (EmiUtil.isShiftDown()) {
+				if (EmiInput.isShiftDown()) {
 					getAutoResolutions(this, (stack, recipe) -> {
 						if (node == null || recipe != node.recipe) {
 							list.add(new RecipeTooltipComponent(recipe, 0x4488FFAA));

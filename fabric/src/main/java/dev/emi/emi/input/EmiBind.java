@@ -1,4 +1,4 @@
-package dev.emi.emi.bind;
+package dev.emi.emi.input;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
@@ -85,7 +84,7 @@ public class EmiBind {
 
 	public boolean isHeld() {
 		for (ModifiedKey boundKey : boundKeys) {
-			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
+			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (boundKey.key.getCategory() == InputUtil.Type.KEYSYM && boundKey.key.getCode() != -1) {
 					if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), boundKey.key.getCode())) {
 						return true;
@@ -98,7 +97,7 @@ public class EmiBind {
 
 	public boolean matchesKey(int keyCode, int scanCode) {
 		for (ModifiedKey boundKey : boundKeys) {
-			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
+			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
 					if (boundKey.key.getCategory() == InputUtil.Type.SCANCODE && boundKey.key.getCode() == scanCode) {
 						return true;
@@ -115,7 +114,7 @@ public class EmiBind {
 
 	public boolean matchesMouse(int code) {
 		for (ModifiedKey boundKey : boundKeys) {
-			if (EmiUtil.getCurrentModifiers() == boundKey.modifiersToMatch()) {
+			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (boundKey.key.getCategory() == InputUtil.Type.MOUSE && boundKey.key.getCode() == code) {
 					return true;
 				}
@@ -134,11 +133,11 @@ public class EmiBind {
 				key = InputUtil.fromTranslationKey(parts[parts.length - 1]);
 				for (int i = 0; i < parts.length - 1; i++) {
 					if (parts[i].equals("ctrl") || parts[i].equals("control")) {
-						modifiers |= EmiUtil.CONTROL_MASK;
+						modifiers |= EmiInput.CONTROL_MASK;
 					} else if (parts[i].equals("alt")) {
-						modifiers |= EmiUtil.ALT_MASK;
+						modifiers |= EmiInput.ALT_MASK;
 					} else if (parts[i].equals("shift")) {
-						modifiers |= EmiUtil.SHIFT_MASK;
+						modifiers |= EmiInput.SHIFT_MASK;
 					}
 				}
 			}
@@ -156,13 +155,13 @@ public class EmiBind {
 
 		public String toName() {
 			String name = "";
-			if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
+			if ((modifiers & EmiInput.CONTROL_MASK) > 0) {
 				name += "ctrl ";
 			}
-			if ((modifiers & EmiUtil.ALT_MASK) > 0) {
+			if ((modifiers & EmiInput.ALT_MASK) > 0) {
 				name += "alt ";
 			}
-			if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
+			if ((modifiers & EmiInput.SHIFT_MASK) > 0) {
 				name += "shift ";
 			}
 			name += key.getTranslationKey();
@@ -172,7 +171,7 @@ public class EmiBind {
 		public int modifiersToMatch() {
 			int modifiers = this.modifiers;
 			if (key.getCategory() == InputUtil.Type.KEYSYM) {
-				modifiers ^= EmiUtil.maskFromCode(key.getCode());
+				modifiers ^= EmiInput.maskFromCode(key.getCode());
 			}
 			return modifiers;
 		}
@@ -189,15 +188,15 @@ public class EmiBind {
 		}
 	
 		private void appendModifiers(MutableText text, int modifiers) {
-			if ((modifiers & EmiUtil.CONTROL_MASK) > 0) {
+			if ((modifiers & EmiInput.CONTROL_MASK) > 0) {
 				EmiPort.append(text, EmiPort.translatable("key.keyboard.control"));
 				EmiPort.append(text, EmiPort.literal(" + "));
 			}
-			if ((modifiers & EmiUtil.ALT_MASK) > 0) {
+			if ((modifiers & EmiInput.ALT_MASK) > 0) {
 				EmiPort.append(text, EmiPort.translatable("key.keyboard.alt"));
 				EmiPort.append(text, EmiPort.literal(" + "));
 			}
-			if ((modifiers & EmiUtil.SHIFT_MASK) > 0) {
+			if ((modifiers & EmiInput.SHIFT_MASK) > 0) {
 				EmiPort.append(text, EmiPort.translatable("key.keyboard.shift"));
 				EmiPort.append(text, EmiPort.literal(" + "));
 			}

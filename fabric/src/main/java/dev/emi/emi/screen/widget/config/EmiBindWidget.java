@@ -6,8 +6,8 @@ import java.util.function.Supplier;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.bind.EmiBind;
-import dev.emi.emi.bind.EmiBind.ModifiedKey;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiBind.ModifiedKey;
 import dev.emi.emi.screen.ConfigScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;

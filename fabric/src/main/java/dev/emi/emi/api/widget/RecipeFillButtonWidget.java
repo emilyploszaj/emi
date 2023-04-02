@@ -8,13 +8,13 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRecipeFiller;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.widget.RecipeButtonWidget;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -65,7 +65,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (canFill) {
 			HandledScreen<?> hs = EmiApi.getHandledScreen();
-			if (hs != null && EmiRecipeFiller.performFill(recipe, hs, EmiFillAction.FILL, EmiUtil.isShiftDown() ? Integer.MAX_VALUE : 1)) {
+			if (hs != null && EmiRecipeFiller.performFill(recipe, hs, EmiFillAction.FILL, EmiInput.isShiftDown() ? Integer.MAX_VALUE : 1)) {
 				this.playButtonSound();
 				return true;
 			}

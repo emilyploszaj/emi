@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import dev.emi.emi.EmiUtil;
-import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import dev.emi.emi.config.EmiConfig.Comment;
 import dev.emi.emi.config.EmiConfig.ConfigGroup;
 import dev.emi.emi.config.EmiConfig.ConfigValue;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiInput;
 import net.minecraft.client.util.InputUtil;
 
 public class ConfigPresets {
@@ -76,13 +76,13 @@ public class ConfigPresets {
 	@ConfigValue("presets.author-binds")
 	public static Runnable authorBinds = () -> {
 		EmiConfig.toggleVisibility.setBinds(
-			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_O, EmiUtil.CONTROL_MASK)
+			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_O, EmiInput.CONTROL_MASK)
 		);
 		EmiConfig.focusSearch.setBinds(
-			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_F, EmiUtil.CONTROL_MASK)
+			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_F, EmiInput.CONTROL_MASK)
 		);
 		EmiConfig.clearSearch.setBinds(
-			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_D, EmiUtil.CONTROL_MASK)
+			EmiBind.ModifiedKey.of(GLFW.GLFW_KEY_D, EmiInput.CONTROL_MASK)
 		);
 		EmiConfig.viewRecipes.setToDefault();
 		EmiConfig.viewUses.setToDefault();
@@ -95,10 +95,10 @@ public class ConfigPresets {
 		EmiConfig.craftOne.setToDefault();
 		EmiConfig.craftAll.setBinds();
 		EmiConfig.craftOneToInventory.setBinds(
-			new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiUtil.SHIFT_MASK)
+			new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiInput.SHIFT_MASK)
 		);
 		EmiConfig.craftAllToInventory.setBinds(
-			new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiUtil.SHIFT_MASK)
+			new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.SHIFT_MASK)
 		);
 		EmiConfig.showCraft.setToDefault();
 		EmiConfig.cheatOneToInventory.setToDefault();

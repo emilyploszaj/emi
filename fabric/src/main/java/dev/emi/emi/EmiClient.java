@@ -19,6 +19,8 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
+import dev.emi.emi.fabric.EmiAgnosFabric;
+import dev.emi.emi.platform.EmiAgnos;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -44,6 +46,7 @@ public class EmiClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		EmiAgnos.delegate = new EmiAgnosFabric();
 		EmiConfig.loadConfig();
 		EmiData.init();
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {

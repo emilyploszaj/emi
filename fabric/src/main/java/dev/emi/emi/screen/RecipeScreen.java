@@ -32,6 +32,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.widget.RecipeBackground;
@@ -592,7 +593,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			scrollAcc += amount;
 			int sa = (int) scrollAcc;
 			scrollAcc %= 1;
-			if (EmiUtil.isShiftDown()) {
+			if (EmiInput.isShiftDown()) {
 				setPage(tabPage, tab - sa, 0);
 			} else {
 				setPage(tabPage, tab, page - sa);

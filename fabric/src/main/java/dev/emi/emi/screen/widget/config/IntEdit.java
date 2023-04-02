@@ -5,7 +5,7 @@ import java.util.function.IntSupplier;
 import java.util.regex.Pattern;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -49,9 +49,9 @@ public class IntEdit {
 	}
 
 	public int getInc() {
-		if (EmiUtil.isShiftDown()) {
+		if (EmiInput.isShiftDown()) {
 			return 10;
-		} else if (EmiUtil.isControlDown()) {
+		} else if (EmiInput.isControlDown()) {
 			return 5;
 		}
 		return 1;

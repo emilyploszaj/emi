@@ -2,7 +2,7 @@ package dev.emi.emi.screen.widget;
 
 import java.util.List;
 
-import dev.emi.emi.EmiUtil;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 
 public class SidebarButtonWidget extends SizedButtonWidget {
@@ -19,7 +19,7 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 
 	@Override
 	public void onPress() {
-		panel.cycleType(EmiUtil.isShiftDown() ? -1 : 1);
+		panel.cycleType(EmiInput.isShiftDown() ? -1 : 1);
 	}
 
 	@Override

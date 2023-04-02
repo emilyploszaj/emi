@@ -33,7 +33,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.bind.EmiBind;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
@@ -47,6 +46,8 @@ import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.config.SidebarTheme;
 import dev.emi.emi.config.SidebarType;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
@@ -923,7 +924,7 @@ public class EmiScreenManager {
 		if (hasFocusedTextField(client.currentScreen, 10)) {
 			return false;
 		}
-		if (EmiUtil.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+		if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
 			EmiApi.displayAllRecipes();
 			return true;
 		} else {

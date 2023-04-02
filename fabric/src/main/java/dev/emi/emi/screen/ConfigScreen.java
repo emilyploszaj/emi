@@ -14,9 +14,6 @@ import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.EmiUtil;
-import dev.emi.emi.bind.EmiBind;
-import dev.emi.emi.bind.EmiBind.ModifiedKey;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import dev.emi.emi.config.ConfigEnum;
 import dev.emi.emi.config.EmiConfig;
@@ -28,6 +25,9 @@ import dev.emi.emi.config.IntGroup;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.config.SidebarPages;
 import dev.emi.emi.config.SidebarSubpanels;
+import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.input.EmiBind.ModifiedKey;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
@@ -384,15 +384,15 @@ public class ConfigScreen extends Screen {
 	}
 
 	private void pushModifier(int lastModifier) {
-		activeModifiers |= EmiUtil.maskFromCode(this.lastModifier);
+		activeModifiers |= EmiInput.maskFromCode(this.lastModifier);
 		this.lastModifier = lastModifier;
-		activeModifiers &= ~EmiUtil.maskFromCode(lastModifier);
+		activeModifiers &= ~EmiInput.maskFromCode(lastModifier);
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (activeBind != null) {
-			if (EmiUtil.maskFromCode(keyCode) != 0) {
+			if (EmiInput.maskFromCode(keyCode) != 0) {
 				pushModifier(keyCode);
 			} else {
 				pushModifier(0);
@@ -434,7 +434,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		if (activeBind != null) {
-			activeModifiers &= ~EmiUtil.maskFromCode(keyCode);
+			activeModifiers &= ~EmiInput.maskFromCode(keyCode);
 			if (keyCode == lastModifier) {
 				activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(keyCode), activeModifiers));
 				activeBind = null;
