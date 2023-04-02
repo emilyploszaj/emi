@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.mixinsupport;
 
 import java.util.List;
 import java.util.Set;

@@ -9,8 +9,6 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiComparisonDefaults;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemConvertible;
@@ -202,31 +200,11 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(ItemConvertible item) {
-		return of(ItemVariant.of(item), 1);
+		return of(new ItemStack(item), 1);
 	}
 
 	public static EmiStack of(ItemConvertible item, long amount) {
-		return of(ItemVariant.of(item), amount);
-	}
-
-	@Deprecated
-	public static EmiStack of(ItemVariant item) {
-		return of(item.toStack(), 1);
-	}
-
-	@Deprecated
-	public static EmiStack of(ItemVariant item, long amount) {
-		return of(item.toStack(), amount);
-	}
-
-	@Deprecated
-	public static EmiStack of(FluidVariant fluid) {
-		return new FluidEmiStack(fluid);
-	}
-
-	@Deprecated
-	public static EmiStack of(FluidVariant fluid, long amount) {
-		return new FluidEmiStack(fluid, amount);
+		return of(new ItemStack(item), amount);
 	}
 
 	public static EmiStack of(Fluid fluid) {
