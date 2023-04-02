@@ -16,7 +16,7 @@ import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.config.EmiConfig;
-import net.fabricmc.loader.api.FabricLoader;
+import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -29,7 +29,7 @@ import net.minecraft.text.Text;
 @Mixin(AbstractInventoryScreen.class)
 public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> extends HandledScreen<T> {
 	@Unique
-	private static boolean hasInventoryTabs = FabricLoader.getInstance().isModLoaded("inventorytabs");
+	private static boolean hasInventoryTabs = EmiAgnos.isModLoaded("inventorytabs");
 	
 	private AbstractInventoryScreenMixin() { super(null, null, null); }
 

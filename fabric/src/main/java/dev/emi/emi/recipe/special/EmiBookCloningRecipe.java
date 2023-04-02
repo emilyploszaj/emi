@@ -9,7 +9,7 @@ import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
-import net.fabricmc.loader.api.FabricLoader;
+import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.WrittenBookItem;
@@ -23,10 +23,8 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 		"Emi", "A Rabbit", "[REDACTED]", "Jeb", "The Multiversal Author's Guild", "Another Book", "A Collection of Branches",
 		"Unknown"
 	);
-	private static final List<String> MOD_AUTHORS = FabricLoader.getInstance().getAllMods().stream()
-		.flatMap(c -> c.getMetadata().getAuthors().stream()).map(p -> p.getName()).distinct().toList();
-	private static final List<String> MOD = FabricLoader.getInstance().getAllMods().stream()
-		.map(c -> c.getMetadata().getName()).toList();
+	private static final List<String> MOD_AUTHORS = EmiAgnos.getAllModAuthors();
+	private static final List<String> MOD = EmiAgnos.getAllModNames();
 	private static final List<String> NOUN = List.of(
 		"Bunnies", "Apples", "Rocks", "Antimemetics", "a Rabbit", "Deers", "Mice", "a Dog", "Bnuuy", "Kitties",
 		"Reconstruction", "Dawn", "Time", "Night", "the Sky",

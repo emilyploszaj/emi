@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.joml.Matrix4f;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,7 +23,7 @@ import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.config.EmiConfig;
-import net.fabricmc.loader.api.FabricLoader;
+import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
@@ -36,14 +38,13 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import org.joml.Matrix4f;
 
 /**
  * @author Una "unascribed" Thompson
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
-	private static boolean isSodiumLoaded = FabricLoader.getInstance().isModLoaded("sodium");
+	private static boolean isSodiumLoaded = EmiAgnos.isModLoaded("sodium");
 	
 	static {
 		try {
