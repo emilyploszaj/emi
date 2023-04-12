@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -26,8 +25,8 @@ public class FakeScreen extends Screen {
 		Optional<TooltipData> data = stack.getTooltipData();
 		if (data.isPresent()) {
 			try {
-				ScreenAccessor.emi$addTooltipComponent(list, data.get());
-				//handle.invokeWithArguments(list, data.get());
+				//ScreenAccessor.emi$addTooltipComponent(list, data.get());
+				list.add(TooltipComponent.of(data.get()));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

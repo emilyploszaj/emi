@@ -7,7 +7,9 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
@@ -76,6 +78,12 @@ public class EmiAgnosForge extends EmiAgnos {
 	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'getFluidTooltipAgnos'");
+	}
+
+	@Override
+	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'renderFluidAgnos'");
 	}
 
 	@Override

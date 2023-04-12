@@ -3,6 +3,7 @@ package dev.emi.emi.platform;
 import java.nio.file.Path;
 import java.util.List;
 
+import dev.emi.emi.api.stack.FluidEmiStack;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -70,6 +71,12 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt);
+
+	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+		delegate.renderFluidAgnos(stack, matrices, x, y, delta);
+	}
+
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta);
 
 	public static boolean canBatch(Item item) {
 		return delegate.canBatchAgnos(item);

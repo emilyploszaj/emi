@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import dev.emi.emi.EmiFabric;
+import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
@@ -11,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
@@ -67,6 +70,11 @@ public class EmiAgnosFabric extends EmiAgnos {
 	@Override
 	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
 		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, nbt));
+	}
+
+	@Override
+	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+		EmiFabric.renderFluidStack(stack, matrices, x, y, delta);
 	}
 
 	@Override

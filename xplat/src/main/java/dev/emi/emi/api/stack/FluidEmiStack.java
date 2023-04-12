@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiFabric;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
@@ -69,7 +68,7 @@ public class FluidEmiStack extends EmiStack {
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		if ((flags & RENDER_ICON) != 0) {
-			EmiFabric.renderFluidStack(this, matrices, x, y, delta);
+			EmiAgnos.renderFluid(this, matrices, x, y, delta);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRender.renderRemainderIcon(this, matrices, x, y);
