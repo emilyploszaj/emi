@@ -6,15 +6,14 @@ import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
 
-import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Item;
@@ -132,23 +131,21 @@ public class EmiReloadManager {
 						continue;
 					}
 					EmiRegistry registry = new EmiRegistryImpl();
-					for (EntrypointContainer<EmiPlugin> plugin : FabricLoader.getInstance()
-							.getEntrypointContainers("emi", EmiPlugin.class).stream()
+					for (EmiPluginContainer container : EmiAgnos.getPlugins().stream()
 							.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList()) {
-						String id = plugin.getProvider().getMetadata().getName();
-						step(EmiPort.literal("Loading plugin from " + id), 10_000);
+						step(EmiPort.literal("Loading plugin from " + container.id()), 10_000);
 						long start = System.currentTimeMillis();
 						try {
-							plugin.getEntrypoint().register(registry);
+							container.plugin().register(registry);
 						} catch (Throwable e) {
-							EmiReloadLog.warn("Exception loading plugin provided by " + id);
+							EmiReloadLog.warn("Exception loading plugin provided by " + container.id());
 							EmiReloadLog.error(e);
 							if (restart) {
 								continue outer;
 							}
 							continue;
 						}
-						EmiLog.info("Reloaded plugin from " + plugin.getProvider().getMetadata().getName() + " in "
+						EmiLog.info("Reloaded plugin from " + container.id() + " in "
 							+ (System.currentTimeMillis() - start) + "ms");
 						if (restart) {
 							continue outer;
@@ -192,8 +189,8 @@ public class EmiReloadManager {
 			thread = null;
 		}
 
-		private final static int entrypointPriority(EntrypointContainer<EmiPlugin> entrypoint) {
-			return entrypoint.getProvider().getMetadata().getId().equals("emi") ? 0 : 1;
+		private final static int entrypointPriority(EmiPluginContainer container) {
+			return container.id().equals("emi") ? 0 : 1;
 		}
 	}
 }

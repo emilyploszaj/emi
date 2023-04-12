@@ -12,7 +12,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.network.EmiNetwork;
-import dev.emi.emi.network.RecipeFillC2SPacket;
+import dev.emi.emi.network.FillRecipeC2SPacket;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -39,6 +39,6 @@ public class EmiClient {
 		T screenHandler = screen.getScreenHandler();
 		List<Slot> crafting = handler.getCraftingSlots(recipe, screenHandler);
 		Slot output = handler.getOutputSlot(screenHandler);
-		EmiNetwork.sendToServer(new RecipeFillC2SPacket(screenHandler, action, handler.getInputSources(screenHandler), crafting, output, stacks));
+		EmiNetwork.sendToServer(new FillRecipeC2SPacket(screenHandler, action, handler.getInputSources(screenHandler), crafting, output, stacks));
 	}
 }

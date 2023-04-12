@@ -7,6 +7,9 @@ import net.minecraft.util.Identifier;
 
 public class PingS2CPacket implements EmiPacket {
 
+	public PingS2CPacket() {
+	}
+
 	public PingS2CPacket(PacketByteBuf buf) {
 	}
 

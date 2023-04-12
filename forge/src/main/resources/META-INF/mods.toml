@@ -11,4 +11,4 @@ authors = "Emi"
 description = '''
 A featureful and accessible item and recipe viewer
 '''
-#logoFile = ""
+#logoFile = "assets/emi/icon.png"

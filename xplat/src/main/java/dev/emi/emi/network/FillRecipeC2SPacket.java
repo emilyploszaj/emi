@@ -15,14 +15,14 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
-public class RecipeFillC2SPacket implements EmiPacket {
+public class FillRecipeC2SPacket implements EmiPacket {
 	private final ScreenHandler handler;
 	private final int action;
 	private final List<Slot> slots, crafting;
 	private final @Nullable Slot output;
 	private final List<ItemStack> stacks;
 
-	public RecipeFillC2SPacket(ScreenHandler handler, int action, List<Slot> slots, List<Slot> crafting, @Nullable Slot output, List<ItemStack> stacks) {
+	public FillRecipeC2SPacket(ScreenHandler handler, int action, List<Slot> slots, List<Slot> crafting, @Nullable Slot output, List<ItemStack> stacks) {
 		this.handler = handler;
 		this.action = action;
 		this.slots = slots;
@@ -31,7 +31,7 @@ public class RecipeFillC2SPacket implements EmiPacket {
 		this.stacks = stacks;
 	}
 
-	public RecipeFillC2SPacket(PlayerEntity player, PacketByteBuf buf) {
+	public FillRecipeC2SPacket(PlayerEntity player, PacketByteBuf buf) {
 		int syncId = buf.readInt();
 		handler = player.currentScreenHandler;
 		action = buf.readByte();

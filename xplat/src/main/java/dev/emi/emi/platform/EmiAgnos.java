@@ -3,7 +3,9 @@ package dev.emi.emi.platform;
 import java.nio.file.Path;
 import java.util.List;
 
+import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.registry.EmiPluginContainer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -59,6 +61,18 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract List<String> getAllModAuthorsAgnos();
+
+	public static List<EmiPluginContainer> getPlugins() {
+		return delegate.getPluginsAgnos();
+	}
+
+	protected abstract List<EmiPluginContainer> getPluginsAgnos();
+
+	public static void addBrewingRecipes(EmiRegistry registry) {
+		delegate.addBrewingRecipesAgnos(registry);
+	}
+
+	protected abstract void addBrewingRecipesAgnos(EmiRegistry registry);
 
 	public static Text getFluidName(Fluid fluid, NbtCompound nbt) {
 		return delegate.getFluidNameAgnos(fluid, nbt);

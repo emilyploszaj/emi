@@ -12,7 +12,17 @@
     "accessor.LegacySmithingRecipeAccessor",
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
-    "AbstractInventoryScreenMixin"
+    "AbstractInventoryScreenMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "CraftingResultSlotMixin",
+    "HandledScreenMixin",
+    "HoeItemMixin",
+    "ItemStackMixin",
+    "KeyboardMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "ScreenMixin",
+    "ToastManagerMixin"
   ],
   "mixins": [
   ],

@@ -16,17 +16,7 @@
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "CraftingResultSlotMixin",
-    "HandledScreenMixin",
-    "HoeItemMixin",
-    "ItemStackMixin",
-    "KeyboardMixin",
-    "MinecraftClientMixin",
-    "MouseMixin",
-    "ScreenMixin",
-    "SynchronizeRecipesS2CPacketMixin",
-    "ToastManagerMixin"
+    "SynchronizeRecipesS2CPacketMixin"
   ],
   "server": [],
   "injectors": {

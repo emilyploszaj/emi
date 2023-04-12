@@ -44,8 +44,8 @@ import dev.emi.emi.mixin.accessor.AxeItemAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
-import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.recipe.EmiCookingRecipe;
 import dev.emi.emi.recipe.EmiGrindstoneRecipe;
 import dev.emi.emi.recipe.EmiShapedRecipe;
@@ -93,20 +93,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolItem;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.ArmorDyeRecipe;
 import net.minecraft.recipe.BannerDuplicateRecipe;
 import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.BookCloningRecipe;
-import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CampfireCookingRecipe;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.FireworkRocketRecipe;
 import net.minecraft.recipe.FireworkStarFadeRecipe;
 import net.minecraft.recipe.FireworkStarRecipe;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.MapCloningRecipe;
 import net.minecraft.recipe.MapExtendingRecipe;
 import net.minecraft.recipe.Recipe;
@@ -411,44 +408,8 @@ public class VanillaPlugin implements EmiPlugin {
 				}
 			}
 		}
-
-		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
-			for (ItemStack stack : ingredient.getMatchingStacks()) {
-				String pid = EmiUtil.subId(stack.getItem());
-				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
-					if (recipe.ingredient.getMatchingStacks().length > 0) {
-						Identifier id = new Identifier("emi", "brewing/potion/" + pid
-							+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
-							+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
-							+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output)));
-						addRecipeSafe(registry, () -> new EmiBrewingRecipe(
-							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
-							EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output)), id));
-					}
-				}
-			}
-		}
-
-		for (BrewingRecipeRegistry.Recipe<Item> recipe : BrewingRecipeRegistry.ITEM_RECIPES) {
-			if (recipe.ingredient.getMatchingStacks().length > 0) {
-				String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
-				String iid = EmiUtil.subId(recipe.input);
-				String oid = EmiUtil.subId(recipe.output);
-				EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
-					Potion potion = entry.value();
-					if (potion == Potions.EMPTY) {
-						return;
-					}
-					if (BrewingRecipeRegistry.isBrewable(potion)) {
-						Identifier id = new Identifier("emi", "brewing/item/"
-							+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
-						addRecipeSafe(registry, () -> new EmiBrewingRecipe(
-							EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.input), potion)), EmiIngredient.of(recipe.ingredient),
-							EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.output), potion)), id));
-					}
-				});
-			}
-		}
+		
+		EmiAgnos.addBrewingRecipes(registry);
 
 		EmiStack concreteWater = EmiStack.of(Fluids.WATER);
 		concreteWater.setRemainder(concreteWater);

@@ -4,11 +4,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import dev.emi.emi.data.EmiData;
-import dev.emi.emi.network.CommandS2CPacket;
-import dev.emi.emi.network.EmiChessPacket;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.EmiPacket;
-import dev.emi.emi.network.PingS2CPacket;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -64,7 +61,7 @@ public class EmiClientFabric implements ClientModInitializer {
 
 		EmiNetwork.initClient((clazz, id, create) -> {
 			ClientPlayNetworking.registerGlobalReceiver(id, (client, handler, buf, sender) -> {
-				EmiPacket packet = create.apply(buf);
+				EmiPacket packet = create.apply(client.player, buf);
 				client.execute(() -> {
 					packet.apply(client.player);
 				});
@@ -73,24 +70,6 @@ public class EmiClientFabric implements ClientModInitializer {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			packet.write(buf);
 			ClientPlayNetworking.send(packet.getId(), buf);
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(EmiNetwork.PING, (client, handler, buf, sender) -> {
-			new PingS2CPacket(buf).apply(client.player);
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(EmiNetwork.COMMAND, (client, handler, buf, sender) -> {
-			EmiPacket packet = new CommandS2CPacket(buf);
-			client.execute(() -> {
-				packet.apply(client.player);
-			});
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(EmiNetwork.CHESS, (client, handler, buf, sender) -> {
-			EmiPacket packet = new EmiChessPacket.S2C(buf);
-			client.execute(() -> {
-				packet.apply(client.player);
-			});
 		});
 	}
 }
