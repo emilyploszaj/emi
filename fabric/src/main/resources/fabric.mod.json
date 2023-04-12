@@ -17,7 +17,7 @@
       "dev.emi.emi.EmiMain"
     ],
     "client": [
-      "dev.emi.emi.EmiClient"
+      "dev.emi.emi.EmiClientFabric"
     ],
     "server": [],
     "emi": [

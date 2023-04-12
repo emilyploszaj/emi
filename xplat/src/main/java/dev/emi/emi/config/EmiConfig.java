@@ -106,6 +106,63 @@ public class EmiConfig {
 	@ConfigValue("ui.empty-search-sidebar-focus")
 	public static SidebarType emptySearchSidebarFocus = SidebarType.NONE;
 
+	@Comment("The amount of vertical margin to give in the recipe screen.")
+	@ConfigValue("ui.vertical-margin")
+	public static int verticalMargin = 20;
+
+	@Comment("The minimum width of the recipe screen in pixels. "
+		+ "Controls how many tabs there can be, and where the page switching buttons go. "
+		+ "The default is 176, the width of most screens.")
+	@ConfigValue("ui.minimum-recipe-screen-width")
+	public static int minimumRecipeScreenWidth = 176;
+
+	@ConfigFilter("ui.workstation-location")
+	private static Predicate<SidebarSide> workstationLocationFilter = side -> {
+		return side != SidebarSide.TOP;
+	};
+	@Comment("Where to show workstations in the recipe screen")
+	@ConfigValue("ui.workstation-location")
+	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
+
+	@Comment("Display cost per batch when hovering a recipe output")
+	@ConfigValue("ui.show-cost-per-batch")
+	public static boolean showCostPerBatch = true;
+
+
+	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
+	@ConfigValue("ui.miscraft-prevention")
+	public static boolean miscraftPrevention = true;
+
+	@Comment("The unit to display fluids as.")
+	@ConfigValue("ui.fluid-unit")
+	public static FluidUnit fluidUnit = FluidUnit.LITERS;
+
+	@Comment("Whether to use the batched render system. Batching is faster, but may have incompatibilities"
+		+ " with shaders or other mods.")
+	@ConfigValue("ui.use-batched-renderer")
+	public static boolean useBatchedRenderer = true;
+	@ConfigGroup("ui.recipe-buttons")
+	@Comment("Whether recipes should have a button to set as default.")
+	@ConfigValue("ui.recipe-default-button")
+	public static boolean recipeDefaultButton = true;
+
+	@Comment("Whether recipes should have a button to show the recipe tree.")
+	@ConfigValue("ui.recipe-tree-button")
+	public static boolean recipeTreeButton = true;
+
+	@Comment("Whether recipes should have a button to fill the ingredients in a handler.")
+	@ConfigValue("ui.recipe-fill-button")
+	public static boolean recipeFillButton = true;
+
+	@ConfigGroupEnd
+	@Comment("Whether recipes should have a button to take a screenshot of the recipe.")
+	@ConfigValue("ui.recipe-screenshot-button")
+	public static boolean recipeScreenshotButton = false;
+
+	@Comment("The GUI scale at which recipe screenshots are saved. Use 0 to use the current GUI scale.")
+	@ConfigValue("ui.recipe-screenshot-scale")
+	public static int recipeScreenshotScale = 0;
+
 	// Left sidebar
 
 	@ConfigGroup("ui.left-sidebar")
@@ -261,66 +318,6 @@ public class EmiConfig {
 	@Comment("Which theme to use for the bottom sidebar")
 	@ConfigValue("ui.bottom-sidebar-theme")
 	public static SidebarTheme bottomSidebarTheme = SidebarTheme.TRANSPARENT;
-
-	//
-
-	@Comment("The amount of vertical margin to give in the recipe screen.")
-	@ConfigValue("ui.vertical-margin")
-	public static int verticalMargin = 20;
-
-	@Comment("The minimum width of the recipe screen in pixels. "
-		+ "Controls how many tabs there can be, and where the page switching buttons go. "
-		+ "The default is 176, the width of most screens.")
-	@ConfigValue("ui.minimum-recipe-screen-width")
-	public static int minimumRecipeScreenWidth = 176;
-
-	@ConfigFilter("ui.workstation-location")
-	private static Predicate<SidebarSide> workstationLocationFilter = side -> {
-		return side != SidebarSide.TOP;
-	};
-	@Comment("Where to show workstations in the recipe screen")
-	@ConfigValue("ui.workstation-location")
-	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
-
-	@Comment("Display cost per batch when hovering a recipe output")
-	@ConfigValue("ui.show-cost-per-batch")
-	public static boolean showCostPerBatch = true;
-
-
-	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
-	@ConfigValue("ui.miscraft-prevention")
-	public static boolean miscraftPrevention = true;
-
-	@Comment("The unit to display fluids as.")
-	@ConfigValue("ui.fluid-unit")
-	public static FluidUnit fluidUnit = FluidUnit.LITERS;
-
-	@Comment("Whether to use the batched render system. Batching is faster, but may have incompatibilities"
-		+ " with shaders or other mods.")
-	@ConfigValue("ui.use-batched-renderer")
-	public static boolean useBatchedRenderer = true;
-	@ConfigGroup("ui.recipe-buttons")
-	@Comment("Whether recipes should have a button to set as default.")
-	@ConfigValue("ui.recipe-default-button")
-	public static boolean recipeDefaultButton = true;
-
-	@Comment("Whether recipes should have a button to show the recipe tree.")
-	@ConfigValue("ui.recipe-tree-button")
-	public static boolean recipeTreeButton = true;
-
-	@Comment("Whether recipes should have a button to fill the ingredients in a handler.")
-	@ConfigValue("ui.recipe-fill-button")
-	public static boolean recipeFillButton = true;
-
-	@ConfigGroupEnd
-	@Comment("Whether recipes should have a button to take a screenshot of the recipe.")
-	@ConfigValue("ui.recipe-screenshot-button")
-	public static boolean recipeScreenshotButton = false;
-
-	@Comment("The GUI scale at which recipe screenshots are saved. Use 0 to use the current GUI scale.")
-	@ConfigValue("ui.recipe-screenshot-scale")
-	public static int recipeScreenshotScale = 0;
-
 
 	// Binds
 	@Comment("Toggle the visibility of EMI.")

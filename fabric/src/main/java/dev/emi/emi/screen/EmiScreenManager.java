@@ -18,7 +18,6 @@ import dev.emi.emi.EmiExclusionAreas;
 import dev.emi.emi.EmiFavorite;
 import dev.emi.emi.EmiFavorites;
 import dev.emi.emi.EmiHistory;
-import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiReloadLog;
 import dev.emi.emi.EmiReloadManager;
@@ -48,14 +47,14 @@ import dev.emi.emi.config.SidebarTheme;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.network.CreateItemC2SPacket;
+import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.sidebar.EmiSidebars;
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
@@ -67,7 +66,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -838,7 +836,7 @@ public class EmiScreenManager {
 					ScreenSpace space = getHoveredSpace(mx, my);
 					if (!cursor.isEmpty() && space != null && space.getType() == SidebarType.INDEX) {
 						handled.getScreenHandler().setCursorStack(ItemStack.EMPTY);
-						ClientPlayNetworking.send(EmiMain.DESTROY_HELD, new PacketByteBuf(Unpooled.buffer()));
+						EmiNetwork.sendToServer(new CreateItemC2SPacket(1, ItemStack.EMPTY));
 						// Returning false here makes the handled screen do something and removes a bug,
 						// oh well.
 						return false;
@@ -1105,10 +1103,7 @@ public class EmiScreenManager {
 			return true;
 		}
 		if (EmiClient.onServer) {
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			buf.writeByte(mode);
-			buf.writeItemStack(is);
-			ClientPlayNetworking.send(EmiMain.CREATE_ITEM, buf);
+			EmiNetwork.sendToServer(new CreateItemC2SPacket(mode, is));
 			return true;
 		} else {
 			if (!is.isEmpty()) {

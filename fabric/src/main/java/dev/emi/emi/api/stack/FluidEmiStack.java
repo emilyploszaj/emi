@@ -4,23 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiFabric;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
@@ -29,36 +20,26 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class FluidEmiStack extends EmiStack {
-	private final FluidEntry entry;
-	private final FluidVariant fluid;
+	private final Fluid fluid;
+	private final NbtCompound nbt;
 
 	public FluidEmiStack(Fluid fluid) {
-		this(FluidVariant.of(fluid));
+		this(fluid, null);
 	}
 
 	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt) {
-		this(FluidVariant.of(fluid, nbt));
+		this(fluid, nbt, 0);
 	}
 
 	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt, long amount) {
-		this(FluidVariant.of(fluid, nbt), amount);
-	}
-
-	@Deprecated
-	public FluidEmiStack(FluidVariant fluid) {
-		this(fluid, 0);
-	}
-
-	@Deprecated
-	public FluidEmiStack(FluidVariant fluid, long amount) {
-		entry = new FluidEntry(fluid);
 		this.fluid = fluid;
+		this.nbt = nbt;
 		this.amount = amount;
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new FluidEmiStack(fluid, amount);
+		EmiStack e = new FluidEmiStack(fluid, nbt, amount);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
@@ -72,57 +53,23 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public NbtCompound getNbt() {
-		return fluid.getNbt();
+		return nbt;
 	}
 
 	@Override
 	public Object getKey() {
-		return fluid.getFluid();
-	}
-	
-	@Override
-	public Entry<?> getEntry() {
-		return entry;
+		return fluid;
 	}
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.getFluidRegistry().getId(fluid.getFluid());
+		return EmiPort.getFluidRegistry().getId(fluid);
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		if ((flags & RENDER_ICON) != 0) {
-			Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
-			if (sprites == null || sprites.length < 1 || sprites[0] == null) {
-				return;
-			}
-			Sprite sprite = sprites[0];
-			EmiPort.setPositionColorTexShader();
-			RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-			RenderSystem.setShaderTexture(0, sprite.getAtlasId());
-			
-			int color = FluidVariantRendering.getColor(fluid);
-			float r = ((color >> 16) & 255) / 256f;
-			float g = ((color >> 8) & 255) / 256f;
-			float b = (color & 255) / 256f;
-			
-			BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-			bufferBuilder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-			float xMin = (float) x;
-			float yMin = (float) y;
-			float xMax = xMin + 16;
-			float yMax = yMin + 16;
-			float uMin = sprite.getMinU();
-			float vMin = sprite.getMinV();
-			float uMax = sprite.getMaxU();
-			float vMax = sprite.getMaxV();
-			Matrix4f model = matrices.peek().getPositionMatrix();
-			bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
-			bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
-			bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
-			bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
-			EmiPort.draw(bufferBuilder);
+			EmiFabric.renderFluidStack(this, matrices, x, y, delta);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRender.renderRemainderIcon(this, matrices, x, y);
@@ -131,7 +78,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return FluidVariantRendering.getTooltip(fluid);
+		return EmiAgnos.getFluidTooltip(fluid, nbt);
 	}
 
 	@Override
@@ -141,7 +88,7 @@ public class FluidEmiStack extends EmiStack {
 		if (amount > 1) {
 			list.add(TooltipComponent.of(EmiPort.ordered(getAmountText(amount))));
 		}
-		String namespace = EmiPort.getFluidRegistry().getId(fluid.getFluid()).getNamespace();
+		String namespace = EmiPort.getFluidRegistry().getId(fluid).getNamespace();
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(namespace);
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
@@ -160,23 +107,10 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public Text getName() {
-		return EmiFabric.fluidName(fluid);
+		return EmiAgnos.getFluidName(fluid, nbt);
 	}
 
-	public static class FluidEntry extends Entry<FluidVariant> {
-
-		public FluidEntry(FluidVariant value) {
-			super(value);
-		}
-
-		@Override
-		public Class<FluidVariant> getType() {
-			return FluidVariant.class;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof FluidEntry e && getValue().getFluid().equals(e.getValue().getFluid());
-		}
+	@SuppressWarnings("unused")
+	private static class FluidEntry {
 	}
 }

@@ -132,11 +132,29 @@ public interface EmiRegistry {
 
 	/**
 	 * Adds a default compraison method for a stack using its key.
+	 * @param key A stack key such as an item or fluid.
+	 * @param comparison The desired comparison method.
+	 */
+	default void setDefaultComparison(Object key, Comparison comparison) {
+		setDefaultComparison(key, old -> comparison);
+	}
+
+	/**
+	 * Adds a default compraison method for a stack using its key.
 	 * @param stack A stack to derive a key from.
 	 * @param comparison A function to mutate the current comprison method.
 	 */
 	default void setDefaultComparison(EmiStack stack, Function<Comparison, Comparison> comparison) {
 		setDefaultComparison(stack.getKey(), comparison);
+	}
+
+	/**
+	 * Adds a default compraison method for a stack using its key.
+	 * @param stack A stack to derive a key from.
+	 * @param comparison The desired comparison method.
+	 */
+	default void setDefaultComparison(EmiStack stack, Comparison comparison) {
+		setDefaultComparison(stack.getKey(), old -> comparison);
 	}
 
 	/**

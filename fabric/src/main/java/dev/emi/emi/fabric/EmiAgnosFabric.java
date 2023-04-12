@@ -5,8 +5,16 @@ import java.util.List;
 import java.util.Optional;
 
 import dev.emi.emi.platform.EmiAgnos;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -49,5 +57,20 @@ public class EmiAgnosFabric extends EmiAgnos {
 	protected List<String> getAllModAuthorsAgnos() {
 		return FabricLoader.getInstance().getAllMods().stream().flatMap(c -> c.getMetadata().getAuthors().stream())
 			.map(p -> p.getName()).distinct().toList();
+	}
+
+	@Override
+	protected Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt) {
+		return FluidVariantAttributes.getName(FluidVariant.of(fluid, nbt));
+	}
+
+	@Override
+	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
+		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, nbt));
+	}
+
+	@Override
+	protected boolean canBatchAgnos(Item item) {
+		return ColorProviderRegistry.ITEM.get(item) == null;
 	}
 }

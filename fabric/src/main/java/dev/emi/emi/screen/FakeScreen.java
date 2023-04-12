@@ -1,14 +1,11 @@
 package dev.emi.emi.screen;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import dev.emi.emi.EmiPort;
-import net.fabricmc.loader.api.FabricLoader;
+import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -16,21 +13,7 @@ import net.minecraft.client.item.TooltipData;
 import net.minecraft.item.ItemStack;
 
 public class FakeScreen extends Screen {
-	private static MethodHandle handle;
 	public static final FakeScreen INSTANCE = new FakeScreen();
-	
-	static {
-		try {
-			String name = FabricLoader.getInstance().getMappingResolver()
-				.mapMethodName("intermediary", "net.minecraft.class_437", "method_32635",
-					"(Ljava/util/List;Lnet/minecraft/class_5632;)V");
-			Method m = Screen.class.getDeclaredMethod(name, List.class, TooltipData.class);
-			m.setAccessible(true);
-			handle = MethodHandles.lookup().unreflect(m);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
 
 	protected FakeScreen() {
 		super(EmiPort.literal(""));
@@ -43,7 +26,8 @@ public class FakeScreen extends Screen {
 		Optional<TooltipData> data = stack.getTooltipData();
 		if (data.isPresent()) {
 			try {
-				handle.invokeWithArguments(list, data.get());
+				ScreenAccessor.emi$addTooltipComponent(list, data.get());
+				//handle.invokeWithArguments(list, data.get());
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

@@ -8,6 +8,10 @@ import java.util.stream.Stream;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.platform.EmiAgnos;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLConfig;
@@ -60,5 +64,23 @@ public class EmiAgnosForge extends EmiAgnos {
 			}
 			return Stream.empty();
 		}).distinct().toList();
+	}
+
+	@Override
+	protected Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getFluidNameAgnos'");
+	}
+
+	@Override
+	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getFluidTooltipAgnos'");
+	}
+
+	@Override
+	protected boolean canBatchAgnos(Item item) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'canBatchAgnos'");
 	}
 }

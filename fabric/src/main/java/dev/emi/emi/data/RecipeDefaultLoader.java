@@ -16,7 +16,6 @@ import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;
@@ -25,7 +24,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 
 public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<RecipeDefault>>
-		implements IdentifiableResourceReloadListener {
+		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
 	public static final Identifier ID = new Identifier("emi:recipe_defaults");
 
@@ -81,7 +80,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 	}
 	
 	@Override
-	public Identifier getFabricId() {
+	public Identifier getEmiId() {
 		return ID;
 	}
 }

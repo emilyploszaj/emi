@@ -7,11 +7,9 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
@@ -28,10 +26,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ItemEmiStack extends EmiStack implements Batchable {
-	private final ItemEntry entry;
+	private static final MinecraftClient client = MinecraftClient.getInstance();
 	private final ItemStack stack;
-	@Deprecated
-	public final ItemVariant item;
 	private boolean unbatchable;
 
 	public ItemEmiStack(ItemStack stack) {
@@ -42,13 +38,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		stack = stack.copy();
 		stack.setCount((int) amount);
 		this.stack = stack;
-		this.entry = new ItemEntry(new ItemVariantImpl(stack.getItem(), stack.getNbt()));
-		this.item = entry.getValue();
 		this.amount = amount;
-	}
-	
-	public ItemEmiStack(ItemVariant item, long amount) {
-		this(item.toStack((int) amount), amount);
 	}
 
 	@Override
@@ -81,18 +71,12 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public Entry<?> getEntry() {
-		return entry;
-	}
-
-	@Override
 	public Identifier getId() {
 		return EmiPort.getItemRegistry().getId(stack.getItem());
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
-		MinecraftClient client = MinecraftClient.getInstance();
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
 			ItemRenderer itemRenderer = client.getItemRenderer();
@@ -113,14 +97,14 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public boolean isSideLit() {
-		return MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isSideLit();
+		return client.getItemRenderer().getModel(getItemStack(), null, null, 0).isSideLit();
 	}
 	
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || stack.isDamaged() || ColorProviderRegistry.ITEM.get(stack.getItem()) != null
-			|| MinecraftClient.getInstance().getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
+		return unbatchable || stack.hasGlint() || stack.isDamaged() || !EmiAgnos.canBatch(stack.getItem())
+			|| client.getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	
 	@Override
@@ -131,7 +115,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
 		ItemStack stack = getItemStack();
-		ItemRenderer ir = MinecraftClient.getInstance().getItemRenderer();
+		ItemRenderer ir = client.getItemRenderer();
 		BakedModel model = ir.getModel(stack, null, null, 0);
 		matrices.push();
 		try {
@@ -146,7 +130,6 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		MinecraftClient client = MinecraftClient.getInstance();
 		return getItemStack().getTooltip(client.player, TooltipContext.BASIC);
 	}
 
@@ -172,20 +155,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		return getItemStack().getName();
 	}
 
-	public static class ItemEntry extends Entry<ItemVariant> {
-
-		public ItemEntry(ItemVariant variant) {
-			super(variant);
-		}
-
-		@Override
-		public Class<ItemVariant> getType() {
-			return ItemVariant.class;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof ItemEntry e && getValue().getItem().equals(e.getValue().getItem());
-		}
+	@SuppressWarnings("unused")
+	private static class ItemEntry {
 	}
 }

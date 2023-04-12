@@ -3,6 +3,12 @@ package dev.emi.emi.platform;
 import java.nio.file.Path;
 import java.util.List;
 
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
+
 public abstract class EmiAgnos {
 	public static EmiAgnos delegate;
 
@@ -52,4 +58,22 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract List<String> getAllModAuthorsAgnos();
+
+	public static Text getFluidName(Fluid fluid, NbtCompound nbt) {
+		return delegate.getFluidNameAgnos(fluid, nbt);
+	}
+
+	protected abstract Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt);
+
+	public static List<Text> getFluidTooltip(Fluid fluid, NbtCompound nbt) {
+		return delegate.getFluidTooltipAgnos(fluid, nbt);
+	}
+
+	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt);
+
+	public static boolean canBatch(Item item) {
+		return delegate.canBatchAgnos(item);
+	}
+	
+	protected abstract boolean canBatchAgnos(Item item);
 }

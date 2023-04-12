@@ -9,7 +9,6 @@ import com.google.gson.JsonObject;
 
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;
@@ -18,7 +17,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 
 public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
-		implements IdentifiableResourceReloadListener {
+		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
 	private final Identifier id;
 	private final String path;
@@ -62,7 +61,7 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public Identifier getEmiId() {
 		return id;
 	}
 

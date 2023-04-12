@@ -32,8 +32,8 @@ import net.minecraft.screen.slot.Slot;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class EmiPlayerInventory {
-	private final Comparison none = Comparison.builder().amount(false).nbt(false).build();
-	private final Comparison nbt = Comparison.builder().amount(false).nbt(true).build();
+	private final Comparison none = Comparison.DEFAULT_COMPARISON;
+	private final Comparison nbt = Comparison.compareNbt();
 	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
 	@Deprecated
@@ -201,7 +201,9 @@ public class EmiPlayerInventory {
 		if (other == null) {
 			return false;
 		}
-		Comparison comparison = Comparison.builder().nbt(true).amount(true).build();
+		Comparison comparison = Comparison.of((a, b) -> {
+			return nbt.compare(a, b) && a.getAmount() == b.getAmount();
+		});
 		if (other.inventory.size() != inventory.size()) {
 			return false;
 		} else {

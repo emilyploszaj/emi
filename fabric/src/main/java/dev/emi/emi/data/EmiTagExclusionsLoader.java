@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;
@@ -21,7 +20,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 
 public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Set<Identifier>>
-		implements IdentifiableResourceReloadListener {
+		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
 	private static final Identifier ID = new Identifier("emi:tag_exclusions");
 
@@ -67,7 +66,7 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public Identifier getEmiId() {
 		return ID;
 	}
 }

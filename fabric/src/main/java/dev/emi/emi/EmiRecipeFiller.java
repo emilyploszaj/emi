@@ -305,7 +305,7 @@ public class EmiRecipeFiller {
 	}
 
 	private static class DiscoveredItem {
-		private static final Comparison COMPARISON = Comparison.builder().nbt(false).amount(false).build();
+		private static final Comparison COMPARISON = Comparison.DEFAULT_COMPARISON;
 		public EmiStack ingredient;
 		public ItemStack stack;
 		public int consumed;

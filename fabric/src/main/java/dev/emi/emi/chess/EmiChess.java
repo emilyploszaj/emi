@@ -7,20 +7,18 @@ import org.apache.commons.compress.utils.Lists;
 
 import com.google.common.collect.ImmutableList;
 
-import dev.emi.emi.EmiMain;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.SidebarType;
+import dev.emi.emi.network.EmiChessPacket;
+import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.screen.EmiScreenManager;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
 
 // Yes, this is a thing that exists
 public class EmiChess {
@@ -189,12 +187,7 @@ public class EmiChess {
 	}
 
 	private static void sendNetwork(UUID uuid, int type, int start, int end) {
-		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeUuid(uuid);
-		buf.writeByte(type);
-		buf.writeByte(start);
-		buf.writeByte(end);
-		ClientPlayNetworking.send(EmiMain.CHESS, buf);
+		EmiNetwork.sendToServer(new EmiChessPacket.C2S(uuid, (byte) type, (byte) start, (byte) end));
 	}
 
 	public static void receiveNetwork(UUID uuid, int type, int start, int end) {

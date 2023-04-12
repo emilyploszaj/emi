@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -257,12 +256,13 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		});
 
-		Function<Comparison, Comparison> compareNbt = c -> c.copy().nbt(true).build();
-		registry.setDefaultComparison(Items.POTION, compareNbt);
-		registry.setDefaultComparison(Items.SPLASH_POTION, compareNbt);
-		registry.setDefaultComparison(Items.LINGERING_POTION, compareNbt);
-		registry.setDefaultComparison(Items.TIPPED_ARROW, compareNbt);
-		registry.setDefaultComparison(Items.ENCHANTED_BOOK, compareNbt);
+		Comparison potionComparison = Comparison.of((a, b) -> PotionUtil.getPotionEffects(a.getNbt()).equals(PotionUtil.getPotionEffects(b.getNbt())));
+
+		registry.setDefaultComparison(Items.POTION, potionComparison);
+		registry.setDefaultComparison(Items.SPLASH_POTION, potionComparison);
+		registry.setDefaultComparison(Items.LINGERING_POTION, potionComparison);
+		registry.setDefaultComparison(Items.TIPPED_ARROW, potionComparison);
+		registry.setDefaultComparison(Items.ENCHANTED_BOOK, Comparison.compareNbt());
 
 		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CRAFTING)) {
 			if (recipe instanceof MapExtendingRecipe map) {

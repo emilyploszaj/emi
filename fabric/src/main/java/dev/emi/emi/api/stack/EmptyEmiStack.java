@@ -58,11 +58,6 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public Entry<?> getEntry() {
-		return ENTRY;
-	}
-
-	@Override
 	public Identifier getId() {
 		return ID;
 	}

@@ -2,6 +2,7 @@ package dev.emi.emi.data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -23,8 +24,6 @@ import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -36,10 +35,10 @@ public class EmiData {
 	public static List<EmiAlias> aliases = List.of();
 	public static List<Supplier<EmiRecipe>> recipes = List.of();
 	
-	public static void init() {
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new RecipeDefaultLoader());
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new EmiTagExclusionsLoader());
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+	public static void init(Consumer<EmiResourceReloadListener> register) {
+		register.accept(new RecipeDefaultLoader());
+		register.accept(new EmiTagExclusionsLoader());
+		register.accept(
 			new EmiDataLoader<Map<String, EmiRecipeCategoryProperties>>(
 				new Identifier("emi:category_properties"), "category/properties", Maps::newHashMap,
 				(map, json, id) -> {
@@ -82,7 +81,7 @@ public class EmiData {
 						}
 					}
 				}, map -> categoryPriorities = map));
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+		register.accept(
 			new EmiDataLoader<List<Predicate<EmiRecipe>>>(
 				new Identifier("emi:recipe_filters"), "recipe/filters", Lists::newArrayList,
 				(list, json, oid) -> {
@@ -134,7 +133,7 @@ public class EmiData {
 						}
 					}
 				}, list -> recipeFilters = list));
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+		register.accept(
 			new EmiDataLoader<List<IndexStackData>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
 				(list, json, id) -> {
@@ -160,7 +159,7 @@ public class EmiData {
 					}
 					list.add(new IndexStackData(added, removed));
 				}, list -> stackData = list));
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+		register.accept(
 			new EmiDataLoader<List<EmiAlias>>(
 				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
 				(list, json, id) -> {
@@ -175,7 +174,7 @@ public class EmiData {
 						}
 					}
 				}, list -> aliases = list));
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(
+		register.accept(
 			new EmiDataLoader<List<Supplier<EmiRecipe>>>(
 				new Identifier("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
 				(list, json, oid) -> {

@@ -89,63 +89,27 @@ public abstract class EmiStack implements EmiIngredient {
 		return null;
 	}
 
-	/**
-	 * @deprecated Use getKey
-	 */
-	@Deprecated
-	public Entry<?> getEntry() {
-		return EmptyEmiStack.ENTRY;
-	}
-
 	public abstract Identifier getId();
-
-	/**
-	 * @deprecated Use getKeyOfType
-	 */
-	@Deprecated
-	@SuppressWarnings("unchecked")
-	public <T> @Nullable Entry<T> getEntryOfType(Class<T> clazz) {
-		Entry<?> entry = getEntry();
-		if (entry.getType() == clazz) {
-			return (Entry<T>) entry;
-		}
-		return null;
-	}
 
 	public ItemStack getItemStack() {
 		return ItemStack.EMPTY;
 	}
 
 	public boolean isEqual(EmiStack stack) {
-		boolean amount = comparison.amount.orElseGet(() -> EmiComparisonDefaults.get(getKey()).amount.orElse(false))
-			|| stack.comparison.amount.orElseGet(() -> EmiComparisonDefaults.get(stack.getKey()).amount.orElse(false));
-		boolean nbt = comparison.nbt.orElseGet(() -> EmiComparisonDefaults.get(getKey()).nbt.orElse(false))
-			|| stack.comparison.nbt.orElseGet(() -> EmiComparisonDefaults.get(stack.getKey()).nbt.orElse(false));
-		if (!getEntry().equals(stack.getEntry())) {
+		if (!getKey().equals(stack.getKey())) {
 			return false;
 		}
-		if (nbt && (hasNbt() != stack.hasNbt() || (hasNbt() && !getNbt().equals(stack.getNbt())))) {
-			return false;
+		Comparison a = comparison == Comparison.DEFAULT_COMPARISON ? EmiComparisonDefaults.get(getKey()) : comparison;
+		Comparison b = stack.comparison == Comparison.DEFAULT_COMPARISON ? EmiComparisonDefaults.get(stack.getKey()) : stack.comparison;
+		if (a == b) {
+			return a.compare(this, stack);
+		} else {
+			return a.compare(this, stack) && b.compare(this, stack);
 		}
-		if (amount && getAmount() != stack.getAmount()) {
-			return false;
-		}
-		return true;
 	}
 
 	public boolean isEqual(EmiStack stack, Comparison comparison) {
-		boolean amount = comparison.amount.orElse(false);
-		boolean nbt = comparison.nbt.orElse(false);
-		if (!getEntry().equals(stack.getEntry())) {
-			return false;
-		}
-		if (nbt && (hasNbt() != stack.hasNbt() || (hasNbt() && !getNbt().equals(stack.getNbt())))) {
-			return false;
-		}
-		if (amount && getAmount() != stack.getAmount()) {
-			return false;
-		}
-		return true;
+		return getKey().equals(stack.getKey()) && comparison.compare(this, stack);
 	}
 
 	public abstract List<Text> getTooltipText();
