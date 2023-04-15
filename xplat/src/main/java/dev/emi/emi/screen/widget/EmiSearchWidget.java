@@ -198,7 +198,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 		String lower = getText().toLowerCase();
 
 		boolean dinnerbone = lower.contains("dinnerbone");
-		accumulatedSpin += (dinnerbone ? 1 : -1) * (System.currentTimeMillis() - lastRender);
+		accumulatedSpin += (dinnerbone ? 1 : -1) * Math.abs(System.currentTimeMillis() - lastRender);
 		if (accumulatedSpin < 0) {
 			accumulatedSpin = 0;
 		} else if (accumulatedSpin > 500) {

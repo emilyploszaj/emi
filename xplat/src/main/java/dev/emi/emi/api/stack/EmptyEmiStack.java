@@ -6,13 +6,13 @@ import dev.emi.emi.EmiPort;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmptyEmiStack extends EmiStack {
 	private static final Identifier ID = new Identifier("emi", "empty");
-	public static final EmptyEntry ENTRY = new EmptyEntry();
 
 	@Override
 	public EmiStack getRemainder() {
@@ -54,7 +54,12 @@ public class EmptyEmiStack extends EmiStack {
 
 	@Override
 	public Object getKey() {
-		return ENTRY;
+		return Items.AIR;
+	}
+
+	@Override
+	public ItemStack getItemStack() {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -86,15 +91,6 @@ public class EmptyEmiStack extends EmiStack {
 		return EmiPort.literal("");
 	}
 
-	public static class EmptyEntry extends Entry<ItemStack> {
-
-		public EmptyEntry() {
-			super(ItemStack.EMPTY);
-		}
-
-		@Override
-		public Class<ItemStack> getType() {
-			return ItemStack.class;
-		}
+	static class EmptyEntry {
 	}
 }

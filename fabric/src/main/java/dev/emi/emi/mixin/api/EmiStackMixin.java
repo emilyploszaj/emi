@@ -3,13 +3,12 @@ package dev.emi.emi.mixin.api;
 import org.spongepowered.asm.mixin.Mixin;
 
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.stack.EmptyEmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.mixinsupport.annotation.InvokeTarget;
 import dev.emi.emi.mixinsupport.annotation.Transform;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 
-@SuppressWarnings("unchecked")
 @Mixin(EmiStack.class)
 public class EmiStackMixin {
 	
@@ -33,14 +32,23 @@ public class EmiStackMixin {
 		return new FluidEmiStack(fluid.getFluid(), fluid.getNbt(), amount);
 	}
 
-	public EmiStack.Entry<?> getEntry() {
-		return EmptyEmiStack.ENTRY;
+	@InvokeTarget(owner = "dev/emi/emi/api/stack/EmiStack", name = "getEntry",
+		desc = "()Ldev/emi/emi/api/stack/EmiStack$Entry;", type = "VIRTUAL")
+	private static Object getEmptyEntry(EmiStack stack) { throw new AbstractMethodError(); }
+
+	@Transform(desc = "()Ldev/emi/emi/api/stack/EmiStack$Entry;")
+	public Object getEntry() {
+		return getEmptyEntry(EmiStack.EMPTY);
 	}
 
-	public <T> EmiStack.Entry<T> getEntryOfType(Class<T> clazz) {
-		EmiStack.Entry<?> entry = getEntry();
-		if (entry.getType() == clazz) {
-			return (EmiStack.Entry<T>) entry;
+	@InvokeTarget(owner = "dev/emi/emi/api/stack/EmiStack$Entry", name = "getType",
+		desc = "()Ljava/lang/Class;", type = "VIRTUAL")
+	private static Class<?> getType(Object object) { throw new AbstractMethodError(); }
+
+	@Transform(desc = "(Ljava/lang/Class;)Ldev/emi/emi/api/stack/EmiStack$Entry;")
+	public Object getEntryOfType(Class<?> clazz) {
+		if (getType(getEntry()) == clazz) {
+			return getEntry();
 		}
 		return null;
 	}

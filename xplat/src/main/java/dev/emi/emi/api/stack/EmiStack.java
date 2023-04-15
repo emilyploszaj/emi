@@ -187,18 +187,6 @@ public abstract class EmiStack implements EmiIngredient {
 		return new FluidEmiStack(fluid, nbt, amount);
 	}
 
-	@Deprecated
-	public static abstract class Entry<T> {
-		private final T value;
-
-		public Entry(T value) {
-			this.value = value;
-		}
-
-		public T getValue() {
-			return value;
-		}
-
-		public abstract Class<? extends T> getType();
+	static abstract class Entry<T> {
 	}
 }

@@ -109,7 +109,6 @@ public class FluidEmiStack extends EmiStack {
 		return EmiAgnos.getFluidName(fluid, nbt);
 	}
 
-	@SuppressWarnings("unused")
-	private static class FluidEntry {
+	static class FluidEntry {
 	}
 }

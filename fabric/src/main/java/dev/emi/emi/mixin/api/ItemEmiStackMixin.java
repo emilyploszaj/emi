@@ -1,6 +1,5 @@
 package dev.emi.emi.mixin.api;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,10 +14,8 @@ import net.minecraft.item.ItemStack;
 
 @Mixin(ItemEmiStack.class)
 public abstract class ItemEmiStackMixin {
-	@Final
 	@Transform(desc = "Ldev/emi/emi/api/stack/EmiStack$Entry;")
 	private Object entry;
-	@Final
 	public ItemVariant item;
 
 	@InvokeTarget(owner = "dev/emi/emi/api/stack/ItemEmiStack$ItemEntry", name = "<init>",

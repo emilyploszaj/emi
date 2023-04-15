@@ -61,7 +61,9 @@ public class EmiMixinTransformation {
 			//String name = Annotations.getValue(transform, "name", "");
 			//String desc = Annotations.getValue(transform, "desc", "");
 			String visibility = Annotations.getValue(transform, "visibility", "");
+			int flags = Annotations.getValue(transform, "flags", 0);
 			clazz.access = mutateAccess(clazz.access, visibility);
+			clazz.access |= flags;
 		}
 	}
 	
@@ -71,6 +73,7 @@ public class EmiMixinTransformation {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
 			String visibility = Annotations.getValue(transform, "visibility", "");
+			int flags = Annotations.getValue(transform, "flags", 0);
 			if (!name.isEmpty()) {
 				method.name = name;
 			}
@@ -78,7 +81,8 @@ public class EmiMixinTransformation {
 				method.desc = desc;
 			}
 			method.access = mutateAccess(method.access, visibility);
-			return !name.isEmpty() || !desc.isEmpty();
+			method.access |= flags;
+			return true;
 		}
 		return false;
 	}
@@ -89,6 +93,7 @@ public class EmiMixinTransformation {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
 			String visibility = Annotations.getValue(transform, "visibility", "");
+			int flags = Annotations.getValue(transform, "flags", 0);
 			if (!name.isEmpty()) {
 				field.name = name;
 			}
@@ -96,7 +101,8 @@ public class EmiMixinTransformation {
 				field.desc = desc;
 			}
 			field.access = mutateAccess(field.access, visibility);
-			return !name.isEmpty() || !desc.isEmpty();
+			field.access |= flags;
+			return true;
 		}
 		return false;
 	}

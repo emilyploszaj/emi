@@ -23,4 +23,9 @@ public @interface Transform {
 	 * One of PUBLIC, PRIVATE, PROTECTED, or PACKAGE, or empty for no change
 	 */
 	String visibility() default "";
+
+	/*
+	 * Extra access flags to be ORed onto the value
+	 */
+	int flags() default 0;
 }

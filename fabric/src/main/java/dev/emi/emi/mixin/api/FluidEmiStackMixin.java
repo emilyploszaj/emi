@@ -1,7 +1,6 @@
 package dev.emi.emi.mixin.api;
 
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,7 +16,6 @@ import net.minecraft.nbt.NbtCompound;
 
 @Mixin(FluidEmiStack.class)
 public abstract class FluidEmiStackMixin {
-	@Final
 	@Transform(desc = "Ldev/emi/emi/api/stack/EmiStack$Entry;")
 	private Object entry;
 

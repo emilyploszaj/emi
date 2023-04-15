@@ -35,7 +35,6 @@ public class Comparison {
 		public boolean test(EmiStack a, EmiStack b);
 	}
 
-	@SuppressWarnings("unused")
-	private static class Builder {
+	static class Builder {
 	}
 }

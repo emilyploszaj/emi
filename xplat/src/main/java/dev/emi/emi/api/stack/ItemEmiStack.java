@@ -155,7 +155,6 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		return getItemStack().getName();
 	}
 
-	@SuppressWarnings("unused")
-	private static class ItemEntry {
+	static class ItemEntry {
 	}
 }
