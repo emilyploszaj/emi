@@ -11,11 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 
-import dev.emi.emi.EmiFavorite;
-import dev.emi.emi.EmiHistory;
-import dev.emi.emi.EmiRecipeFiller;
-import dev.emi.emi.EmiRecipes;
-import dev.emi.emi.EmiStackList;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -28,10 +23,15 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
+import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.runtime.EmiFavorite;
+import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
-import dev.emi.emi.sidebar.EmiSidebars;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

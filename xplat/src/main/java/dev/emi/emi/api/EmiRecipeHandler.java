@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRecipeFiller;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
+import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.registry.EmiRecipeFiller;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;

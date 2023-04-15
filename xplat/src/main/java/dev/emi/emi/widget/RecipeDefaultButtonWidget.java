@@ -2,11 +2,11 @@ package dev.emi.emi.widget;
 
 import java.util.List;
 
-import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 

@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.Map;

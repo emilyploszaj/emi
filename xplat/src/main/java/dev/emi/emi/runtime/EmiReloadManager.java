@@ -1,13 +1,23 @@
-package dev.emi.emi;
+package dev.emi.emi.runtime;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.registry.EmiComparisonDefaults;
+import dev.emi.emi.registry.EmiDragDropHandlers;
+import dev.emi.emi.registry.EmiExclusionAreas;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.registry.EmiRegistryImpl;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.registry.EmiStackProviders;
+import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;

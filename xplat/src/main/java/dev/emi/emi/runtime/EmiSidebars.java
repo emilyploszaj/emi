@@ -1,4 +1,4 @@
-package dev.emi.emi.sidebar;
+package dev.emi.emi.runtime;
 
 import java.util.List;
 
@@ -7,17 +7,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiFavorite;
-import dev.emi.emi.EmiFavorites;
-import dev.emi.emi.EmiPersistentData;
-import dev.emi.emi.EmiRecipes;
-import dev.emi.emi.EmiStackList;
-import dev.emi.emi.EmiStackSerializer;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.SidebarType;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.registry.EmiStackSerializer;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;

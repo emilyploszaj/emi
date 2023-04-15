@@ -9,9 +9,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiClient;
-import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;

@@ -10,12 +10,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiPersistentData;
-import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.data.RecipeDefault;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.runtime.EmiPersistentData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;

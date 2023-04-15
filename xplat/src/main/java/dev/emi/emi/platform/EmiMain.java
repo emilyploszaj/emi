@@ -1,6 +1,6 @@
 package dev.emi.emi.platform;
 
-public class EmiMod {
+public class EmiMain {
 	
 	public static void init() {
 	}

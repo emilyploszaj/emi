@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SinglePreparationResourceReloader;

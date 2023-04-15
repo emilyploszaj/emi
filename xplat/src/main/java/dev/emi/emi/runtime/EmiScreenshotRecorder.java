@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.runtime;
 
 import java.io.File;
 import java.util.function.Consumer;
@@ -7,6 +7,7 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;

@@ -1,6 +1,6 @@
 package dev.emi.emi.network;
 
-import dev.emi.emi.EmiClient;
+import dev.emi.emi.platform.EmiClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;

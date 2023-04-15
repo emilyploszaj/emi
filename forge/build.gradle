@@ -16,7 +16,7 @@ loom {
 		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
 		mixinConfig "emi.mixins.json"
-		//mixinConfig "emi-forge.mixins.json"
+		mixinConfig "emi-forge.mixins.json"
 	}
 
 	mods {

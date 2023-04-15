@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.registry;
 
 import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
 import static net.minecraft.server.command.CommandManager.argument;

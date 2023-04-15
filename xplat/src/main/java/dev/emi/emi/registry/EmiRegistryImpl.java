@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.registry;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -16,6 +16,7 @@ import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;

@@ -1,4 +1,4 @@
-package dev.emi.emi.forge;
+package dev.emi.emi.platform.forge;
 
 import java.nio.file.Path;
 import java.util.List;

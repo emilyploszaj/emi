@@ -14,10 +14,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.emi.emi.EmiMain"
+      "dev.emi.emi.platform.fabric.EmiMainFabric"
     ],
     "client": [
-      "dev.emi.emi.EmiClientFabric"
+      "dev.emi.emi.platform.fabric.EmiClientFabric"
     ],
     "server": [],
     "emi": [

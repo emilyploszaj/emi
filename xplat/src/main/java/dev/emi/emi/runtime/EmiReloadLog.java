@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.runtime;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

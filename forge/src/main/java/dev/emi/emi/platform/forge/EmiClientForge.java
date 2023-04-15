@@ -1,9 +1,9 @@
 package dev.emi.emi.platform.forge;
 
-import dev.emi.emi.EmiClient;
-import dev.emi.emi.EmiTags;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
+import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.registry.EmiTags;
 import net.minecraft.client.MinecraftClient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;

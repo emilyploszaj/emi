@@ -1,9 +1,9 @@
 package dev.emi.emi.platform.forge;
 
-import dev.emi.emi.EmiCommands;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.PingS2CPacket;
-import dev.emi.emi.platform.EmiMod;
+import dev.emi.emi.platform.EmiMain;
+import dev.emi.emi.registry.EmiCommands;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -15,7 +15,7 @@ import net.minecraftforge.network.PacketDistributor;
 public class EmiForge {
 
 	public EmiForge() {
-		EmiMod.init();
+		EmiMain.init();
 		EmiPacketHandler.init();
 		EmiNetwork.initServer((player, packet) -> {
 			EmiPacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);

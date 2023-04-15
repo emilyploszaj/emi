@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;

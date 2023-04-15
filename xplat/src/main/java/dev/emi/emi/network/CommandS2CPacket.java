@@ -1,11 +1,11 @@
 package dev.emi.emi.network;
 
-import dev.emi.emi.EmiCommands;
-import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.registry.EmiCommands;
+import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;

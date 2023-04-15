@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.platform.fabric;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -10,6 +10,8 @@ import dev.emi.emi.network.EmiChessPacket;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.EmiPacket;
 import dev.emi.emi.network.PingS2CPacket;
+import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.registry.EmiTags;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;

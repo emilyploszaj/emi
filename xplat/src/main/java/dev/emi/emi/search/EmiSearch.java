@@ -7,10 +7,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiLog;
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiReloadLog;
-import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -18,6 +15,9 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiAlias;
 import dev.emi.emi.data.EmiData;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.runtime.EmiLog;
+import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;

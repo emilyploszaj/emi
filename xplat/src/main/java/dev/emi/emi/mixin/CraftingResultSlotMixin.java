@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.sidebar.EmiSidebars;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.runtime.EmiSidebars;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;

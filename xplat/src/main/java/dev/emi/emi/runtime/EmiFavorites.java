@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.runtime;
 
 import java.util.AbstractList;
 import java.util.List;
@@ -22,6 +22,8 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.registry.EmiStackSerializer;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.util.Identifier;

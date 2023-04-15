@@ -12,12 +12,8 @@ import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiFavorites;
-import dev.emi.emi.EmiHistory;
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRecipes;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.EmiStackList;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -39,6 +35,10 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.runtime.EmiFavorites;
+import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;

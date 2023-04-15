@@ -1,4 +1,4 @@
-package dev.emi.emi.fabric;
+package dev.emi.emi.platform.fabric;
 
 import java.nio.file.Path;
 import java.util.List;

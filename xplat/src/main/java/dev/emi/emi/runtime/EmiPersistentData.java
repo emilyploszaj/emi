@@ -1,4 +1,4 @@
-package dev.emi.emi;
+package dev.emi.emi.runtime;
 
 import java.io.File;
 import java.io.FileReader;
@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.sidebar.EmiSidebars;
 import net.minecraft.util.JsonHelper;
 
 public class EmiPersistentData {

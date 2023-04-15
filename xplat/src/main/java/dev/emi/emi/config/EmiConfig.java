@@ -19,11 +19,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import dev.emi.emi.EmiLog;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.ints.IntList;
 import joptsimple.internal.Strings;
 import net.minecraft.client.font.TextHandler;

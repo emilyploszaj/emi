@@ -1,6 +1,6 @@
 package dev.emi.emi.network;
 
-import dev.emi.emi.EmiLog;
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
