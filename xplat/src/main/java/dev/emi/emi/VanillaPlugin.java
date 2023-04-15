@@ -120,7 +120,7 @@ import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
-import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.BlastFurnaceScreenHandler;
@@ -571,16 +571,12 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			new Identifier("emi", "fill_water_bottle")));
 
-		EmiPort.getItemRegistry().streamTagsAndEntries().forEach(pair -> {
-			TagKey<Item> key = pair.getFirst();
-			if (EmiClient.excludedTags.contains(key.id())) {
-				return;
-			}
-			RegistryEntryList.Named<Item> list = pair.getSecond();
+		for (TagKey<Item> key : EmiTags.itemTags) {
+			List<Item> list = EmiUtil.values(key).map(RegistryEntry::value).toList();
 			if (list.size() > 1) {
 				addRecipeSafe(registry, () -> new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
 			}
-		});
+		}
 
 		EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
 			.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));

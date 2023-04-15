@@ -30,6 +30,12 @@
     "c:ores/redstone",
     "c:ores/lapis",
     "c:ores/emerald",
-    "c:ores/diamond"
+    "c:ores/diamond",
+    "forge:ore_bearing_ground/deepslate",
+    "forge:ore_bearing_ground/netherrack",
+    "forge:ore_bearing_ground/stone",
+    "forge:ore_rates/dense",
+    "forge:ore_rates/singular",
+    "forge:ore_rates/sparse"
   ]
 }

@@ -1,23 +1,16 @@
 package dev.emi.emi;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.function.Consumer;
-
-import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.item.Item;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 
 public class EmiReloadManager {
@@ -105,25 +98,8 @@ public class EmiReloadManager {
 					}
 	
 					step(EmiPort.literal("Processing tags"));
-					EmiClient.itemTags = EmiPort.getItemRegistry().streamTags()
-						.filter(key -> !EmiClient.excludedTags.contains(key.id()))
-						.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
-						.toList();
-					if (EmiConfig.logUntranslatedTags) {
-						List<String> tags = Lists.newArrayList();
-						for (TagKey<Item> tag : EmiClient.itemTags) {
-							String translation = EmiUtil.translateId("tag.", tag.id());
-							if (!I18n.hasTranslation(translation)) {
-								tags.add(tag.id().toString());
-							}
-						}
-						if (!tags.isEmpty()) {
-							for (String tag : tags.stream().sorted().toList()) {
-								EmiReloadLog.warn("Untranslated tag #" + tag);
-							}
-							EmiReloadLog.info(" Tag warning can be disabled in the config, EMI docs describe how to add a translation or exclude tags.");
-						}
-					}
+					EmiTags.reload();
+
 					step(EmiPort.literal("Constructing index"));
 					EmiComparisonDefaults.comparisons = new HashMap<>();
 					EmiStackList.reload();

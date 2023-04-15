@@ -28,8 +28,8 @@
     ]
   },
   "mixins": [
-    "emi-common.mixins.json",
-    "emi.mixins.json"
+    "emi.mixins.json",
+    "emi-fabric.mixins.json"
   ],
   "accessWidener" : "emi.accesswidener",
   "depends": {

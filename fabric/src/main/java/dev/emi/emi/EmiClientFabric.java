@@ -2,17 +2,20 @@ package dev.emi.emi;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 
 import dev.emi.emi.data.EmiData;
+import dev.emi.emi.network.CommandS2CPacket;
+import dev.emi.emi.network.EmiChessPacket;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.EmiPacket;
+import dev.emi.emi.network.PingS2CPacket;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
@@ -44,32 +47,28 @@ public class EmiClientFabric implements ClientModInitializer {
 				}
 			});
 		});
+
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
-			EmiClient.MODELED_TAGS.clear();
-			for (Identifier id : EmiPort.findResources(manager, "models/item/tags", s -> s.endsWith(".json"))) {
-				String path = id.getPath();
-				path = path.substring(0, path.length() - 5);
-				String[] parts = path.substring(17).split("/");
-				if (parts.length > 1) {
-					EmiClient.MODELED_TAGS.add(new Identifier(parts[0], path.substring(18 + parts[0].length())));
-					if (id.getNamespace().equals("emi")) {
-						consumer.accept(new ModelIdentifier(id.getNamespace(), path.substring(12), "inventory"));
-					}
-				}
-			}
+			EmiTags.registerTagModels(manager, consumer);
 		});
 
-		EmiNetwork.initClient((clazz, id, create) -> {
-			ClientPlayNetworking.registerGlobalReceiver(id, (client, handler, buf, sender) -> {
-				EmiPacket packet = create.apply(client.player, buf);
-				client.execute(() -> {
-					packet.apply(client.player);
-				});
-			});
-		}, packet -> {
+		EmiNetwork.initClient(packet -> {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			packet.write(buf);
 			ClientPlayNetworking.send(packet.getId(), buf);
+		});
+
+		registerPacketReader(EmiNetwork.PING, PingS2CPacket::new);
+		registerPacketReader(EmiNetwork.COMMAND, CommandS2CPacket::new);
+		registerPacketReader(EmiNetwork.CHESS, EmiChessPacket.S2C::new);
+	}
+
+	private void registerPacketReader(Identifier id, Function<PacketByteBuf, EmiPacket> create) {
+		ClientPlayNetworking.registerGlobalReceiver(id, (client, handler, buf, sender) -> {
+			EmiPacket packet = create.apply(buf);
+			client.execute(() -> {
+				packet.apply(client.player);
+			});
 		});
 	}
 }

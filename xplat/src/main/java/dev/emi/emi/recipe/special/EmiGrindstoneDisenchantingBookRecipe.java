@@ -7,6 +7,7 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.api.widget.TextWidget.Alignment;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -55,21 +56,21 @@ public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayWidth() {
-		return 130;
+		return 116;
 	}
 
 	@Override
 	public int getDisplayHeight() {
-		return 61;
+		return 56;
 	}
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(BACKGROUND, 0, 0, 130, 61, 16, 14);
+		widgets.addTexture(BACKGROUND, 0, 0, 116, 56, 30, 15);
 
-		widgets.addText(getExp(), 78, 39, -1, true);
-		widgets.addSlot(getBook(), 32, 4).drawBack(false);
-		widgets.addSlot(EmiStack.of(Items.BOOK), 112, 19).drawBack(false).recipeContext(this);
+		widgets.addText(getExp(), 114, 39, -1, true).horizontalAlign(Alignment.END);
+		widgets.addSlot(getBook(), 18, 3).drawBack(false);
+		widgets.addSlot(EmiStack.of(Items.BOOK), 98, 18).drawBack(false).recipeContext(this);
 	}
 
 	private EmiStack getBook() {

@@ -15,8 +15,14 @@ loom {
 		convertAccessWideners = true
 		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
-		mixinConfig "emi-common.mixins.json"
 		mixinConfig "emi.mixins.json"
+		//mixinConfig "emi-forge.mixins.json"
+	}
+
+	mods {
+		main {
+			sourceSet project(':xplat').sourceSets.main
+		}
 	}
 }
 
@@ -31,7 +37,7 @@ configurations {
 dependencies {
 	forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-	common(project(path: ":xplat", configuration: "namedElements")) { transitive false }
+	common(project(path: ":xplat", configuration: "namedElements")) { transitive = false }
 	shadowCommon(project(path: ":xplat", configuration: "transformProductionForge")) { transitive = false }
 }
 

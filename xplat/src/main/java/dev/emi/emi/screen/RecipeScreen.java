@@ -194,7 +194,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 5, minimumWidth - 38, 12, 0, 16, 3, 6);
 		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 19, minimumWidth - 38, 12, 0, 16, 3, 6);
 		
-		boolean categoryHovered = mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY <= y + 5 + 12;
+		boolean categoryHovered = mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY < y + 5 + 12;
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
@@ -574,7 +574,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				if (!slot.getBounds().contains(ox, oy) && button == 0) {
 					EmiIngredient stack = slot.getStack();
 					if (slot.getRecipe() != null) {
-						stack = new EmiFavorite.Craftable(slot.getRecipe());
+						stack = new EmiFavorite(stack, slot.getRecipe());
 					}
 					EmiScreenManager.pressedStack = stack;
 					EmiScreenManager.draggedStack = stack;

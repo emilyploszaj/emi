@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
@@ -70,6 +71,24 @@ public class EmiFavorites {
 		}
 	}
 
+	private static int indexOf(EmiIngredient stack) {
+		for (int i = 0; i < favorites.size(); i++) {
+			if (favorites.get(i).equals(stack) && favorites.get(i).getRecipe() == EmiApi.getRecipeContext(stack)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static boolean removeFavorite(EmiIngredient stack) {
+		int index = indexOf(stack);
+		if (index != -1) {
+			favorites.remove(index);
+			return true;
+		}
+		return false;
+	}
+
 	public static void addFavorite(EmiIngredient stack) {
 		addFavorite(stack, null);
 	}
@@ -78,9 +97,12 @@ public class EmiFavorites {
 		if (stack instanceof EmiFavorite.Synthetic) {
 			return;
 		}
+		if (stack instanceof EmiFavorite.Craftable craftable) {
+			stack = craftable.stack;
+		}
 		EmiFavorite favorite;
 		if (stack instanceof EmiFavorite fav) {
-			int original = favorites.indexOf(fav);
+			int original = indexOf(stack);
 			if (original != -1) {
 				if (original < offset) {
 					offset--;
@@ -120,7 +142,7 @@ public class EmiFavorites {
 			stack = craftable.stack;
 		}
 		if (stack instanceof EmiFavorite f) {
-			if (!favorites.remove(f)) {
+			if (!removeFavorite(f)) {
 				favorites.add(f);
 			}
 		} else {

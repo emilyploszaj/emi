@@ -7,9 +7,9 @@ import org.jetbrains.annotations.ApiStatus;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.EmiTags;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
@@ -26,8 +26,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -104,13 +102,12 @@ public class TagEmiIngredient implements EmiIngredient {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		if ((flags & RENDER_ICON) != 0) {
-			if (!EmiClient.MODELED_TAGS.contains(id)) {
+			if (!EmiTags.hasCustomModel(key)) {
 				if (stacks.size() > 0) {
 					stacks.get(0).render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
 				}
 			} else {
-				BakedModel model = client.getBakedModelManager()
-					.getModel(new ModelIdentifier("emi", "tags/" + id.getNamespace() + "/" + id.getPath(), "inventory"));
+				BakedModel model = client.getBakedModelManager().getModel(EmiTags.getCustomModel(key));
 					
 				MatrixStack vs = RenderSystem.getModelViewStack();
 				vs.push();
@@ -133,7 +130,7 @@ public class TagEmiIngredient implements EmiIngredient {
 					.invokeRenderBakedItemModel(model,
 						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, ms, 
 						ItemRenderer.getDirectItemGlintConsumer(immediate,
-						TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
+							TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
 				immediate.draw();
 
 				if (!model.isSideLit()) {
@@ -161,15 +158,10 @@ public class TagEmiIngredient implements EmiIngredient {
 
 	@Override
 	public List<TooltipComponent> getTooltip() {
-		String translation = EmiUtil.translateId("tag.", id);
 		List<TooltipComponent> list = Lists.newArrayList();
-		if (I18n.hasTranslation(translation)) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable(translation))));
-			if (EmiUtil.showAdvancedTooltips()) {
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
-			}
-		} else {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id))));
+		list.add(TooltipComponent.of(EmiPort.ordered(EmiTags.getTagName(key))));
+		if (EmiUtil.showAdvancedTooltips()) {
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
 		}
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(id.getNamespace());

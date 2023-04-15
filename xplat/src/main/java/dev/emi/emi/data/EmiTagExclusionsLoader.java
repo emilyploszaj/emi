@@ -43,7 +43,11 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Se
 						if (JsonHelper.hasArray(json, "exclusions")) {
 							JsonArray arr = JsonHelper.getArray(json, "exclusions");
 							for (JsonElement el : arr) {
-								exclusions.add(new Identifier(el.getAsString()));
+								Identifier eid = new Identifier(el.getAsString());
+								exclusions.add(eid);
+								if (eid.getNamespace().equals("c")) {
+									exclusions.add(new Identifier("forge", eid.getPath()));
+								}
 							}
 						}
 					} catch (Exception e) {

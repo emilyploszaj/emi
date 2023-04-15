@@ -10,6 +10,13 @@ architectury {
 
 loom {
 	accessWidenerPath = project(":xplat").loom.accessWidenerPath
+
+	mods {
+		main {
+			sourceSet sourceSets.main
+			sourceSet project(':xplat').sourceSets.main
+		}
+	}
 }
 
 configurations {
@@ -44,6 +51,7 @@ processResources {
 }
 
 shadowJar {
+	exclude "fabric.mod.json"
 	exclude "architectury.common.json"
 
 	configurations = [project.configurations.shadowCommon]

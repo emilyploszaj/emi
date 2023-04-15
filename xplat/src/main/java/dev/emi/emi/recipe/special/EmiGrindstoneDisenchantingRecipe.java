@@ -54,21 +54,20 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayWidth() {
-		return 130;
+		return 116;
 	}
 
 	@Override
 	public int getDisplayHeight() {
-		return 61;
+		return 56;
 	}
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(BACKGROUND, 0, 0, 130, 61, 16, 14);
+		widgets.addTexture(BACKGROUND, 0, 0, 116, 56, 30, 15);
 
-		int notUniq= uniq;
-		widgets.addGeneratedSlot(r -> getTool(r, true), notUniq,32, 4).drawBack(false);
-		widgets.addGeneratedSlot(r -> getTool(r, false), notUniq, 112, 19).drawBack(false).recipeContext(this);
+		widgets.addGeneratedSlot(r -> getTool(r, true), uniq, 18, 3).drawBack(false);
+		widgets.addGeneratedSlot(r -> getTool(r, false), uniq, 98, 18).drawBack(false).recipeContext(this);
 	}
 
 	private EmiStack getTool(Random random, Boolean enchanted){

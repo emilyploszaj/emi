@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
 
-import dev.emi.emi.EmiClient;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiTags;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -112,7 +112,7 @@ public interface EmiIngredient extends EmiRenderable {
 			return EmiStack.of(ingredient.getMatchingStacks()[0], amount);
 		}
 		List<TagKey<Item>> keys = Lists.newArrayList();
-		for (TagKey<Item> key : EmiClient.itemTags) {
+		for (TagKey<Item> key : EmiTags.itemTags) {
 			List<Item> values = EmiUtil.values(key).map(i -> i.value()).toList();
 			if (values.size() < 2) {
 				continue;

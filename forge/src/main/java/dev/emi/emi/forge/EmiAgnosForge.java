@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.EmiRegistry;
@@ -17,6 +18,8 @@ import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -27,8 +30,10 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -150,8 +155,13 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
-		// TODO Auto-generated method stub
-		//throw new UnsupportedOperationException("Unimplemented method 'renderFluidAgnos'");
+		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
+		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
+		Identifier texture = ext.getStillTexture(fs);
+		int color = ext.getTintColor(fs);
+		MinecraftClient client = MinecraftClient.getInstance();
+		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);
+		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, 16, 16);
 	}
 
 	@Override

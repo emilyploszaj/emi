@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiLog;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -16,72 +17,55 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
 public class FillRecipeC2SPacket implements EmiPacket {
-	private final ScreenHandler handler;
+	private final int syncId;
 	private final int action;
-	private final List<Slot> slots, crafting;
-	private final @Nullable Slot output;
+	private final List<Integer> slots, crafting;
+	private final int output;
 	private final List<ItemStack> stacks;
 
 	public FillRecipeC2SPacket(ScreenHandler handler, int action, List<Slot> slots, List<Slot> crafting, @Nullable Slot output, List<ItemStack> stacks) {
-		this.handler = handler;
+		this.syncId = handler.syncId;
 		this.action = action;
-		this.slots = slots;
-		this.crafting = crafting;
-		this.output = output;
+		this.slots = slots.stream().map(s -> s == null ? -1 : s.id).toList();
+		this.crafting = crafting.stream().map(s -> s == null ? -1 : s.id).toList();
+		this.output = output == null ? -1 : output.id;
 		this.stacks = stacks;
 	}
 
-	public FillRecipeC2SPacket(PlayerEntity player, PacketByteBuf buf) {
-		int syncId = buf.readInt();
-		handler = player.currentScreenHandler;
+	public FillRecipeC2SPacket(PacketByteBuf buf) {
+		syncId = buf.readInt();
 		action = buf.readByte();
-		if (handler != null && handler.syncId == syncId) {
-			slots = parseCompressedSlots(handler, buf);
-			crafting = Lists.newArrayList();
-			int craftingSize = buf.readVarInt();
-			for (int i = 0; i < craftingSize; i++) {
-				int s = buf.readVarInt();
-				if (s >= 0 && s < handler.slots.size()) {
-					crafting.add(handler.slots.get(s));
-				} else {
-					crafting.add(null);
-				}
-			}
-			if (buf.readBoolean()) {
-				int i = buf.readVarInt();
-				if (i >= 0 && i < handler.slots.size()) {
-					output = handler.getSlot(i);
-				} else {
-					output = null;
-				}
-			} else {
-				output = null;
-			}
-			int size = buf.readVarInt();
-			stacks = Lists.newArrayList();
-			for (int i = 0; i < size; i++) {
-				stacks.add(buf.readItemStack());
-			}
+		slots = parseCompressedSlots(buf);
+		crafting = Lists.newArrayList();
+		int craftingSize = buf.readVarInt();
+		for (int i = 0; i < craftingSize; i++) {
+			int s = buf.readVarInt();
+			crafting.add(s);
+		}
+		if (buf.readBoolean()) {
+			output = buf.readVarInt();
 		} else {
-			slots = List.of();
-			crafting = List.of();
-			output = null;
-			stacks = List.of();
+			output = -1;
+		}
+		int size = buf.readVarInt();
+		stacks = Lists.newArrayList();
+		for (int i = 0; i < size; i++) {
+			stacks.add(buf.readItemStack());
 		}
 	}
 
 	@Override
 	public void write(PacketByteBuf buf) {
-		buf.writeInt(handler.syncId);
+		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(slots, buf);
 		buf.writeVarInt(crafting.size());
-		for (Slot s : crafting) {
-			buf.writeVarInt(s == null ? -1 : s.id);
+		for (Integer s : crafting) {
+			buf.writeVarInt(s);
 		}
-		if (output != null) {
+		if (output != -1) {
 			buf.writeBoolean(true);
-			buf.writeVarInt(output.id);
+			buf.writeVarInt(output);
 		} else {
 			buf.writeBoolean(false);
 		}
@@ -93,8 +77,36 @@ public class FillRecipeC2SPacket implements EmiPacket {
 
 	@Override
 	public void apply(PlayerEntity player) {
-		if (handler == null || slots == null || crafting == null) {
+		if (slots == null || crafting == null) {
+			EmiLog.error("Client requested fill but passed input and crafting slot information was invalid, aborting");
 			return;
+		}
+		ScreenHandler handler = player.currentScreenHandler;
+		if (handler == null || handler.syncId != syncId) {
+			EmiLog.warn("Client requested fill but screen handler has changed, aborting");
+			return;
+		}
+		List<Slot> slots = Lists.newArrayList();
+		List<Slot> crafting = Lists.newArrayList();
+		Slot output = null;
+		for (int i : this.slots) {
+			if (i < 0 || i >= handler.slots.size()) {
+				EmiLog.error("Client requested fill but passed input slots don't exist, aborting");
+				return;
+			}
+			slots.add(handler.slots.get(i));
+		}
+		for (int i : this.crafting) {
+			if (i < 0 || i >= handler.slots.size()) {
+				EmiLog.error("Client requested fill but passed crafting slots don't exist, aborting");
+				return;
+			}
+			crafting.add(handler.slots.get(i));
+		}
+		if (this.output != -1) {
+			if (this.output >= 0 && this.output < handler.slots.size()) {
+				output = handler.slots.get(this.output);
+			}
 		}
 		if (crafting.size() >= stacks.size()) {
 			List<ItemStack> rubble = Lists.newArrayList();
@@ -117,7 +129,6 @@ public class FillRecipeC2SPacket implements EmiPacket {
 							stack.setCount(gotten);
 							player.getInventory().offerOrDrop(stack);
 						}
-						System.out.println(gotten + " " + stack.getCount());
 						return;
 					} else {
 						Slot s = crafting.get(i);
@@ -143,8 +154,8 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		}
 	}
 
-	private static List<Slot> parseCompressedSlots(ScreenHandler handler, PacketByteBuf buf) {
-		List<Slot> list = Lists.newArrayList();
+	private static List<Integer> parseCompressedSlots(PacketByteBuf buf) {
+		List<Integer> list = Lists.newArrayList();
 		int amount = buf.readVarInt();
 		for (int i = 0; i < amount; i++) {
 			int low = buf.readVarInt();
@@ -153,22 +164,13 @@ public class FillRecipeC2SPacket implements EmiPacket {
 				return null;
 			}
 			for (int j = low; j <= high; j++) {
-				if (j < handler.slots.size()) {
-					list.add(handler.getSlot(j));
-				} else {
-					return null;
-				}
+				list.add(j);
 			}
 		}
 		return list;
 	}
 	
-	private static void writeCompressedSlots(List<Slot> slots, PacketByteBuf buf) {
-		List<Integer> list = slots.stream()
-			.map(s -> s.id)
-			.sorted()
-			.distinct()
-			.toList();
+	private static void writeCompressedSlots(List<Integer> list, PacketByteBuf buf) {
 		List<Consumer<PacketByteBuf>> postWrite = Lists.newArrayList();
 		int groups = 0;
 		int i = 0;

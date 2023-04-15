@@ -4,14 +4,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import dev.emi.emi.EmiFabric;
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
@@ -21,6 +22,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -90,14 +92,15 @@ public class EmiAgnosFabric extends EmiAgnos {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
 					try {
-						if (recipe.ingredient.getMatchingStacks().length > 0) {
+						Ingredient recipeIngredient = ((BrewingRecipeRegistryRecipeAccessor) recipe).getIngredient();
+						if (recipeIngredient.getMatchingStacks().length > 0) {
 							Identifier id = new Identifier("emi", "brewing/potion/" + pid
-								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output)));
+								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()))
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output)), id));
+								EmiStack.of(PotionUtil.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput())), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(PotionUtil.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())), id));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -108,10 +111,11 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 		for (BrewingRecipeRegistry.Recipe<Item> recipe : BrewingRecipeRegistry.ITEM_RECIPES) {
 			try {
-				if (recipe.ingredient.getMatchingStacks().length > 0) {
-					String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
-					String iid = EmiUtil.subId(recipe.input);
-					String oid = EmiUtil.subId(recipe.output);
+				Ingredient recipeIngredient = ((BrewingRecipeRegistryRecipeAccessor) recipe).getIngredient();
+				if (recipeIngredient.getMatchingStacks().length > 0) {
+					String gid = EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem());
+					String iid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput());
+					String oid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput());
 					EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
 						Potion potion = entry.value();
 						if (potion == Potions.EMPTY) {
@@ -121,8 +125,8 @@ public class EmiAgnosFabric extends EmiAgnos {
 							Identifier id = new Identifier("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.input), potion)), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.output), potion)), id));
+								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()), potion)), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput()), potion)), id));
 						}
 					});
 				}
@@ -144,7 +148,15 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
-		EmiFabric.renderFluidStack(stack, matrices, x, y, delta);
+		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getNbt());
+		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
+		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
+			return;
+		}
+		Sprite sprite = sprites[0];
+		int color = FluidVariantRendering.getColor(fluid);
+		
+		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, 16, 16);
 	}
 
 	@Override

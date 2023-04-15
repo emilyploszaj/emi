@@ -1,0 +1,7 @@
+{
+  "parent": "emi:item/half_item",
+  "textures": {
+    "first": "minecraft:item/iron_nugget",
+    "second": "minecraft:item/gold_nugget"
+  }
+}

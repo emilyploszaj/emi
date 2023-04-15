@@ -3,6 +3,7 @@ package dev.emi.emi;
 import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
+import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -23,6 +24,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -63,6 +69,33 @@ public class EmiRenderHelper {
 		DrawableHelper.drawTexture(matrices, x + cor,   y + corih, innerWidth, cor,         u + cor,    v + corcen, cen, cor, 256, 256);
 		// BR
 		DrawableHelper.drawTexture(matrices, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
+	}
+
+	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int width, int height) {
+		EmiPort.setPositionColorTexShader();
+		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
+		
+		float r = ((color >> 16) & 255) / 256f;
+		float g = ((color >> 8) & 255) / 256f;
+		float b = (color & 255) / 256f;
+		
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+		float xMin = (float) x;
+		float yMin = (float) y;
+		float xMax = xMin + width;
+		float yMax = yMin + height;
+		float uMin = sprite.getMinU();
+		float vMin = sprite.getMinV();
+		float uMax = sprite.getMaxU();
+		float vMax = sprite.getMaxV();
+		Matrix4f model = matrices.peek().getPositionMatrix();
+		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
+		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
+		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
+		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
+		EmiPort.draw(bufferBuilder);
 	}
 
 	public static Text getEmiText() {

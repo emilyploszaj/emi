@@ -2,6 +2,6 @@
   "parent": "emi:item/half_item",
   "textures": {
     "first": "minecraft:item/golden_sword",
-    "second": "minecraft:item/iron_pickaxe"
+    "second": "minecraft:item/diamond_pickaxe"
   }
 }
