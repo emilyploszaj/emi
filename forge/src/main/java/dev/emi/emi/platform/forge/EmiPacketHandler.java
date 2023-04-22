@@ -19,7 +19,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class EmiPacketHandler {
 	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-		new Identifier("emi:emi"), () -> "0", "0"::equals, "0"::equals);
+		new Identifier("emi:emi"), () -> "0", NetworkRegistry.acceptMissingOr("0"), NetworkRegistry.acceptMissingOr("0"));
 	
 	public static void init() {
 		int i = 0;

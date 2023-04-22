@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.resource.language.I18n;
@@ -149,13 +150,13 @@ public class EmiTags {
 			} else if (bn.equals("c")) {
 				return b;
 			} else if (an.equals("fabric")) {
-				return a;
+				return EmiAgnos.isModLoaded("forge") ? b : a;
 			} else if (bn.equals("fabric")) {
-				return b;
+				return EmiAgnos.isModLoaded("forge") ? a : b;
 			} else if (an.equals("forge")) {
-				return a;
+				return EmiAgnos.isModLoaded("forge") ? a : b;
 			} else if (bn.equals("forge")) {
-				return b;
+				return EmiAgnos.isModLoaded("forge") ? b : a;
 			}
 		}
 		return a.id().toString().length() <= b.id().toString().length() ? a : b;

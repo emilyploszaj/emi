@@ -122,6 +122,9 @@ public class EmiApi {
 	}
 	
 	public static void displayRecipes(EmiIngredient stack) {
+		if (stack instanceof EmiFavorite fav) {
+			stack = fav.getStack();
+		}
 		if (stack instanceof TagEmiIngredient tag) {
 			for (EmiRecipe recipe : EmiRecipes.byCategory.getOrDefault(VanillaPlugin.TAG, List.of())) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {

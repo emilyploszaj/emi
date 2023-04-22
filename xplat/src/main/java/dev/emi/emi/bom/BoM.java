@@ -10,21 +10,28 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.data.RecipeDefault;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiPersistentData;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.Item;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class BoM {
 	private static List<RecipeDefault> defaults = List.of();
 	public static MaterialTree tree;
-	public static Map<EmiStack, EmiRecipe> defaultRecipes = Maps.newHashMap();
-	public static Map<EmiStack, EmiRecipe> addedRecipes = Maps.newHashMap();
+	public static Map<EmiIngredient, EmiRecipe> defaultRecipes = Maps.newHashMap();
+	public static Map<EmiIngredient, EmiRecipe> addedRecipes = Maps.newHashMap();
 	public static Set<EmiRecipe> disabledRecipes = Sets.newHashSet();
 	public static boolean craftingMode = false;
 
@@ -35,10 +42,15 @@ public class BoM {
 
 	public static JsonObject saveAdded() {
 		JsonArray added = new JsonArray();
+		JsonObject addedTags = new JsonObject();
 		Set<Identifier> placed = Sets.newHashSet();
-		for (Map.Entry<EmiStack, EmiRecipe> entry : addedRecipes.entrySet()) {
+		for (Map.Entry<EmiIngredient, EmiRecipe> entry : addedRecipes.entrySet()) {
 			EmiRecipe recipe = entry.getValue();
-			if (recipe != null && recipe.getId() != null && !placed.contains(recipe.getId())) {
+			if (recipe instanceof EmiResolutionRecipe err) {
+				if (err.ingredient instanceof TagEmiIngredient tei) {
+					addedTags.addProperty(tei.key.id().toString(), EmiPort.getItemRegistry().getId(err.stack.getItemStack().getItem()).toString());
+				}
+			} else if (recipe != null && recipe.getId() != null && !placed.contains(recipe.getId())) {
 				placed.add(recipe.getId());
 				added.add(recipe.getId().toString());
 			}
@@ -51,6 +63,7 @@ public class BoM {
 		}
 		JsonObject obj = new JsonObject();
 		obj.add("added", added);
+		obj.add("added_item_tags", addedTags);
 		obj.add("disabled", disabled);
 		return obj;
 	}
@@ -72,6 +85,17 @@ public class BoM {
 				for (EmiStack output : recipe.getOutputs()) {
 					addedRecipes.put(output, recipe);
 				}
+			}
+		}
+		JsonObject addedTags = JsonHelper.getObject(object, "added_item_tags", new JsonObject());
+		for (String key : addedTags.keySet()) {
+			Item item = EmiPort.getItemRegistry().get(new Identifier(JsonHelper.getString(addedTags, key, "")));
+			Identifier id = new Identifier(key);
+			TagKey<Item> tag = TagKey.of(EmiPort.getItemRegistry().getKey(), id);
+			List<Item> items = EmiUtil.values(tag).map(RegistryEntry<Item>::value).toList();
+			if (item != null && items.contains(item)) {
+				EmiIngredient tagStack = EmiIngredient.of(tag);
+				addedRecipes.put(tagStack, new EmiResolutionRecipe(tagStack, EmiStack.of(item)));
 			}
 		}
 	}
@@ -113,7 +137,7 @@ public class BoM {
 		tree.addResolution(ingredient, recipe);
 	}
 
-	public static void addRecipe(EmiRecipe recipe, EmiStack stack) {
+	public static void addRecipe(EmiIngredient stack, EmiRecipe recipe) {
 		disabledRecipes.remove(recipe);
 		addedRecipes.put(stack, recipe);
 		EmiPersistentData.save();

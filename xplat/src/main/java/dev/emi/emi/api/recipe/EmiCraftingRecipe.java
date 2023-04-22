@@ -93,6 +93,6 @@ public class EmiCraftingRecipe implements EmiRecipe {
 				widgets.addSlot(EmiStack.of(ItemStack.EMPTY), i % 3 * 18, i / 3 * 18);
 			}
 		}
-		widgets.addSlot(output, 92, 14).output(true).recipeContext(this);
+		widgets.addSlot(output, 92, 14).large(true).recipeContext(this);
 	}
 }

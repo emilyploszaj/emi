@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class DrawableWidget extends Widget {
+public class DrawableWidget extends Widget implements WidgetTooltipHolder<DrawableWidget> {
 	protected final DrawableWidgetConsumer consumer;
 	protected final Bounds bounds;
 	protected final int x, y;
@@ -19,6 +19,7 @@ public class DrawableWidget extends Widget {
 		this.consumer = consumer;
 	}
 
+	@Override
 	public DrawableWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;

@@ -25,6 +25,9 @@
     ],
     "modmenu": [
       "dev.emi.emi.compat.EmiModMenu"
+    ],
+    "jei_mod_plugin": [
+      "dev.emi.emi.jemi.JemiPlugin"
     ]
   },
   "mixins": [

@@ -1,12 +1,16 @@
 package dev.emi.emi.runtime;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.jemi.JemiPlugin;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.registry.EmiDragDropHandlers;
@@ -117,8 +121,15 @@ public class EmiReloadManager {
 						continue;
 					}
 					EmiRegistry registry = new EmiRegistryImpl();
-					for (EmiPluginContainer container : EmiAgnos.getPlugins().stream()
-							.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList()) {
+					List<EmiPluginContainer> plugins = Lists.newArrayList();
+					plugins.addAll(EmiAgnos.getPlugins().stream()
+						.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList());
+					
+					if (EmiAgnos.isModLoaded("jei")) {
+						plugins.add(new EmiPluginContainer(new JemiPlugin(), "emi"));
+					}
+					
+					for (EmiPluginContainer container : plugins) {
 						step(EmiPort.literal("Loading plugin from " + container.id()), 10_000);
 						long start = System.currentTimeMillis();
 						try {

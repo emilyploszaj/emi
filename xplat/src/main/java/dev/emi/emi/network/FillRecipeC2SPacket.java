@@ -97,11 +97,11 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			slots.add(handler.slots.get(i));
 		}
 		for (int i : this.crafting) {
-			if (i < 0 || i >= handler.slots.size()) {
-				EmiLog.error("Client requested fill but passed crafting slots don't exist, aborting");
-				return;
+			if (i >= 0 && i < handler.slots.size()) {
+				crafting.add(handler.slots.get(i));
+			} else {
+				crafting.add(null);
 			}
-			crafting.add(handler.slots.get(i));
 		}
 		if (this.output != -1) {
 			if (this.output >= 0 && this.output < handler.slots.size()) {

@@ -18,6 +18,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
@@ -65,11 +66,11 @@ public class SlotWidget extends Widget {
 	}
 
 	/**
-	 * Display the slot as a 26x26 vanilla output slot.
+	 * Whether to the slot as the large 26x26 or small 18x18 slot.
 	 * This is a purely visual change.
 	 */
-	public SlotWidget output(boolean output) {
-		this.output = output;
+	public SlotWidget large(boolean large) {
+		this.output = large;
 		return this;
 	}
 
@@ -116,8 +117,8 @@ public class SlotWidget extends Widget {
 
 	/**
 	 * Sets the slot to use a custom texture.
-	 * The size of the texture drawn is determined by whether the slot is visually an output,
-	 * which is set by {@link SlotWidget#output()}.
+	 * The size of the texture drawn is 18x18, or 26x26 if the slot is large,
+	 * which is set by {@link SlotWidget#large()}.
 	 * {@link SlotWidget#custom()} is an alternative for custom sizing.
 	 */
 	public SlotWidget backgroundTexture(Identifier id, int u, int v) {
@@ -125,17 +126,6 @@ public class SlotWidget extends Widget {
 		this.u = u;
 		this.v = v;
 		return this;
-	}
-
-	/**
-	 * @see {@link SlotWidget#customBackground}
-	 */
-	@Deprecated
-	public void custom(Identifier id, int u, int v, int width, int height) {
-		backgroundTexture(id, u, v);
-		this.custom = true;
-		this.customWidth = width;
-		this.customHeight = height;
 	}
 
 	/**
@@ -163,9 +153,15 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		Bounds bounds = getBounds();
 		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		drawBackground(matrices, mouseX, mouseY, delta);
+		drawStack(matrices, mouseX, mouseY, delta);
+		drawOverlay(matrices, mouseX, mouseY, delta);
+	}
+
+	public void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		Bounds bounds = getBounds();
 		int width = bounds.width();
 		int height = bounds.height();
 		if (drawBack) {
@@ -182,12 +178,13 @@ public class SlotWidget extends Widget {
 				}
 			}
 		}
+	}
 
-		int xOff = (width - 16) / 2;
-		int yOff = (height - 16) / 2;
+	public void drawStack(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		Bounds bounds = getBounds();
+		int xOff = (bounds.width() - 16) / 2;
+		int yOff = (bounds.height() - 16) / 2;
 		getStack().render(matrices, bounds.x() + xOff, bounds.y() + yOff, delta);
-
-		drawOverlay(matrices, mouseX, mouseY, delta);
 	}
 
 	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -231,10 +228,10 @@ public class SlotWidget extends Widget {
 			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(recipe.getId().toString(), Formatting.GRAY))));
 			}
-			if (EmiConfig.favorite.isBound()) {
+			if (EmiConfig.favorite.isBound() && EmiConfig.showHelp) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
 			}
-			if (RecipeScreen.resolve != null) {
+			if (RecipeScreen.resolve != null && EmiConfig.showHelp) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve", Formatting.GREEN))));
 			}
 			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
@@ -250,7 +247,11 @@ public class SlotWidget extends Widget {
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (button == 0 && getRecipe() != null && getRecipe().supportsRecipeTree() && RecipeScreen.resolve != null) {
-			BoM.addResolution(RecipeScreen.resolve, getRecipe());
+			if (EmiInput.isShiftDown()) {
+				BoM.addRecipe(RecipeScreen.resolve, getRecipe());
+			} else {
+				BoM.addResolution(RecipeScreen.resolve, getRecipe());
+			}
 			EmiHistory.pop();
 			return true;
 		} else if (EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),

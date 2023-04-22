@@ -36,7 +36,7 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 			BoM.removeRecipe(recipe);
 		} else {
 			for (EmiStack stack : recipe.getOutputs()) {
-				BoM.addRecipe(recipe, stack);
+				BoM.addRecipe(stack, recipe);
 			}
 		}
 		this.playButtonSound();

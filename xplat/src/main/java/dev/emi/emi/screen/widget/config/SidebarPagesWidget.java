@@ -27,19 +27,18 @@ public class SidebarPagesWidget extends ConfigEntryWidget {
 	public void updateButtons() {
 		buttons.clear();
 		SidebarPages pages = mutator.get();
-		boolean canChess = pages.canShowChess();
 		for (int i = 0; i < pages.pages.size(); i++) {
 			final int j = i;
 			SidebarPages.SidebarPage page = pages.pages.get(i);
 			buttons.add(EmiPort.newButton(0, 0, 194, 20, page.type.getText(), b -> {
-				EnumWidget.page(page.type, t -> canChess || t != SidebarType.CHESS, t -> {
+				EnumWidget.page(page.type, t -> pages.canShowChess() || t != SidebarType.CHESS, t -> {
 					pages.pages.get(j).type = (SidebarType) t;
 					pages.unique();
 				});
 			}));
 		}
 		buttons.add(EmiPort.newButton(0, 0, 20, 20, EmiPort.literal("+"), b -> {
-			EnumWidget.page(SidebarType.INDEX, t -> canChess || t != SidebarType.CHESS, t -> {
+			EnumWidget.page(SidebarType.INDEX, t -> pages.canShowChess() || t != SidebarType.CHESS, t -> {
 				pages.pages.add(new SidebarPages.SidebarPage((SidebarType) t));
 				pages.unique();
 			});

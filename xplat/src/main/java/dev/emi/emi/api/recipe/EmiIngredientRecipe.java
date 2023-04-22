@@ -2,11 +2,16 @@ package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.bom.BoM;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
@@ -103,7 +108,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		}
 	}
 
-	private static class PageSlotWidget extends SlotWidget {
+	private class PageSlotWidget extends SlotWidget {
 		public final PageManager manager;
 		public final int offset;
 
@@ -127,6 +132,15 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 			if (!getStack().isEmpty()) {
 				super.render(matrices, mouseX, mouseY, delta);
+			}
+		}
+		
+		@Override
+		public void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+			super.drawBackground(matrices, mouseX, mouseY, delta);
+			if (BoM.getRecipe(getIngredient()) instanceof EmiResolutionRecipe err && err.stack.equals(getStack())) {
+				RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+				DrawableHelper.drawTexture(matrices, x, y, 36, 128, 18, 18, 256, 256);
 			}
 		}
 	}

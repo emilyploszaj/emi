@@ -99,6 +99,19 @@ public class EmiRenderHelper {
 		EmiPort.draw(bufferBuilder);
 	}
 
+	public static void drawScroll(MatrixStack matrices, int x, int y, int width, int height, int progress, int total, int color) {
+		if (total <= 1) {
+			return;
+		}
+		int start = x + width * progress / total;
+		int end = start + Math.max(width / total, 1);
+		if (progress == total - 1) {
+			end = x + width;
+			start = end - Math.max(width / total, 1);
+		}
+		DrawableHelper.fill(matrices, start, y, end, y + height, color);
+	}
+
 	public static Text getEmiText() {
 		return
 			EmiPort.append(

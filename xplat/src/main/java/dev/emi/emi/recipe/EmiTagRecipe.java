@@ -48,6 +48,6 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 
 	@Override
 	public Identifier getId() {
-		return new Identifier("emi", "tag/item/" + EmiUtil.subId(key.id()));
+		return new Identifier("emi", "/tag/item/" + EmiUtil.subId(key.id()));
 	}
 }

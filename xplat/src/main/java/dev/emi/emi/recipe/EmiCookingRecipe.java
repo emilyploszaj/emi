@@ -80,6 +80,6 @@ public class EmiCookingRecipe implements EmiRecipe {
 		}
 		widgets.addText(EmiPort.ordered(EmiPort.translatable("emi.cooking.experience", recipe.getExperience())), 26, 28, -1, true);
 		widgets.addSlot(input, 0, 4);
-		widgets.addSlot(output, 56, 0).output(true).recipeContext(this);
+		widgets.addSlot(output, 56, 0).large(true).recipeContext(this);
 	}
 }

@@ -51,6 +51,10 @@ public class EmiConfig {
 	@ConfigValue("general.cheat-mode")
 	public static boolean cheatMode = false;
 
+	@Comment("Whether EMI tooltips and popups will show helpful information about how to use it.")
+	@ConfigValue("general.show-help")
+	public static boolean showHelp = true;
+
 	@ConfigGroup("general.search")
 	@Comment("Whether normal search queries should include the tooltip.")
 	@ConfigValue("general.search-tooltip-by-default")
@@ -66,13 +70,13 @@ public class EmiConfig {
 	public static boolean searchTagsByDefault = false;
 
 	// UI
-	@Comment("Whether to move status effects to the top of the screen.")
-	@ConfigValue("ui.move-effects")
-	public static boolean moveEffects = true;
+	@Comment("Which action should be performed when clicking the recipe book.")
+	@ConfigValue("ui.recipe-book-action")
+	public static RecipeBookAction recipeBookAction = RecipeBookAction.TOGGLE_CRAFTABLES;
 
-	@Comment("Whether to have the search bar in the center of the screen, instead of to the side.")
-	@ConfigValue("ui.center-search-bar")
-	public static boolean centerSearchBar = true;
+	@Comment("Where to display status effects in the inventory.")
+	@ConfigValue("ui.effect-location")
+	public static EffectLocation effectLocation = EffectLocation.TOP;
 
 	@Comment("Whether to display a gray overlay when hovering over a stack.")
 	@ConfigValue("ui.show-hover-overlay")
@@ -87,6 +91,23 @@ public class EmiConfig {
 	@Comment("Whether to add mod name to item tooltips, in case another mod provides behavior")
 	@ConfigValue("ui.append-item-mod-id")
 	public static boolean appendItemModId = true;
+
+	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
+	@ConfigValue("ui.miscraft-prevention")
+	public static boolean miscraftPrevention = true;
+
+	@Comment("The unit to display fluids as.")
+	@ConfigValue("ui.fluid-unit")
+	public static FluidUnit fluidUnit = FluidUnit.LITERS;
+
+	@Comment("Whether to use the batched render system. Batching is faster, but may have incompatibilities"
+		+ " with shaders or other mods.")
+	@ConfigValue("ui.use-batched-renderer")
+	public static boolean useBatchedRenderer = true;
+
+	@Comment("Whether to have the search bar in the center of the screen, instead of to the side.")
+	@ConfigValue("ui.center-search-bar")
+	public static boolean centerSearchBar = true;
 
 	@ConfigFilter("ui.search-sidebar-focus")
 	private static Predicate<SidebarType> searchSidebarFocusFilter = type -> {
@@ -106,6 +127,7 @@ public class EmiConfig {
 	@ConfigValue("ui.empty-search-sidebar-focus")
 	public static SidebarType emptySearchSidebarFocus = SidebarType.NONE;
 
+	@ConfigGroup("ui.recipe-screen")
 	@Comment("The amount of vertical margin to give in the recipe screen.")
 	@ConfigValue("ui.vertical-margin")
 	public static int verticalMargin = 20;
@@ -124,23 +146,11 @@ public class EmiConfig {
 	@ConfigValue("ui.workstation-location")
 	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
 
+	@ConfigGroupEnd()
 	@Comment("Display cost per batch when hovering a recipe output")
 	@ConfigValue("ui.show-cost-per-batch")
 	public static boolean showCostPerBatch = true;
 
-
-	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
-	@ConfigValue("ui.miscraft-prevention")
-	public static boolean miscraftPrevention = true;
-
-	@Comment("The unit to display fluids as.")
-	@ConfigValue("ui.fluid-unit")
-	public static FluidUnit fluidUnit = FluidUnit.LITERS;
-
-	@Comment("Whether to use the batched render system. Batching is faster, but may have incompatibilities"
-		+ " with shaders or other mods.")
-	@ConfigValue("ui.use-batched-renderer")
-	public static boolean useBatchedRenderer = true;
 	@ConfigGroup("ui.recipe-buttons")
 	@Comment("Whether recipes should have a button to set as default.")
 	@ConfigValue("ui.recipe-default-button")
@@ -154,11 +164,11 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
 
-	@ConfigGroupEnd
 	@Comment("Whether recipes should have a button to take a screenshot of the recipe.")
 	@ConfigValue("ui.recipe-screenshot-button")
 	public static boolean recipeScreenshotButton = false;
 
+	@ConfigGroupEnd
 	@Comment("The GUI scale at which recipe screenshots are saved. Use 0 to use the current GUI scale.")
 	@ConfigValue("ui.recipe-screenshot-scale")
 	public static int recipeScreenshotScale = 0;

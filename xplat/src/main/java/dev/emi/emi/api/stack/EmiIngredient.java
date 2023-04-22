@@ -27,6 +27,10 @@ public interface EmiIngredient extends EmiRenderable {
 	public static final int RENDER_INGREDIENT = 4;
 	public static final int RENDER_REMAINDER = 8;
 	
+	/**
+	 * @return The {@link EmiStack}s represented by this ingredient.
+	 * 	List is never empty, for an empty ingredient, return {@link EmiStack#EMPTY}
+	 */
 	List<EmiStack> getEmiStacks();
 
 	default boolean isEmpty() {

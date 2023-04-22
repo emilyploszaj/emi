@@ -17,6 +17,7 @@
     "api.FluidEmiStackMixin",
     "api.ItemEmiStackEntryMixin",
     "api.ItemEmiStackMixin",
+    "api.SlotWidgetMixin",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",

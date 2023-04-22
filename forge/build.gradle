@@ -11,18 +11,18 @@ architectury {
 loom {
 	accessWidenerPath = project(":xplat").loom.accessWidenerPath
 
+	mods {
+		main {
+			sourceSet project(':xplat').sourceSets.main
+		}
+	}
+
 	forge {
 		convertAccessWideners = true
 		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
 		mixinConfig "emi.mixins.json"
 		mixinConfig "emi-forge.mixins.json"
-	}
-
-	mods {
-		main {
-			sourceSet project(':xplat').sourceSets.main
-		}
 	}
 }
 

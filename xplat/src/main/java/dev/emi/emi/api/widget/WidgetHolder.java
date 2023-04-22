@@ -1,6 +1,8 @@
 package dev.emi.emi.api.widget;
 
+import java.util.List;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
@@ -8,6 +10,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.DrawableWidget.DrawableWidgetConsumer;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -63,6 +66,18 @@ public interface WidgetHolder {
 	default ButtonWidget addButton(int x, int y, int width, int height, int u, int v,
 			Identifier texture, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
 		return add(new ButtonWidget(x, y, width, height, u, v, texture, isActive, action));
+	}
+
+	default TooltipWidget addTooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier, int x, int y, int width, int height) {
+		return new TooltipWidget(tooltipSupplier, x, y, width, height);
+	}
+
+	default TooltipWidget addTooltip(List<TooltipComponent> tooltip, int x, int y, int width, int height) {
+		return addTooltip((mx, my) -> tooltip, x, y, width, height);
+	}
+
+	default TooltipWidget addTooltipText(List<Text> tooltip, int x, int y, int width, int height) {
+		return addTooltip(tooltip.stream().map(Text::asOrderedText).map(TooltipComponent::of).toList(), x, y, width, height);
 	}
 
 	/**

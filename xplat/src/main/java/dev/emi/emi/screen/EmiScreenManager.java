@@ -430,6 +430,19 @@ public class EmiScreenManager {
 		return panels.get(1);
 	}
 
+	public static void toggleSidebarType(SidebarType type) {
+		boolean visible = false;
+		for (SidebarPanel panel : panels) {
+			if (panel.getType() == type) {
+				visible = true;
+				panel.cycleType(1);
+			}
+		}
+		if (!visible) {
+			focusSidebarType(type);
+		}
+	}
+
 	public static List<? extends EmiIngredient> getSearchSource() {
 		return EmiSidebars.getStacks(getSearchPanel().getType());
 	}
@@ -808,7 +821,7 @@ public class EmiScreenManager {
 		}
 		if (isDisabled()) {
 			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
-				toggleVisibility();
+				toggleVisibility(true);
 				return true;
 			}
 			return false;
@@ -911,7 +924,7 @@ public class EmiScreenManager {
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (isDisabled()) {
 			if (EmiConfig.toggleVisibility.matchesKey(keyCode, scanCode)) {
-				toggleVisibility();
+				toggleVisibility(true);
 				return true;
 			}
 			return false;
@@ -954,7 +967,7 @@ public class EmiScreenManager {
 
 	public static boolean genericInteraction(Function<EmiBind, Boolean> function) {
 		if (function.apply(EmiConfig.toggleVisibility)) {
-			toggleVisibility();
+			toggleVisibility(true);
 			return true;
 		}
 		boolean searchBreak = false;
@@ -1084,10 +1097,10 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	private static void toggleVisibility() {
+	public static void toggleVisibility(boolean notify) {
 		EmiConfig.enabled = !EmiConfig.enabled;
 		EmiConfig.writeConfig();
-		if (!EmiConfig.enabled) {
+		if (notify && !EmiConfig.enabled && EmiConfig.showHelp) {
 			client.getToastManager().add(new DisabledToast());
 		}
 	}
@@ -1303,15 +1316,9 @@ public class EmiScreenManager {
 					int scrollLeft = space.tx + 18;
 					int scrollWidth = space.tw * ENTRY_SIZE - 36;
 					int scrollY = space.ty - 4;
-					int start = scrollLeft + scrollWidth * page / totalPages;
-					int end = start + Math.max(scrollWidth / totalPages, 1);
-					if (page == totalPages - 1) {
-						end = scrollLeft + scrollWidth;
-						start = end - Math.max(scrollWidth / totalPages, 1);
-					}
 					DrawableHelper.fill(matrices, scrollLeft, scrollY, scrollLeft + scrollWidth, scrollY + 2,
 							0x55555555);
-					DrawableHelper.fill(matrices, start, scrollY, end, scrollY + 2, 0xFFFFFFFF);
+					EmiRenderHelper.drawScroll(matrices, scrollLeft, scrollY, scrollWidth, 2, page, totalPages, 0xFFFFFFFF);
 				}
 			}
 		}

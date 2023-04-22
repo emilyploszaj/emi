@@ -11,7 +11,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-public class TextureWidget extends Widget {
+public class TextureWidget extends Widget implements WidgetTooltipHolder<TextureWidget> {
 	protected final Identifier texture;
 	protected final int x, y;
 	protected final int width, height;
@@ -39,6 +39,7 @@ public class TextureWidget extends Widget {
 		this(texture, x, y, width, height, u, v, width, height, 256, 256);
 	}
 
+	@Override
 	public TextureWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;

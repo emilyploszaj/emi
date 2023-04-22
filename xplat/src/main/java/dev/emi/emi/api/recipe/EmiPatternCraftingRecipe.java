@@ -34,7 +34,7 @@ public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 		for (int i = 0; i < 9; i++) {
 			widgets.add(getInputWidget(i, i % 3 * 18, i / 3 * 18));
 		}
-		widgets.add(getOutputWidget(92, 14).output(true).recipeContext(this));
+		widgets.add(getOutputWidget(92, 14).large(true).recipeContext(this));
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
@@ -59,6 +60,7 @@ public class ResolutionButtonWidget extends ButtonWidget {
 				u = 36;
 			}
 		}
+		EmiTexture.SLOT.render(matrices, x, y, delta);
 		DrawableHelper.drawTexture(matrices, x, y, u, 128, width, height, 256, 256);
 	}
 }

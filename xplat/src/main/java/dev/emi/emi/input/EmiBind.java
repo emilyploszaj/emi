@@ -52,7 +52,7 @@ public class EmiBind {
 	}
 
 	public boolean isBound() {
-		return boundKeys.size() > 0;
+		return boundKeys.size() > 0 && !boundKeys.get(0).isUnbound();
 	}
 
 	public Text getBindText() {

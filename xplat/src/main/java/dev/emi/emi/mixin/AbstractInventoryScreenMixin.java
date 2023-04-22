@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.config.EffectLocation;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -55,7 +56,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 
 	@Inject(at = @At("HEAD"), method = "drawStatusEffects", cancellable = true)
 	private void drawStatusEffects(MatrixStack matrices, int mouseX, int mouseY, CallbackInfo info) {
-		if (EmiConfig.moveEffects) {
+		if (EmiConfig.effectLocation == EffectLocation.TOP) {
 			if (emi$drawCenteredEffects(matrices, mouseX, mouseY)) {
 				info.cancel();
 			}
@@ -112,15 +113,17 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 	@ModifyVariable(at = @At(value = "STORE", ordinal = 0),
 		method = "drawStatusEffects", ordinal = 0)
 	private boolean squishEffects(boolean original) {
-		return false;
+		return !EmiConfig.effectLocation.compressed;
 	}
 
 	@ModifyVariable(at = @At(value = "STORE", ordinal = 0),
-		method = "drawStatusEffects", ordinal = 3)
+		method = "drawStatusEffects", ordinal = 2)
 	private int changeEffectSpace(int original) {
-		if (!EmiConfig.moveEffects) {
-			return original;
-		}
-		return this.x - 2;
+		return switch (EmiConfig.effectLocation) {
+			case RIGHT, RIGHT_COMPRESSED -> original;
+			case TOP -> this.x;
+			case LEFT_COMPRESSED -> this.x - 2- 32;
+			case LEFT -> this.x - 2 - 120;
+		};
 	}
 }

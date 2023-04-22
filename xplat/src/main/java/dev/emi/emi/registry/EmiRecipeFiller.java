@@ -204,8 +204,17 @@ public class EmiRecipeFiller {
 	public static <T extends ScreenHandler> int batchesAlreadyPresent(EmiRecipe recipe, StandardRecipeHandler<T> handler, HandledScreen<T> screen) {
 		List<EmiIngredient> inputs = recipe.getInputs();
 		List<ItemStack> stacks = Lists.newArrayList();
-		for (Slot slot : handler.getInputSources(screen.getScreenHandler())) {
-			stacks.add(slot.getStack());
+		Slot output = handler.getOutputSlot(screen.getScreenHandler());
+		if (output != null && !output.getStack().isEmpty() && recipe.getOutputs().size() > 0
+				&& !output.getStack().isItemEqual(recipe.getOutputs().get(0).getItemStack())) {
+			return 0;
+		}
+		for (Slot slot : handler.getCraftingSlots(recipe, screen.getScreenHandler())) {
+			if (slot != null) {
+				stacks.add(slot.getStack());
+			} else {
+				stacks.add(ItemStack.EMPTY);
+			}
 		}
 		long amount = Long.MAX_VALUE;
 		outer:

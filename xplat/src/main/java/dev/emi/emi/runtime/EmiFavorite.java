@@ -1,6 +1,5 @@
 package dev.emi.emi.runtime;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
@@ -8,16 +7,20 @@ import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 public class EmiFavorite implements EmiIngredient, Batchable {
 	protected final EmiIngredient stack;
@@ -175,17 +178,29 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			if (state == -1) {
 				return list;
 			}
-			String key = "";
-			if (state == 0) {
-				key = "tooltip.emi.synfav.uncraftable";
-			} else if (state == 1) {
-				key = "tooltip.emi.synfav.partially_craftable";
-			} else if (state == 2) {
-				key = "tooltip.emi.synfav.fully_craftable";
+			
+			Text craftKey = null;
+
+			if (EmiConfig.showHelp && EmiRecipeFiller.getFirstValidHandler(recipe, EmiApi.getHandledScreen()) != null) {
+				if (EmiConfig.craftAllToInventory.isBound()) {
+					craftKey = EmiConfig.craftAllToInventory.getBindText();
+				} else if (EmiConfig.craftAll.isBound()) {
+					craftKey = EmiConfig.craftAll.getBindText();
+				}
 			}
-			list.addAll(Arrays
-					.stream(I18n.translate(key, batches).split("\n"))
-					.map(s -> TooltipComponent.of(EmiPort.ordered(EmiPort.literal(s)))).toList());
+			if (state == 0) {
+				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.uncraftable").asOrderedText()));
+			} else if (state == 1) {
+				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.partially_craftable").asOrderedText()));
+				if (craftKey != null) {
+					list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.craft_some", craftKey).asOrderedText()));
+				}
+			} else if (state == 2) {
+				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.fully_craftable", batches).asOrderedText()));
+				if (craftKey != null) {
+					list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.craft_all", craftKey, batches).asOrderedText()));
+				}
+			}
 			return list;
 		}
 

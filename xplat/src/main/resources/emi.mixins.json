@@ -21,6 +21,7 @@
     "KeyboardMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "RecipeBookWidgetMixin",
     "ScreenMixin",
     "ToastManagerMixin"
   ],

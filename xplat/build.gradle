@@ -6,8 +6,18 @@ loom {
 	accessWidenerPath = file("src/main/resources/emi.accesswidener")
 }
 
+repositories {
+	maven {
+		url = "https://maven.blamejared.com/"
+	}
+}
+
 dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+	
+	modCompileOnly("mezz.jei:jei-1.19.3-fabric:12.3.0.21") {
+		transitive = false
+	}
 }
 
 afterEvaluate {
