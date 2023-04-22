@@ -1,0 +1,7 @@
+{
+  "parent": "emi:item/half_item",
+  "textures": {
+    "first": "minecraft:block/white_stained_glass",
+    "second": "minecraft:block/black_stained_glass"
+  }
+}
