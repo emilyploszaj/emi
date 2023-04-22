@@ -655,6 +655,9 @@ public class VanillaPlugin implements EmiPlugin {
 				continue;
 			}
 			Item base = items.get(0);
+			if (!stacks.contains(base)) {
+				continue;
+			}
 			for (int i = 1; i < items.size(); i++) {
 				Item item = items.get(i);
 				if (!stacks.contains(item) || comparator.compare(base, item) != 0) {
