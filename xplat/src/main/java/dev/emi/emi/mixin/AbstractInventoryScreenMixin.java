@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EffectLocation;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
@@ -105,7 +106,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		}
 		if (hovered != null && size > 1) {
 			List<Text> list = List.of(this.getStatusEffectDescription(hovered),
-				StatusEffectUtil.durationToString(hovered, 1.0f));
+				EmiPort.literal(StatusEffectUtil.durationToString(hovered, 1.0f)));
 			this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
 		}
 		return true;

@@ -38,13 +38,13 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 	}
 
 	@Intrinsic @Override
-	public void renderBackground(MatrixStack matrices, int vOffset) {
-		super.renderBackground(matrices, vOffset);
+	public void renderBackground(MatrixStack matrices) {
+		super.renderBackground(matrices);
 	}
 
 	@Dynamic
-	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;I)V")
-	private void renderBackground(MatrixStack matrices, int vOffset, CallbackInfo info) {
+	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V")
+	private void renderBackground(MatrixStack matrices, CallbackInfo info) {
 		Window window = client.getWindow();
 		int mouseX = (int) (client.mouse.getX() * window.getScaledWidth() / window.getWidth());
 		int mouseY = (int) (client.mouse.getY() * window.getScaledHeight() / window.getHeight());
