@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "emi",
+  "version": "${version}",
+  "name": "EMI",
+  "description": "A featureful and accessible item and recipe viewer",
+  "authors": [
+    "Emi"
+  ],
+  "contributors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/emi/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.emi.emi.platform.fabric.EmiMainFabric"
+    ],
+    "client": [
+      "dev.emi.emi.platform.fabric.EmiClientFabric"
+    ],
+    "server": [],
+    "emi": [
+      "dev.emi.emi.VanillaPlugin"
+    ],
+    "modmenu": [
+      "dev.emi.emi.compat.EmiModMenu"
+    ],
+    "jei_mod_plugin": [
+      "dev.emi.emi.jemi.JemiPlugin"
+    ]
+  },
+  "mixins": [
+    "emi.mixins.json",
+    "emi-fabric.mixins.json"
+  ],
+  "accessWidener" : "emi.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.13.1",
+    "fabric": "*"
+  }
+}

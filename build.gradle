@@ -1,174 +1,48 @@
-buildscript {
-	repositories {
-		mavenCentral()
-		gradlePluginPortal()
-	}
-	dependencies {
-		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
-		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
-	}
-}
-
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
-	id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
-	id 'maven-publish'
+	id "architectury-plugin" version "3.4-SNAPSHOT"
+	id "dev.architectury.loom" version "1.1-SNAPSHOT" apply false
 }
 
-if (System.getenv("MODRINTH_TOKEN")) {
-	apply plugin: "com.modrinth.minotaur"
-}
-if (System.getenv("CURSEFORGE_TOKEN")) {
-	apply plugin: "com.matthewprenger.cursegradle"
+architectury {
+	minecraft = rootProject.minecraft_version
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+subprojects {
+	apply plugin: "dev.architectury.loom"
 
-archivesBaseName = project.archives_base_name
-version = "${project.mod_version}+${project.platform_version}"
-group = project.maven_group
-
-loom {
-	accessWidenerPath = file("src/main/resources/emi.accesswidener")
-}
-
-quiltflower {
-	quiltflowerVersion.set("1.8.0")
-}
-
-repositories {
-	maven {
-		url = "https://maven.terraformersmc.com/"
+	dependencies {
+		minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+		mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
 	}
 }
 
-dependencies {
-	//to change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+allprojects {
+	apply plugin: "java"
+	apply plugin: "architectury-plugin"
+	apply plugin: "maven-publish"
 
-	modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	modLocalRuntime "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	modCompileOnly "com.terraformersmc:modmenu:5.0.0-alpha.4"
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	architectury {
+		compileOnly()
 	}
-}
 
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
+	archivesBaseName = rootProject.archives_base_name
+	version = rootProject.mod_version
+	group = rootProject.maven_group
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
-}
-
-task apiJar(type: Jar) {
-	classifier = "api"
-	dependsOn remapJar
-	from zipTree(remapJar.archivePath)
-	include 'fabric.mod.json'
-	include 'emi.mixins.json'
-	include 'emi.accesswidener'
-	include 'dev/emi/emi/api/**'
-}
-
-task apiSourcesJar(type: Jar) {
-	classifier = "api-sources"
-	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.archivePath)
-	include 'fabric.mod.json'
-	include 'emi.mixins.json'
-	include 'emi.accesswidener'
-	include 'dev/emi/emi/api/**'
-}
-
-build.dependsOn apiJar
-build.dependsOn apiSourcesJar
-
-jar {
-	from "LICENSE"
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			artifact remapJar
-			artifact remapSourcesJar
-			artifact apiJar
-			artifact apiSourcesJar
-		}
+	repositories {
+		// Add repositories to retrieve artifacts from in here.
+		// You should only use this when depending on other mods because
+		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+		// for more information about repositories.
 	}
-	setupRepositories(repositories)
-}
 
-void setupRepositories(RepositoryHandler repositories) {
-	if (project.hasProperty("mavenUrl")) {
-		repositories.maven {
-			url project.mavenUrl
-			credentials {
-				username project.mavenUsername
-				password project.mavenPassword
-			}
-		}
+	tasks.withType(JavaCompile) {
+		options.encoding = "UTF-8"
+		options.release = 17
 	}
-}
 
-if (System.getenv("MODRINTH_TOKEN")) {
-	modrinth {
-		token = System.getenv("MODRINTH_TOKEN")
-		projectId = 'emi'
-		versionNumber = project.version
-		versionName = project.version
-		versionType = 'release'
-		uploadFile = remapJar
-		gameVersions = [project.platform_version]
-		loaders = ['fabric', 'quilt']
-		detectLoaders = false
-		changelog = file('CHANGELOG.md').text
-		/*
-		dependencies {
-			required.project 'fabric-api'
-			required.project 'qsl'
-		}*/
-	}
-}
-
-if (System.getenv("CURSEFORGE_TOKEN")) {
-	curseforge {
-		apiKey = System.getenv("CURSEFORGE_TOKEN")
-		project {
-			id = '580555'
-			releaseType = 'release'
-			changelogType = 'markdown'
-			changelog = file('CHANGELOG.md')
-
-			addGameVersion project.platform_version
-			addGameVersion 'Fabric'
-			addGameVersion 'Quilt'
-
-			mainArtifact(remapJar) {
-				displayName = 'emi-' + project.version
-			}
-			/*
-			relations {
-				//requiredDependency 'fabric-api'
-				//requiredDependency 'qsl'
-			}*/
-		}
-		options {
-			javaIntegration = false
-			forgeGradleIntegration = false
-			javaVersionAutoDetect = false
-		}
+	java {
+		withSourcesJar()
 	}
 }
