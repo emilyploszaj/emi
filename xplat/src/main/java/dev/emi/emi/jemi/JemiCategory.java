@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.MinecraftClient;
@@ -16,7 +17,7 @@ public class JemiCategory extends EmiRecipeCategory {
 			} else {
 				MinecraftClient client = MinecraftClient.getInstance();
 				String title = category.getTitle().getString();
-				DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer, title.substring(0, Math.min(2, title.length())), x + 8, y + 2, -1);
+				DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer, EmiPort.literal(title.substring(0, Math.min(2, title.length()))), x + 8, y + 2, -1);
 			}
 		});
 		this.category = category;
