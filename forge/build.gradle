@@ -8,6 +8,8 @@ architectury {
 	forge()
 }
 
+version = "${project.mod_version}+${project.minecraft_version}+forge"
+
 loom {
 	accessWidenerPath = project(":xplat").loom.accessWidenerPath
 

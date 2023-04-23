@@ -3,9 +3,6 @@ package dev.emi.emi.api.stack;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -105,44 +102,7 @@ public interface EmiIngredient extends EmiRenderable {
 		if (ingredient == null) {
 			return EmiStack.EMPTY;
 		}
-		List<Item> items = Arrays.stream(ingredient.getMatchingStacks())
-			.filter(s -> !s.isEmpty())
-			.map(i -> i.getItem())
-			.distinct()
-			.collect(Collectors.toList());
-		if (items.size() == 0) {
-			return EmiStack.EMPTY;
-		} else if (items.size() == 1) {
-			return EmiStack.of(ingredient.getMatchingStacks()[0], amount);
-		}
-		List<TagKey<Item>> keys = Lists.newArrayList();
-		for (TagKey<Item> key : EmiTags.itemTags) {
-			List<Item> values = EmiUtil.values(key).map(i -> i.value()).toList();
-			if (values.size() < 2) {
-				continue;
-			}
-			if (items.containsAll(values)) {
-				items.removeAll(values);
-				keys.add(key);
-			}
-			if (items.size() == 0) {
-				break;
-			}
-		}
-		if (keys.isEmpty()) {
-			return new ListEmiIngredient(Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList(), amount);
-		} else if (items.isEmpty()) {
-			if (keys.size() == 1) {
-				return new TagEmiIngredient(keys.get(0), amount);
-			} else {
-				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList(), amount);
-			}
-		} else {
-			return new ListEmiIngredient(List.of(items.stream().map(ItemStack::new).map(EmiStack::of).toList(),
-					keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList())
-				.stream().flatMap(a -> a.stream()).toList(), amount);
-		}
-
+		return EmiTags.getIngredient(Arrays.asList(ingredient.getMatchingStacks()), amount);
 	}
 
 	public static EmiIngredient of(List<? extends EmiIngredient> list) {
@@ -171,12 +131,12 @@ public interface EmiIngredient extends EmiRenderable {
 			}
 			for (EmiIngredient i : list) {
 				for (EmiStack s : i.getEmiStacks()) {
-					if (!(s.getKey() instanceof Item)) {
+					if (!s.isEmpty() && !(s.getKey() instanceof Item)) {
 						return new ListEmiIngredient(list, amount);
 					}
 				}
 			}
-			return EmiIngredient.of(Ingredient.ofStacks(list.stream().flatMap(i -> i.getEmiStacks().stream().map(s -> s.getItemStack()))), amount);
+			return EmiTags.getIngredient(list.stream().flatMap(i -> i.getEmiStacks().stream()).map(EmiStack::getItemStack).toList(), amount);
 		}
 	}
 }
