@@ -94,7 +94,12 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		for (IRecipeCategory<?> c : categories) {
 			Identifier id = c.getRecipeType().getUid();
 			if (c.getRecipeType() == RecipeTypes.INFORMATION) {
-				addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
+				try {
+					addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+				continue;
 			}
 			if (handledNamespaces.contains(id.getNamespace())) {
 				EmiLog.info("[JEMI] Skipping recipe category " + id + " because mod is already handled");

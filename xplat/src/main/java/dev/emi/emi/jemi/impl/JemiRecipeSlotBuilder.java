@@ -85,13 +85,15 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	@Override
 	public IRecipeSlotBuilder setFluidRenderer(long capacity, boolean showCapacity, int width, int height) {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setFluidRenderer'");
+		float f;
+		return this;
 	}
 
 	@Override
 	public <T> IRecipeSlotBuilder setCustomRenderer(IIngredientType<T> ingredientType,
 			IIngredientRenderer<T> ingredientRenderer) {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setCustomRenderer'");
+		float f;
+		return this;
 	}
 }

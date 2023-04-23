@@ -14,6 +14,10 @@ import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.ListEmiIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.platform.EmiClient;
@@ -21,6 +25,7 @@ import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
@@ -30,6 +35,47 @@ import net.minecraft.util.registry.RegistryEntry;
 public class EmiTags {
 	private static final Set<Identifier> MODELED_TAGS = Sets.newHashSet();
 	public static List<TagKey<Item>> itemTags = List.of();
+
+	public static EmiIngredient getIngredient(List<ItemStack> stacks, long amount) {
+		Map<Item, ItemStack> map = Maps.newHashMap();
+		for (ItemStack stack : stacks) {
+			if (!stack.isEmpty()) {
+				map.put(stack.getItem(), stack);
+			}
+		}
+		if (map.size() == 0) {
+			return EmiStack.EMPTY;
+		} else if (map.size() == 1) {
+			return EmiStack.of(map.values().stream().toList().get(0), amount);
+		}
+		List<TagKey<Item>> keys = Lists.newArrayList();
+		for (TagKey<Item> key : EmiTags.itemTags) {
+			List<Item> values = EmiUtil.values(key).map(i -> i.value()).toList();
+			if (values.size() < 2) {
+				continue;
+			}
+			if (map.keySet().containsAll(values)) {
+				map.keySet().removeAll(values);
+				keys.add(key);
+			}
+			if (map.isEmpty()) {
+				break;
+			}
+		}
+		if (keys.isEmpty()) {
+			return new ListEmiIngredient(stacks.stream().map(EmiStack::of).toList(), amount);
+		} else if (map.isEmpty()) {
+			if (keys.size() == 1) {
+				return new TagEmiIngredient(keys.get(0), amount);
+			} else {
+				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList(), amount);
+			}
+		} else {
+			return new ListEmiIngredient(List.of(map.values().stream().map(EmiStack::of).toList(),
+					keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList())
+				.stream().flatMap(a -> a.stream()).toList(), amount);
+		}
+	}
 
 	public static Text getTagName(TagKey<Item> key) {
 		String s = getTagTranslationKey(key);
