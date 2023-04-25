@@ -15,7 +15,7 @@ repositories {
 dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 	
-	modCompileOnly("mezz.jei:jei-1.19.3-fabric:12.3.0.21") {
+	modCompileOnly("mezz.jei:jei-1.19.2-fabric:11.6.0.1015") {
 		transitive = false
 	}
 }
