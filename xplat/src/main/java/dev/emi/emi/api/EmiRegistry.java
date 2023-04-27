@@ -9,6 +9,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.ScreenHandler;
@@ -86,6 +87,12 @@ public interface EmiRegistry {
 	default void removeEmiStacks(EmiStack stack) {
 		removeEmiStacks(s -> s.equals(stack));
 	}
+
+	/**
+	 * Adds a serializer for a given type of ingredient.
+	 * This will allow it to be favorited, among other things.
+	 */
+	<T extends EmiIngredient> void addIngredientSerializer(Class<T> clazz, EmiIngredientSerializer<T> serializer);
 
 	/**
 	 * Adds an EmiExclusionArea to screens of a given class.

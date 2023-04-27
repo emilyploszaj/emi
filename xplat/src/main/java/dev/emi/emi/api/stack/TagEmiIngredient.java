@@ -33,6 +33,7 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+@ApiStatus.Internal
 public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;

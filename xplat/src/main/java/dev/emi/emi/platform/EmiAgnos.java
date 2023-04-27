@@ -4,11 +4,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
@@ -25,6 +27,12 @@ public abstract class EmiAgnos {
 		} catch (Throwable t) {
 		}
 	}
+
+	public static boolean isForge() {
+		return delegate.isForgeAgnos();
+	}
+
+	protected abstract boolean isForgeAgnos();
 
 	public static String getModName(String namespace) {
 		return delegate.getModNameAgnos(namespace);
@@ -92,9 +100,15 @@ public abstract class EmiAgnos {
 
 	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta);
 
-	public static boolean canBatch(Item item) {
-		return delegate.canBatchAgnos(item);
+	public static EmiStack createFluidStack(Object object) {
+		return delegate.createFluidStackAgnos(object);
+	}
+
+	protected abstract EmiStack createFluidStackAgnos(Object object);
+
+	public static boolean canBatch(ItemStack stack) {
+		return delegate.canBatchAgnos(stack);
 	}
 	
-	protected abstract boolean canBatchAgnos(Item item);
+	protected abstract boolean canBatchAgnos(ItemStack stack);
 }

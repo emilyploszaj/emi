@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
@@ -39,6 +40,11 @@ import net.minecraft.util.Identifier;
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
 		EmiAgnos.delegate = new EmiAgnosFabric();
+	}
+
+	@Override
+	protected boolean isForgeAgnos() {
+		return false;
 	}
 
 	@Override
@@ -160,7 +166,12 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected boolean canBatchAgnos(Item item) {
-		return ColorProviderRegistry.ITEM.get(item) == null;
+	protected EmiStack createFluidStackAgnos(Object object) {
+		return JemiUtil.getFluidFromJei(object);
+	}
+
+	@Override
+	protected boolean canBatchAgnos(ItemStack stack) {
+		return ColorProviderRegistry.ITEM.get(stack.getItem()) == null;
 	}
 }

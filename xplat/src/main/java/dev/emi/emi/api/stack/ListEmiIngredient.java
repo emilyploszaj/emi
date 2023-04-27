@@ -12,6 +12,7 @@ import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 
+@ApiStatus.Internal
 public class ListEmiIngredient implements EmiIngredient {
 	private final List<? extends EmiIngredient> ingredients;
 	private final List<EmiStack> fullList;

@@ -40,6 +40,9 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.api.stack.ItemEmiStack;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.config.EffectLocation;
@@ -80,6 +83,9 @@ import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
+import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
+import dev.emi.emi.stack.serializer.TagEmiIngredientSerializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -189,6 +195,10 @@ public class VanillaPlugin implements EmiPlugin {
 
 	@Override
 	public void register(EmiRegistry registry) {
+		registry.addIngredientSerializer(ItemEmiStack.class, new ItemEmiStackSerializer());
+		registry.addIngredientSerializer(FluidEmiStack.class, new FluidEmiStackSerializer());
+		registry.addIngredientSerializer(TagEmiIngredient.class, new TagEmiIngredientSerializer());
+
 		registry.addCategory(CRAFTING);
 		registry.addCategory(SMELTING);
 		registry.addCategory(BLASTING);

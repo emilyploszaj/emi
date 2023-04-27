@@ -11,10 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.registry.EmiStackSerializer;
 import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -51,18 +48,17 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<List<
 								for (JsonElement entry : el.getAsJsonArray()) {
 									defaults.add(new RecipeDefault(new Identifier(entry.getAsString()), null));
 								}
-							}
-						} else if (el.isJsonObject()) {
-							Identifier kid = new Identifier(key);
+							} // TODO per stack defaults
+						} /* else if (el.isJsonObject()) {
 							JsonObject object = el.getAsJsonObject();
 							for (Entry<String, JsonElement> entry : object.entrySet()) {
 								Identifier recipe = new Identifier(entry.getKey());
-								EmiIngredient stack = EmiStackSerializer.deserialize(kid, object);
+								EmiIngredient stack = EmiIngredientSerializer.getDeserialized(object);
 								for (EmiStack es : stack.getEmiStacks()) {
 									defaults.add(new RecipeDefault(recipe, es));
 								}
 							}
-						}
+						}*/
 					}
 				}
 			} catch (Exception e) {
