@@ -15,6 +15,7 @@ import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.registry.EmiDragDropHandlers;
 import dev.emi.emi.registry.EmiExclusionAreas;
+import dev.emi.emi.registry.EmiIngredientSerializers;
 import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
@@ -97,6 +98,7 @@ public class EmiReloadManager {
 					step(EmiPort.literal("Clearing data"));
 					EmiRecipes.clear();
 					EmiStackList.clear();
+					EmiIngredientSerializers.clear();
 					EmiExclusionAreas.clear();
 					EmiDragDropHandlers.clear();
 					EmiStackProviders.clear();
@@ -172,8 +174,8 @@ public class EmiReloadManager {
 					BoM.reload();
 					EmiPersistentData.load();
 					EmiSearch.bake();
-					// Update search
 					EmiScreenManager.search.update();
+					EmiScreenManager.recalculate();
 					EmiReloadLog.bake();
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 					status = 2;

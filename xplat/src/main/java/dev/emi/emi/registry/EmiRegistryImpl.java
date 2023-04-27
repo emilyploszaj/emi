@@ -16,6 +16,7 @@ import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -80,6 +81,12 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void removeEmiStacks(Predicate<EmiStack> predicate) {
 		EmiStackList.invalidators.add(predicate);
+	}
+
+	@Override
+	public <T extends EmiIngredient> void addIngredientSerializer(Class<T> clazz, EmiIngredientSerializer<T> serializer) {
+		EmiIngredientSerializers.BY_CLASS.put(clazz, serializer);
+		EmiIngredientSerializers.BY_TYPE.put(serializer.getType(), serializer);
 	}
 
 	@Override

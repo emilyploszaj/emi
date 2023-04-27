@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -83,11 +82,14 @@ public class MouseMixin {
 
 	@Inject(at = @At(value = "INVOKE", target =
 			"net/minecraft/client/gui/screen/Screen.mouseScrolled(DDD)Z"),
-		method = "onMouseScroll(JDD)V", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
-	private void onMouseScrolled(long window, double x, double y, CallbackInfo info, double amount, double mx, double my) {
+		method = "onMouseScroll(JDD)V", cancellable = true)
+	private void onMouseScrolled(long window, double horizontal, double vertical, CallbackInfo info) {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?> hs) {
+				double amount = (client.options.getDiscreteMouseScroll().getValue() ? Math.signum(vertical) : vertical) * client.options.getMouseWheelSensitivity().getValue();
+				double mx = x * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
+				double my = y * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
 				if (EmiScreenManager.mouseScrolled(mx, my, amount)) {
 					info.cancel();
 				}

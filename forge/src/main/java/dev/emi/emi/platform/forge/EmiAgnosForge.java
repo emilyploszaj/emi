@@ -19,6 +19,9 @@ import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BasicBakedModel;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
@@ -43,6 +46,11 @@ import net.minecraftforge.fml.loading.FMLLoader;
 public class EmiAgnosForge extends EmiAgnos {
 	static {
 		EmiAgnos.delegate = new EmiAgnosForge();
+	}
+
+	@Override
+	protected boolean isForgeAgnos() {
+		return true;
 	}
 
 	@Override
@@ -150,7 +158,7 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
-		return List.of();
+		return List.of(getFluidName(fluid, nbt));
 	}
 
 	@Override
@@ -165,8 +173,18 @@ public class EmiAgnosForge extends EmiAgnos {
 	}
 
 	@Override
-	protected boolean canBatchAgnos(Item item) {
-		// TODO Auto-generated method stub
-		return true;
+	protected EmiStack createFluidStackAgnos(Object object) {
+		if (object instanceof FluidStack f) {
+			return EmiStack.of(f.getFluid(), f.getTag(), f.getAmount());
+		}
+		return EmiStack.EMPTY;
+	}
+
+	@Override
+	protected boolean canBatchAgnos(ItemStack stack) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		ItemRenderer ir = client.getItemRenderer();
+		BakedModel model = ir.getModel(stack, null, null, 0);
+		return model != null && model.getClass() == BasicBakedModel.class;
 	}
 }
