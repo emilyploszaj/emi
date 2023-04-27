@@ -1,12 +1,13 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.platform.EmiAgnos;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
 import net.minecraft.text.Text;
 
 public enum FluidUnit implements ConfigEnum {
-	LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters", (int) (a / 81))),
-	MILLIBUCKETS("millibuckets", a -> EmiPort.translatable("emi.fluid.amount.millibuckets", (int) (a / 81))),
+	LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters", (int) (a / literDivisor()))),
+	MILLIBUCKETS("millibuckets", a -> EmiPort.translatable("emi.fluid.amount.millibuckets", (int) (a / literDivisor()))),
 	DROPLETS("droplets", a -> EmiPort.translatable("emi.fluid.amount.droplets", (int) a)),
 	;
 
@@ -18,6 +19,14 @@ public enum FluidUnit implements ConfigEnum {
 		this.name = name;
 		translation = EmiPort.translatable("emi.unit." + name);
 		this.translator = translator;
+	}
+
+	private static int literDivisor() {
+		if (EmiAgnos.isForge()) {
+			return 1;
+		} else {
+			return 81;
+		}
 	}
 
 	@Override

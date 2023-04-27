@@ -2,6 +2,8 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,6 +13,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+@ApiStatus.Internal
 public class EmptyEmiStack extends EmiStack {
 	private static final Identifier ID = new Identifier("emi", "empty");
 

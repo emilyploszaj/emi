@@ -2,6 +2,7 @@ package dev.emi.emi.search;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,8 @@ public class EmiSearch {
 				}
 			}
 		}
-		for (EmiAlias alias : EmiData.aliases) {
+		for (Supplier<EmiAlias> supplier : EmiData.aliases) {
+			EmiAlias alias = supplier.get();
 			for (String key : alias.keys()) {
 				if (!I18n.hasTranslation(key)) {
 					EmiReloadLog.warn("Untranslated alias " + key);

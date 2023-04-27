@@ -2,6 +2,8 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -25,6 +27,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+@ApiStatus.Internal
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 	private final ItemStack stack;
@@ -43,6 +46,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public ItemStack getItemStack() {
+		stack.setCount((int) amount);
 		return stack;
 	}
 
@@ -103,7 +107,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || stack.isDamaged() || !EmiAgnos.canBatch(stack.getItem())
+		return unbatchable || stack.hasGlint() || stack.isDamaged() || !EmiAgnos.canBatch(stack)
 			|| client.getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	

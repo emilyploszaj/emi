@@ -68,11 +68,11 @@ public class EmiTags {
 			if (keys.size() == 1) {
 				return new TagEmiIngredient(keys.get(0), amount);
 			} else {
-				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList(), amount);
+				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList(), amount);
 			}
 		} else {
-			return new ListEmiIngredient(List.of(map.values().stream().map(EmiStack::of).toList(),
-					keys.stream().map(k -> new TagEmiIngredient(k, amount)).toList())
+			return new ListEmiIngredient(List.of(map.values().stream().map(i -> EmiStack.of(i, 1)).toList(),
+					keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList())
 				.stream().flatMap(a -> a.stream()).toList(), amount);
 		}
 	}

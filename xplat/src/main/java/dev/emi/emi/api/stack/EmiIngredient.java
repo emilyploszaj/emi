@@ -123,11 +123,7 @@ public interface EmiIngredient extends EmiRenderable {
 			}
 			if (internalAmount > 1) {
 				amount = internalAmount;
-				for (EmiIngredient i : list) {
-					if (i instanceof EmiStack s) {
-						s.setAmount(1);
-					}
-				}
+				list = list.stream().map(st -> st.copy().setAmount(1)).toList();
 			}
 			for (EmiIngredient i : list) {
 				for (EmiStack s : i.getEmiStacks()) {

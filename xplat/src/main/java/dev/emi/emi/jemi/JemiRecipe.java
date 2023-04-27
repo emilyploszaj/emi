@@ -7,11 +7,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
@@ -29,6 +31,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 	public List<EmiIngredient> catalysts = Lists.newArrayList();
 	public List<EmiStack> outputs = Lists.newArrayList();
 	public EmiRecipeCategory recipeCategory;
+	public Identifier id;
 	public IRecipeCategory<T> category;
 	public T recipe;
 	public JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
@@ -38,15 +41,19 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.recipeCategory = recipeCategory;
 		this.category = category;
 		this.recipe = recipe;
+		Identifier id = category.getRegistryName(recipe);
+		if (id != null) {
+			this.id = new Identifier("jei", "/" + EmiUtil.subId(id));
+		}
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiIngredientAcceptor acceptor : builder.ingredients) {
+			EmiIngredient stack = acceptor.build();
 			if (acceptor.role == RecipeIngredientRole.INPUT) {
-				inputs.add(acceptor.build());
+				inputs.add(stack);
 			} else if (acceptor.role == RecipeIngredientRole.CATALYST) {
-				catalysts.add(acceptor.build());
+				catalysts.add(stack);
 			} else if (acceptor.role == RecipeIngredientRole.OUTPUT) {
-				EmiIngredient stack = acceptor.build();
-				if (stack.getEmiStacks().size() != 1) {
+				if (stack.getEmiStacks().size() > 1) {
 					allowTree = false;
 				}
 				outputs.addAll(stack.getEmiStacks());
@@ -61,7 +68,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 
 	@Override
 	public @Nullable Identifier getId() {
-		return category.getRegistryName(recipe);
+		return id;
 	}
 
 	@Override

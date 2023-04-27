@@ -92,38 +92,42 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 		List<IRecipeCategory<?>> categories = runtime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().toList();
 		for (IRecipeCategory<?> c : categories) {
-			Identifier id = c.getRecipeType().getUid();
-			if (c.getRecipeType() == RecipeTypes.INFORMATION) {
-				try {
-					addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
-				} catch (Throwable t) {
-					t.printStackTrace();
+			try {
+				Identifier id = c.getRecipeType().getUid();
+				if (c.getRecipeType() == RecipeTypes.INFORMATION) {
+					try {
+						addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+					continue;
 				}
-				continue;
-			}
-			if (handledNamespaces.contains(id.getNamespace())) {
-				EmiLog.info("[JEMI] Skipping recipe category " + id + " because mod is already handled");
-				continue;
-			}
-			if (existingCategories.contains(id)) {
-				EmiLog.info("[JEMI] Skipping recipe category " + id + " because native EMI recipe category already exists");
-				continue;
-			}
-			EmiRecipeCategory category = new JemiCategory(c);
-			registry.addCategory(category);
-			List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(c.getRecipeType()).includeHidden().get().map(JemiUtil::getStack).toList();
-			for (EmiStack catalyst : catalysts) {
-				if (!catalyst.isEmpty()) {
-					registry.addWorkstation(category, catalyst);
+				if (handledNamespaces.contains(id.getNamespace())) {
+					EmiLog.info("[JEMI] Skipping recipe category " + id + " because mod is already handled");
+					continue;
 				}
-			}
-			List<?> recipes = runtime.getRecipeManager().createRecipeLookup(c.getRecipeType()).includeHidden().get().toList();
-			for (Object r : recipes) {
-				try {
-					registry.addRecipe(new JemiRecipe(category, c, r));
-				} catch (Throwable t) {
-					t.printStackTrace();
+				if (existingCategories.contains(id)) {
+					EmiLog.info("[JEMI] Skipping recipe category " + id + " because native EMI recipe category already exists");
+					continue;
 				}
+				EmiRecipeCategory category = new JemiCategory(c);
+				registry.addCategory(category);
+				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(c.getRecipeType()).includeHidden().get().map(JemiUtil::getStack).toList();
+				for (EmiStack catalyst : catalysts) {
+					if (!catalyst.isEmpty()) {
+						registry.addWorkstation(category, catalyst);
+					}
+				}
+				List<?> recipes = runtime.getRecipeManager().createRecipeLookup(c.getRecipeType()).includeHidden().get().toList();
+				for (Object r : recipes) {
+					try {
+						registry.addRecipe(new JemiRecipe(category, c, r));
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+				}
+			} catch(Throwable t) {
+				t.printStackTrace();
 			}
 		}
 	}

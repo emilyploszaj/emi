@@ -18,12 +18,12 @@ import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.registry.EmiRecipes;
-import dev.emi.emi.registry.EmiStackSerializer;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.util.Identifier;
@@ -37,7 +37,7 @@ public class EmiFavorites {
 	public static JsonArray save() {
 		JsonArray arr = new JsonArray();
 		for (EmiFavorite fav : favorites) {
-			JsonObject stack = EmiStackSerializer.serialize(fav.getStack());
+			JsonElement stack = EmiIngredientSerializer.getSerialized(fav.getStack());
 			if (stack != null) {
 				JsonObject obj = new JsonObject();
 				obj.add("stack", stack);
@@ -59,8 +59,8 @@ public class EmiFavorites {
 				if (JsonHelper.hasString(json, "recipe")) {
 					recipe = EmiRecipes.byId.get(new Identifier(JsonHelper.getString(json, "recipe")));
 				}
-				if (JsonHelper.hasJsonObject(json, "stack")) {
-					EmiIngredient ingredient = EmiStackSerializer.deserialize(JsonHelper.getObject(json, "stack"));
+				if (JsonHelper.hasElement(json, "stack")) {
+					EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack"));
 					if (ingredient.isEmpty()) {
 						continue;
 					}
@@ -113,7 +113,7 @@ public class EmiFavorites {
 			}
 			favorite = fav;
 		} else {
-			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
+			stack = EmiIngredientSerializer.getDeserialized(EmiIngredientSerializer.getSerialized(stack));
 			if (stack.isEmpty()) {
 				return;
 			}
@@ -148,7 +148,7 @@ public class EmiFavorites {
 				favorites.add(f);
 			}
 		} else {
-			stack = EmiStackSerializer.deserialize(EmiStackSerializer.serialize(stack));
+			stack = EmiIngredientSerializer.getDeserialized(EmiIngredientSerializer.getSerialized(stack));
 			if (stack instanceof EmiStack es) {
 				es = es.copy();
 				if (context == null && es instanceof ItemEmiStack ies) {

@@ -2,6 +2,7 @@ package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 
@@ -78,7 +79,8 @@ public class EmiStackList {
 			}
 			return false;
 		});
-		for (IndexStackData ssd : EmiData.stackData) {
+		for (Supplier<IndexStackData> supplier : EmiData.stackData) {
+			IndexStackData ssd = supplier.get();
 			if (!ssd.removed().isEmpty()) {
 				stacks.removeIf(s -> {
 					for (EmiIngredient invalidator : ssd.removed()) {

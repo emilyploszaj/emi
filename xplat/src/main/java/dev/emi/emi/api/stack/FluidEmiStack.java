@@ -3,6 +3,7 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
@@ -18,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+@ApiStatus.Internal
 public class FluidEmiStack extends EmiStack {
 	private final Fluid fluid;
 	private final NbtCompound nbt;

@@ -10,11 +10,11 @@ import com.google.gson.JsonObject;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
-import dev.emi.emi.registry.EmiStackSerializer;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -68,7 +68,7 @@ public class EmiSidebars {
 				break;
 			}
 			EmiIngredient stack = lookupHistory.get(i);
-			arr.add(EmiStackSerializer.serialize(stack));
+			arr.add(EmiIngredientSerializer.getSerialized(stack));
 		}
 		json.add("lookup_history", arr);
 
@@ -90,7 +90,7 @@ public class EmiSidebars {
 		lookupHistory.clear();
 		if (JsonHelper.hasArray(json, "lookup_history")) {
 			for (JsonElement el : JsonHelper.getArray(json, "lookup_history")) {
-				EmiIngredient stack = EmiStackSerializer.deserialize(el);
+				EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
 				if (!stack.isEmpty()) {
 					lookupHistory.add(stack);
 				}
