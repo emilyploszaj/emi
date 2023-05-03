@@ -1,11 +1,15 @@
 package dev.emi.emi.platform.forge;
 
+import java.util.Arrays;
+
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ForgeRenderTypes;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,6 +21,7 @@ public class EmiClientForge {
 	
 	@SubscribeEvent
 	public static void clientInit(FMLClientSetupEvent event) {
+		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(ForgeRenderTypes.values()).map(f -> f.get()).toList());
 		EmiClient.init();
 		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.sendToServer(packet));
 	}

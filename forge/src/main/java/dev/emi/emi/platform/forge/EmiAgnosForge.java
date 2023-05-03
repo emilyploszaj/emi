@@ -2,6 +2,7 @@ package dev.emi.emi.platform.forge;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -18,6 +19,8 @@ import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
@@ -37,6 +40,7 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -186,5 +190,17 @@ public class EmiAgnosForge extends EmiAgnos {
 		ItemRenderer ir = client.getItemRenderer();
 		BakedModel model = ir.getModel(stack, null, null, 0);
 		return model != null && model.getClass() == BasicBakedModel.class;
+	}
+
+	@Override
+	protected Map<Item, Integer> getFuelMapAgnos() {
+		Object2IntMap<Item> fuelMap = new Object2IntOpenHashMap<>();
+		for (Item item : EmiPort.getItemRegistry()) {
+			int time = ForgeHooks.getBurnTime(item.getDefaultStack(), null);
+			if (time > 0) {
+				fuelMap.put(item, time);
+			}
+		}
+		return fuelMap;
 	}
 }

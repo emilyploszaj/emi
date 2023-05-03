@@ -2,6 +2,7 @@ package dev.emi.emi.platform.fabric;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import dev.emi.emi.EmiPort;
@@ -17,7 +18,10 @@ import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -173,5 +177,20 @@ public class EmiAgnosFabric extends EmiAgnos {
 	@Override
 	protected boolean canBatchAgnos(ItemStack stack) {
 		return ColorProviderRegistry.ITEM.get(stack.getItem()) == null;
+	}
+
+	@Override
+	protected Map<Item, Integer> getFuelMapAgnos() {
+		Object2IntMap<Item> fuelMap = new Object2IntOpenHashMap<>();
+		for (Item item : EmiPort.getItemRegistry()) {
+			if (FuelRegistry.INSTANCE.get(item) == null) {
+				continue;
+			}
+			int time = FuelRegistry.INSTANCE.get(item);
+			if (time > 0) {
+				fuelMap.put(item, time);
+			}
+		}
+		return fuelMap;
 	}
 }

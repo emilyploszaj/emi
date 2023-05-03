@@ -5,6 +5,7 @@
   "plugin": "dev.emi.emi.mixinsupport.EmiMixinPlugin",
   "client": [
     "accessor.AxeItemAccessor",
+    "accessor.BakedModelManagerAccessor",
     "accessor.CraftingResultSlotAccessor",
     "accessor.HandledScreenAccessor",
     "accessor.HoeItemAccessor",
@@ -12,6 +13,7 @@
     "accessor.LegacySmithingRecipeAccessor",
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
+    "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "ClientPlayNetworkHandlerMixin",
     "CraftingResultSlotMixin",

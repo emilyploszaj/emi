@@ -1,17 +1,23 @@
 package dev.emi.emi.registry;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
+import dev.emi.emi.runtime.EmiHidden;
+import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.Block;
@@ -19,7 +25,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemStackSet;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
@@ -29,6 +38,7 @@ public class EmiStackList {
 	private static final TagKey<Fluid> FLUID_HIDDEN = TagKey.of(EmiPort.getFluidRegistry().getKey(), new Identifier("c", "hidden_from_recipe_viewers"));
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = List.of();
+	public static List<EmiStack> filteredStacks = List.of();
 	public static Object2IntMap<EmiStack> indices = new Object2IntOpenHashMap<>();
 
 	public static void clear() {
@@ -38,24 +48,60 @@ public class EmiStackList {
 	}
 
 	public static void reload() {
-		List<EmiStack> stacks = Lists.newLinkedList();
-		MinecraftClient client = MinecraftClient.getInstance();
-		ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.player.world.getRegistryManager());
-		stacks.addAll(ItemGroups.getSearchGroup().getDisplayStacks().stream().map(EmiStack::of).toList());
-		for (int i = 0; i < EmiPort.getFluidRegistry().size(); i++) {
-			Fluid fluid = EmiPort.getFluidRegistry().get(i);
-			if (fluid.isStill(fluid.getDefaultState())) {
-				EmiStack fs = new FluidEmiStack(fluid);
-				try {
-					fs.getName();
-					fs.getTooltip();
-					stacks.add(fs);
-				} catch (Throwable e) {
+		try {
+			MinecraftClient client = MinecraftClient.getInstance();
+			ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.player.world.getRegistryManager());
+		} catch (Throwable t) {
+			EmiLog.error("Failed to update creative tabs. Using fallback index.");
+			t.printStackTrace();
+		}
+		List<IndexGroup> groups = Lists.newArrayList();
+		Map<String, IndexGroup> namespaceGroups = Maps.newHashMap();
+		for (Item item : EmiPort.getItemRegistry()) {
+			EmiStack stack = EmiStack.of(item);
+			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+		}
+		Set<ItemStack> iss = ItemStackSet.create();
+		for (ItemGroup group : ItemGroups.getGroups()) {
+			Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
+			IndexGroup ig = new IndexGroup();
+			Collection<ItemStack> searchStacks = group.getSearchTabStacks();
+			for (ItemStack stack : searchStacks) {
+				if (iss.contains(stack)) {
+					continue;
+				}
+				iss.add(stack);
+				EmiStack es = EmiStack.of(stack);
+				String namespace = es.getId().getNamespace();
+				usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
+				ig.stacks.add(es);
+			}
+			for (String namespace : usedNamespaces.keySet()) {
+				if (namespaceGroups.containsKey(namespace)) {
+					IndexGroup ng = namespaceGroups.get(namespace);
+					if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
+						ng.suppressedBy.add(ig);
+					}
 				}
 			}
+			groups.add(ig);
 		}
+		groups.addAll(namespaceGroups.values());
+		IndexGroup fluidGroup = new IndexGroup();
+		for (Fluid fluid : EmiPort.getFluidRegistry()) {
+			if (fluid.isStill(fluid.getDefaultState())) {
+				EmiStack fs = EmiStack.of(fluid);
+				fluidGroup.stacks.add(fs);
+			}
+		}
+		groups.add(fluidGroup);
 		
-		EmiStackList.stacks = stacks;
+		stacks = Lists.newLinkedList();
+		for (IndexGroup group : groups) {
+			if (group.shouldDisplay()) {
+				stacks.addAll(group.stacks);
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -108,9 +154,47 @@ public class EmiStackList {
 				}
 			}
 		}
-		stacks = stacks.stream().toList();
+		stacks = stacks.stream().filter(stack -> {
+			String name = "Unknown";
+			String id = "unknown";
+			try {
+				if (stack.isEmpty()) {
+					return false;
+				}
+				name = stack.toString();
+				id = stack.getId().toString();
+				if (name != null && stack.getKey() != null && stack.getName() != null && stack.getTooltip() != null) {
+					return true;
+				}
+				EmiLog.warn("Hiding stack " + name + " with id " + id + " from index due to returning dangerous values");
+				return false;
+			} catch (Throwable t) {
+				EmiLog.warn("Hiding stack " + name + " with id " + id + " from index due to throwing errors");
+				t.printStackTrace();
+				return false;
+			}
+		}).toList();
 		for (int i = 0; i < stacks.size(); i++) {
 			indices.put(stacks.get(i), i);
+		}
+		bakeFiltered();
+	}
+
+	public static void bakeFiltered() {
+		filteredStacks = stacks.stream().filter(s -> !EmiHidden.isHidden(s)).toList();
+	}
+
+	public static class IndexGroup {
+		public List<EmiStack> stacks = Lists.newArrayList();
+		public Set<IndexGroup> suppressedBy = Sets.newHashSet();
+
+		public boolean shouldDisplay() {
+			for (IndexGroup suppressor : suppressedBy) {
+				if (suppressor.shouldDisplay()) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }

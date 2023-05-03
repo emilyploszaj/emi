@@ -2,6 +2,7 @@ package dev.emi.emi.platform;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
@@ -111,4 +112,10 @@ public abstract class EmiAgnos {
 	}
 	
 	protected abstract boolean canBatchAgnos(ItemStack stack);
+
+	public static Map<Item, Integer> getFuelMap() {
+		return delegate.getFuelMapAgnos();
+	}
+
+	protected abstract Map<Item, Integer> getFuelMapAgnos();
 }

@@ -12,6 +12,7 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -27,6 +28,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.TagKey;
@@ -37,17 +39,27 @@ import net.minecraft.util.Identifier;
 public class TagEmiIngredient implements EmiIngredient {
 	private final Identifier id;
 	private List<EmiStack> stacks;
-	public final TagKey<Item> key;
+	public final TagKey<?> key;
 	private long amount;
 	private float chance = 1;
 
 	@ApiStatus.Internal
-	public TagEmiIngredient(TagKey<Item> key, long amount) {
-		this(key, EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList(), amount);
+	public TagEmiIngredient(TagKey<?> key, long amount) {
+		this(key, fromKey(key), amount);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	private static List<EmiStack> fromKey(TagKey<?> key) {
+		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
+			return EmiUtil.values((TagKey<Item>) key).map(ItemStack::new).map(EmiStack::of).toList();
+		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
+			return EmiUtil.values((TagKey<Fluid>) key).map(f -> EmiStack.of(f.value())).distinct().toList();
+		}
+		throw new UnsupportedOperationException("Unsupported tag registry " + key);
 	}
 
 	@ApiStatus.Internal
-	public TagEmiIngredient(TagKey<Item> key, List<EmiStack> stacks, long amount) {
+	public TagEmiIngredient(TagKey<?> key, List<EmiStack> stacks, long amount) {
 		this.id = key.id();
 		this.key = key;
 		this.stacks = stacks;
@@ -108,7 +120,8 @@ public class TagEmiIngredient implements EmiIngredient {
 					stacks.get(0).render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
 				}
 			} else {
-				BakedModel model = client.getBakedModelManager().getModel(EmiTags.getCustomModel(key));
+				BakedModel model = ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
+					.getOrDefault(EmiTags.getCustomModel(key), client.getBakedModelManager().getMissingModel());
 					
 				MatrixStack vs = RenderSystem.getModelViewStack();
 				vs.push();

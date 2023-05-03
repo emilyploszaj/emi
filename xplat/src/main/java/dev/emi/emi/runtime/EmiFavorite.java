@@ -15,7 +15,6 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -167,7 +166,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			if (recipe != null) {
 				EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal("" + amount));
 			} else {
-				EmiRenderHelper.renderAmount(matrices, x, y, stack.getAmountText(amount));
+				EmiRenderHelper.renderAmount(matrices, x, y, EmiRenderHelper.getAmountText(stack, amount));
 			}
 		}
 
