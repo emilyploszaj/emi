@@ -51,9 +51,9 @@ public class EmiStackList {
 		for (Item item : EmiPort.getItemRegistry()) {
 			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
 			item.appendStacks(ItemGroup.SEARCH, itemStacks);
-			stacks.addAll(itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).collect(Collectors.toList()));
-			if (itemStacks.isEmpty()) {
-				namespaceGroups.computeIfAbsent(EmiStack.of(itemStacks.get(0)).getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(EmiStack.of(item));
+			List<EmiStack> stacks = itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).toList();
+			if (!stacks.isEmpty()) {
+				namespaceGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
 			}
 		}
 		groups.addAll(namespaceGroups.values());
