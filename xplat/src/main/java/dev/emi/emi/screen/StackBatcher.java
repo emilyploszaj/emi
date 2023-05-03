@@ -80,6 +80,8 @@ public class StackBatcher {
 	private int y;
 	private int z;
 
+	public static final List<RenderLayer> EXTRA_RENDER_LAYERS = Lists.newArrayList();
+
 	private static boolean isEnabled() {
 		return EmiConfig.useBatchedRenderer;
 	}
@@ -95,6 +97,9 @@ public class StackBatcher {
 		assign(buffers, RenderLayer.getGlint());
 		assign(buffers, RenderLayer.getDirectGlint());
 		assign(buffers, RenderLayer.getEntityGlint());
+		for (RenderLayer layer : EXTRA_RENDER_LAYERS) {
+			assign(buffers, layer);
+		}
 		imm = new BatcherVertexConsumerProvider(new BufferBuilder(256), buffers);
 		unlitFacade = new UnlitFacade(imm);
 	}

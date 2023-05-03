@@ -11,6 +11,9 @@ public enum FluidUnit implements ConfigEnum {
 	DROPLETS("droplets", a -> EmiPort.translatable("emi.fluid.amount.droplets", (int) a)),
 	;
 
+	public static final int BUCKET = EmiAgnos.isForge() ? 1000 : 81_000;
+	public static final int BOTTLE = EmiAgnos.isForge() ? 250 : 27_000;
+
 	private final String name;
 	private final Text translation;
 	private final Double2ObjectFunction<Text> translator;

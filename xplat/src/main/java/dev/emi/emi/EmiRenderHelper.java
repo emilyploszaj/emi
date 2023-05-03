@@ -1,5 +1,6 @@
 package dev.emi.emi;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
@@ -15,6 +16,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -29,12 +31,15 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
 public class EmiRenderHelper {
+	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
+	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
 	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
@@ -75,6 +80,7 @@ public class EmiRenderHelper {
 		EmiPort.setPositionColorTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+		RenderSystem.enableBlend();
 		
 		float r = ((color >> 16) & 255) / 256f;
 		float g = ((color >> 8) & 255) / 256f;
@@ -159,6 +165,34 @@ public class EmiRenderHelper {
 		DrawableHelper.fill(matrices, x, y, x + w, y + h, -2130706433);
 		RenderSystem.colorMask(true, true, true, true);
 		matrices.pop();
+	}
+
+	public static Text getAmountText(EmiIngredient stack) {
+		return getAmountText(stack, stack.getAmount());
+	}
+
+	public static Text getAmountText(EmiIngredient stack, long amount) {
+		if (stack.isEmpty() || amount == 0) {
+			return EMPTY_TEXT;
+		}
+		if (stack.getEmiStacks().get(0).getKey() instanceof Fluid) {
+			return getFluidAmount(amount);
+		}
+		return EmiPort.literal("" + amount);
+	}
+
+	public static Text getAmountText(EmiIngredient stack, double amount) {
+		if (stack.isEmpty() || amount == 0) {
+			return EMPTY_TEXT;
+		}
+		if (stack.getEmiStacks().get(0).getKey() instanceof Fluid) {
+			return EmiConfig.fluidUnit.translate(amount);
+		}
+		return EmiPort.literal("" + amount);
+	}
+
+	public static Text getFluidAmount(long amount) {
+		return EmiConfig.fluidUnit.translate(amount);
 	}
 
 	public static int getAmountOverflow(Text amount) {

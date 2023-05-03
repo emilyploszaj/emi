@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -70,6 +71,6 @@ public class EmiFuelRecipe implements EmiRecipe {
 		widgets.addAnimatedTexture(EmiTexture.FULL_FLAME, 1, 1, 1000 * time / 20, false, true, true);
 		widgets.addSlot(stack, 18, 0).recipeContext(this);
 		widgets.addText(EmiPort.translatable("emi.fuel_time.items",
-			EmiIngredient.TEXT_FORMAT.format(time / 200f)), 38, 5, -1, true);
+			EmiRenderHelper.TEXT_FORMAT.format(time / 200f)), 38, 5, -1, true);
 	}
 }

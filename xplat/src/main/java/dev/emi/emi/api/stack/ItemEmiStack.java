@@ -16,6 +16,7 @@ import dev.emi.emi.screen.StackBatcher.Batchable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -84,6 +85,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
+			DiffuseLighting.enableGuiDepthLighting();
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
 			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());

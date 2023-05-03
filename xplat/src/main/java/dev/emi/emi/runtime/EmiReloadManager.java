@@ -175,7 +175,7 @@ public class EmiReloadManager {
 					EmiPersistentData.load();
 					EmiSearch.bake();
 					EmiScreenManager.search.update();
-					EmiScreenManager.recalculate();
+					EmiScreenManager.forceRecalculate();
 					EmiReloadLog.bake();
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 					status = 2;

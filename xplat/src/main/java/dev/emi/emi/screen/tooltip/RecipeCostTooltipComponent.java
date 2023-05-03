@@ -113,9 +113,9 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 		public Node(EmiIngredient stack, double amount, boolean chanced) {
 			this.stack = stack;
 			if (chanced) {
-				text = EmiPort.append(EmiPort.literal("≈"), stack.getAmountText(amount)).formatted(Formatting.GOLD);
+				text = EmiPort.append(EmiPort.literal("≈"), EmiRenderHelper.getAmountText(stack, amount)).formatted(Formatting.GOLD);
 			} else {
-				text = stack.getAmountText(amount);
+				text = EmiRenderHelper.getAmountText(stack, amount);
 			}
 		}
 	}

@@ -47,6 +47,7 @@ import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.config.EffectLocation;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.config.FluidUnit;
 import dev.emi.emi.handler.CookingRecipeHandler;
 import dev.emi.emi.handler.CraftingRecipeHandler;
 import dev.emi.emi.handler.InventoryRecipeHandler;
@@ -93,7 +94,6 @@ import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.TallFlowerBlock;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -155,7 +155,7 @@ import net.minecraft.util.registry.RegistryEntry;
 
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
-		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.identifier());
+		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.none());
 	
 	public static EmiRecipeCategory INGREDIENT = new EmiRecipeCategory(new Identifier("emi:ingredient"),
 		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
@@ -536,7 +536,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
 			EmiStack cauldron = EmiStack.of(Items.CAULDRON);
-			EmiStack waterThird = EmiStack.of(Fluids.WATER, 81_000 / 3);
+			EmiStack waterThird = EmiStack.of(Fluids.WATER, FluidUnit.BOTTLE);
 			int uniq = EmiUtil.RANDOM.nextInt();
 			addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 				.id(synthetic("world/cauldron_washing", EmiUtil.subId(i)))
@@ -552,8 +552,8 @@ public class VanillaPlugin implements EmiPlugin {
 				.build());
 		}
 
-		EmiStack water = EmiStack.of(Fluids.WATER, 81_000);
-		EmiStack lava = EmiStack.of(Fluids.LAVA, 81_000);
+		EmiStack water = EmiStack.of(Fluids.WATER, FluidUnit.BUCKET);
+		EmiStack lava = EmiStack.of(Fluids.LAVA, FluidUnit.BUCKET);
 		EmiStack waterCatalyst = water.copy().setRemainder(water);
 		EmiStack lavaCatalyst = lava.copy().setRemainder(lava);
 
@@ -561,7 +561,7 @@ public class VanillaPlugin implements EmiPlugin {
 			.id(synthetic("world/fluid_spring", "minecraft/water"))
 			.leftInput(waterCatalyst)
 			.rightInput(waterCatalyst, false)
-			.output(EmiStack.of(Fluids.WATER, 81_000))
+			.output(EmiStack.of(Fluids.WATER, FluidUnit.BUCKET))
 			.build());
 		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 			.id(synthetic("world/fluid_interaction", "minecraft/coblestone"))
@@ -601,7 +601,7 @@ public class VanillaPlugin implements EmiPlugin {
 			Fluid fluid = entry.value();
 			Item bucket = fluid.getBucketItem();
 			if (fluid.isStill(fluid.getDefaultState()) && !fluid.getDefaultState().getBlockState().isAir() && bucket != Items.AIR && fluid instanceof FlowableFluid) {
-				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, 81_000), EmiStack.of(bucket),
+				addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.BUCKET), EmiStack.of(fluid, FluidUnit.BUCKET), EmiStack.of(bucket),
 					synthetic("emi", "bucket_filling/" + EmiUtil.subId(fluid)), false));
 			}
 		});
@@ -610,10 +610,9 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			synthetic("world/unique", "minecraft/water_bottle")));
 
-		for (TagKey<Item> key : EmiTags.itemTags) {
-			List<Item> list = EmiUtil.values(key).map(RegistryEntry::value).toList();
-			if (list.size() > 1) {
-				addRecipeSafe(registry, () -> new EmiTagRecipe(key, list.stream().map(ItemStack::new).map(EmiStack::of).toList()));
+		for (TagKey<?> key : EmiTags.TAGS) {
+			if (new TagEmiIngredient(key, 1).getEmiStacks().size() > 1) {
+				addRecipeSafe(registry, () -> new EmiTagRecipe(key));
 			}
 		}
 
@@ -627,7 +626,7 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static void addFuel(EmiRegistry registry) {
-		Map<Item, Integer> fuelMap = AbstractFurnaceBlockEntity.createFuelTimeMap();
+		Map<Item, Integer> fuelMap = EmiAgnos.getFuelMap();
 		compressRecipesToTags(fuelMap.keySet().stream().collect(Collectors.toSet()), (a, b) -> {
 				return Integer.compare(fuelMap.get(a), fuelMap.get(b));
 			}, tag -> {
@@ -659,7 +658,7 @@ public class VanillaPlugin implements EmiPlugin {
 	private static void compressRecipesToTags(Set<Item> stacks, Comparator<Item> comparator, Consumer<TagKey<Item>> tagConsumer, Consumer<Item> itemConsumer) {
 		Set<Item> handled = Sets.newHashSet();
 		outer:
-		for (net.minecraft.tag.TagKey<Item> key : EmiTags.itemTags) {
+		for (TagKey<Item> key : EmiTags.getTags(EmiPort.getItemRegistry())) {
 			List<Item> items = EmiUtil.values(key).map(RegistryEntry::value).toList();
 			if (items.size() < 2) {
 				continue;

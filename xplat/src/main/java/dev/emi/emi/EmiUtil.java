@@ -27,12 +27,14 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryEntryList.Named;
+import net.minecraft.util.registry.RegistryKey;
 
 public class EmiUtil {
 	public static final Random RANDOM = new Random();
@@ -53,8 +55,9 @@ public class EmiUtil {
 		return subId(EmiPort.getFluidRegistry().getId(fluid));
 	}
 
-	public static Stream<RegistryEntry<Item>> values(TagKey<Item> key) {
-		Optional<Named<Item>> opt = EmiPort.getItemRegistry().getEntryList(key);
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
+		Optional<Named<T>> opt = Registry.REGISTRIES.get((RegistryKey) key.registry()).getEntryList(key);
 		if (opt.isEmpty()) {
 			return Stream.of();
 		} else {
