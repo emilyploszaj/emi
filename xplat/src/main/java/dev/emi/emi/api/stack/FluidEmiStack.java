@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
@@ -87,7 +88,7 @@ public class FluidEmiStack extends EmiStack {
 		List<TooltipComponent> list = getTooltipText().stream().map(EmiPort::ordered).map(TooltipComponent::of)
 			.collect(Collectors.toList());
 		if (amount > 1) {
-			list.add(TooltipComponent.of(EmiPort.ordered(getAmountText(amount))));
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiRenderHelper.getAmountText(this, amount))));
 		}
 		String namespace = EmiPort.getFluidRegistry().getId(fluid).getNamespace();
 		if (EmiConfig.appendModId) {
@@ -96,14 +97,6 @@ public class FluidEmiStack extends EmiStack {
 		}
 		list.addAll(super.getTooltip());
 		return list;
-	}
-
-	@Override
-	public Text getAmountText(double amount) {
-		if (amount != 0) {
-			return EmiConfig.fluidUnit.translate(amount);
-		}
-		return EmiPort.literal("");
 	}
 
 	@Override

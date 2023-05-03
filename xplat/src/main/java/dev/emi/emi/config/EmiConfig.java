@@ -420,15 +420,34 @@ public class EmiConfig {
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiInput.CONTROL_MASK));
 	
-	@ConfigGroupEnd
 	@Comment("Cheat in a stack of an item into the cursor.")
 	@ConfigValue("binds.cheat-stack-to-cursor")
 	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
 	
+	@ConfigGroupEnd
+	@Comment("Delete the stack in the cursor when hovering the index")
+	@ConfigValue("binds.delete-cursor-stack")
+	public static EmiBind deleteCursorStack = new EmiBind("key.emi.delete_cursor_stack",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
+
+	@Comment("In edit mode, hide the hovered stack")
+	@ConfigValue("binds.hide-stack")
+	public static EmiBind hideStack = new EmiBind("key.emi.hide_stack",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+
+	@Comment("In edit mode, hide stacks with the hovered stack's id")
+	@ConfigValue("binds.hide-stack-by-id")
+	public static EmiBind hideStackById = new EmiBind("key.emi.hide_stack_by_id",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK | EmiInput.SHIFT_MASK));
+	
 	// Dev
-	@Comment("Whether certain development functions should be enabled. Not recommended for general play.")
+	@Comment("Whether development functions should be enabled. Not recommended for general play.")
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = EmiAgnos.isDevelopmentEnvironment();
+
+	@Comment("Whether editing the index is enabled")
+	@ConfigValue("dev.edit-mode")
+	public static boolean editMode = false;
 
 	@Comment("Whether to log untranslated tags as warnings.")
 	@ConfigValue("dev.log-untranslated-tags")

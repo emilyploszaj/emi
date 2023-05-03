@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -67,7 +68,7 @@ public class EmiCompostingRecipe implements EmiRecipe {
 	public void addWidgets(WidgetHolder widgets) {
 		widgets.addSlot(stack, 0, 0);
 		widgets.addTexture(EmiTexture.EMPTY_ARROW, 46, 1);
-		widgets.addText(EmiPort.literal(EmiIngredient.TEXT_FORMAT.format(chance * 100) + "%"), 32, 5, -1, true).horizontalAlign(Alignment.CENTER);
+		widgets.addText(EmiPort.literal(EmiRenderHelper.TEXT_FORMAT.format(chance * 100) + "%"), 32, 5, -1, true).horizontalAlign(Alignment.CENTER);
 		widgets.addText(EmiPort.literal("x7"), 74, 5, -1, true);
 		widgets.addSlot(BONE_MEAL, 90, 0).recipeContext(this);
 	}

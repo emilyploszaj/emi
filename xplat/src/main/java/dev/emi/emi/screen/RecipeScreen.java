@@ -19,6 +19,7 @@ import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.DrawableWidget;
 import dev.emi.emi.api.widget.RecipeFillButtonWidget;
@@ -293,6 +294,13 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (rTab != null) {
 			EmiRenderHelper.drawTooltip(this, matrices, rTab.category.getTooltip(), mouseX, mouseY);
 		}
+	}
+
+	public EmiIngredient getHoveredStack() {
+		if (hoveredWidget instanceof SlotWidget slot) {
+			return slot.getStack();
+		}
+		return EmiStack.EMPTY;
 	}
 
 	public RecipeTab getTabAt(int mx, int my) {

@@ -18,7 +18,9 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.jemi.runtime.JemiBookmarkOverlay;
 import dev.emi.emi.jemi.runtime.JemiIngredientFilter;
+import dev.emi.emi.jemi.runtime.JemiIngredientListOverlay;
 import dev.emi.emi.jemi.runtime.JemiRecipesGui;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiPluginContainer;
@@ -48,6 +50,8 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 	@Override
 	public void registerRuntime(IRuntimeRegistration registration) {
+		registration.setIngredientListOverlay(new JemiIngredientListOverlay());
+		registration.setBookmarkOverlay(new JemiBookmarkOverlay());
 		registration.setRecipesGui(new JemiRecipesGui());
 		registration.setIngredientFilter(new JemiIngredientFilter());
 	}

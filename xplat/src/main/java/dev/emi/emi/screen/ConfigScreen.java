@@ -44,6 +44,7 @@ import dev.emi.emi.screen.widget.config.ScreenAlignWidget;
 import dev.emi.emi.screen.widget.config.SidebarPagesWidget;
 import dev.emi.emi.screen.widget.config.SidebarSubpanelsWidget;
 import dev.emi.emi.screen.widget.config.SubGroupNameWidget;
+import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -84,6 +85,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	public void close() {
 		EmiConfig.writeConfig();
+		EmiSearch.update();
 		MinecraftClient.getInstance().setScreen(last);
 	}
 

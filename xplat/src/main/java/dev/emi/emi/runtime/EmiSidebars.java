@@ -12,6 +12,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.chess.EmiChess;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
@@ -26,7 +27,7 @@ public class EmiSidebars {
 
 	public static List<? extends EmiIngredient> getStacks(SidebarType type) {
 		return switch (type) {
-			case INDEX -> EmiStackList.stacks;
+			case INDEX -> EmiConfig.editMode ? EmiStackList.stacks : EmiStackList.filteredStacks;
 			case CRAFTABLES -> craftables;
 			case FAVORITES -> EmiFavorites.favoriteSidebar;
 			case LOOKUP_HISTORY -> lookupHistory;

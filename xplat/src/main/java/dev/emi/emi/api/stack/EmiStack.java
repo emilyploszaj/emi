@@ -164,11 +164,11 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(ItemConvertible item) {
-		return of(new ItemStack(item), 1);
+		return of(item.asItem().getDefaultStack(), 1);
 	}
 
 	public static EmiStack of(ItemConvertible item, long amount) {
-		return of(new ItemStack(item), amount);
+		return of(item.asItem().getDefaultStack(), amount);
 	}
 
 	public static EmiStack of(Fluid fluid) {

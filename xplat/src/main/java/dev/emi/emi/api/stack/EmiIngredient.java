@@ -10,6 +10,7 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -26,7 +27,7 @@ public interface EmiIngredient extends EmiRenderable {
 	
 	/**
 	 * @return The {@link EmiStack}s represented by this ingredient.
-	 * 	List is never empty, for an empty ingredient, return {@link EmiStack#EMPTY}
+	 * 	List is never empty. For an empty ingredient, us {@link EmiStack#EMPTY}
 	 */
 	List<EmiStack> getEmiStacks();
 
@@ -55,14 +56,6 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	void render(MatrixStack matrices, int x, int y, float delta, int flags);
-
-	default Text getAmountText(double amount) {
-		if (amount == 0) {
-			return EMPTY_TEXT;
-		} else {
-			return EmiPort.literal(TEXT_FORMAT.format(amount));
-		}
-	}
 
 	List<TooltipComponent> getTooltip();
 
@@ -102,7 +95,7 @@ public interface EmiIngredient extends EmiRenderable {
 		if (ingredient == null) {
 			return EmiStack.EMPTY;
 		}
-		return EmiTags.getIngredient(Arrays.asList(ingredient.getMatchingStacks()), amount);
+		return EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList(), amount);
 	}
 
 	public static EmiIngredient of(List<? extends EmiIngredient> list) {
@@ -125,14 +118,24 @@ public interface EmiIngredient extends EmiRenderable {
 				amount = internalAmount;
 				list = list.stream().map(st -> st.copy().setAmount(1)).toList();
 			}
+			Class<?> tagType = null;
 			for (EmiIngredient i : list) {
 				for (EmiStack s : i.getEmiStacks()) {
-					if (!s.isEmpty() && !(s.getKey() instanceof Item)) {
-						return new ListEmiIngredient(list, amount);
+					if (!s.isEmpty()) {
+						Class<?> tt = null;
+						if (s.getKey() instanceof Item) {
+							tt = Item.class;
+						} else if (s.getKey() instanceof Fluid) {
+							tt = Fluid.class;
+						}
+						if (tt == null || (tagType != null && tt != tagType)) {
+							tagType = tt;
+							return new ListEmiIngredient(list, amount);
+						}
 					}
 				}
 			}
-			return EmiTags.getIngredient(list.stream().flatMap(i -> i.getEmiStacks().stream()).map(EmiStack::getItemStack).toList(), amount);
+			return EmiTags.getIngredient(tagType, list.stream().flatMap(i -> i.getEmiStacks().stream()).toList(), amount);
 		}
 	}
 }

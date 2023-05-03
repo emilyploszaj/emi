@@ -554,15 +554,15 @@ public class BoMScreen extends Screen {
 			long adjusted = cost.getEffectiveAmount();
 			Text totalText;
 			if (cost instanceof ChanceMaterialCost cmc) {
-				totalText = EmiPort.append(EmiPort.literal("≈"), cost.ingredient.getAmountText(adjusted))
+				totalText = EmiPort.append(EmiPort.literal("≈"), EmiRenderHelper.getAmountText(cost.ingredient, adjusted))
 					.formatted(Formatting.GOLD);
 			} else {
-				totalText = cost.ingredient.getAmountText(adjusted);
+				totalText = EmiRenderHelper.getAmountText(cost.ingredient, adjusted);
 			}
 			if (!remainder && BoM.craftingMode) {
 				long amount = alreadyDone;
 				if (amount < adjusted) {
-					Text amountText = amount == 0 ? EmiPort.literal("0") : (cost.ingredient.getAmountText(amount));
+					Text amountText = amount == 0 ? EmiPort.literal("0") : (EmiRenderHelper.getAmountText(cost.ingredient, amount));
 					MutableText text = EmiPort.append(EmiPort.literal("", Formatting.RED), amountText);
 					text = EmiPort.append(text, EmiPort.literal("/"));
 					text = EmiPort.append(text, totalText);
@@ -738,10 +738,10 @@ public class BoMScreen extends Screen {
 				long a = Math.round(amount * chance.chance());
 				a = Math.max(a, node.amount);
 				return EmiPort.append(EmiPort.literal("≈"),
-						node.ingredient.getAmountText(a))
+						EmiRenderHelper.getAmountText(node.ingredient, a))
 					.formatted(Formatting.GOLD);
 			} else {
-				return node.ingredient.getAmountText(amount);
+				return EmiRenderHelper.getAmountText(node.ingredient, amount);
 			}
 		}
 

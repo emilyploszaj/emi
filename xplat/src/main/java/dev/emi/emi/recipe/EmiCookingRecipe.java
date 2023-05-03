@@ -9,6 +9,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.config.FluidUnit;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
@@ -30,7 +31,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
 		output = EmiStack.of(EmiPort.getOutput(recipe));
 		if (input.getEmiStacks().get(0).getItemStack().isOf(Items.WET_SPONGE)) {
-			input.getEmiStacks().get(0).setRemainder(EmiStack.of(Fluids.WATER, 81_000));
+			input.getEmiStacks().get(0).setRemainder(EmiStack.of(Fluids.WATER, FluidUnit.BUCKET));
 		}
 		this.recipe = recipe;
 		this.fuelMultiplier = fuelMultiplier;
