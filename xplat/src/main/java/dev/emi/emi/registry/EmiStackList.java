@@ -1,6 +1,7 @@
 package dev.emi.emi.registry;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
@@ -56,7 +56,7 @@ public class EmiStackList {
 			t.printStackTrace();
 		}
 		List<IndexGroup> groups = Lists.newArrayList();
-		Map<String, IndexGroup> namespaceGroups = Maps.newHashMap();
+		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
 			EmiStack stack = EmiStack.of(item);
 			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);

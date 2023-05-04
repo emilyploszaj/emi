@@ -9,6 +9,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,17 +37,22 @@ public class EmiExclusionAreas {
 			// Search bar
 			list.add(new Bounds(EmiScreenManager.search.x - 1, EmiScreenManager.search.y - 1, EmiScreenManager.search.getWidth() + 2, EmiScreenManager.search.getHeight() + 2));
 		}
-		if (fromClass.containsKey(screen.getClass())) {
-			for (EmiExclusionArea exclusion : fromClass.get(screen.getClass())) {
+		try {
+			if (fromClass.containsKey(screen.getClass())) {
+				for (EmiExclusionArea exclusion : fromClass.get(screen.getClass())) {
+					exclusion.addExclusionArea(screen, rect -> {
+						list.add((Bounds) rect);
+					});
+				}
+			}
+			for (EmiExclusionArea exclusion : generic) {
 				exclusion.addExclusionArea(screen, rect -> {
 					list.add((Bounds) rect);
 				});
 			}
-		}
-		for (EmiExclusionArea exclusion : generic) {
-			exclusion.addExclusionArea(screen, rect -> {
-				list.add((Bounds) rect);
-			});
+		} catch (Exception e) {
+			EmiLog.error("Exception thrown when adding exclusion areas");
+			e.printStackTrace();
 		}
 		return list;
 	}

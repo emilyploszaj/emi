@@ -33,6 +33,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
 import mezz.jei.api.registration.IRuntimeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
+import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
@@ -83,10 +84,13 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		EmiLog.info("[JEMI] JEI reloaded!");
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
-			if (runtime != null) {
-				runtime.getScreenHelper().getGuiExclusionAreas(screen).forEach(r -> {
-					consumer.accept(new Bounds(r.getX(), r.getY(), r.getWidth(), r.getHeight()));
-				});
+			if (runtime != null && runtime.getScreenHelper() != null) {
+				List<Rect2i> areas = runtime.getScreenHelper().getGuiExclusionAreas(screen).toList();
+				for (Rect2i r : areas) {
+					if (r != null) {
+						consumer.accept(new Bounds(r.getX(), r.getY(), r.getWidth(), r.getHeight()));
+					}
+				}
 			}
 		});
 
