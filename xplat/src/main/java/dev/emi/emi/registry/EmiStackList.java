@@ -1,14 +1,13 @@
 package dev.emi.emi.registry;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
@@ -47,7 +46,7 @@ public class EmiStackList {
 
 	public static void reload() {
 		List<IndexGroup> groups = Lists.newArrayList();
-		Map<String, IndexGroup> namespaceGroups = Maps.newHashMap();
+		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
 			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
 			item.appendStacks(ItemGroup.SEARCH, itemStacks);
