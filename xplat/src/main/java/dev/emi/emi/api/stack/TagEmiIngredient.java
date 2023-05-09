@@ -31,6 +31,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -51,7 +52,7 @@ public class TagEmiIngredient implements EmiIngredient {
 	@SuppressWarnings({"unchecked"})
 	private static List<EmiStack> fromKey(TagKey<?> key) {
 		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
-			return EmiUtil.values((TagKey<Item>) key).map(ItemStack::new).map(EmiStack::of).toList();
+			return EmiUtil.values((TagKey<Item>) key).map(RegistryEntry::value).map(EmiStack::of).toList();
 		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
 			return EmiUtil.values((TagKey<Fluid>) key).map(f -> EmiStack.of(f.value())).distinct().toList();
 		}

@@ -27,6 +27,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HeaderType;
+import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.config.Margins;
 import dev.emi.emi.config.ScreenAlign;
 import dev.emi.emi.config.ScreenAlign.Horizontal;
@@ -1132,7 +1133,7 @@ public class EmiScreenManager {
 	public static void toggleVisibility(boolean notify) {
 		EmiConfig.enabled = !EmiConfig.enabled;
 		EmiConfig.writeConfig();
-		if (notify && !EmiConfig.enabled && EmiConfig.showHelp) {
+		if (notify && !EmiConfig.enabled && EmiConfig.helpLevel.has(HelpLevel.NORMAL)) {
 			client.getToastManager().add(new DisabledToast());
 		}
 	}
