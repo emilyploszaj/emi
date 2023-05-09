@@ -12,6 +12,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
@@ -180,7 +181,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			
 			Text craftKey = null;
 
-			if (EmiConfig.showHelp && EmiRecipeFiller.getFirstValidHandler(recipe, EmiApi.getHandledScreen()) != null) {
+			if (EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiRecipeFiller.getFirstValidHandler(recipe, EmiApi.getHandledScreen()) != null) {
 				if (EmiConfig.craftAllToInventory.isBound()) {
 					craftKey = EmiConfig.craftAllToInventory.getBindText();
 				} else if (EmiConfig.craftAll.isBound()) {

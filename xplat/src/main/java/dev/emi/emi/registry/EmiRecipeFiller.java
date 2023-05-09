@@ -18,6 +18,8 @@ import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.handler.CoercedRecipeHandler;
+import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import dev.emi.emi.runtime.EmiSidebars;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -25,10 +27,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 
@@ -63,6 +67,14 @@ public class EmiRecipeFiller {
 			}
 			if ((type != null || screenHandler instanceof PlayerScreenHandler) && handlers.containsKey(type)) {
 				return (List<EmiRecipeHandler<T>>) (List<?>) handlers.get(type);
+			}
+			for (Slot slot : screen.getScreenHandler().slots) {
+				if (slot instanceof CraftingResultSlot crs) {
+					CraftingInventory inv = ((CraftingResultSlotAccessor) crs).getInput();
+					if (inv != null && inv.getWidth() > 0 && inv.getHeight() > 0) {
+						return List.of(new CoercedRecipeHandler<T>(crs));
+					}
+				}
 			}
 		}
 		return List.of();

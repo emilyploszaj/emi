@@ -541,7 +541,7 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
 				.id(synthetic("world/cauldron_washing", EmiUtil.subId(i)))
 				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
-					ItemStack stack = new ItemStack(i);
+					ItemStack stack = i.getDefaultStack();
 					((DyeableItem) i).setColor(stack, r.nextInt(0xFFFFFF + 1));
 					return EmiStack.of(stack);
 				}, uniq, s.getBounds().x(), s.getBounds().y()))

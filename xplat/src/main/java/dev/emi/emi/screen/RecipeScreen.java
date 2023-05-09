@@ -11,7 +11,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -21,13 +20,9 @@ import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.DrawableWidget;
 import dev.emi.emi.api.widget.RecipeFillButtonWidget;
 import dev.emi.emi.api.widget.SlotWidget;
-import dev.emi.emi.api.widget.TextWidget;
-import dev.emi.emi.api.widget.TextWidget.Alignment;
 import dev.emi.emi.api.widget.Widget;
-import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.input.EmiInput;
@@ -36,10 +31,6 @@ import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import dev.emi.emi.widget.RecipeBackground;
-import dev.emi.emi.widget.RecipeDefaultButtonWidget;
-import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
-import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -48,12 +39,10 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen implements EmiScreen {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
-	private static final int RECIPE_PADDING = 10;
 	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
 	public HandledScreen<?> old;
@@ -85,9 +74,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			new SizedButtonWidget(x + backgroundWidth - 17, y + 5, 12, 12, 12, 64,
 				() -> tabs.size() > 1, w -> setPage(tabPage, tab + 1, 0)),
 			new SizedButtonWidget(x + 5, y + 18, 12, 12, 0, 64,
-				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page - 1)),
+				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page - 1)),
 			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 64,
-				() -> tabs.get(tab).recipes.size() > 1, w -> setPage(tabPage, tab, page + 1))
+				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page + 1))
 		);
 		resolve = null;
 		this.recipes = recipes;
@@ -113,8 +102,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 		if (recipes != null) {
 			EmiRecipe current = null;
-			if (tab < tabs.size() && page < tabs.get(tab).recipes.size() && tabs.get(tab).recipes.get(page).size() > 0) {
-				current = tabs.get(tab).recipes.get(page).get(0);
+			if (tab < tabs.size() && page < tabs.get(tab).getPageCount() && tabs.get(tab).getPage(page).size() > 0) {
+				current = tabs.get(tab).getPage(page).get(0).recipe;
 			}
 			tabs.clear();
 			if (!recipes.isEmpty()) {
@@ -132,7 +121,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 						}).toList()) {
 					List<EmiRecipe> set = entry.getValue();
 					if (!set.isEmpty()) {
-						tabs.add(new RecipeTab(entry.getKey(), set));
+						RecipeTab tab = new RecipeTab(entry.getKey(), set);
+						tab.bakePages(backgroundHeight);
+						tabs.add(tab);
 					}
 				}
 				
@@ -195,7 +186,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 5, minimumWidth - 38, 12, 0, 16, 3, 6);
 		//EmiRenderHelper.drawScroll(matrices, x + 19 + buttonOff, y + 5 + 10, minimumWidth - 38, 2, tab, tabs.size(), -1);
 		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 19, minimumWidth - 38, 12, 0, 16, 3, 6);
-		//EmiRenderHelper.drawScroll(matrices, x + 19 + buttonOff, y + 19 + 10, minimumWidth - 38, 2, page, tabs.get(tab).recipes.size(), -1);
+		//EmiRenderHelper.drawScroll(matrices, x + 19 + buttonOff, y + 19 + 10, minimumWidth - 38, 2, page, tabs.get(tab).getPageCount(), -1);
 		
 		boolean categoryHovered = mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY < y + 5 + 12;
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
@@ -206,9 +197,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			int extraWidth = client.textRenderer.getWidth("...");
 			text = EmiPort.literal(client.textRenderer.trimToWidth(text, (minimumWidth - 40) - extraWidth).getString() + "...");
 		}
-		EmiPort.drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor);
-		EmiPort.drawCenteredText(matrices, textRenderer,EmiRenderHelper.getPageText(this.page + 1, tab.recipes.size(), minimumWidth - 40),
-			x + backgroundWidth / 2, y + 21, 0xffffff);
+		EmiPort.drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor, true);
+		EmiPort.drawCenteredText(matrices, textRenderer, EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
+			x + backgroundWidth / 2, y + 21, 0xffffff, true);
 
 		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
 		int workstationAmount = Math.min(workstations.size(), getMaxWorkstations());
@@ -321,16 +312,6 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		};
 	}
 
-	public int getVerticalRecipeSpace(EmiRecipeCategory category) {
-		int height = backgroundHeight - 46;
-		if (EmiConfig.workstationLocation == SidebarSide.BOTTOM) {
-			if (!EmiRecipes.workstations.getOrDefault(category, List.of()).isEmpty()) {
-				height -= 23;
-			}
-		}
-		return height;
-	}
-
 	public int getResolveOffset() {
 		return resolve == null ? 0 : 23;
 	}
@@ -367,9 +348,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	public void focusRecipe(EmiRecipe recipe) {
 		for (int i = 0; i < tabs.size(); i++) {
 			RecipeTab tab = tabs.get(i);
-			for (int j = 0; j < tab.recipes.size(); j++) {
-				for (EmiRecipe r : tab.recipes.get(j)) {
-					if (r == recipe) {
+			for (int j = 0; j < tab.getPageCount(); j++) {
+				for (RecipeDisplay d : tab.getPage(j)) {
+					if (d.recipe == recipe) {
 						setPage(tabPage, i, j);
 						return;
 					}
@@ -384,116 +365,26 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			return;
 		}
 		boolean snapTabPage = tp == tabPage && t != tab;
-		tab = t;
-		if (tab >= tabs.size()) {
-			tab = 0;
-		} else if (tab < 0) {
-			tab = tabs.size() - 1;
-		}
+		tab = wrap(t, tabs.size());
 		if (snapTabPage) {
 			tp = (tab) / tabPageSize;
 		}
-		tabPage = tp;
-		if (tabPage >= (tabs.size() - 1) / tabPageSize + 1) {
-			tabPage = 0;
-		} else if (tabPage < 0) {
-			tabPage = (tabs.size() - 1) / tabPageSize;
-		}
-		List<List<EmiRecipe>> recipes = tabs.get(tab).recipes;
-		page = p;
-		if (page >= recipes.size()) {
-			page = 0;
-		} else if (page < 0) {
-			page = recipes.size() - 1;
-		}
-		if (page < recipes.size()) {
-			int width = minimumWidth - 16;
-			for (List<EmiRecipe> list : recipes) {
-				for (EmiRecipe r : list) {
-					try {
-						int w = r.getDisplayWidth();
-						if (r.supportsRecipeTree() || EmiRecipeFiller.isSupported(r) || EmiConfig.recipeScreenshotButton) {
-							w += 26;
-						}
-						width = Math.max(width, w);
-					} catch (Throwable e) {
-						e.printStackTrace();
-					}
-				}
-			}
+		tabPage = wrap(tp, (tabs.size() - 1) / tabPageSize);
+		RecipeTab tab = tabs.get(this.tab);
+		page = wrap(p, tab.getPageCount());
+		if (page < tab.getPageCount()) {
+			int width = Math.max(minimumWidth - 16, tab.getWidth());
 			setRecipePageWidth(width + 16);
-			int off = 0;
-			for (EmiRecipe r : recipes.get(page)) {
-				List<Widget> widgets = Lists.newArrayList();
-				int rWidth = 128;
-				int rHeight = 64;
-				int wx = x + (backgroundWidth - rWidth) / 2;
-				int wy = y + 37 + off;
-				try {
-					rWidth = r.getDisplayWidth();
-					wx = x + (backgroundWidth - rWidth) / 2;
-					rHeight = Math.min(getVerticalRecipeSpace(tabs.get(tab).category), r.getDisplayHeight());
-					final int recipeWidth = rWidth;
-					final int recipeHeight = rHeight;
-					widgets.add(new RecipeBackground(-4, -4, rWidth + 8, recipeHeight + 8));
-					WidgetHolder holder = new WidgetHolder() {
-			
-						public int getWidth() {
-							return recipeWidth;
-						}
-			
-						public int getHeight() {
-							return recipeHeight;
-						}
-			
-						public <T extends Widget> T add(T widget) {
-							widgets.add(widget);
-							return widget;
-						}
-					};
-					r.addWidgets(holder);
-					int by = rHeight - 12;
-					if (rHeight <= 18) {
-						by += 4;
-					}
-					int button = 0;
-					int lbutton = 0;
-					if (EmiRecipeFiller.isSupported(r)) {
-						if (EmiConfig.recipeFillButton) {
-							widgets.add(new RecipeFillButtonWidget(rWidth + 5, by + 14 * button++, r));
-						}
-					}
-					if (r.supportsRecipeTree()) {
-						if (EmiConfig.recipeTreeButton) {
-							widgets.add(new RecipeTreeButtonWidget(rWidth + 5, by - 14 * button++, r));
-						}
-						if (EmiConfig.recipeDefaultButton) {
-							widgets.add(new RecipeDefaultButtonWidget(rWidth + 5, by - 14 * button++, r));
-						}
-					}
-					if (EmiConfig.recipeScreenshotButton) {
-						widgets.add(new RecipeScreenshotButtonWidget(-5 - 12, by - 14 * lbutton++, r));
-					}
-				} catch (Throwable e) {
-					widgets.clear();
-					widgets.add(new RecipeBackground(-4, -4, rWidth + 8, rHeight + 8));
-					widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.initialize")),
-						rWidth / 2, rHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));
-					widgets.add(new DrawableWidget(0, 0, rWidth, rHeight, (matrices, mouseX, mouseY, delta) -> {})
-						.tooltip((i, j) -> EmiUtil.getStackTrace(e).stream()
-							.map(EmiPort::literal).map(EmiPort::ordered).map(TooltipComponent::of).toList()));
-				}
-				off += rHeight + RECIPE_PADDING;
-				currentPage.add(new WidgetGroup(r, widgets, wx, wy, rWidth, rHeight));
-			}
-			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tabs.get(tab).category, List.of());
+			currentPage = Lists.newArrayList();
+			currentPage.addAll(tab.constructWidgets(page, x, y, backgroundWidth, backgroundHeight));
+			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
 			if (!workstations.isEmpty()) {
-				List<Widget> widgets = Lists.newArrayList();
+				WidgetGroup widgets = new WidgetGroup(null, 0, 0, 0, 0);
 				for (int i = 0; i < workstations.size() && i < getMaxWorkstations(); i++) {
 					Bounds bounds = getWorkstationBounds(i);
 					widgets.add(new SlotWidget(workstations.get(i), bounds.x(), bounds.y()));
 				}
-				currentPage.add(new WidgetGroup(null, widgets, 0, 0, 0, 0));
+				currentPage.add(widgets);
 			}
 		}
 		if (resolve != null && resolutionButton != null) {
@@ -501,6 +392,15 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			resolutionButton.x = bounds.x();
 			resolutionButton.y = bounds.y();
 		}
+	}
+
+	public int wrap(int value, int size) {
+		if (value >= size) {
+			return 0;
+		} else if (value < 0) {
+			return size - 1;
+		}
+		return value;
 	}
 
 	@Override
@@ -691,71 +591,5 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	public int emi$getBottom() {
 		return y + backgroundHeight;
-	}
-
-	private class RecipeTab {
-		private final EmiRecipeCategory category;
-		private final List<List<EmiRecipe>> recipes;
-
-		public RecipeTab(EmiRecipeCategory category, List<EmiRecipe> recipes) {
-			this.category = category;
-			this.recipes = getPages(recipes, getVerticalRecipeSpace(category));
-		}
-
-		private List<List<EmiRecipe>> getPages(List<EmiRecipe> recipes, int height) {
-			List<List<EmiRecipe>> list = Lists.newArrayList();
-			List<EmiRecipe> current = Lists.newArrayList();
-			int h = 0;
-			for (EmiRecipe recipe : recipes) {
-				int rh = recipe.getDisplayHeight();
-				if (!current.isEmpty() && h + rh > height) {
-					list.add(current);
-					current = Lists.newArrayList();
-					h = 0;
-				}
-				h += rh + RECIPE_PADDING;
-				current.add(recipe);
-			}
-			if (!current.isEmpty()) {
-				list.add(current);
-			}
-			return list;
-		}
-	}
-
-	private static class WidgetGroup {
-		public final EmiRecipe recipe;
-		public final int x, y, width, height;
-		public List<Widget> widgets;
-
-		public WidgetGroup(EmiRecipe recipe, List<Widget> widgets, int x, int y, int width, int height) {
-			this.recipe = recipe;
-			this.widgets = widgets;
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-		}
-
-		public void error(Throwable e) {
-			List<Widget> widgets = Lists.newArrayList();
-			if (!this.widgets.isEmpty()) {
-				widgets.add(this.widgets.get(0));
-			}
-			widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.render")),
-				width / 2, height / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));
-			widgets.add(new DrawableWidget(0, 0, width, height, (matrices, mouseX, mouseY, delta) -> {})
-				.tooltip((i, j) -> EmiUtil.getStackTrace(e).stream()
-					.map(EmiPort::literal).map(EmiPort::ordered).map(TooltipComponent::of).toList()));
-			this.widgets = widgets;
-		}
-
-		public int x() {
-			return x;
-		}
-
-		public int y() {
-			return y;
-		}
 	}
 }
