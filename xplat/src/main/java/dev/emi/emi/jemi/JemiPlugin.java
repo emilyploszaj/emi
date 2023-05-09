@@ -142,21 +142,21 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 	private void addInfoRecipes(EmiRegistry registry, IRecipeCategory<IJeiIngredientInfoRecipe> category) {
 		List<IJeiIngredientInfoRecipe> recipes = runtime.getRecipeManager().createRecipeLookup(RecipeTypes.INFORMATION).includeHidden().get().toList();
-		Map<Object, List<IJeiIngredientInfoRecipe>> grouped = Maps.newHashMap();
+		Map<List<EmiStack>, List<IJeiIngredientInfoRecipe>> grouped = Maps.newHashMap();
 		for (IJeiIngredientInfoRecipe recipe : recipes) {
-			grouped.computeIfAbsent(recipe.getIngredients(), k -> Lists.newArrayList()).add(recipe);
+			grouped.computeIfAbsent(recipe.getIngredients().stream().map(JemiUtil::getStack).toList(), k -> Lists.newArrayList()).add(recipe);
 		}
 		Map<Text, List<EmiStack>> identical = Maps.newHashMap();
-		for (List<IJeiIngredientInfoRecipe> group : grouped.values()) {
+		for (Map.Entry<List<EmiStack>, List<IJeiIngredientInfoRecipe>> group : grouped.entrySet()) {
 			MutableText text = EmiPort.literal("");
-			for (IJeiIngredientInfoRecipe recipe : group) {
+			for (IJeiIngredientInfoRecipe recipe : group.getValue()) {
 				for (StringVisitable sv : recipe.getDescription()) {
 					sv.visit((style, string) -> {
 						return Optional.of(EmiPort.literal(string, style));
 					}, Style.EMPTY).ifPresent(t -> text.append(" ").append(t));
 				}
 			}
-			identical.computeIfAbsent(text, k -> Lists.newArrayList()).addAll(group.get(0).getIngredients().stream().map(JemiUtil::getStack).toList());
+			identical.computeIfAbsent(text, k -> Lists.newArrayList()).addAll(group.getKey());
 		}
 		
 		for (Text text : identical.keySet()) {

@@ -12,10 +12,10 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
+import net.minecraft.util.registry.RegistryEntry;
 
 public interface EmiIngredient extends EmiRenderable {
 	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
@@ -78,7 +78,7 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 	
 	public static EmiIngredient of(TagKey<Item> key, long amount) {
-		List<EmiStack> stacks = EmiUtil.values(key).map(ItemStack::new).map(EmiStack::of).toList();
+		List<EmiStack> stacks = EmiUtil.values(key).map(RegistryEntry::value).map(EmiStack::of).toList();
 		if (stacks.isEmpty()) {
 			return EmiStack.EMPTY;
 		} else if (stacks.size() == 1) {

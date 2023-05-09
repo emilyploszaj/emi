@@ -51,9 +51,9 @@ public class EmiConfig {
 	@ConfigValue("general.cheat-mode")
 	public static boolean cheatMode = false;
 
-	@Comment("Whether EMI tooltips and popups will show helpful information about how to use it.")
-	@ConfigValue("general.show-help")
-	public static boolean showHelp = true;
+	@Comment("How much EMI should use tooltips and popups to show controls and information.")
+	@ConfigValue("general.help-level")
+	public static HelpLevel helpLevel = HelpLevel.NORMAL;
 
 	@ConfigGroup("general.search")
 	@Comment("Whether normal search queries should include the tooltip.")

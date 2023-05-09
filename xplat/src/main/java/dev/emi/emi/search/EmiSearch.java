@@ -45,30 +45,35 @@ public class EmiSearch {
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
-			Text name = stack.getName();
-			if (name != null) {
-				names.add(stack, name.getString().toLowerCase());
-			}
-			List<Text> tooltip = stack.getTooltipText();
-			if (tooltip != null) {
-				for (int i = 1; i < tooltip.size(); i++) {
-					Text text = tooltip.get(i);
-					if (text != null) {
-						tooltips.add(stack, text.getString().toLowerCase());
+			try {
+				Text name = stack.getName();
+				if (name != null) {
+					names.add(stack, name.getString().toLowerCase());
+				}
+				List<Text> tooltip = stack.getTooltipText();
+				if (tooltip != null) {
+					for (int i = 1; i < tooltip.size(); i++) {
+						Text text = tooltip.get(i);
+						if (text != null) {
+							tooltips.add(stack, text.getString().toLowerCase());
+						}
 					}
 				}
-			}
-			Identifier id = stack.getId();
-			if (id != null) {
-				mods.add(stack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
-			}
-			if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
-				for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
-					Identifier eid = EmiPort.getEnchantmentRegistry().getId(e);
-					if (eid != null && !eid.getNamespace().equals("minecraft")) {
-						mods.add(stack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
+				Identifier id = stack.getId();
+				if (id != null) {
+					mods.add(stack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
+				}
+				if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
+					for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
+						Identifier eid = EmiPort.getEnchantmentRegistry().getId(e);
+						if (eid != null && !eid.getNamespace().equals("minecraft")) {
+							mods.add(stack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
+						}
 					}
 				}
+			} catch (Exception e) {
+				EmiLog.error("EMI caught an exception while baking search for " + stack);
+				e.printStackTrace();
 			}
 		}
 		for (Supplier<EmiAlias> supplier : EmiData.aliases) {
