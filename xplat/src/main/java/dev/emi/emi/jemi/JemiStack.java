@@ -63,7 +63,7 @@ public class JemiStack<T> extends EmiStack {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return renderer.getTooltip(ingredient, TooltipContext.BASIC);
+		return renderer.getTooltip(ingredient, TooltipContext.Default.NORMAL);
 	}
 
 	@Override
