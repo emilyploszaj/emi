@@ -160,7 +160,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		}
 		
 		for (Text text : identical.keySet()) {
-			registry.addRecipe(new EmiInfoRecipe(List.of(EmiIngredient.of(identical.get(text))), List.of(text), null));
+			registry.addRecipe(new EmiInfoRecipe(identical.get(text).stream().map(s -> (EmiIngredient) s).toList(), List.of(text), null));
 		}
 	}
 }

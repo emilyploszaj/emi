@@ -129,9 +129,9 @@ public interface EmiIngredient extends EmiRenderable {
 							tt = Fluid.class;
 						}
 						if (tt == null || (tagType != null && tt != tagType)) {
-							tagType = tt;
 							return new ListEmiIngredient(list, amount);
 						}
+						tagType = tt;
 					}
 				}
 			}
