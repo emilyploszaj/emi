@@ -9,8 +9,10 @@ import dev.emi.emi.platform.EmiAgnos;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
 import mezz.jei.api.helpers.IPlatformFluidHelper;
+import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
+import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 
@@ -42,6 +44,12 @@ public class JemiUtil {
 			return EmiStack.of((ItemStack) ingredient);
 		} else if (type == getFluidType()) {
 			return EmiAgnos.createFluidStack(ingredient);
+		} else {
+			IIngredientManager im = JemiPlugin.runtime.getIngredientManager();
+			IIngredientHelper helper = im.getIngredientHelper(type);
+			if (helper.isValidIngredient(ingredient)) {
+				return new JemiStack(type, helper, im.getIngredientRenderer(type), ingredient);
+			}
 		}
 		return EmiStack.EMPTY;
 	}

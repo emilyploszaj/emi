@@ -369,7 +369,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (snapTabPage) {
 			tp = (tab) / tabPageSize;
 		}
-		tabPage = wrap(tp, (tabs.size() - 1) / tabPageSize);
+		tabPage = wrap(tp, (tabs.size() - 1) / tabPageSize + 1);
 		RecipeTab tab = tabs.get(this.tab);
 		page = wrap(p, tab.getPageCount());
 		if (page < tab.getPageCount()) {
