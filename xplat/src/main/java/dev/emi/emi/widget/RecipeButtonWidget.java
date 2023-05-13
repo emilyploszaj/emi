@@ -46,7 +46,7 @@ public class RecipeButtonWidget extends Widget {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+		RenderSystem.setShaderTexture(0, EmiRenderHelper.BUTTONS);
 		DrawableHelper.drawTexture(matrices, x, y, 12, 12, u, v + getTextureOffset(mouseX, mouseY), 12, 12, 256, 256);
 	}
 }

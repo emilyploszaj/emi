@@ -122,6 +122,9 @@ public class EmiRecipes {
 		EmiRecipes.byOutput = byOutput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
 			return m.getValue().stream().toList();
 		}));
+		for (EmiRecipeCategory category : workstations.keySet()) {
+			workstations.put(category, workstations.get(category).stream().distinct().toList());
+		}
 		for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : byCategory.entrySet()) {
 			for (EmiIngredient ingredient : workstations.getOrDefault(entry.getKey(), List.of())) {
 				for (EmiStack stack : ingredient.getEmiStacks()) {

@@ -11,7 +11,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 
 	public RecipeTreeButtonWidget(int x, int y, EmiRecipe recipe) {
-		super(x, y, 36, 64, recipe);
+		super(x, y, 36, 0, recipe);
 	}
 
 	@Override

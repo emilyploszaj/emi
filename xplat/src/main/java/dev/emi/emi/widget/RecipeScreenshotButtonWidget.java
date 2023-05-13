@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 public class RecipeScreenshotButtonWidget extends RecipeButtonWidget {
 	public RecipeScreenshotButtonWidget(int x, int y, EmiRecipe recipe) {
-		super(x, y, 60, 64, recipe);
+		super(x, y, 60, 0, recipe);
 	}
 
 	@Override

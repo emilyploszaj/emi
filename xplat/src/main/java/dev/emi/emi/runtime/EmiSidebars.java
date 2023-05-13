@@ -69,7 +69,10 @@ public class EmiSidebars {
 				break;
 			}
 			EmiIngredient stack = lookupHistory.get(i);
-			arr.add(EmiIngredientSerializer.getSerialized(stack));
+			JsonElement el = EmiIngredientSerializer.getSerialized(stack);
+			if (el != null && !el.isJsonNull()) {
+				arr.add(el);
+			}
 		}
 		json.add("lookup_history", arr);
 

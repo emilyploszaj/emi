@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi.impl;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -9,6 +10,7 @@ import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
+import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -21,6 +23,8 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	public final Optional<String> name;
 	public final IRecipeSlotTooltipCallback tooltipCallback;
 	public final OffsetDrawable background, overlay;
+	public final Map<IIngredientType<?>, IngredientRenderer<?>> renderers;
+	public final TankInfo tankInfo;
 	public final EmiIngredient stack;
 	public SlotWidget widget;
 
@@ -32,7 +36,9 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 		this.tooltipCallback = builder.tooltipCallback;
 		this.background = builder.background;
 		this.overlay = builder.overlay;
-		this.stack = EmiIngredient.of(builder.acceptor.stacks);
+		this.renderers = builder.renderers;
+		this.tankInfo = builder.tankInfo;
+		this.stack = builder.acceptor.build();
 	}
 
 	@Override
@@ -79,5 +85,11 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	}
 
 	public static record OffsetDrawable(IDrawable drawable, int xOff, int yOff){
+	}
+
+	public static record IngredientRenderer<T>(IIngredientType<T> type, IIngredientRenderer<T> renderer){
+	}
+
+	public static record TankInfo(int width, int height, long capacity, boolean showCapacity) {
 	}
 }

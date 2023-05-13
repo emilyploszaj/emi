@@ -10,6 +10,7 @@
     "accessor.HandledScreenAccessor",
     "accessor.HoeItemAccessor",
     "accessor.ItemRendererAccessor",
+    "accessor.OrderedTextTooltipComponentAccessor",
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
     "accessor.SmithingRecipeAccessor",

@@ -9,23 +9,20 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
-import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.data.RecipeDefault;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiPersistentData;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.RegistryEntry;
 
 public class BoM {
 	private static List<RecipeDefault> defaults = List.of();
@@ -43,16 +40,37 @@ public class BoM {
 	public static JsonObject saveAdded() {
 		JsonArray added = new JsonArray();
 		JsonObject addedTags = new JsonObject();
+		JsonObject resolutions = new JsonObject();
 		Set<Identifier> placed = Sets.newHashSet();
 		for (Map.Entry<EmiIngredient, EmiRecipe> entry : addedRecipes.entrySet()) {
 			EmiRecipe recipe = entry.getValue();
 			if (recipe instanceof EmiResolutionRecipe err) {
 				if (err.ingredient instanceof TagEmiIngredient tei) {
-					addedTags.addProperty(tei.key.id().toString(), EmiPort.getItemRegistry().getId(err.stack.getItemStack().getItem()).toString());
+					JsonElement el = EmiIngredientSerializer.getSerialized(tei.copy().setAmount(1).setChance(1));
+					JsonElement val = EmiIngredientSerializer.getSerialized(err.stack);
+					if (el != null && JsonHelper.isString(el) && val != null) {
+						addedTags.add(el.getAsString(), val);
+					}
 				}
 			} else if (recipe != null && recipe.getId() != null && !placed.contains(recipe.getId())) {
+				DefaultStatus status = getRecipeStatus(recipe);
 				placed.add(recipe.getId());
-				added.add(recipe.getId().toString());
+				if (status == DefaultStatus.FULL) {
+					added.add(recipe.getId().toString());
+				} else if (status == DefaultStatus.PARTIAL) {
+					JsonArray arr = new JsonArray();
+					for (EmiStack stack : recipe.getOutputs()) {
+						if (getRecipe(stack) == recipe) {
+							JsonElement el = EmiIngredientSerializer.getSerialized(stack);
+							if (el != null) {
+								arr.add(el);
+							}
+						}
+					}
+					if (!arr.isEmpty()) {
+						resolutions.add(recipe.getId().toString(), arr);
+					}
+				}
 			}
 		}
 		JsonArray disabled = new JsonArray();
@@ -63,7 +81,8 @@ public class BoM {
 		}
 		JsonObject obj = new JsonObject();
 		obj.add("added", added);
-		obj.add("added_item_tags", addedTags);
+		obj.add("tags", addedTags);
+		obj.add("resolutions", resolutions);
 		obj.add("disabled", disabled);
 		return obj;
 	}
@@ -87,15 +106,26 @@ public class BoM {
 				}
 			}
 		}
-		JsonObject addedTags = JsonHelper.getObject(object, "added_item_tags", new JsonObject());
-		for (String key : addedTags.keySet()) {
-			Item item = EmiPort.getItemRegistry().get(new Identifier(JsonHelper.getString(addedTags, key, "")));
+		JsonObject resolutions = JsonHelper.getObject(object, "resolutions", new JsonObject());
+		for (String key : resolutions.keySet()) {
 			Identifier id = new Identifier(key);
-			TagKey<Item> tag = TagKey.of(EmiPort.getItemRegistry().getKey(), id);
-			List<Item> items = EmiUtil.values(tag).map(RegistryEntry<Item>::value).toList();
-			if (item != null && items.contains(item)) {
-				EmiIngredient tagStack = EmiIngredient.of(tag);
-				addedRecipes.put(tagStack, new EmiResolutionRecipe(tagStack, EmiStack.of(item)));
+			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			if (recipe != null && JsonHelper.hasArray(resolutions, key)) {
+				JsonArray arr = JsonHelper.getArray(resolutions, key);
+				for (JsonElement el : arr) {
+					EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
+					if (!stack.isEmpty()) {
+						addedRecipes.put(stack, recipe);
+					}
+				}
+			}
+		}
+		JsonObject addedTags = JsonHelper.getObject(object, "tags", new JsonObject());
+		for (String key : addedTags.keySet()) {
+			EmiIngredient tag = EmiIngredientSerializer.getDeserialized(new JsonPrimitive(key));
+			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(addedTags.get(key));
+			if (!tag.isEmpty() && !stack.isEmpty() && stack.getEmiStacks().size() == 1 && tag.getEmiStacks().containsAll(stack.getEmiStacks())) {
+				addedRecipes.put(tag, new EmiResolutionRecipe(tag, stack.getEmiStacks().get(0)));
 			}
 		}
 	}
@@ -117,13 +147,29 @@ public class BoM {
 		return !disabledRecipes.contains(recipe) && (defaultRecipes.values().contains(recipe) || addedRecipes.values().contains(recipe));
 	}
 
+	public static DefaultStatus getRecipeStatus(EmiRecipe recipe) {
+		int found = 0;
+		for (EmiStack stack : recipe.getOutputs()) {
+			if (getRecipe(stack) == recipe) {
+				found++;
+			}
+		}
+		if (found == 0) {
+			return DefaultStatus.EMPTY;
+		} else if (found >= recipe.getOutputs().size()) {
+			return DefaultStatus.FULL;
+		} else {
+			return DefaultStatus.PARTIAL;
+		}
+	}
+
 	public static EmiRecipe getRecipe(EmiIngredient stack) {
 		EmiRecipe recipe = addedRecipes.get(stack);
 		if (recipe == null) {
 			recipe = defaultRecipes.get(stack);
-		}
-		if (recipe != null && disabledRecipes.contains(recipe)) {
-			return null;
+			if (recipe != null && disabledRecipes.contains(recipe)) {
+				return null;
+			}
 		}
 		return recipe;
 	}
@@ -137,15 +183,28 @@ public class BoM {
 		tree.addResolution(ingredient, recipe);
 	}
 
-	public static void addRecipe(EmiIngredient stack, EmiRecipe recipe) {
+	public static void addRecipe(EmiRecipe recipe) {
 		disabledRecipes.remove(recipe);
+		for (EmiStack stack : recipe.getOutputs()) {
+			addedRecipes.put(stack, recipe);
+		}
+		EmiPersistentData.save();
+		recalculate();
+	}
+
+	public static void addRecipe(EmiIngredient stack, EmiRecipe recipe) {
 		addedRecipes.put(stack, recipe);
 		EmiPersistentData.save();
 		recalculate();
 	}
 
 	public static void removeRecipe(EmiRecipe recipe) {
-		disabledRecipes.add(recipe);
+		for (EmiStack stack : recipe.getOutputs()) {
+			addedRecipes.remove(stack, recipe);
+		}
+		if (getRecipeStatus(recipe) != DefaultStatus.EMPTY) {
+			disabledRecipes.add(recipe);
+		}
 		EmiPersistentData.save();
 		recalculate();
 	}
@@ -154,5 +213,11 @@ public class BoM {
 		if (tree != null) {
 			tree.recalculate();
 		}
+	}
+
+	public static enum DefaultStatus {
+		EMPTY,
+		PARTIAL,
+		FULL
 	}
 }

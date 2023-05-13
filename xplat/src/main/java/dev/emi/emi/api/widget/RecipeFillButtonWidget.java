@@ -26,7 +26,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@ApiStatus.Internal
 	public RecipeFillButtonWidget(int x, int y, EmiRecipe recipe) {
-		super(x, y, 24, 64, recipe);
+		super(x, y, 24, 0, recipe);
 		HandledScreen hs = EmiApi.getHandledScreen();
 		EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 		tooltip = List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.inapplicable"))));

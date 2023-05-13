@@ -24,7 +24,7 @@ public class EmptyEmiStack extends EmiStack {
 
 	@Override
 	public List<EmiStack> getEmiStacks() {
-		return List.of();
+		return List.of(EMPTY);
 	}
 
 	@Override

@@ -157,7 +157,13 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+	protected boolean isFloatyFluidAgnos(FluidEmiStack stack) {
+		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getNbt());
+		return FluidVariantAttributes.isLighterThanAir(fluid);
+	}
+
+	@Override
+	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getNbt());
 		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
 		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
@@ -166,7 +172,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		Sprite sprite = sprites[0];
 		int color = FluidVariantRendering.getColor(fluid);
 		
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, 16, 16);
+		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
 	}
 
 	@Override

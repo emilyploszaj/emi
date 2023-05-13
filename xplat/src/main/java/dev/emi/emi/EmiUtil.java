@@ -57,10 +57,17 @@ public class EmiUtil {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
-		Optional<Named<T>> opt = Registry.REGISTRIES.get((RegistryKey) key.registry()).getEntryList(key);
+		Registry<T> registry = Registry.REGISTRIES.get((RegistryKey) key.registry());
+		Optional<Named<T>> opt = registry.getEntryList(key);
 		if (opt.isEmpty()) {
 			return Stream.of();
 		} else {
+			if (registry == EmiPort.getFluidRegistry()) {
+				return opt.get().stream().filter(o -> {
+					Fluid f = (Fluid) o.value();
+					return f.isStill(f.getDefaultState());
+				});
+			}
 			return opt.get().stream();
 		}
 	}
