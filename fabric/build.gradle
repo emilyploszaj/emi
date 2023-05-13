@@ -8,8 +8,6 @@ architectury {
 	fabric()
 }
 
-version = "${project.mod_version}+${project.minecraft_version}+fabric"
-
 loom {
 	accessWidenerPath = project(":xplat").loom.accessWidenerPath
 

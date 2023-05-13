@@ -11,6 +11,7 @@
     "accessor.HoeItemAccessor",
     "accessor.ItemRendererAccessor",
     "accessor.LegacySmithingRecipeAccessor",
+    "accessor.OrderedTextTooltipComponentAccessor",
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
     "jei.PluginCallerMixin",

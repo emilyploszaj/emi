@@ -17,7 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 
 public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredientAcceptor> {
 	public final RecipeIngredientRole role;
-	public final List<EmiStack> stacks = Lists.newArrayList();
+	private final List<EmiStack> stacks = Lists.newArrayList();
 
 	public JemiIngredientAcceptor(RecipeIngredientRole role) {
 		this.role = role;

@@ -342,13 +342,13 @@ public class EmiConfig {
 	@ConfigValue("binds.clear-search")
 	public static EmiBind clearSearch = new EmiBind("key.emi.clear_search", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("Display the recipes for creating an item.")
+	@Comment("Display the recipes for creating a stack.")
 	@ConfigValue("binds.view-recipes")
 	public static EmiBind viewRecipes = new EmiBind("key.emi.view_recipes",
 		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_R), 0),
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
-	@Comment("Display the recipes that can be created using an item.")
+	@Comment("Display the recipes that can be created using a stack.")
 	@ConfigValue("binds.view-uses")
 	public static EmiBind viewUses = new EmiBind("key.emi.view_uses",
 		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_U), 0),
@@ -358,7 +358,12 @@ public class EmiConfig {
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
 
-	@Comment("Display the recipe tree for a given item.")
+	@Comment("Set the default recipe for a given stack in the output of a recipe to that recipe.")
+	@ConfigValue("binds.default-stack")
+	public static EmiBind defaultStack = new EmiBind("key.emi.default_stack",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+
+	@Comment("Display the recipe tree for a given stack.")
 	@ConfigValue("binds.view-stack-tree")
 	public static EmiBind viewStackTree = new EmiBind("key.emi.view_stack_tree", InputUtil.UNKNOWN_KEY.getCode());
 

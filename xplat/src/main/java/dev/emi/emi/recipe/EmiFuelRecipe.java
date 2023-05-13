@@ -52,7 +52,7 @@ public class EmiFuelRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayWidth() {
-		return 134;
+		return 144;
 	}
 
 	@Override

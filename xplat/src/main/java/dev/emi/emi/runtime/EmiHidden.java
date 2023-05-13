@@ -17,7 +17,10 @@ public class EmiHidden {
 	public static JsonArray save() {
 		JsonArray arr = new JsonArray();
 		for (EmiIngredient stack : hiddenStacks) {
-			arr.add(EmiIngredientSerializer.getSerialized(stack));
+			JsonElement el = EmiIngredientSerializer.getSerialized(stack);
+			if (el != null && !el.isJsonNull()) {
+				arr.add(el);
+			}
 		}
 		return arr;
 	}

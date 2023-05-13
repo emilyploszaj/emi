@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -15,6 +14,7 @@ import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -26,9 +26,11 @@ import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.emi.runtime.EmiReloadManager;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
 import mezz.jei.api.registration.IRuntimeRegistration;
@@ -71,6 +73,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	@Override
 	public void register(EmiRegistry registry) {
 		EmiLog.info("[JEMI] Waiting for JEI to finish reloading...");
+		EmiReloadManager.step(EmiPort.literal("Waiting for JEI to finish..."), 20_000);
 		try {
 			while (true) {
 				if (runtime != null) {
@@ -82,6 +85,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			return;
 		}
 		EmiLog.info("[JEMI] JEI reloaded!");
+		EmiReloadManager.step(EmiPort.literal("Loading information from JEI..."), 5_000);
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
 			if (runtime != null && runtime.getScreenHelper() != null) {
@@ -94,19 +98,38 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			}
 		});
 
-		Set<String> handledNamespaces = Stream.concat(EmiAgnos.getPlugins().stream().map(EmiPluginContainer::id), Stream.of("minecraft", "jei"))
-			.distinct().collect(Collectors.toSet());
+		Set<String> handledNamespaces = EmiAgnos.getPlugins().stream().map(EmiPluginContainer::id).collect(Collectors.toSet());
 		Set<Identifier> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
+		Map<RecipeType, EmiRecipeCategory> categoryMap = Maps.newHashMap();
+		categoryMap.put(RecipeTypes.CRAFTING, VanillaEmiRecipeCategories.CRAFTING);
+		categoryMap.put(RecipeTypes.SMELTING, VanillaEmiRecipeCategories.SMELTING);
+		categoryMap.put(RecipeTypes.BLASTING, VanillaEmiRecipeCategories.BLASTING);
+		categoryMap.put(RecipeTypes.SMOKING, VanillaEmiRecipeCategories.SMOKING);
+		categoryMap.put(RecipeTypes.CAMPFIRE_COOKING, VanillaEmiRecipeCategories.CAMPFIRE_COOKING);
+		categoryMap.put(RecipeTypes.STONECUTTING, VanillaEmiRecipeCategories.STONECUTTING);
+		categoryMap.put(RecipeTypes.SMITHING, VanillaEmiRecipeCategories.SMITHING);
+		categoryMap.put(RecipeTypes.ANVIL, VanillaEmiRecipeCategories.ANVIL_REPAIRING);
+		categoryMap.put(RecipeTypes.BREWING, VanillaEmiRecipeCategories.BREWING);
+		categoryMap.put(RecipeTypes.FUELING, VanillaEmiRecipeCategories.FUEL);
+		categoryMap.put(RecipeTypes.COMPOSTING, VanillaEmiRecipeCategories.COMPOSTING);
+		categoryMap.put(RecipeTypes.INFORMATION, VanillaEmiRecipeCategories.INFO);
 
 		List<IRecipeCategory<?>> categories = runtime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().toList();
 		for (IRecipeCategory<?> c : categories) {
+			EmiReloadManager.step(EmiPort.literal("Loading JEI data for ").append(c.getTitle()), 5_000);
 			try {
-				Identifier id = c.getRecipeType().getUid();
-				if (c.getRecipeType() == RecipeTypes.INFORMATION) {
-					try {
+				RecipeType type = c.getRecipeType();
+				Identifier id = type.getUid();
+				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(type).includeHidden().get().map(JemiUtil::getStack).toList();
+				if (categoryMap.containsKey(type)) {
+					EmiRecipeCategory category = categoryMap.get(type);
+					for (EmiStack catalyst : catalysts) {
+						if (!catalyst.isEmpty()) {
+							registry.addWorkstation(category, catalyst);
+						}
+					}
+					if (type == RecipeTypes.INFORMATION) {
 						addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
-					} catch (Throwable t) {
-						t.printStackTrace();
 					}
 					continue;
 				}
@@ -120,13 +143,12 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				}
 				EmiRecipeCategory category = new JemiCategory(c);
 				registry.addCategory(category);
-				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(c.getRecipeType()).includeHidden().get().map(JemiUtil::getStack).toList();
 				for (EmiStack catalyst : catalysts) {
 					if (!catalyst.isEmpty()) {
 						registry.addWorkstation(category, catalyst);
 					}
 				}
-				List<?> recipes = runtime.getRecipeManager().createRecipeLookup(c.getRecipeType()).includeHidden().get().toList();
+				List<?> recipes = runtime.getRecipeManager().createRecipeLookup(type).includeHidden().get().toList();
 				for (Object r : recipes) {
 					try {
 						registry.addRecipe(new JemiRecipe(category, c, r));

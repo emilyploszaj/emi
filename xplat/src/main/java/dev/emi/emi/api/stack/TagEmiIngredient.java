@@ -156,7 +156,7 @@ public class TagEmiIngredient implements EmiIngredient {
 				RenderSystem.applyModelViewMatrix();
 			}
 		}
-		if ((flags & RENDER_AMOUNT) != 0) {
+		if ((flags & RENDER_AMOUNT) != 0 && !key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
 			String count = "";
 			if (amount != 1) {
 				count += amount;
@@ -177,6 +177,9 @@ public class TagEmiIngredient implements EmiIngredient {
 		list.add(TooltipComponent.of(EmiPort.ordered(EmiTags.getTagName(key))));
 		if (EmiUtil.showAdvancedTooltips()) {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
+		}
+		if (key.registry().equals(EmiPort.getFluidRegistry().getKey()) && amount > 1) {
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiRenderHelper.getAmountText(this, amount))));
 		}
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(id.getNamespace());

@@ -2,6 +2,7 @@ package dev.emi.emi.jemi;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -12,8 +13,9 @@ public class JemiCategory extends EmiRecipeCategory {
 
 	public JemiCategory(IRecipeCategory<?> category) {
 		super(category.getRecipeType().getUid(), (matrices, x, y, delta) -> {
-			if (category.getIcon() != null) {
-				category.getIcon().draw(matrices, x, y);
+			IDrawable icon = category.getIcon();
+			if (icon != null) {
+				icon.draw(matrices, x + (16 - icon.getWidth()) / 2, y + (16 - icon.getHeight()) / 2);
 			} else {
 				MinecraftClient client = MinecraftClient.getInstance();
 				String title = category.getTitle().getString();

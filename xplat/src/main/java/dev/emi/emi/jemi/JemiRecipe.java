@@ -18,6 +18,7 @@ import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
+import dev.emi.emi.jemi.widget.JemiTankWidget;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
@@ -113,7 +114,11 @@ public class JemiRecipe<T> implements EmiRecipe {
 			});
 			for (JemiRecipeSlotBuilder sb : builder.slots) {
 				JemiRecipeSlot slot = new JemiRecipeSlot(sb);
-				widgets.add(new JemiSlotWidget(slot, this));
+				if (slot.tankInfo != null) {
+					widgets.add(new JemiTankWidget(slot, this));
+				} else {
+					widgets.add(new JemiSlotWidget(slot, this));
+				}
 			}
 		}
 	}

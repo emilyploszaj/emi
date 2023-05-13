@@ -1,11 +1,16 @@
 package dev.emi.emi.jemi.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Maps;
+
+import dev.emi.emi.jemi.impl.JemiRecipeSlot.IngredientRenderer;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot.OffsetDrawable;
+import dev.emi.emi.jemi.impl.JemiRecipeSlot.TankInfo;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
@@ -21,6 +26,8 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	public Optional<String> name = Optional.empty();
 	public IRecipeSlotTooltipCallback tooltipCallback;
 	public OffsetDrawable background, overlay;
+	public Map<IIngredientType<?>, IngredientRenderer<?>> renderers; 
+	public TankInfo tankInfo;
 
 	public JemiRecipeSlotBuilder(RecipeIngredientRole role, int x, int y) {
 		this.acceptor = new JemiIngredientAcceptor(role);
@@ -84,16 +91,17 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 
 	@Override
 	public IRecipeSlotBuilder setFluidRenderer(long capacity, boolean showCapacity, int width, int height) {
-		// TODO Auto-generated method stub
-		float f;
+		this.tankInfo = new TankInfo(width, height, capacity, showCapacity);
 		return this;
 	}
 
 	@Override
 	public <T> IRecipeSlotBuilder setCustomRenderer(IIngredientType<T> ingredientType,
 			IIngredientRenderer<T> ingredientRenderer) {
-		// TODO Auto-generated method stub
-		float f;
+		if (renderers == null) {
+			renderers = Maps.newHashMap();
+		}
+		renderers.put(ingredientType, new IngredientRenderer<T>(ingredientType, ingredientRenderer));
 		return this;
 	}
 }

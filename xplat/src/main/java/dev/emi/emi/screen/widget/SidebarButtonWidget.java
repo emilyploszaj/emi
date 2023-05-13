@@ -2,6 +2,7 @@ package dev.emi.emi.screen.widget;
 
 import java.util.List;
 
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 
@@ -15,6 +16,7 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 			return List.of(panel.getType().getText());
 		});
 		this.panel = panel;
+		texture = EmiRenderHelper.WIDGETS;
 	}
 
 	@Override

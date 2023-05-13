@@ -95,11 +95,21 @@ public abstract class EmiAgnos {
 
 	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt);
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
-		delegate.renderFluidAgnos(stack, matrices, x, y, delta);
+	public static boolean isFloatyFluid(FluidEmiStack stack) {
+		return delegate.isFloatyFluidAgnos(stack);
 	}
 
-	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta);
+	protected abstract boolean isFloatyFluidAgnos(FluidEmiStack stack);
+
+	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+		renderFluid(stack, matrices, x, y, delta, 0, 0, 16, 16);
+	}
+
+	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+		delegate.renderFluidAgnos(stack, matrices, x, y, delta, xOff, yOff, width, height);
+	}
+
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
 
 	public static EmiStack createFluidStack(Object object) {
 		return delegate.createFluidStackAgnos(object);

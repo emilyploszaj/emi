@@ -198,17 +198,18 @@ public class SlotWidget extends Widget {
 			EmiRender.renderCatalystIcon(getStack(), matrices, x + xOff, y + yOff);
 		}
 
-		if (bounds.contains(mouseX, mouseY)) {
+		if (shouldDrawSlotHighlight(mouseX, mouseY)) {
 			drawSlotHighlight(matrices, bounds);
 		}
 	}
 
+	public boolean shouldDrawSlotHighlight(int mouseX, int mouseY) {
+		return getBounds().contains(mouseX, mouseY) && EmiConfig.showHoverOverlay;
+	}
+
 	public void drawSlotHighlight(MatrixStack matrices, Bounds bounds) {
-		if (EmiConfig.showHoverOverlay) {
-			RenderSystem.disableDepthTest();
-			EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
-			RenderSystem.enableDepthTest();
-		}
+		RenderSystem.disableDepthTest();
+		EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
 	}
 	
 	@Override

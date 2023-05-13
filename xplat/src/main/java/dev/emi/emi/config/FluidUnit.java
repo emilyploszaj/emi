@@ -1,14 +1,18 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.platform.EmiAgnos;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
 import net.minecraft.text.Text;
 
 public enum FluidUnit implements ConfigEnum {
-	LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters", (int) (a / literDivisor()))),
-	MILLIBUCKETS("millibuckets", a -> EmiPort.translatable("emi.fluid.amount.millibuckets", (int) (a / literDivisor()))),
-	DROPLETS("droplets", a -> EmiPort.translatable("emi.fluid.amount.droplets", (int) a)),
+	LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters",
+		EmiRenderHelper.TEXT_FORMAT.format((int) (a / literDivisor())))),
+	MILLIBUCKETS("millibuckets", a -> EmiPort.translatable("emi.fluid.amount.millibuckets",
+		EmiRenderHelper.TEXT_FORMAT.format((int) (a / literDivisor())))),
+	DROPLETS("droplets", a -> EmiPort.translatable("emi.fluid.amount.droplets",
+		EmiRenderHelper.TEXT_FORMAT.format((int) a))),
 	;
 
 	public static final int BUCKET = EmiAgnos.isForge() ? 1000 : 81_000;

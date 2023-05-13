@@ -152,7 +152,7 @@ public class ConfigScreen extends Screen {
 			MinecraftClient client = MinecraftClient.getInstance();
 			client.setScreen(new ConfigPresetScreen(this));
 		}));
-		this.addDrawableChild(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 64, () -> true, widget -> {
+		this.addDrawableChild(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 0, () -> true, widget -> {
 			EmiConfig.setGlobalState(!EmiConfig.useGlobalConfig);
 			ConfigScreen.this.resize(client, width, height);
 		}, () -> (EmiConfig.useGlobalConfig ? 40 : 0), () -> {

@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 public class SizedButtonWidget extends ButtonWidget {
 	private final BooleanSupplier isActive;
 	private final IntSupplier vOffset;
-	protected Identifier texture = EmiRenderHelper.WIDGETS;
+	protected Identifier texture = EmiRenderHelper.BUTTONS;
 	protected Supplier<List<Text>> text;
 	protected int u, v;
 

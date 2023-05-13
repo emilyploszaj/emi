@@ -26,7 +26,11 @@ allprojects {
 	}
 
 	archivesBaseName = rootProject.archives_base_name
-	version = rootProject.mod_version
+	version = "${rootProject.mod_version}"
+	if (System.getenv().RELEASE == null) {
+		version += "-SNAPSHOT"
+	}
+	version += "+${rootProject.minecraft_version}+${project.name}"
 	group = rootProject.maven_group
 
 	repositories {
