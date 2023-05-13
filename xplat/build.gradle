@@ -20,6 +20,14 @@ dependencies {
 	}
 }
 
+processResources {
+	inputs.property "version", project(":fabric").version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project(":fabric").version
+	}
+}
+
 afterEvaluate {
 	configurations.default.extendsFrom = [configurations.namedElements]
 }

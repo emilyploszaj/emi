@@ -144,12 +144,20 @@ public class EmiAgnosForge extends EmiAgnos {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected List<String> getAllModAuthorsAgnos() {
 		return ModList.get().getMods().stream().flatMap(m -> {
 			Optional<Object> opt = m.getConfig().getConfigElement("authors");
 			if (opt.isPresent()) {
-				String authors = (String) opt.get();
-				return Lists.newArrayList(authors.split("\\,")).stream().map(s -> s.trim());
+				Object obj = opt.get();
+				if (obj instanceof String authors) {
+					return Lists.newArrayList(authors.split("\\,")).stream().map(s -> s.trim());
+				} else if (obj instanceof List<?> list) {
+					if (list.size() > 0 && list.get(0) instanceof String) {
+						List<String> authors = (List<String>) list;
+						return authors.stream();
+					}
+				}
 			}
 			return Stream.empty();
 		}).distinct().toList();
@@ -166,14 +174,20 @@ public class EmiAgnosForge extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+	protected boolean isFloatyFluidAgnos(FluidEmiStack stack) {
+		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
+		return fs.getFluid().getFluidType().isLighterThanAir();
+	}
+
+	@Override
+	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
 		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
 		Identifier texture = ext.getStillTexture(fs);
 		int color = ext.getTintColor(fs);
 		MinecraftClient client = MinecraftClient.getInstance();
 		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, 16, 16);
+		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
 	}
 
 	@Override

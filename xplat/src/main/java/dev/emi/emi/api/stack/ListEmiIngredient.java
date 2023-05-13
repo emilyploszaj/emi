@@ -6,7 +6,6 @@ import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -83,16 +82,13 @@ public class ListEmiIngredient implements EmiIngredient {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
+		EmiIngredient current = ingredients.get(item);
 		if ((flags & RENDER_ICON) != 0) {
-			int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
-			ingredients.get(item).render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
+			current.render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
-			String count = "";
-			if (amount != 1) {
-				count += amount;
-			}
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
+			current.copy().setAmount(amount).render(matrices, x, y, delta, RENDER_AMOUNT);
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
 			EmiRender.renderIngredientIcon(this, matrices, x, y);
@@ -105,7 +101,7 @@ public class ListEmiIngredient implements EmiIngredient {
 		tooltip.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.accepts"))));
 		tooltip.add(new IngredientTooltipComponent(ingredients));
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
-		tooltip.addAll(ingredients.get(item).getTooltip());
+		tooltip.addAll(ingredients.get(item).copy().setAmount(amount).getTooltip());
 		return tooltip;
 	}
 }

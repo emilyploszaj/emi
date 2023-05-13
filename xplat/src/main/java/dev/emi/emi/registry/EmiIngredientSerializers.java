@@ -35,6 +35,9 @@ public class EmiIngredientSerializers {
 	}
 
 	public static EmiIngredient deserialize(JsonElement element) {
+		if (element == null || element.isJsonNull()) {
+			return EmiStack.EMPTY;
+		}
 		try {
 			String type;
 			if (element.isJsonObject()) {

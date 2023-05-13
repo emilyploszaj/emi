@@ -65,17 +65,17 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		super(EmiPort.translatable("screen.emi.recipe"));
 		this.old = old;
 		arrows = List.of(
-			new SizedButtonWidget(x + 2, y - 18, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 2, y - 18, 12, 12, 0, 0,
 				() -> tabs.size() > tabPageSize, w -> setPage(tabPage - 1, tab, page)),
-			new SizedButtonWidget(x + backgroundWidth - 14, y - 18, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 14, y - 18, 12, 12, 12, 0,
 				() -> tabs.size() > tabPageSize, w -> setPage(tabPage + 1, tab, page)),
-			new SizedButtonWidget(x + 5, y + 5, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 5, y + 5, 12, 12, 0, 0,
 				() -> tabs.size() > 1, w -> setPage(tabPage, tab - 1, 0)),
-			new SizedButtonWidget(x + backgroundWidth - 17, y + 5, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 17, y + 5, 12, 12, 12, 0,
 				() -> tabs.size() > 1, w -> setPage(tabPage, tab + 1, 0)),
-			new SizedButtonWidget(x + 5, y + 18, 12, 12, 0, 64,
+			new SizedButtonWidget(x + 5, y + 18, 12, 12, 0, 0,
 				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page - 1)),
-			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 64,
+			new SizedButtonWidget(x + backgroundWidth - 17, y + 18, 12, 12, 12, 0,
 				() -> tabs.get(tab).getPageCount() > 1, w -> setPage(tabPage, tab, page + 1))
 		);
 		resolve = null;

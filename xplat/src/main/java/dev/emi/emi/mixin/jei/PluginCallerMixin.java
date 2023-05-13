@@ -19,10 +19,15 @@ public class PluginCallerMixin {
 		method = "callOnPlugins", remap = false)
 	private static void callOnPlugins(Consumer<IModPlugin> target, Object value, String title, List<IModPlugin> plugins, Consumer<IModPlugin> func) {
 		IModPlugin plugin = (IModPlugin) value;
-		if (title.equals("Registering Runtime") && plugin.getPluginUid().getNamespace().equals("jei")) {
-
-		} else {
-			target.accept(plugin);
+		if (plugin.getPluginUid().getNamespace().equals("jei")) {
+			switch (title) {
+				case "Registering categories" -> {}
+				case "Registering ingredients" -> {}
+				case "Sending Runtime" -> {}
+				case "Sending Runtime Unavailable" -> {}
+				default -> { return; }
+			}
 		}
+		target.accept(plugin);
 	}
 }

@@ -54,6 +54,7 @@ public class TagEmiIngredientSerializer implements EmiIngredientSerializer<TagEm
 		if (stack.getAmount() == 1 && stack.getChance() == 1) {
 			String type = switch(stack.key.registry().getValue().toString()) {
 				case "minecraft:item" -> "item";
+				case "minecraft:fluid" -> "fluid";
 				default -> null;
 			};
 			return new JsonPrimitive("#" + type + ":" + stack.key.id());

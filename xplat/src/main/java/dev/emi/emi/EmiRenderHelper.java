@@ -18,6 +18,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.mixin.accessor.OrderedTextTooltipComponentAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -26,6 +27,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
+import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -34,6 +36,8 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -43,6 +47,7 @@ public class EmiRenderHelper {
 	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
+	public static final Identifier BUTTONS = new Identifier("emi", "textures/gui/buttons.png");
 	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
 	public static final Identifier GRID = new Identifier("emi", "textures/gui/grid.png");
 	public static final Identifier DASH = new Identifier("emi", "textures/gui/dash.png");
@@ -77,7 +82,7 @@ public class EmiRenderHelper {
 		DrawableHelper.drawTexture(matrices, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
 	}
 
-	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int width, int height) {
+	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
 		EmiPort.setPositionColorTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
@@ -93,10 +98,12 @@ public class EmiRenderHelper {
 		float yMin = (float) y;
 		float xMax = xMin + width;
 		float yMax = yMin + height;
-		float uMin = sprite.getMinU();
-		float vMin = sprite.getMinV();
-		float uMax = sprite.getMaxU();
-		float vMax = sprite.getMaxV();
+		float uSpan = sprite.getMaxU() - sprite.getMinU();
+		float vSpan = sprite.getMaxV() - sprite.getMinV();
+		float uMin = sprite.getMinU() + uSpan / 16 * xOff;
+		float vMin = sprite.getMinV() + vSpan / 16 * yOff;
+		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
+		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
 		Matrix4f model = matrices.peek().getPositionMatrix();
 		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
 		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
@@ -145,17 +152,44 @@ public class EmiRenderHelper {
 		int original = screen.width;
 		try {
 			screen.width = x;
-			drawTooltip(screen, matrices, components, x, y);
+			drawTooltip(screen, matrices, components, x, y, original);
 		} finally {
 			screen.width = original;
 		}
 	}
 
 	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
+		drawTooltip(screen, matrices, components, x, y, screen.width);
+	}
+
+	private static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y, int width) {
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();
-		mutable.addAll(components);
+		int wrapWidth = Math.max(components.stream()
+			.map(c -> c instanceof OrderedTextTooltipComponent ? 0 : c.getWidth(CLIENT.textRenderer))
+			.max(Integer::compare).orElse(0), width / 2);
+		for (TooltipComponent comp : components) {
+			if (comp instanceof OrderedTextTooltipComponent ottc && ottc.getWidth(CLIENT.textRenderer) > wrapWidth) {
+				try {
+					OrderedText ordered = ((OrderedTextTooltipComponentAccessor) ottc).getText();
+					MutableText text = Text.empty();
+					// Mojang, what is this??? Please give me some other way to wrap
+					ordered.accept(((var1, style, codepoint) -> {
+						text.append(EmiPort.literal(String.valueOf(Character.toChars(codepoint)), style));
+						return true;
+					}));
+					for (OrderedText o : CLIENT.textRenderer.wrapLines(text, wrapWidth)) {
+						mutable.add(TooltipComponent.of(o));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					mutable.add(comp);
+				}
+			} else {
+				mutable.add(comp);
+			}
+		}
 		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, mutable, x, y, HoveredTooltipPositioner.INSTANCE);
 	}
 
@@ -189,7 +223,7 @@ public class EmiRenderHelper {
 		if (stack.getEmiStacks().get(0).getKey() instanceof Fluid) {
 			return EmiConfig.fluidUnit.translate(amount);
 		}
-		return EmiPort.literal("" + amount);
+		return EmiPort.literal(TEXT_FORMAT.format(amount));
 	}
 
 	public static Text getFluidAmount(long amount) {

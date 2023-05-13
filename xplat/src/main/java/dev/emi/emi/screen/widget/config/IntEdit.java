@@ -34,11 +34,11 @@ public class IntEdit {
 			return NUMBER.matcher(s).matches();
 		});
 
-		up = new SizedButtonWidget(150, 0, 12, 10, 232, 112, () -> true, button -> {
+		up = new SizedButtonWidget(150, 0, 12, 10, 232, 48, () -> true, button -> {
 			setter.accept(getter.getAsInt() + getInc());
 			text.setText("" + getter.getAsInt());
 		});
-		down = new SizedButtonWidget(150, 10, 12, 10, 244, 112, () -> true, button -> {
+		down = new SizedButtonWidget(150, 10, 12, 10, 244, 48, () -> true, button -> {
 			setter.accept(getter.getAsInt() - getInc());
 			text.setText("" + getter.getAsInt());
 		});
