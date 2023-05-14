@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -102,6 +103,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void addWidgets(WidgetHolder widgets) {
 		Optional<IRecipeLayoutDrawable<T>> opt = JemiPlugin.runtime.getRecipeManager().createRecipeLayoutDrawable(category, recipe, FocusGroup.EMPTY);
 		if (opt.isPresent()) {
@@ -109,12 +111,13 @@ public class JemiRecipe<T> implements EmiRecipe {
 			widgets.addDrawable(0, 0, getDisplayWidth(), getDisplayHeight(), (matrices, mouseX, mouseY, delta) -> {
 				category.getBackground().draw(matrices);
 				category.draw(recipe, drawable.getRecipeSlotsView(), matrices, mouseX, mouseY);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			}).tooltip((x, y) -> {
 				return category.getTooltipStrings(recipe, drawable.getRecipeSlotsView(), x, y).stream().map(t -> TooltipComponent.of(t.asOrderedText())).toList();
 			});
 			for (JemiRecipeSlotBuilder sb : builder.slots) {
 				JemiRecipeSlot slot = new JemiRecipeSlot(sb);
-				if (slot.tankInfo != null) {
+				if (slot.tankInfo != null && !slot.getIngredients(JemiUtil.getFluidType()).toList().isEmpty()) {
 					widgets.add(new JemiTankWidget(slot, this));
 				} else {
 					widgets.add(new JemiSlotWidget(slot, this));

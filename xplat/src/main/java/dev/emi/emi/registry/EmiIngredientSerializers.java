@@ -25,6 +25,9 @@ public class EmiIngredientSerializers {
 	}
 
 	public static @Nullable JsonElement serialize(EmiIngredient ingredient) {
+		if (ingredient == null || !BY_CLASS.containsKey(ingredient.getClass())) {
+			return null;
+		}
 		try {
 			return ((EmiIngredientSerializer) BY_CLASS.get(ingredient.getClass())).serialize(ingredient);
 		} catch (Exception e) {
