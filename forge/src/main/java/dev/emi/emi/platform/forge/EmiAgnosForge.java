@@ -44,8 +44,8 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 public class EmiAgnosForge extends EmiAgnos {
 	static {
@@ -71,7 +71,7 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected Path getConfigDirectoryAgnos() {
-		return Path.of(FMLConfig.defaultConfigPath());
+		return FMLPaths.CONFIGDIR.get();
 	}
 
 	@Override

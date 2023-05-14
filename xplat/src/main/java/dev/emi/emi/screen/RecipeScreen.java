@@ -221,9 +221,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
-			MatrixStack view = RenderSystem.getModelViewStack();
-			view.push();
-			view.translate(group.x(), group.y(), 0);
+			matrices.push();
+			matrices.translate(group.x(), group.y(), 0);
 			RenderSystem.applyModelViewMatrix();
 			try {
 				for (Widget widget : group.widgets) {
@@ -247,7 +246,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					}
 				}
 			}
-			view.pop();
+			matrices.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
 		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, delta);
