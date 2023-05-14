@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
@@ -64,6 +65,7 @@ public class JemiSlotWidget extends SlotWidget {
 					IIngredientRenderer renderer = slot.renderers.get(typed.getType()).renderer();
 					int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
 					int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
+					RenderSystem.enableBlend();
 					matrices.push();
 					matrices.translate(xOff, yOff, 0);
 					renderer.render(matrices, typed.getIngredient());
@@ -78,7 +80,11 @@ public class JemiSlotWidget extends SlotWidget {
 	@Override
 	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (slot.overlay != null) {
+			RenderSystem.enableBlend();
+			matrices.push();
+			matrices.translate(0, 0, 200);
 			slot.overlay.drawable().draw(matrices, x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
+			matrices.pop();
 		}
 		super.drawOverlay(matrices, mouseX, mouseY, delta);
 	}

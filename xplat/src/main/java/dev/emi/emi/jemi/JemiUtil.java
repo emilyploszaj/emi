@@ -74,11 +74,11 @@ public class JemiUtil {
 		return EmiStack.EMPTY;
 	}
 
-	private static IPlatformFluidHelper getFluidHelper() {
+	public static IPlatformFluidHelper getFluidHelper() {
 		return JemiPlugin.runtime.getJeiHelpers().getPlatformFluidHelper();
 	}
 
-	private static IIngredientType getFluidType() {
+	public static IIngredientType getFluidType() {
 		return getFluidHelper().getFluidIngredientType();
 	}
 }
