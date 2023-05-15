@@ -128,7 +128,7 @@ public class EmiReloadManager {
 						.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList());
 					
 					if (EmiAgnos.isModLoaded("jei")) {
-						plugins.add(new EmiPluginContainer(new JemiPlugin(), "emi"));
+						plugins.add(new EmiPluginContainer(new JemiPlugin(), "jemi"));
 					}
 					
 					for (EmiPluginContainer container : plugins) {

@@ -116,6 +116,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 		List<IRecipeCategory<?>> categories = runtime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().toList();
 		for (IRecipeCategory<?> c : categories) {
+			EmiLog.info("[JEMI] Collecing data for " + c.getTitle().getString());
 			EmiReloadManager.step(EmiPort.literal("Loading JEI data for ").append(c.getTitle()), 5_000);
 			try {
 				RecipeType type = c.getRecipeType();
