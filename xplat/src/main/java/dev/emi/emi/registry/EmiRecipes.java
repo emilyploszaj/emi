@@ -27,6 +27,8 @@ import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
@@ -67,6 +69,9 @@ public class EmiRecipes {
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 
 		invalidators.addAll(EmiData.recipeFilters);
+
+		Object2IntMap<Identifier> duplicateIds = new Object2IntOpenHashMap<>();
+
 		outer:
 		for (EmiRecipe recipe : recipes) {
 			for (Predicate<EmiRecipe> predicate : invalidators) {
@@ -91,11 +96,16 @@ public class EmiRecipes {
 			byCategory.computeIfAbsent(category, a -> Lists.newArrayList()).add(recipe);
 			if (id != null) {
 				if (byId.containsKey(id)) {
-					EmiReloadLog.warn("Recipe loaded with duplicate id: " + id);
+					duplicateIds.put(id, duplicateIds.getOrDefault(id, 1) + 1);
 				}
 				byId.put(id, recipe);
 			}
 		}
+
+		for (Identifier id : duplicateIds.keySet()) {
+			EmiReloadLog.warn(duplicateIds.getInt(id) + " recipes loaded with the same id: " + id);
+		}
+
 		for (EmiRecipeCategory category : byCategory.keySet()) {
 			String key = EmiUtil.translateId("emi.category.", category.getId());
 			if (category.getName().equals(EmiPort.translatable(key)) && !I18n.hasTranslation(key)) {

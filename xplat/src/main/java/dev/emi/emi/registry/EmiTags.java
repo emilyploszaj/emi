@@ -1,5 +1,6 @@
 package dev.emi.emi.registry;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,11 +36,13 @@ import net.minecraft.util.Identifier;
 
 public class EmiTags {
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
+	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
+	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
 	private static final Map<Identifier, List<TagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<Registry<?>> REGISTRIES = List.of(EmiPort.getItemRegistry(), EmiPort.getFluidRegistry());
 	public static final List<TagKey<?>> TAGS = Lists.newArrayList();
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<EmiStack> stacks, long amount) {
 		Registry<T> registry;
 		if (clazz == Item.class) {
@@ -60,21 +63,33 @@ public class EmiTags {
 		} else if (map.size() == 1) {
 			return map.values().stream().toList().get(0);
 		}
-		List<TagKey<T>> keys = Lists.newArrayList();
-		for (TagKey<T> key : getTags(registry)) {
-			List<T> values = EmiUtil.values(key).map(i -> i.value()).toList();
-			if (values.size() < 2) {
-				continue;
-			}
-			if (map.keySet().containsAll(values)) {
+		List<TagKey<T>> keys = (List<TagKey<T>>) (List) CACHED_TAGS.get(map.keySet());
+
+		if (keys != null) {
+			for (TagKey<T> key : keys) {
+				List<T> values = (List<T>) TAG_VALUES.get(key);
 				map.keySet().removeAll(values);
-				keys.add(key);
 			}
-			if (map.isEmpty()) {
-				break;
+		} else {
+			keys = Lists.newArrayList();
+			Set<T> original = new HashSet<>(map.keySet());
+			for (TagKey<T> key : getTags(registry)) {
+				List<T> values = (List<T>) TAG_VALUES.get(key);
+				if (values.size() < 2) {
+					continue;
+				}
+				if (map.keySet().containsAll(values)) {
+					map.keySet().removeAll(values);
+					keys.add(key);
+				}
+				if (map.isEmpty()) {
+					break;
+				}
 			}
+			CACHED_TAGS.put((Set) original, (List) keys);
 		}
-		if (keys.isEmpty()) {
+
+		if (keys == null || keys.isEmpty()) {
 			return new ListEmiIngredient(stacks.stream().toList(), amount);
 		} else if (map.isEmpty()) {
 			if (keys.size() == 1) {
@@ -172,6 +187,8 @@ public class EmiTags {
 	public static void reload() {
 		TAGS.clear();
 		SORTED_TAGS.clear();
+		TAG_VALUES.clear();
+		CACHED_TAGS.clear();
 		for (Registry<?> registry : REGISTRIES) {
 			reloadTags(registry);
 		}
@@ -184,6 +201,9 @@ public class EmiTags {
 			.toList();
 		logUntranslatedTags(tags);
 		tags = consolodateTags(tags);
+		for (TagKey<T> key : tags) {
+			TAG_VALUES.put(key, EmiUtil.values(key).map(i -> i.value()).toList());
+		}
 		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.toString().compareTo(b.toString())).toList());
 		tags = tags.stream()
 			.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
