@@ -9,12 +9,13 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
+import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
+import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
-import dev.emi.emi.screen.FakeScreen;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -33,16 +34,30 @@ public class JemiSlotWidget extends SlotWidget {
 			this.recipeContext(recipe);
 		}
 		this.drawBack(false);
+		IIngredientRenderer<?> renderer = getRenderer();
+		if (renderer != null) {
+			this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
+		}
+	}
+
+	private ITypedIngredient<?> getIngredient() {
 		if (slot.renderers != null) {
 			Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(getStack().getEmiStacks().get(0));
 			if (opt.isPresent()) {
-				ITypedIngredient<?> typed = opt.get();
-				if (slot.renderers.containsKey(typed.getType())) {
-					IIngredientRenderer<?> renderer = slot.renderers.get(typed.getType()).renderer();
-					this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
-				}
+				return opt.get();
 			}
 		}
+		return null;
+	}
+
+	private IIngredientRenderer<?> getRenderer() {
+		ITypedIngredient<?> typed = getIngredient();
+		if (typed != null) {
+			if (slot.renderers.containsKey(typed.getType())) {
+				return slot.renderers.get(typed.getType()).renderer();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -56,23 +71,18 @@ public class JemiSlotWidget extends SlotWidget {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void drawStack(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		if (slot.renderers != null) {
-			Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(getStack().getEmiStacks().get(0));
-			if (opt.isPresent()) {
-				ITypedIngredient<?> typed = opt.get();
-				if (slot.renderers.containsKey(typed.getType())) {
-					Bounds bounds = getBounds();
-					IIngredientRenderer renderer = slot.renderers.get(typed.getType()).renderer();
-					int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
-					int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
-					RenderSystem.enableBlend();
-					matrices.push();
-					matrices.translate(xOff, yOff, 0);
-					renderer.render(matrices, typed.getIngredient());
-					matrices.pop();
-					return;
-				}
-			}
+		IIngredientRenderer renderer = getRenderer();
+		if (renderer != null) {
+			ITypedIngredient<?> typed = getIngredient();
+			Bounds bounds = getBounds();
+			int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
+			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
+			RenderSystem.enableBlend();
+			matrices.push();
+			matrices.translate(xOff, yOff, 0);
+			renderer.render(matrices, typed.getIngredient());
+			matrices.pop();
+			return;
 		}
 		super.drawStack(matrices, mouseX, mouseY, delta);
 	}
@@ -89,22 +99,27 @@ public class JemiSlotWidget extends SlotWidget {
 		super.drawOverlay(matrices, mouseX, mouseY, delta);
 	}
 
-	public static void addTooltip(List<TooltipComponent> list, JemiRecipeSlot slot, EmiStack stack) {
+	@SuppressWarnings("unchecked")
+	public static void addTooltip(List<TooltipComponent> list, JemiRecipeSlot slot, EmiIngredient stack, IIngredientRenderer<?> renderer) {
+		if (renderer != null) {
+			if (stack.getEmiStacks().size() == 1 && stack.getEmiStacks().get(0) instanceof JemiStack js) {
+				js = js.copy();
+				js.renderer = renderer;
+				stack = js;
+			}
+		}
+		list.addAll(stack.getTooltip());
 		if (slot.tooltipCallback != null) {
 			try {
 				List<Text> event = Lists.newArrayList();
-				Set<Text> toRemove;
-				if (!stack.getItemStack().isEmpty()) {
-					List<Text> text = FakeScreen.INSTANCE.getTooltipFromItem(stack.getItemStack());
-					event.addAll(text);
-					toRemove = text.stream().collect(Collectors.toSet());
-				} else {
-					toRemove = Set.of();
-				}
+				List<Text> original = stack.getEmiStacks().get(0).getTooltipText();
+				Set<Text> toRemove = original.stream().collect(Collectors.toSet());
+				event.addAll(stack.getEmiStacks().get(0).getTooltipText());
 				slot.tooltipCallback.onTooltip(slot, event);
-				List<TooltipComponent> orig = stack.getTooltip();
-				int index = Math.min(list.size(), orig.size());
-				list.addAll(index, event.stream().filter(t -> !toRemove.contains(t)).map(t -> TooltipComponent.of(t.asOrderedText())).toList());
+				int index = Math.min(list.size(), 1);
+				if (!event.isEmpty()) {
+					list.addAll(index, event.stream().filter(t -> !toRemove.contains(t) && !JemiIngredientAcceptor.FLUID_END.matcher(t.getString()).find()).map(t -> TooltipComponent.of(t.asOrderedText())).toList());
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -113,8 +128,12 @@ public class JemiSlotWidget extends SlotWidget {
 
 	@Override
 	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		List<TooltipComponent> list = Lists.newArrayList(super.getTooltip(mouseX, mouseY));
-		addTooltip(list, slot, getStack().getEmiStacks().get(0));
+		List<TooltipComponent> list = Lists.newArrayList();
+		if (getStack().isEmpty()) {
+			return List.of();
+		}
+		addTooltip(list, slot, getStack(), getRenderer());
+		addSlotTooltip(list);
 		return list;
 	}
 }

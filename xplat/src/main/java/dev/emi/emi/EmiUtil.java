@@ -122,6 +122,16 @@ public class EmiUtil {
 		}, 3, 3);
 	}
 
+	public static int getOutputCount(EmiRecipe recipe, EmiIngredient stack) {
+		int count = 0;
+		for (EmiStack o : recipe.getOutputs()) {
+			if (stack.getEmiStacks().contains(o)) {
+				count += o.getAmount();
+			}
+		}
+		return count;
+	}
+
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static List<EmiRecipe> getValidRecipes(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
 		if (ingredient.getEmiStacks().size() == 1) {

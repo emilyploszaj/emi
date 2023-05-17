@@ -20,6 +20,7 @@ import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
+import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -48,6 +49,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -60,6 +62,7 @@ public class BoMScreen extends Screen {
 	private static final int NODE_HORIZONTAL_SPACING = 8;
 	private static final int NODE_VERTICAL_SPACING = 20;
 	private static final int COST_HORIZONTAL_SPACING = 8;
+	private static final EmiBind LEFT_CLICK = new EmiBind("", new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 	private static StackBatcher batcher = new StackBatcher();
 	private static int zoom = 0;
 	private Bounds batches = new Bounds(-24, -50, 48, 26);
@@ -261,7 +264,9 @@ public class BoMScreen extends Screen {
 		if (hover != null) {
 			hover.drawTooltip(this, matrices, mouseX, mouseY);
 		} else if (BoM.tree != null && batches.contains(mx, my)) {
-			List<TooltipComponent> list = EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches);
+			List<TooltipComponent> list = Lists.newArrayList();
+			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.ideal", LEFT_CLICK.getBindText())));
 			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
 		} else if (BoM.tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
@@ -477,6 +482,13 @@ public class BoMScreen extends Screen {
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			BoM.craftingMode = !BoM.craftingMode;
 			recalculateTree();
+		} else if (batches.contains(mx, my)) {
+			long ideal = BoM.tree.cost.getIdealBatch(BoM.tree.goal, 1, 1);
+			if (ideal != BoM.tree.batches) {
+				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+				BoM.tree.batches = ideal;
+				recalculateTree();
+			}
 		}
 		Function<EmiBind, Boolean> function = bind -> bind.matchesMouse(button);
 		if (function.apply(EmiConfig.back)) {

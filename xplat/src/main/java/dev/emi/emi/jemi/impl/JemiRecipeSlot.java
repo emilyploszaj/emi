@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -39,6 +40,19 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 		this.renderers = builder.renderers;
 		this.tankInfo = builder.tankInfo;
 		this.stack = builder.acceptor.build();
+	}
+
+	public JemiRecipeSlot(RecipeIngredientRole role, EmiStack stack) {
+		this.role = role;
+		this.x = 0;
+		this.y = 0;
+		this.name = Optional.empty();
+		this.tooltipCallback = null;
+		this.background = null;
+		this.overlay = null;
+		this.renderers = null;
+		this.tankInfo = null;
+		this.stack = stack;
 	}
 
 	@Override
