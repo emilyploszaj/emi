@@ -44,7 +44,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 			if (typed != null && (stack instanceof JemiStack || stack.getKey() instanceof Fluid)) {
 				List<Text> base = Lists.newArrayList();
 				if (renderers != null && renderers.containsKey(typed.getType())) {
-					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipContext.Default.BASIC));
+					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipContext.Default.NORMAL));
 				}
 				if (base == null || base.isEmpty()) {
 					if (tooltipCallback == null) {
