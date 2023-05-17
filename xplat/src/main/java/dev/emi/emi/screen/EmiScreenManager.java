@@ -589,9 +589,6 @@ public class EmiScreenManager {
 
 			renderLastHoveredCraftable(matrices, mouseX, mouseY, delta, screen);
 
-			renderDraggedStack(matrices, mouseX, mouseY, delta, screen);
-
-			renderCurrentTooltip(matrices, mouseX, mouseY, delta, screen);
 			client.getProfiler().pop();
 		}
 
@@ -600,6 +597,16 @@ public class EmiScreenManager {
 
 		renderExclusionAreas(matrices, mouseX, mouseY, delta, screen);
 		client.getProfiler().pop();
+
+		RenderSystem.disableDepthTest();
+	}
+
+	public static void drawForeground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		Screen screen = client.currentScreen;
+		if (screen instanceof EmiScreen && !isDisabled()) {
+			renderDraggedStack(matrices, mouseX, mouseY, delta, screen);
+			renderCurrentTooltip(matrices, mouseX, mouseY, delta, screen);
+		}
 	}
 
 	private static void renderWidgets(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
@@ -799,23 +806,12 @@ public class EmiScreenManager {
 		tree.y = screen.height - 22;
 
 		updateSidebarButtons();
-
-		screen.addSelectableChild(search);
-		screen.addSelectableChild(emi);
-		screen.addSelectableChild(tree);
-
-		for (SidebarPanel panel : panels) {
-			panel.updateWidgetPosition();
-			panel.updateWidgetVisibility();
-			screen.addSelectableChild(panel.pageLeft);
-			screen.addSelectableChild(panel.cycle);
-			screen.addSelectableChild(panel.pageRight);
-		}
 	}
 
 	private static void updateSidebarButtons() {
 		for (SidebarPanel panel : panels) {
 			panel.updateWidgetPosition();
+			panel.updateWidgetVisibility();
 		}
 	}
 
@@ -836,8 +832,21 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (!search.isMouseOver(mouseX, mouseY)) {
-			EmiScreenManager.search.mouseClicked(mouseX, mouseY, button);
+		if (search.mouseClicked(mouseX, mouseY, button)) {
+			return true;
+		} else if (emi.mouseClicked(mouseX, mouseY, button)) {
+			return true;
+		} else if (tree.mouseClicked(mouseX, mouseY, button)) {
+			return true;
+		}
+		for (SidebarPanel panel : panels) {
+			if (panel.cycle.mouseClicked(mouseX, mouseY, button)) {
+				return true;
+			} else if (panel.pageLeft.mouseClicked(mouseX, mouseY, button)) {
+				return true;
+			} else if (panel.pageRight.mouseClicked(mouseX, mouseY, button)) {
+				return true;
+			}
 		}
 		if (isDisabled()) {
 			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
@@ -1118,7 +1127,14 @@ public class EmiScreenManager {
 				}
 				int amount = all ? Integer.MAX_VALUE : 1;
 				if (stack.getStack() instanceof EmiFavorite.Synthetic syn) {
-					amount = Math.min(amount, (int) syn.batches);
+					int batches = (int) syn.batches;
+					if (syn.getRecipe() == null) {
+						int oc = EmiUtil.getOutputCount(context, syn.getStack());
+						if (oc > 0) {
+							batches /= oc;
+						}
+					}
+					amount = Math.min(amount, batches);
 				}
 				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), action, amount)) {
 					MinecraftClient.getInstance().getSoundManager()

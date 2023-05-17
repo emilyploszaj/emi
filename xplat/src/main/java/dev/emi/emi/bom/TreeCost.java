@@ -241,13 +241,17 @@ public class TreeCost {
 		}
 	}
 
-	public long getIdealBatch(MaterialNode node, long total) {
+	public long getIdealBatch(MaterialNode node, long total, long amount) {
+		if (node.recipe == null) {
+			return total;
+		}
 		if (node.divisor > 0) {
-			total *= node.divisor / gcd(total, node.divisor);
+			long mod = node.divisor / gcd(node.divisor, amount);
+			total *= mod / gcd(total, mod);
 		}
 		if (node.children != null) {
 			for (MaterialNode n : node.children) {
-				total = getIdealBatch(n, total);
+				total = getIdealBatch(n, total, amount * n.amount);
 			}
 		}
 		return total;

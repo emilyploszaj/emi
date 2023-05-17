@@ -51,13 +51,24 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 
 	@Inject(at = @At(value = "INVOKE",
 			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawForeground(Lnet/minecraft/client/util/math/MatrixStack;II)V",
-			shift = Shift.AFTER),
+			shift = Shift.BEFORE),
 		method = "render")
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
 		matrices.push();
 		matrices.translate(-x, -y, 0.0);
 		EmiPort.setPositionTexShader();
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
+		matrices.pop();
+	}
+
+	@Inject(at = @At(value = "INVOKE",
+			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawForeground(Lnet/minecraft/client/util/math/MatrixStack;II)V",
+			shift = Shift.AFTER),
+		method = "render")
+	private void renderForeground(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
+		matrices.push();
+		matrices.translate(-x, -y, 0.0);
+		EmiScreenManager.drawForeground(matrices, mouseX, mouseY, delta);
 		matrices.pop();
 	}
 

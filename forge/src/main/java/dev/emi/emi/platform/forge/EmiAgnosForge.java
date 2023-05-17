@@ -165,7 +165,7 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt) {
-		return new FluidStack(fluid, 1000).getDisplayName();
+		return new FluidStack(fluid, 1000, nbt).getDisplayName();
 	}
 
 	@Override

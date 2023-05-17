@@ -251,6 +251,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		}
 		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, delta);
 		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
+		EmiScreenManager.drawForeground(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (categoryHovered) {
 			this.renderTooltip(matrices, List.of(

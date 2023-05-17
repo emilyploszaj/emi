@@ -219,6 +219,11 @@ public class SlotWidget extends Widget {
 			return list;
 		}
 		list.addAll(getStack().getTooltip());
+		addSlotTooltip(list);
+		return list;
+	}
+
+	protected void addSlotTooltip(List<TooltipComponent> list) {
 		for (Supplier<TooltipComponent> supplier : tooltipSuppliers) {
 			list.add(supplier.get());
 		}
@@ -243,7 +248,6 @@ public class SlotWidget extends Widget {
 				}
 			}
 		}
-		return list;
 	}
 
 	@Override
