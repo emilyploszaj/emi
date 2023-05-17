@@ -11,6 +11,7 @@ import dev.emi.emi.config.EmiConfig;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -24,14 +25,20 @@ import net.minecraft.util.Identifier;
 public class JemiStack<T> extends EmiStack {
 	private final IIngredientType<T> type;
 	private final IIngredientHelper<T> helper;
-	private final IIngredientRenderer<T> renderer;
+	public final Object base;
 	public final T ingredient;
+	public IIngredientRenderer<T> renderer;
 
 	public JemiStack(IIngredientType<T> type, IIngredientHelper<T> helper, IIngredientRenderer<T> renderer, T ingredient) {
 		this.type = type;
 		this.helper = helper;
 		this.renderer = renderer;
 		this.ingredient = ingredient;
+		if (type instanceof IIngredientTypeWithSubtypes<?, T> iitws) {
+			base = iitws.getBase(ingredient);
+		} else {
+			base = helper.getUniqueId(ingredient, UidContext.Recipe);
+		}
 	}
 
 	@Override
@@ -45,7 +52,7 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public EmiStack copy() {
+	public JemiStack<T> copy() {
 		return new JemiStack<T>(type, helper, renderer, helper.copyIngredient(ingredient));
 	}
 
@@ -61,7 +68,7 @@ public class JemiStack<T> extends EmiStack {
 
 	@Override
 	public Object getKey() {
-		return helper.getUniqueId(ingredient, UidContext.Ingredient);
+		return base;
 	}
 
 	@Override

@@ -98,7 +98,7 @@ public class EmiConfig {
 
 	@Comment("The unit to display fluids as.")
 	@ConfigValue("ui.fluid-unit")
-	public static FluidUnit fluidUnit = FluidUnit.LITERS;
+	public static FluidUnit fluidUnit = EmiAgnos.isForge() ? FluidUnit.MILLIBUCKETS : FluidUnit.LITERS;
 
 	@Comment("Whether to use the batched render system. Batching is faster, but may have incompatibilities"
 		+ " with shaders or other mods.")

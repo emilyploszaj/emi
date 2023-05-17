@@ -15,6 +15,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -30,10 +31,19 @@ import dev.emi.emi.runtime.EmiReloadManager;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
+import mezz.jei.api.ingredients.ITypedIngredient;
+import mezz.jei.api.ingredients.subtypes.IIngredientSubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.ISubtypeManager;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
+import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRuntimeRegistration;
+import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.text.MutableText;
@@ -44,11 +54,17 @@ import net.minecraft.util.Identifier;
 
 @JeiPlugin
 public class JemiPlugin implements IModPlugin, EmiPlugin {
+	private static ISubtypeManager subtypeManager;
 	public static IJeiRuntime runtime;
 
 	@Override
 	public Identifier getPluginUid() {
 		return new Identifier("emi:emi");
+	}
+
+	@Override
+	public void registerIngredients(IModIngredientRegistration registration) {
+		subtypeManager = registration.getSubtypeManager();
 	}
 
 	@Override
@@ -69,8 +85,8 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		JemiPlugin.runtime = null;
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void register(EmiRegistry registry) {
 		EmiLog.info("[JEMI] Waiting for JEI to finish reloading...");
 		EmiReloadManager.step(EmiPort.literal("Waiting for JEI to finish..."), 20_000);
@@ -85,8 +101,9 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			return;
 		}
 		EmiLog.info("[JEMI] JEI reloaded!");
-		EmiReloadManager.step(EmiPort.literal("Loading information from JEI..."), 5_000);
+		Set<String> handledNamespaces = EmiAgnos.getPlugins().stream().map(EmiPluginContainer::id).collect(Collectors.toSet());
 
+		EmiReloadManager.step(EmiPort.literal("Loading information from JEI..."), 5_000);
 		registry.addGenericExclusionArea((screen, consumer) -> {
 			if (runtime != null && runtime.getScreenHelper() != null) {
 				List<Rect2i> areas = runtime.getScreenHelper().getGuiExclusionAreas(screen).toList();
@@ -98,7 +115,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			}
 		});
 
-		Set<String> handledNamespaces = EmiAgnos.getPlugins().stream().map(EmiPluginContainer::id).collect(Collectors.toSet());
+		EmiReloadManager.step(EmiPort.literal("Processing JEI recipes..."), 5_000);
 		Set<Identifier> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
 		Map<RecipeType, EmiRecipeCategory> categoryMap = Maps.newHashMap();
 		categoryMap.put(RecipeTypes.CRAFTING, VanillaEmiRecipeCategories.CRAFTING);
@@ -161,6 +178,9 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				t.printStackTrace();
 			}
 		}
+
+		EmiReloadManager.step(EmiPort.literal("Processing JEI subtypes..."), 5_000);
+		parseSubtypes(registry);
 	}
 
 	private void addInfoRecipes(EmiRegistry registry, IRecipeCategory<IJeiIngredientInfoRecipe> category) {
@@ -184,6 +204,48 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		
 		for (Text text : identical.keySet()) {
 			registry.addRecipe(new EmiInfoRecipe(identical.get(text).stream().map(s -> (EmiIngredient) s).toList(), List.of(text), null));
+		}
+	}
+
+	@SuppressWarnings({"unchecked"})
+	private void parseSubtypes(EmiRegistry registry) {
+		if (subtypeManager != null) {
+			IIngredientManager im = runtime.getIngredientManager();
+			List<IIngredientType<?>> types = Lists.newArrayList(im.getRegisteredIngredientTypes());
+			for (IIngredientType<?> type : types) {
+				if (type instanceof IIngredientTypeWithSubtypes iitws) {
+					List<Object> ings = Lists.newArrayList(im.getAllIngredients(type));
+					for (Object o : ings) {
+						String info = subtypeManager.getSubtypeInfo(iitws, o, UidContext.Recipe);
+						if (info != IIngredientSubtypeInterpreter.NONE) {
+							if (type == VanillaTypes.ITEM_STACK) {
+								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+									return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
+										.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
+								}));
+							} else if (type == JemiUtil.getFluidType()) {
+								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+									ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
+									ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
+									if (ta != null && tb != null) {
+										return subtypeManager.getSubtypeInfo(iitws, ta.getIngredient(), UidContext.Recipe)
+											.equals(subtypeManager.getSubtypeInfo(iitws, tb.getIngredient(), UidContext.Recipe));
+									}
+									return false;
+								}));
+							} else {
+								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+									if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
+										return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
+											.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
+									}
+									return false;
+								}));
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

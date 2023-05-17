@@ -47,6 +47,9 @@ public class JemiRecipe<T> implements EmiRecipe {
 			this.id = new Identifier("jei", "/" + EmiUtil.subId(id));
 		}
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
+			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+		}
 		for (JemiIngredientAcceptor acceptor : builder.ingredients) {
 			EmiIngredient stack = acceptor.build();
 			if (acceptor.role == RecipeIngredientRole.INPUT) {

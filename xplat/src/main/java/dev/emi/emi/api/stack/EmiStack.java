@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemConvertible;
@@ -181,14 +182,20 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
-		if (fluid == Fluids.EMPTY) {
+		if (fluid instanceof FlowableFluid ff) {
+			fluid = ff.getStill();
+		}
+		if (!fluid.isStill(fluid.getDefaultState()) || fluid == Fluids.EMPTY) {
 			return EmiStack.EMPTY;
 		}
 		return new FluidEmiStack(fluid, nbt);
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt, long amount) {
-		if (fluid == Fluids.EMPTY) {
+		if (fluid instanceof FlowableFluid ff) {
+			fluid = ff.getStill();
+		}
+		if (!fluid.isStill(fluid.getDefaultState()) || fluid == Fluids.EMPTY) {
 			return EmiStack.EMPTY;
 		}
 		return new FluidEmiStack(fluid, nbt, amount);

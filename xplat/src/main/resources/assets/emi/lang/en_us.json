@@ -169,7 +169,7 @@
   "emi.unit.millibuckets": "Millibuckets",
   "emi.unit.droplets": "Droplets",
   "emi.fluid.amount.liters": "%s L",
-  "emi.fluid.amount.millibuckets": "%s mB",
+  "emi.fluid.amount.millibuckets": "%smB",
   "emi.fluid.amount.droplets": "%s d",
 
   "emi.disabled": "EMI disabled! Toggle with",
@@ -225,6 +225,7 @@
   "tooltip.emi.synfav.craft_all": "Press %s to craft all §9%s§r batches",
 
   "tooltip.emi.bom.batch_size": "Batch size: %s\nScroll to adjust\nHold §6[shift]§r to adjust by 16",
+  "tooltip.emi.bom.batch_size.ideal": "Press %s to get minimal leftovers",
   "tooltip.emi.bom.mode.view": "§6Viewing§r recipe tree",
   "tooltip.emi.bom.mode.craft": "§6Crafting§r recipe tree\nProgress will be shown in recipe tree\n§bSynthetic favorites§r added to sidebar",
   "tooltip.emi.bom.help": "The recipe tree shows the process and base cost of a recipe\nThe display can be panned and zoomed\n\nLeft click a node to choose a recipe to assign to it\nHold §6[shift]§r to automatically pick based on your inventory\n\nRight click a recipe node to fold it temporarily\nHold §6[shift]§r to clear the recipe\n\nThe initial tree state is controlled by default recipes\nA button next to recipes can set default recipe preferences\n\nThe toggle by total cost can be used to help craft a recipe tree\nWhile crafting, materials that need to be collected will be displayed\n§bSynthetic favorites§r will be added to the favorites sidebar that\nwill show incomplete steps and can be used to craft",

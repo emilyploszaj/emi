@@ -27,7 +27,7 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 
 	public RecipeCostTooltipComponent(EmiRecipe recipe) {
 		tree = new MaterialTree(recipe);
-		tree.batches = tree.cost.getIdealBatch(tree.goal, 1);
+		tree.batches = tree.cost.getIdealBatch(tree.goal, 1, 1);
 		tree.calculateCost();
 		addNodes();
 	}

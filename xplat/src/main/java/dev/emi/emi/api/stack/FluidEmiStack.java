@@ -7,9 +7,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
+import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -88,7 +88,7 @@ public class FluidEmiStack extends EmiStack {
 		List<TooltipComponent> list = getTooltipText().stream().map(EmiPort::ordered).map(TooltipComponent::of)
 			.collect(Collectors.toList());
 		if (amount > 1) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiRenderHelper.getAmountText(this, amount))));
+			list.add(EmiTooltipComponents.getAmount(this));
 		}
 		String namespace = EmiPort.getFluidRegistry().getId(fluid).getNamespace();
 		if (EmiConfig.appendModId) {
