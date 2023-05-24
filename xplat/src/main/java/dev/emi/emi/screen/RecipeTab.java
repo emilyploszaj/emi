@@ -46,7 +46,7 @@ public class RecipeTab {
 	private int getVerticalRecipeSpace(int backgroundHeight) {
 		int height = backgroundHeight - 46;
 		if (EmiConfig.workstationLocation == SidebarSide.BOTTOM) {
-			if (!EmiRecipes.workstations.getOrDefault(category, List.of()).isEmpty()) {
+			if (!EmiRecipes.workstations.getOrDefault(category, List.of()).isEmpty() || RecipeScreen.resolve != null) {
 				height -= 23;
 			}
 		}

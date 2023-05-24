@@ -73,6 +73,17 @@ public class EmiFavorites {
 		}
 	}
 
+	public static boolean canFavorite(EmiIngredient stack, EmiRecipe recipe) {
+		stack = EmiIngredientSerializer.getDeserialized(EmiIngredientSerializer.getSerialized(stack));
+		if (stack.isEmpty()) {
+			return false;
+		}
+		if (recipe != null) {
+			return recipe.getId() != null;
+		}
+		return true;
+	}
+
 	private static int indexOf(EmiIngredient stack) {
 		for (int i = 0; i < favorites.size(); i++) {
 			if (favorites.get(i).equals(stack) && favorites.get(i).getRecipe() == EmiApi.getRecipeContext(stack)) {
@@ -149,9 +160,9 @@ public class EmiFavorites {
 			}
 		} else {
 			stack = EmiIngredientSerializer.getDeserialized(EmiIngredientSerializer.getSerialized(stack));
-			if (stack instanceof EmiStack es) {
+			if (stack instanceof EmiStack es && context != null && context.getId() != null) {
 				es = es.copy();
-				if (context == null && es instanceof ItemEmiStack ies) {
+				if (es instanceof ItemEmiStack ies) {
 					ies.getItemStack().setCount(1);
 				}
 				if (!es.isEmpty()) {

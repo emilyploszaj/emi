@@ -48,7 +48,9 @@ public class EmiPacketHandler {
 	private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> clientHandler(BiConsumer<T, PlayerEntity> handler) {
 		return (t, context) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
-			handler.accept(t, client.player);
+			client.execute(() -> {
+				handler.accept(t, client.player);
+			});
 			context.get().setPacketHandled(true);
 		};
 	}

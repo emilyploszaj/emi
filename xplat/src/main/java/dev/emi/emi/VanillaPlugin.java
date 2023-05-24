@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
+import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
@@ -153,6 +154,7 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+@EmiEntrypoint
 public class VanillaPlugin implements EmiPlugin {
 	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
 		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.none());
@@ -268,6 +270,9 @@ public class VanillaPlugin implements EmiPlugin {
 							top = ((HandledScreenAccessor) inv).getY() - 34;
 							if (((Object) screen) instanceof CreativeInventoryScreen) {
 								top -= 28;
+								if (EmiAgnos.isForge()) {
+									top -= 22;
+								}
 							}
 							int xOff = 34;
 							if (size == 1) {

@@ -6,12 +6,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.objectweb.asm.Type;
+
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
-import dev.emi.emi.VanillaPlugin;
+import dev.emi.emi.api.EmiEntrypoint;
+import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -19,6 +22,7 @@ import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
@@ -46,6 +50,7 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.forgespi.language.ModFileScanData;
 
 public class EmiAgnosForge extends EmiAgnos {
 	static {
@@ -91,7 +96,29 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected List<EmiPluginContainer> getPluginsAgnos() {
-		return List.of(new EmiPluginContainer(new VanillaPlugin(), "emi"));
+		List<EmiPluginContainer> containers = Lists.newArrayList();
+		Type entrypointType = Type.getType(EmiEntrypoint.class);
+		for (ModFileScanData data : ModList.get().getAllScanData()) {
+			for (ModFileScanData.AnnotationData annot : data.getAnnotations()) {
+				try {
+					if (entrypointType.equals(annot.annotationType())) {
+						Class<?> clazz = Class.forName(annot.memberName());
+						if (EmiPlugin.class.isAssignableFrom(clazz)) {
+							Class<? extends EmiPlugin> pluginClass = clazz.asSubclass(EmiPlugin.class);
+							EmiPlugin plugin = pluginClass.getConstructor().newInstance();
+							String id = data.getIModInfoData().get(0).getMods().get(0).getModId();
+							containers.add(new EmiPluginContainer(plugin, id));
+						} else {
+							EmiLog.error("EmiEntrypoint " + annot.memberName() + " does not implement EmiPlugin");
+						}
+					}
+				} catch (Throwable t) {
+					EmiLog.error("Exception constructing entrypoint:");
+					t.printStackTrace();
+				}
+			}
+		}
+		return containers;
 	}
 
 	@Override

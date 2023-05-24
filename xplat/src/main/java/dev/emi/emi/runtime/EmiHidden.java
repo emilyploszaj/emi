@@ -59,6 +59,7 @@ public class EmiHidden {
 				hiddenStacks.remove(stack);
 			}
 		}
+		EmiPersistentData.save();
 		EmiStackList.bakeFiltered();
 	}
 }
