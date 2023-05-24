@@ -23,7 +23,6 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
-import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiFavorite;
@@ -170,15 +169,6 @@ public class EmiApi {
 		if (client.currentScreen instanceof RecipeScreen rs) {
 			rs.focusRecipe(recipe);
 		}
-	}
-
-	@Deprecated
-	public static boolean performFill(EmiRecipe recipe, EmiFillAction action, int amount) {
-		HandledScreen<?> hs = getHandledScreen();
-		if (hs != null) {
-			return EmiRecipeFiller.performFill(recipe, hs, action, amount);
-		}
-		return false;
 	}
 
 	private static void push() {

@@ -1,0 +1,83 @@
+apply plugin: "dev.architectury.loom"
+
+evaluationDependsOn ':xplat'
+
+dependencies {
+	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+	mappings loom.officialMojangMappings()
+}
+
+task mojmapJar(type: net.fabricmc.loom.task.RemapJarTask) {
+	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
+	dependsOn project(':xplat').remapJar
+	
+	inputFile = project(':xplat').remapJar.archiveFile
+	sourceNamespace = 'intermediary'
+	targetNamespace = 'named'
+	
+	remapperIsolation = true
+}
+
+task mojmapSourcesJar(type: net.fabricmc.loom.task.RemapSourcesJarTask) {
+	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
+	dependsOn project(':xplat').filteredSourcesJar
+	
+	classifier 'sources'
+	
+	inputFile = project(':xplat').filteredSourcesJar.archiveFile
+	sourceNamespace = 'intermediary'
+	targetNamespace = 'named'
+	
+	remapperIsolation = true
+}
+
+task mojmapApiJar(type: net.fabricmc.loom.task.RemapJarTask) {
+	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
+	dependsOn project(':xplat').apiJar
+	
+	classifier 'api'
+	
+	inputFile = project(':xplat').apiJar.archiveFile
+	sourceNamespace = 'intermediary'
+	targetNamespace = 'named'
+	
+	remapperIsolation = true
+}
+
+build.dependsOn mojmapJar
+build.dependsOn mojmapSourcesJar
+build.dependsOn mojmapApiJar
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			artifactId = "${rootProject.name}-xplat-mojmap"
+			version = project.ext.mavenVersion
+			artifact(mojmapJar) {
+				builtBy mojmapJar
+				classifier ''
+			}
+			artifact(mojmapSourcesJar) {
+				builtBy mojmapSourcesJar
+				classifier 'sources'
+			}
+			artifact(mojmapApiJar) {
+				builtBy mojmapApiJar
+				classifier 'api'
+			}
+		}
+	}
+	setupRepositories(repositories)
+}
+
+void setupRepositories(RepositoryHandler repositories) {
+	if (project.hasProperty("mavenUrl")) {
+		repositories.maven {
+			url project.mavenUrl
+			credentials {
+				username project.mavenUsername
+				password project.mavenPassword
+			}
+		}
+	}
+}

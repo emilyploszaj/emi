@@ -1,9 +1,12 @@
 package dev.emi.emi.mixin.api;
 
+import java.text.DecimalFormat;
+
 import org.spongepowered.asm.mixin.Mixin;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.mixinsupport.annotation.AdditionalField;
 import net.minecraft.text.Text;
 
 /**
@@ -13,6 +16,12 @@ import net.minecraft.text.Text;
  */
 @Mixin(EmiIngredient.class)
 public interface EmiIngredientMixin {
+
+	@AdditionalField(value = "TEXT_FORMAT", owner = "dev/emi/emi/EmiRenderHelper", name = "TEXT_FORMAT")
+	default DecimalFormat copyTextFormat() { throw new AbstractMethodError(); }
+
+	@AdditionalField(value = "EMPTY_TEXT", owner = "dev/emi/emi/EmiRenderHelper", name = "EMPTY_TEXT")
+	default Text copyEmptyText() { throw new AbstractMethodError(); }
 
 	default Text getAmountText(double amount) {
 		return EmiRenderHelper.getAmountText((EmiIngredient) (Object) this, amount);

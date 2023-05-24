@@ -20,6 +20,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
@@ -235,7 +236,7 @@ public class SlotWidget extends Widget {
 			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(recipe.getId().toString(), Formatting.GRAY))));
 			}
-			if (EmiConfig.favorite.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL)) {
+			if (EmiConfig.favorite.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiFavorites.canFavorite(getStack(), getRecipe())) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
 			}
 			if (RecipeScreen.resolve != null && EmiConfig.helpLevel.has(HelpLevel.NORMAL)) {

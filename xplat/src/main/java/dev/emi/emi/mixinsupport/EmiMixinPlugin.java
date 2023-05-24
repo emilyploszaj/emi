@@ -9,7 +9,9 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -19,6 +21,7 @@ import org.spongepowered.asm.util.Annotations;
 
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.mixinsupport.annotation.AdditionalField;
 import dev.emi.emi.mixinsupport.annotation.Extends;
 import dev.emi.emi.mixinsupport.annotation.InvokeTarget;
 import dev.emi.emi.mixinsupport.annotation.StripConstructors;
@@ -103,10 +106,31 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 				};
 				targets.put(method.name + method.desc, new InvokeTargetInfo(owner, name, type, desc));
 			}
+			AnnotationNode additionalField = Annotations.getInvisible(method, AdditionalField.class);
+			if (additionalField != null) {
+				String value = Annotations.getValue(additionalField, "value", "");
+				String ret = method.desc.split("\\)")[1];
+				targetClass.fields.add(new FieldNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL | Opcodes.ACC_STATIC, value, ret, null, null));
+				MethodNode clinit = null;
+				for (MethodNode mn : targetClass.methods) {
+					if ("<clinit>".equals(mn.name)) {
+						clinit = mn;
+					}
+				}
+				if (clinit == null) {
+					clinit = new MethodNode(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+					clinit.instructions.add(new LabelNode());
+					clinit.instructions.add(new InsnNode(Opcodes.RETURN));
+					targetClass.methods.add(clinit);
+				}
+				clinit.instructions.insertBefore(clinit.instructions.getLast(), new FieldInsnNode(Opcodes.GETSTATIC,
+					Annotations.getValue(additionalField, "owner", ""), Annotations.getValue(additionalField, "name", ""), ret));
+				clinit.instructions.insertBefore(clinit.instructions.getLast(), new FieldInsnNode(Opcodes.PUTSTATIC, thisOwner, value, ret));
+			}
 		}
 		for (int i = 0; i < targetClass.methods.size(); i++) {
 			MethodNode method = targetClass.methods.get(i);
-			if (Annotations.getInvisible(method, InvokeTarget.class) != null) {
+			if (Annotations.getInvisible(method, InvokeTarget.class) != null || Annotations.getInvisible(method, AdditionalField.class) != null) {
 				targetClass.methods.remove(i--);
 			}
 		}
