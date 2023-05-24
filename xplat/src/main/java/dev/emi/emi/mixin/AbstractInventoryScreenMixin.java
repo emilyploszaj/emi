@@ -74,6 +74,9 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		int y = this.y - 34;
 		if (((Object) this) instanceof CreativeInventoryScreen || hasInventoryTabs) {
 			y -= 28;
+			if (((Object) this) instanceof CreativeInventoryScreen && EmiAgnos.isForge()) {
+				y -= 22;
+			}
 		}
 		int xOff = 34;
 		if (wide) {

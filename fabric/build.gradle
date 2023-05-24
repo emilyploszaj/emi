@@ -43,6 +43,10 @@ dependencies {
 
 	common(project(path: ":xplat", configuration: "namedElements")) { transitive false }
 	shadowCommon(project(path: ":xplat", configuration: "transformProductionFabric")) { transitive false }
+
+	modCompileOnly("mezz.jei:${rootProject.jei_version}") {
+		transitive = false
+	}
 	modCompileOnly "com.terraformersmc:modmenu:6.1.0-rc.4"
 }
 

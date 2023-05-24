@@ -16,7 +16,6 @@
     "accessor.ShovelItemAccessor",
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
-    "ClientPlayNetworkHandlerMixin",
     "CraftingResultSlotMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
