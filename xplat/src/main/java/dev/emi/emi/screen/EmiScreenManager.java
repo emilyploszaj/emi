@@ -624,7 +624,7 @@ public class EmiScreenManager {
 			EmiStackInteraction cur = getHoveredStack(mouseX, mouseY, false, true);
 			if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
 				ScreenSpace space = getHoveredSpace(mouseX, mouseY);
-				if (space != null && space.getType() == SidebarType.CRAFTABLES) {
+				if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
 					MatrixStack view = RenderSystem.getModelViewStack();
 					view.push();
 					view.translate(0, 0, 200);
@@ -698,6 +698,7 @@ public class EmiScreenManager {
 			client.getProfiler().swap("hover");
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
+			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
 			view.translate(0, 0, 200);
 			RenderSystem.applyModelViewMatrix();
 			EmiIngredient hov = EmiStack.EMPTY;

@@ -1,3 +1,5 @@
+apply plugin: "dev.architectury.loom"
+
 architectury {
 	common(rootProject.enabled_platforms.split(","))
 }
@@ -13,6 +15,9 @@ repositories {
 }
 
 dependencies {
+	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+	mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 	
 	modCompileOnly("mezz.jei:jei-1.19.2-fabric:11.6.0.1015") {
@@ -32,16 +37,62 @@ afterEvaluate {
 	configurations.default.extendsFrom = [configurations.namedElements]
 }
 
+task filteredSourcesJar(type: Jar) {
+	classifier = 'filtered-sources'
+	dependsOn remapSourcesJar
+	from zipTree(remapSourcesJar.archivePath)
+	exclude 'dev/emi/emi/jemi/**'
+}
+
+task apiJar(type: Jar) {
+	classifier = "api"
+	dependsOn remapJar
+	from zipTree(remapJar.archivePath)
+	include 'fabric.mod.json'
+	include 'emi.mixins.json'
+	include 'emi.accesswidener'
+	include 'dev/emi/emi/api/**'
+	exclude 'dev/emi/emi/api/EmiRecipeHandler**'
+	exclude 'dev/emi/emi/api/stack/FluidEmiStack**'
+	exclude 'dev/emi/emi/api/stack/ItemEmiStack**'
+	exclude 'dev/emi/emi/api/stack/EmptyEmiStack**'
+	exclude 'dev/emi/emi/api/stack/TagEmiIngredient**'
+	exclude 'dev/emi/emi/api/stack/ListEmiIngredient**'
+}
+
+build.dependsOn filteredSourcesJar
+build.dependsOn apiJar
+
 publishing {
 	publications {
-		mavenCommon(MavenPublication) {
-			artifactId = rootProject.archives_base_name
-			from components.java
+		maven(MavenPublication) {
+			artifactId = "${rootProject.name}-xplat-intermediary"
+			version = project.ext.mavenVersion
+			artifact(remapJar) {
+				builtBy remapJar
+				classifier ''
+			}
+			artifact(filteredSourcesJar) {
+				builtBy filteredSourcesJar
+				classifier 'sources'
+			}
+			artifact(apiJar) {
+				builtBy apiJar
+				classifier 'api'
+			}
 		}
 	}
+	setupRepositories(repositories)
+}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
+void setupRepositories(RepositoryHandler repositories) {
+	if (project.hasProperty("mavenUrl")) {
+		repositories.maven {
+			url project.mavenUrl
+			credentials {
+				username project.mavenUsername
+				password project.mavenPassword
+			}
+		}
 	}
 }

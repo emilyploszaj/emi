@@ -513,6 +513,14 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	}
 
 	@Override
+	public boolean charTyped(char chr, int modifiers) {
+		if (EmiScreenManager.search.charTyped(chr, modifiers)) {
+			return true;
+		}
+		return super.charTyped(chr, modifiers);
+	}
+
+	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.close();

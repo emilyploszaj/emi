@@ -1,10 +1,8 @@
 package dev.emi.emi.api.stack;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
@@ -14,12 +12,9 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
-import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryEntry;
 
 public interface EmiIngredient extends EmiRenderable {
-	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
-	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final int RENDER_ICON = 1;
 	public static final int RENDER_AMOUNT = 2;
 	public static final int RENDER_INGREDIENT = 4;
