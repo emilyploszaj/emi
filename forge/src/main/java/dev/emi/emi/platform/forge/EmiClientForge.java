@@ -2,7 +2,6 @@ package dev.emi.emi.platform.forge;
 
 import java.util.Arrays;
 
-import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;

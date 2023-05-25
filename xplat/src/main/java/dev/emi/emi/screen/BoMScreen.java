@@ -36,7 +36,6 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
@@ -383,9 +382,10 @@ public class BoMScreen extends Screen {
 			}
 		}
 		if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_R) {
-			if (EmiRecipes.recipes.size() > 0) {
+			List<EmiRecipe> recipes = EmiApi.getRecipeManager().getRecipes();
+			if (recipes.size() > 0) {
 				for (int i = 0; i < 100_000; i++) {
-					EmiRecipe recipe = EmiRecipes.recipes.get(EmiUtil.RANDOM.nextInt(EmiRecipes.recipes.size()));
+					EmiRecipe recipe = recipes.get(EmiUtil.RANDOM.nextInt(recipes.size()));
 					if (recipe.supportsRecipeTree()) {
 						BoM.setGoal(recipe);
 						init();

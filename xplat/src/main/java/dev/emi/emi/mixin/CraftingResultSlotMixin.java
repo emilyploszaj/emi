@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiSidebars;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
@@ -31,7 +31,7 @@ public class CraftingResultSlotMixin {
 		if (player.world.isClient) {
 			Optional<CraftingRecipe> opt = player.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, player.world);
 			if (opt.isPresent()) {
-				EmiRecipe recipe = EmiRecipes.byId.get(opt.get().getId());
+				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(opt.get().getId());
 				if (recipe != null) {
 					EmiSidebars.craft(recipe);
 				}

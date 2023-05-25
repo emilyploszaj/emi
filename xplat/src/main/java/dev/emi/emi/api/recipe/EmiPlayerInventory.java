@@ -19,7 +19,6 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.registry.EmiRecipeFiller;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiFavorite;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -131,7 +130,7 @@ public class EmiPlayerInventory {
 		}
 		Set<EmiRecipe> set = Sets.newHashSet();
 		for (EmiStack stack : inventory.keySet()) {
-			set.addAll(EmiRecipes.byInput.getOrDefault(stack.getKey(), List.of()));
+			set.addAll(EmiApi.getRecipeManager().getRecipesByInput(stack));
 		}
 		return set.stream().filter(r -> !r.hideCraftable() && predicate.test(r) && r.getOutputs().size() > 0)
 			.map(r -> new EmiFavorite.Craftable(r))

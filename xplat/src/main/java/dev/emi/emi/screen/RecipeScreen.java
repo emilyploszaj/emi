@@ -27,7 +27,6 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.registry.EmiRecipeFiller;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
@@ -109,8 +108,8 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			if (!recipes.isEmpty()) {
 				for (Map.Entry<EmiRecipeCategory, List<EmiRecipe>> entry : recipes.entrySet().stream()
 						.sorted((a, b) -> {
-							int ai = EmiRecipes.categories.indexOf(a.getKey());
-							int bi = EmiRecipes.categories.indexOf(b.getKey());
+							int ai = EmiApi.getRecipeManager().getCategories().indexOf(a.getKey());
+							int bi = EmiApi.getRecipeManager().getCategories().indexOf(b.getKey());
 							if (ai < 0) {
 								ai = Integer.MAX_VALUE;
 							}
@@ -201,7 +200,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiPort.drawCenteredText(matrices, textRenderer, EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
 			x + backgroundWidth / 2, y + 21, 0xffffff, true);
 
-		List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
+		List<EmiIngredient> workstations = EmiApi.getRecipeManager().getWorkstations(tab.category);
 		int workstationAmount = Math.min(workstations.size(), getMaxWorkstations());
 		if (workstationAmount > 0 || resolve != null) {
 			RenderSystem.setShaderTexture(0, TEXTURE);
@@ -377,7 +376,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			setRecipePageWidth(width + 16);
 			currentPage = Lists.newArrayList();
 			currentPage.addAll(tab.constructWidgets(page, x, y, backgroundWidth, backgroundHeight));
-			List<EmiIngredient> workstations = EmiRecipes.workstations.getOrDefault(tab.category, List.of());
+			List<EmiIngredient> workstations = EmiApi.getRecipeManager().getWorkstations(tab.category);
 			if (!workstations.isEmpty()) {
 				WidgetGroup widgets = new WidgetGroup(null, 0, 0, 0, 0);
 				for (int i = 0; i < workstations.size() && i < getMaxWorkstations(); i++) {

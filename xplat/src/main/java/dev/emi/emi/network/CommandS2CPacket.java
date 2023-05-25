@@ -5,7 +5,6 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.registry.EmiCommands;
-import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -39,19 +38,19 @@ public class CommandS2CPacket implements EmiPacket {
 	@Override
 	public void apply(PlayerEntity player) {
 		if (type == EmiCommands.VIEW_RECIPE) {
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null) {
 				EmiApi.displayRecipe(recipe);
 			}
 		} else if (type == EmiCommands.VIEW_TREE) {
 			EmiApi.viewRecipeTree();
 		} else if (type == EmiCommands.TREE_GOAL) {
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null) {
 				BoM.setGoal(recipe);
 			}
 		} else if (type == EmiCommands.TREE_RESOLUTION) {
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && BoM.tree != null) {
 				for (EmiStack stack : recipe.getOutputs()) {
 					BoM.tree.addResolution(stack, recipe);

@@ -14,7 +14,6 @@ import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.chess.EmiChess;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarType;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.util.Identifier;
@@ -108,7 +107,7 @@ public class EmiSidebars {
 					String s = el.getAsString();
 					if (Identifier.isValid(s)) {
 						Identifier id = new Identifier(s);
-						EmiRecipe recipe = EmiRecipes.byId.get(id);
+						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 						if (recipe != null) {
 							craftHistory.add(new EmiFavorite.Craftable(recipe));
 						}
