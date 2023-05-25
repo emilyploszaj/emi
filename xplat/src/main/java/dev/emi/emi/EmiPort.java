@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.joml.Matrix4f;
 
@@ -36,6 +37,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
@@ -184,5 +186,11 @@ public final class EmiPort {
 		} else {
 			renderer.draw(matrices, text, x - renderer.getWidth(text) / 2, y, color);
 		}
+	}
+
+	public static Stream<Item> getDisabledItems() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		FeatureSet fs = client.world.getEnabledFeatures();
+		return getItemRegistry().stream().filter(i -> !i.isEnabled(fs));
 	}
 }

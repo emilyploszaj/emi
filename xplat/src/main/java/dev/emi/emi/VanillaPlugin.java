@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -309,6 +310,11 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.setDefaultComparison(Items.TIPPED_ARROW, potionComparison);
 		registry.setDefaultComparison(Items.ENCHANTED_BOOK, Comparison.compareNbt());
 
+		Set<Item> hiddenItems = Stream.concat(
+			EmiUtil.values(TagKey.of(EmiPort.getItemRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value),
+			EmiPort.getDisabledItems()
+		).collect(Collectors.toSet());
+
 		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CRAFTING)) {
 			if (recipe instanceof MapExtendingRecipe map) {
 				EmiStack paper = EmiStack.of(Items.PAPER);
@@ -325,7 +331,9 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
 			} else if (recipe instanceof ArmorDyeRecipe dye) {
 				for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
-					addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
+					if (!hiddenItems.contains(i)) {
+						addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
+					}
 				}
 			} else if (recipe instanceof SuspiciousStewRecipe stew) {
 				addRecipeSafe(registry, () -> new EmiSuspiciousStewRecipe(stew.getId()), recipe);
@@ -364,11 +372,15 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(rocket.getId()), recipe);
 			} else if (recipe instanceof BannerDuplicateRecipe banner) {
 				for (Item i : EmiBannerDuplicateRecipe.BANNERS) {
-					addRecipeSafe(registry, () -> new EmiBannerDuplicateRecipe(i, synthetic("crafting/banner_copying", EmiUtil.subId(i))), recipe);
+					if (!hiddenItems.contains(i)) {
+						addRecipeSafe(registry, () -> new EmiBannerDuplicateRecipe(i, synthetic("crafting/banner_copying", EmiUtil.subId(i))), recipe);
+					}
 				}
 			} else if (recipe instanceof RepairItemRecipe tool) {
 				for (Item i : EmiRepairItemRecipe.TOOLS) {
-					addRecipeSafe(registry, () -> new EmiRepairItemRecipe(i, synthetic("crafting/repairing", EmiUtil.subId(i))), recipe);
+					if (!hiddenItems.contains(i)) {
+						addRecipeSafe(registry, () -> new EmiRepairItemRecipe(i, synthetic("crafting/repairing", EmiUtil.subId(i))), recipe);
+					}
 				}
 			} else if (recipe instanceof MapCloningRecipe map) {
 				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
@@ -407,6 +419,9 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 
 		for (Item i : EmiPort.getItemRegistry()) {
+			if (hiddenItems.contains(i)) {
+				continue;
+			}
 			if (i.getMaxDamage() > 0) {
 				if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().getRepairIngredient() != null
 						&& !ai.getMaterial().getRepairIngredient().isEmpty()) {
@@ -540,6 +555,9 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 
 		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+			if (hiddenItems.contains(i)) {
+				continue;
+			}
 			EmiStack cauldron = EmiStack.of(Items.CAULDRON);
 			EmiStack waterThird = EmiStack.of(Fluids.WATER, FluidUnit.BOTTLE);
 			int uniq = EmiUtil.RANDOM.nextInt();
@@ -626,11 +644,11 @@ public class VanillaPlugin implements EmiPlugin {
 		EmiStack mud = EmiStack.of(Items.MUD);
 		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud, synthetic("world/unique", "minecraft/mud"), false));
 
-		addFuel(registry);
-		addComposting(registry);
+		addFuel(registry, hiddenItems);
+		addComposting(registry, hiddenItems);
 	}
 
-	private static void addFuel(EmiRegistry registry) {
+	private static void addFuel(EmiRegistry registry, Set<Item> hiddenItems) {
 		Map<Item, Integer> fuelMap = EmiAgnos.getFuelMap();
 		compressRecipesToTags(fuelMap.keySet().stream().collect(Collectors.toSet()), (a, b) -> {
 				return Integer.compare(fuelMap.get(a), fuelMap.get(b));
@@ -640,12 +658,14 @@ public class VanillaPlugin implements EmiPlugin {
 				int time = fuelMap.get(item);
 				registry.addRecipe(new EmiFuelRecipe(stack, time, synthetic("fuel/tag", EmiUtil.subId(tag.id()))));
 			}, item -> {
-				int time = fuelMap.get(item);
-				registry.addRecipe(new EmiFuelRecipe(EmiStack.of(item), time, synthetic("fuel/item", EmiUtil.subId(item))));
+				if (!hiddenItems.contains(item)) {
+					int time = fuelMap.get(item);
+					registry.addRecipe(new EmiFuelRecipe(EmiStack.of(item), time, synthetic("fuel/item", EmiUtil.subId(item))));
+				}
 			});
 	}
 
-	private static void addComposting(EmiRegistry registry) {
+	private static void addComposting(EmiRegistry registry, Set<Item> hiddenItems) {
 		compressRecipesToTags(ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.keySet().stream()
 			.map(ItemConvertible::asItem).collect(Collectors.toSet()), (a, b) -> {
 				return Float.compare(ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(a), ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(b));
@@ -655,8 +675,10 @@ public class VanillaPlugin implements EmiPlugin {
 				float chance = ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(item);
 				registry.addRecipe(new EmiCompostingRecipe(stack, chance, synthetic("composting/tag", EmiUtil.subId(tag.id()))));
 			}, item -> {
-				float chance = ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(item);
-				registry.addRecipe(new EmiCompostingRecipe(EmiStack.of(item), chance, synthetic("composting/item", EmiUtil.subId(item))));
+				if (!hiddenItems.contains(item)) {
+					float chance = ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(item);
+					registry.addRecipe(new EmiCompostingRecipe(EmiStack.of(item), chance, synthetic("composting/item", EmiUtil.subId(item))));
+				}
 			});
 	}
 
