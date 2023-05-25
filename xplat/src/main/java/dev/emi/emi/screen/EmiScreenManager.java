@@ -698,7 +698,6 @@ public class EmiScreenManager {
 			client.getProfiler().swap("hover");
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
-			view.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
 			view.translate(0, 0, 200);
 			RenderSystem.applyModelViewMatrix();
 			EmiIngredient hov = EmiStack.EMPTY;
