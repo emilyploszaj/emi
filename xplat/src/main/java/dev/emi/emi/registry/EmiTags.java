@@ -35,6 +35,7 @@ import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
 
 public class EmiTags {
+	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
@@ -196,8 +197,9 @@ public class EmiTags {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> void reloadTags(Registry<T> registry) {
+		Set<T> hidden = EmiUtil.values(TagKey.of(registry.getKey(), HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value).collect(Collectors.toSet());
 		List<TagKey<T>> tags = registry.streamTags()
-			.filter(key -> !EmiClient.excludedTags.contains(key.id()))
+			.filter(key -> !EmiClient.excludedTags.contains(key.id()) && !hidden.containsAll(EmiUtil.values(key).map(RegistryEntry::value).toList()))
 			.toList();
 		logUntranslatedTags(tags);
 		tags = consolodateTags(tags);

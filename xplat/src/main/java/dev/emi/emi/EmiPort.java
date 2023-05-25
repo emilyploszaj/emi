@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -181,5 +182,9 @@ public final class EmiPort {
 		} else {
 			DrawableHelper.drawCenteredText(matrices, renderer, text, x, y, color);
 		}
+	}
+
+	public static Stream<Item> getDisabledItems() {
+		return Stream.empty();
 	}
 }
