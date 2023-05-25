@@ -19,3 +19,5 @@ bin/
 
 #fabric
 run/
+
+.architectury-transformer/

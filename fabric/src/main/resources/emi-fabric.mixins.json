@@ -23,6 +23,7 @@
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
+    "ClientPlayNetworkHandlerMixin",
     "SynchronizeRecipesS2CPacketMixin"
   ],
   "server": [],

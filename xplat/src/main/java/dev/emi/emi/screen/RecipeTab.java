@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
-import dev.emi.emi.registry.EmiRecipes;
 
 public class RecipeTab {
 	private static final int RECIPE_PADDING = 10;
@@ -46,7 +46,7 @@ public class RecipeTab {
 	private int getVerticalRecipeSpace(int backgroundHeight) {
 		int height = backgroundHeight - 46;
 		if (EmiConfig.workstationLocation == SidebarSide.BOTTOM) {
-			if (!EmiRecipes.workstations.getOrDefault(category, List.of()).isEmpty() || RecipeScreen.resolve != null) {
+			if (!EmiApi.getRecipeManager().getWorkstations(category).isEmpty() || RecipeScreen.resolve != null) {
 				height -= 23;
 			}
 		}

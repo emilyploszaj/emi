@@ -14,6 +14,7 @@ import com.google.common.collect.Maps;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeManager;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
@@ -41,6 +42,10 @@ public class EmiApi {
 
 	public static List<EmiStack> getIndexStacks() {
 		return EmiStackList.stacks;
+	}
+
+	public static EmiRecipeManager getRecipeManager() {
+		return EmiRecipes.manager;
 	}
 
 	public static boolean isCheatMode() {
@@ -109,11 +114,12 @@ public class EmiApi {
 	}
 
 	public static void displayAllRecipes() {
-		setPages(EmiRecipes.byCategory, EmiStack.EMPTY);
+		EmiRecipeManager manager = EmiApi.getRecipeManager();
+		setPages(manager.getCategories().stream().collect(Collectors.toMap(c -> c, c -> manager.getRecipes(c))), EmiStack.EMPTY);
 	}
 
 	public static void displayRecipeCategory(EmiRecipeCategory category) {
-		setPages(Map.of(category, EmiRecipes.byCategory.get(category)), EmiStack.EMPTY);
+		setPages(Map.of(category, getRecipeManager().getRecipes(category)), EmiStack.EMPTY);
 	}
 
 	public static void displayRecipe(EmiRecipe recipe) {
@@ -125,7 +131,7 @@ public class EmiApi {
 			stack = fav.getStack();
 		}
 		if (stack instanceof TagEmiIngredient tag) {
-			for (EmiRecipe recipe : EmiRecipes.byCategory.getOrDefault(VanillaPlugin.TAG, List.of())) {
+			for (EmiRecipe recipe : getRecipeManager().getRecipes(VanillaPlugin.TAG)) {
 				if (recipe instanceof EmiTagRecipe tr && tr.key.equals(tag.key)) {
 					setPages(Map.of(VanillaPlugin.TAG, List.of(recipe)), stack);
 					break;
@@ -135,7 +141,7 @@ public class EmiApi {
 			setPages(Map.of(VanillaPlugin.INGREDIENT, List.of(new EmiSyntheticIngredientRecipe(stack))), stack);
 		} else if (stack.getEmiStacks().size() == 1) {
 			EmiStack es = stack.getEmiStacks().get(0);
-			setPages(mapRecipes(pruneSources(EmiRecipes.byOutput.getOrDefault(es.getKey(), List.of()), es)), stack);
+			setPages(mapRecipes(pruneSources(EmiApi.getRecipeManager().getRecipesByOutput(es), es)), stack);
 			focusRecipe(BoM.getRecipe(es));
 		}
 	}
@@ -145,7 +151,7 @@ public class EmiApi {
 			EmiStack zero = stack.getEmiStacks().get(0);
 			Map<EmiRecipeCategory, List<EmiRecipe>> map
 				= mapRecipes(Stream.concat(
-						pruneUses(EmiRecipes.byInput.getOrDefault(zero.getKey(), List.of()), stack).stream(),
+						pruneUses(getRecipeManager().getRecipesByInput(zero), stack).stream(),
 						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
 			setPages(map, stack);
 		}

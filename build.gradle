@@ -26,6 +26,9 @@ allprojects {
 	group = rootProject.maven_group
 
 	repositories {
+		maven {
+			url = "https://maven.blamejared.com/"
+		}
 	}
 
 	tasks.withType(JavaCompile) {

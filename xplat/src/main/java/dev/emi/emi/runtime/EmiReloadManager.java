@@ -29,12 +29,35 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
 public class EmiReloadManager {
+	private static int loadedResourcesMask = 0;
 	private static volatile boolean clear = false, restart = false;
 	// 0 - empty, 1 - reloading, 2 - loaded, -1 - error
 	private static volatile int status = 0;
 	private static Thread thread;
 	public static volatile Text reloadStep = EmiPort.literal("");
 	public static volatile long reloadWorry = Long.MAX_VALUE;
+
+	public static void reloadTags() {
+		loadedResourcesMask |= 1;
+		if (loadedResourcesMask == 3) {
+			EmiLog.info("Recipes synchronized, reloading EMI");
+			loadedResourcesMask = 0;
+			reload();
+		} else {
+			EmiLog.info("Recipes synchronized, waiting for tags to reload EMI...");
+		}
+	}
+
+	public static void reloadRecipes() {
+		loadedResourcesMask |= 2;
+		if (loadedResourcesMask == 3) {
+			EmiLog.info("Tags synchronized, reloading EMI");
+			loadedResourcesMask = 0;
+			reload();
+		} else {
+			EmiLog.info("Tags synchronized, waiting for recipes to reload EMI...");
+		}
+	}
 
 	public static void clear() {
 		synchronized (EmiReloadManager.class) {

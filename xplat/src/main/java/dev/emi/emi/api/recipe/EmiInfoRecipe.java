@@ -2,7 +2,6 @@ package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -13,8 +12,8 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-@ApiStatus.Experimental
 public class EmiInfoRecipe implements EmiRecipe {
+	private static final int STACK_WIDTH = 6, MAX_STACKS = STACK_WIDTH * 3;
 	private static final int PADDING = 4;
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	private final List<EmiIngredient> stacks;
@@ -59,22 +58,26 @@ public class EmiInfoRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayHeight() {
-		int stackHeight = ((stacks.size() - 1) / 6 + 1) * 18;
+		int stackHeight = ((Math.min(stacks.size(), MAX_STACKS) - 1) / 6 + 1) * 18;
 		return stackHeight + CLIENT.textRenderer.fontHeight * text.size() + PADDING;
 	}
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		int stackWidth = 6;
-		int stackHeight = ((stacks.size() - 1) / stackWidth + 1);
-		int xOff = 54 - (stacks.size() % stackWidth * 9);
-		for (int i = 0; i < stacks.size(); i++) {
-			int y = i / stackWidth * 18;
-			int x = (i % stackWidth) * 18;
-			if (y / 18 + 1 == stackHeight && stacks.size() % stackWidth != 0) {
+		int stackCount = Math.min(stacks.size(), MAX_STACKS);
+		int stackHeight = ((stackCount - 1) / STACK_WIDTH + 1);
+		int xOff = 54 - (stackCount % STACK_WIDTH * 9);
+		for (int i = 0; i < stackCount; i++) {
+			int y = i / STACK_WIDTH * 18;
+			int x = (i % STACK_WIDTH) * 18;
+			if (y / 18 + 1 == stackHeight && stackCount % STACK_WIDTH != 0) {
 				x += xOff;
 			}
-			widgets.addSlot(stacks.get(i), x + 18, y);
+			if (i + 1 == stackCount && stacks.size() > stackCount) {
+				widgets.addSlot(EmiIngredient.of(stacks.subList(i, stacks.size())), x + 18, y);
+			} else {
+				widgets.addSlot(stacks.get(i), x + 18, y);
+			}
 		}
 		int y = stackHeight * 18 + PADDING;
 		int lineCount = (widgets.getHeight() - y) / CLIENT.textRenderer.fontHeight;

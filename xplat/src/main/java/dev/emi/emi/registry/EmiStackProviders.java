@@ -6,7 +6,9 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiStackProvider;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
@@ -60,8 +62,9 @@ public class EmiStackProviders {
 								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);
 							if (!list.isEmpty()) {
 								Identifier id = list.get(0).getId();
-								if (EmiRecipes.byId.containsKey(id)) {
-									return new EmiStackInteraction(EmiStack.of(stack), EmiRecipes.byId.get(id), false);
+								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
+								if (recipe != null) {
+									return new EmiStackInteraction(EmiStack.of(stack), recipe, false);
 								}
 							}
 						} catch (Exception e) {

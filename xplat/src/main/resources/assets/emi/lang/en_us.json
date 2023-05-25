@@ -376,6 +376,8 @@
 
   "tag.fluid.minecraft.water": "Water",
   "tag.fluid.minecraft.lava": "Lava",
+  "tag.fluid.c.water": "Water",
+  "tag.fluid.c.lava": "Lava",
   "tag.fluid.c.milk": "Milk",
 
   "tag.item.c.stone": "Stone",

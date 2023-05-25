@@ -8,19 +8,13 @@ loom {
 	accessWidenerPath = file("src/main/resources/emi.accesswidener")
 }
 
-repositories {
-	maven {
-		url = "https://maven.blamejared.com/"
-	}
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
 	mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
 
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-	
-	modCompileOnly("mezz.jei:jei-1.19.3-fabric:12.3.0.21") {
+
+	modCompileOnly("mezz.jei:${rootProject.jei_version}") {
 		transitive = false
 	}
 }
