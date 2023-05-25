@@ -8,7 +8,6 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.jemi.JemiUtil;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.screen.RecipeScreen;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -38,7 +37,7 @@ public class JemiRecipesGui implements IRecipesGui {
 	@Override
 	public void showTypes(List<RecipeType<?>> recipeTypes) {
 		for (RecipeType<?> type : recipeTypes) {
-			for (EmiRecipeCategory category : EmiRecipes.categories) {
+			for (EmiRecipeCategory category : EmiApi.getRecipeManager().getCategories()) {
 				if (category.getId().equals(type.getUid())) {
 					EmiApi.displayRecipeCategory(category);
 				}

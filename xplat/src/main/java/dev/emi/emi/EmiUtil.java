@@ -18,7 +18,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiRecipeFiller;
-import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -138,7 +137,7 @@ public class EmiUtil {
 			HandledScreen<?> hs = EmiApi.getHandledScreen();
 			EmiStack stack = ingredient.getEmiStacks().get(0);
 			EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
-			return EmiRecipes.byOutput.getOrDefault(stack.getKey(), List.of()).stream().filter(r -> {
+			return EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
 				if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
 					EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
 					return handler != null && (!requireCraftable || handler.canCraft(r, context));
@@ -152,7 +151,7 @@ public class EmiUtil {
 	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
 		if (ingredient.getEmiStacks().size() == 1) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
-			return getPreferredRecipe(EmiRecipes.byOutput.getOrDefault(stack.getKey(), List.of()).stream().filter(r -> {
+			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
 					if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
 						return !requireCraftable || inventory.canCraft(r);
 					}

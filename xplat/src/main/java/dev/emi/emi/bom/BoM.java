@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -18,7 +19,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.data.RecipeDefault;
-import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiPersistentData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -93,13 +93,13 @@ public class BoM {
 		JsonArray disabled = JsonHelper.getArray(object, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
 			Identifier id = new Identifier(el.getAsString());
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			disabledRecipes.add(recipe);
 		}
 		JsonArray added = JsonHelper.getArray(object, "added", new JsonArray());
 		for (JsonElement el : added) {
 			Identifier id = new Identifier(el.getAsString());
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && !disabledRecipes.contains(recipe)) {
 				for (EmiStack output : recipe.getOutputs()) {
 					addedRecipes.put(output, recipe);
@@ -109,7 +109,7 @@ public class BoM {
 		JsonObject resolutions = JsonHelper.getObject(object, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
 			Identifier id = new Identifier(key);
-			EmiRecipe recipe = EmiRecipes.byId.get(id);
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && JsonHelper.hasArray(resolutions, key)) {
 				JsonArray arr = JsonHelper.getArray(resolutions, key);
 				for (JsonElement el : arr) {
@@ -132,7 +132,7 @@ public class BoM {
 
 	public static void reload() {
 		for (RecipeDefault def : defaults) {
-			EmiRecipe recipe = EmiRecipes.byId.get(def.id());
+			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(def.id());
 			if (recipe != null) {
 				for (EmiStack out : recipe.getOutputs()) {
 					if (def.matchAll() || out.isEqual(def.stack())) {

@@ -27,27 +27,13 @@ public class ClientPlayNetworkHandlerMixin {
 	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/recipe/RecipeManager.setRecipes(Ljava/lang/Iterable;)V",
 		shift = Shift.AFTER), method = "onSynchronizeRecipes")
 	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
-		infoMask |= 1;
-		if (infoMask == 3) {
-			EmiLog.info("Recipes synchronized, reloading EMI");
-			infoMask = 0;
-			EmiReloadManager.reload();
-		} else {
-			EmiLog.info("Recipes synchronized, waiting for tags to reload EMI...");
-		}
+		EmiReloadManager.reloadRecipes();
 	}
 
 	@Inject(at = @At(value = "INVOKE", target = "java/util/Map.forEach(Ljava/util/function/BiConsumer;)V",
 		shift = Shift.AFTER), method = "onSynchronizeTags")
 	private void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
-		infoMask |= 2;
-		if (infoMask == 3) {
-			EmiLog.info("Tags synchronized, reloading EMI");
-			infoMask = 0;
-			EmiReloadManager.reload();
-		} else {
-			EmiLog.info("Tags synchronized, waiting for recipes to reload EMI...");
-		}
+		EmiReloadManager.reloadTags();
 	}
 
 	@Inject(at = @At("RETURN"), method = "onGameJoin")

@@ -16,7 +16,6 @@
     "accessor.SmithingRecipeAccessor",
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
-    "ClientPlayNetworkHandlerMixin",
     "CraftingResultSlotMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
