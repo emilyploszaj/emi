@@ -72,10 +72,14 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 			shift = Shift.AFTER),
 		method = "render")
 	private void renderForeground(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
-		matrices.push();
-		matrices.translate(-x, -y, 0.0);
+		MatrixStack viewStack = RenderSystem.getModelViewStack();
+		viewStack.push();
+		viewStack.translate(-x, -y, 0.0);
+		RenderSystem.applyModelViewMatrix();
+		EmiPort.setPositionTexShader();
 		EmiScreenManager.drawForeground(matrices, mouseX, mouseY, delta);
-		matrices.pop();
+		viewStack.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 
 	@Inject(at = @At("TAIL"), method = "drawSlot")
