@@ -129,7 +129,7 @@ public class EmiAgnosForge extends EmiAgnos {
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
 					try {
 						if (recipe.ingredient.getMatchingStacks().length > 0) {
-							Identifier id = new Identifier("emi", "brewing/potion/" + pid
+							Identifier id = new Identifier("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.f_43532_.get()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.f_43534_.get())));

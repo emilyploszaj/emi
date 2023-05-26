@@ -59,8 +59,15 @@ public class EmiBind {
 		if (!isBound()) {
 			return EmiPort.literal("[]", Formatting.GOLD);
 		} else {
+			ModifiedKey bind = boundKeys.get(0);
+			for (ModifiedKey key : boundKeys) {
+				if (key.key.getCategory() == InputUtil.Type.MOUSE) {
+					bind = key;
+					break;
+				}
+			}
 			return EmiPort.literal("[", Formatting.GOLD)
-				.append(boundKeys.get(0).getKeyText(Formatting.GOLD))
+				.append(bind.getKeyText(Formatting.GOLD))
 				.append(EmiPort.literal("]", Formatting.GOLD));
 		}
 	}

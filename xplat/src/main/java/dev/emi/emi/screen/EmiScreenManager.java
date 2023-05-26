@@ -709,14 +709,9 @@ public class EmiScreenManager {
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(hov.getTooltip());
 			if (EmiApi.getRecipeContext(hov) == null && EmiConfig.showCraft.isHeld()) {
-				List<EmiRecipe> recipes = EmiUtil.getValidRecipes(hov, lastPlayerInventory, true);
-				if (!recipes.isEmpty()) {
-					list.add(new RecipeTooltipComponent(EmiUtil.getPreferredRecipe(recipes), false));
-				} else {
-					recipes = EmiUtil.getValidRecipes(hov, lastPlayerInventory, false);
-					if (!recipes.isEmpty()) {
-						list.add(new RecipeTooltipComponent(EmiUtil.getPreferredRecipe(recipes), true));
-					}
+				EmiRecipe recipe = EmiUtil.getPreferredRecipe(hov, lastPlayerInventory, false);
+				if (recipe != null) {
+					list.add(new RecipeTooltipComponent(recipe, true));
 				}
 			}
 			if (EmiConfig.editMode && sidebar == SidebarType.INDEX) {
@@ -1080,7 +1075,7 @@ public class EmiScreenManager {
 				return true;
 			}
 			Supplier<EmiRecipe> supplier = () -> {
-				return EmiUtil.getPreferredRecipe(EmiUtil.getValidRecipes(ingredient, lastPlayerInventory, true));
+				return EmiUtil.getPreferredRecipe(ingredient, lastPlayerInventory, true);
 			};
 			if (craftInteraction(ingredient, supplier, stack, function)) {
 				return true;

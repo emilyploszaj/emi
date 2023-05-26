@@ -1,5 +1,5 @@
 {
-  "key.keyboard.control": "Control",
+  "key.keyboard.control": "Ctrl",
   "key.keyboard.alt": "Alt",
   "key.keyboard.shift": "Shift",
 
@@ -184,7 +184,8 @@
   "emi.not_enough_ingredients": "Not enough ingredients to craft",
   "emi.too_small": "Crafting grid too small to fit ingredients",
   "emi.favorite_recipe": "Press %s to favorite recipe",
-  "emi.resolve": "Resolve recipe for this recipe tree",
+  "emi.resolve.resolve": "Press %s to use for this recipe tree",
+  "emi.resolve.default": "Press %s to default for all trees",
   "emi.page": "Page %s of %s",
   "emi.page.short": "%s/%s",
   "emi.total_cost": "Total Cost",

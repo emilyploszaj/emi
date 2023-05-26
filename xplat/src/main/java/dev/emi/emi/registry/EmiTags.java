@@ -19,8 +19,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.data.TagExclusions;
 import dev.emi.emi.platform.EmiAgnos;
-import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
@@ -42,6 +42,7 @@ public class EmiTags {
 	private static final Map<Identifier, List<TagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<Registry<?>> REGISTRIES = List.of(EmiPort.getItemRegistry(), EmiPort.getFluidRegistry());
 	public static final List<TagKey<?>> TAGS = Lists.newArrayList();
+	public static TagExclusions exclusions = new TagExclusions();
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<EmiStack> stacks, long amount) {
@@ -198,8 +199,9 @@ public class EmiTags {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> void reloadTags(Registry<T> registry) {
 		Set<T> hidden = EmiUtil.values(TagKey.of(registry.getKey(), HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value).collect(Collectors.toSet());
+		Identifier rid = registry.getKey().getValue();
 		List<TagKey<T>> tags = registry.streamTags()
-			.filter(key -> !EmiClient.excludedTags.contains(key.id()) && !hidden.containsAll(EmiUtil.values(key).map(RegistryEntry::value).toList()))
+			.filter(key -> !exclusions.contains(rid, key.id()) && !hidden.containsAll(EmiUtil.values(key).map(RegistryEntry::value).toList()))
 			.toList();
 		logUntranslatedTags(tags);
 		tags = consolodateTags(tags);

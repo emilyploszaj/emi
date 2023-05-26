@@ -11,11 +11,13 @@ import java.util.stream.Stream;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import net.minecraft.block.Block;
@@ -84,18 +86,6 @@ public class EmiUtil {
 		return EmiAgnos.getModName(namespace);
 	}
 
-	public static EmiRecipe getPreferredRecipe(List<EmiRecipe> recipes) {
-		if (recipes.isEmpty()) {
-			return null;
-		}
-		for (EmiRecipe recipe : recipes) {
-			if (BoM.isRecipeEnabled(recipe)) {
-				return recipe;
-			}
-		}
-		return recipes.get(0);
-	}
-
 	public static List<String> getStackTrace(Throwable t) {
 		StringWriter writer = new StringWriter();
 		t.printStackTrace(new PrintWriter(writer, true));
@@ -131,32 +121,55 @@ public class EmiUtil {
 		return count;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static List<EmiRecipe> getValidRecipes(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
+	public static EmiRecipe getPreferredRecipe(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
 		if (ingredient.getEmiStacks().size() == 1) {
-			HandledScreen<?> hs = EmiApi.getHandledScreen();
 			EmiStack stack = ingredient.getEmiStacks().get(0);
-			EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
-			return EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
-				if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
-					EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
-					return handler != null && (!requireCraftable || handler.canCraft(r, context));
-				}
-				return false;
-			}).toList();
+			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack), inventory, requireCraftable);
 		}
-		return List.of();
+		return null;
 	}
 
-	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static EmiRecipe getPreferredRecipe(List<EmiRecipe> recipes, EmiPlayerInventory inventory, boolean requireCraftable) {
+		EmiRecipe preferred = null;
+		int preferredWeight = -1;
+		HandledScreen<?> hs = EmiApi.getHandledScreen();
+		EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
+		for (EmiRecipe recipe : recipes) {
+			int weight = 0;
+			EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
+			if (handler != null && handler.canCraft(recipe, context)) {
+				weight += 16;
+			} else if (requireCraftable) {
+				continue;
+			} else if (inventory.canCraft(recipe)) {
+				weight += 8;
+			}
+			if (BoM.isRecipeEnabled(recipe)) {
+				weight += 4;
+			}
+			if (recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING) {
+				weight += 2;
+			}
+			if (weight > preferredWeight) {
+				preferredWeight = weight;
+				preferred = recipe;
+			} else if (weight == preferredWeight) {
+				if (EmiRecipeCategoryProperties.getOrder(recipe.getCategory()) < EmiRecipeCategoryProperties.getOrder(preferred.getCategory())) {
+					preferredWeight = weight;
+					preferred = recipe;
+				}
+			}
+		}
+		return preferred;
+	}
+
+	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory) {
 		if (ingredient.getEmiStacks().size() == 1) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
 			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
-					if (r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack))) {
-						return !requireCraftable || inventory.canCraft(r);
-					}
-					return false;
-				}).toList());
+					return r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack));
+				}).toList(), inventory, false);
 		}
 		return null;
 	}
