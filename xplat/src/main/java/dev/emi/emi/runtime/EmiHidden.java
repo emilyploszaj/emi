@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
@@ -28,8 +29,11 @@ public class EmiHidden {
 	public static void load(JsonArray arr) {
 		hiddenStacks.clear();
 		for (JsonElement el : arr) {
-			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
+			EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el).copy();
 			if (!stack.isEmpty()) {
+				for (EmiStack es : stack.getEmiStacks()) {
+					es.comparison(c -> Comparison.compareNbt());
+				}
 				hiddenStacks.add(stack);
 			}
 		}
@@ -46,7 +50,7 @@ public class EmiHidden {
 			for (EmiStack i : EmiStackList.stacks) {
 				if (es.getId().equals(i.getId())) {
 					if (hide) {
-						hiddenStacks.add(i);
+						hiddenStacks.add(i.copy().comparison(c -> Comparison.compareNbt()));
 					} else {
 						hiddenStacks.remove(i);
 					}
@@ -54,6 +58,10 @@ public class EmiHidden {
 			}
 		} else {
 			if (hide) {
+				stack = stack.copy();
+				for (EmiStack es : stack.getEmiStacks()) {
+					es.comparison(c -> Comparison.compareNbt());
+				}
 				hiddenStacks.add(stack);
 			} else {
 				hiddenStacks.remove(stack);

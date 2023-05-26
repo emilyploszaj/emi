@@ -59,7 +59,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 	@Override
 	public Identifier getPluginUid() {
-		return new Identifier("emi:emi");
+		return new Identifier("emi:jemi");
 	}
 
 	@Override

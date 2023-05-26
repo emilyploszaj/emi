@@ -10,7 +10,7 @@
   "contributors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/emi/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

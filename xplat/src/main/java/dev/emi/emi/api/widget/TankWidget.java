@@ -42,7 +42,7 @@ public class TankWidget extends SlotWidget {
 				int y = bounds.y() + 1;
 				int w = bounds.width() - 2;
 				int h = bounds.height() - 2;
-				int filledHeight = (int) Math.min(h, (fes.getAmount() * h / capacity));
+				int filledHeight = Math.max(1, (int) Math.min(h, (fes.getAmount() * h / capacity)));
 				int sy = floaty ? y : y + h;
 				for (int oy = 0; oy < filledHeight; oy += 16) {
 					int rh = Math.min(16, filledHeight - oy);
