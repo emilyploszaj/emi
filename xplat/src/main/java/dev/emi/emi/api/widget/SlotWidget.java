@@ -19,7 +19,7 @@ import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HelpLevel;
-import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -236,11 +236,15 @@ public class SlotWidget extends Widget {
 			if (recipe.getId() != null && EmiConfig.showRecipeIds) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(recipe.getId().toString(), Formatting.GRAY))));
 			}
-			if (EmiConfig.favorite.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiFavorites.canFavorite(getStack(), getRecipe())) {
+			if (canResolve() && EmiConfig.helpLevel.has(HelpLevel.NORMAL)) {
+				if (EmiConfig.viewRecipes.isBound()) {
+					list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve.resolve", EmiConfig.viewRecipes.getBindText()))));
+				}
+				if (EmiConfig.defaultStack.isBound()) {
+					list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve.default", EmiConfig.defaultStack.getBindText()))));
+				}
+			} else if (EmiConfig.favorite.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiFavorites.canFavorite(getStack(), getRecipe())) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
-			}
-			if (RecipeScreen.resolve != null && EmiConfig.helpLevel.has(HelpLevel.NORMAL)) {
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve", Formatting.GREEN))));
 			}
 			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
 				RecipeCostTooltipComponent rctc = new RecipeCostTooltipComponent(recipe);
@@ -253,24 +257,39 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
-		if (button == 0 && getRecipe() != null && getRecipe().supportsRecipeTree() && RecipeScreen.resolve != null) {
-			if (EmiInput.isShiftDown()) {
-				BoM.addRecipe(RecipeScreen.resolve, getRecipe());
-			} else {
-				BoM.addResolution(RecipeScreen.resolve, getRecipe());
-			}
-			EmiHistory.pop();
-			return true;
-		} else if (EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
-				bind -> bind.matchesMouse(button))) {
+		if (slotInteraction(bind -> bind.matchesMouse(button))) {
 			return true;
 		}
-		return false;
+		return EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
+			bind -> bind.matchesMouse(button));
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (slotInteraction(bind -> bind.matchesKey(keyCode, scanCode))) {
+			return true;
+		}
 		return EmiScreenManager.stackInteraction(new EmiStackInteraction(getStack(), getRecipe(), true),
 			bind -> bind.matchesKey(keyCode, scanCode));
+	}
+
+	private boolean canResolve() {
+		EmiRecipe recipe = getRecipe();
+		return recipe != null && recipe.supportsRecipeTree() && RecipeScreen.resolve != null;
+	}
+
+	private boolean slotInteraction(Function<EmiBind, Boolean> function) {
+		if (canResolve()) {
+			if (function.apply(EmiConfig.defaultStack)) {
+				BoM.addRecipe(RecipeScreen.resolve, getRecipe());
+				EmiHistory.pop();
+				return true;
+			} else if (function.apply(EmiConfig.viewRecipes)) {
+				BoM.addResolution(RecipeScreen.resolve, getRecipe());
+				EmiHistory.pop();
+				return true;
+			}
+		}
+		return false;
 	}
 }

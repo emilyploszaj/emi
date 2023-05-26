@@ -1,6 +1,5 @@
 package dev.emi.emi.bom;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,21 +17,21 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
-import dev.emi.emi.data.RecipeDefault;
+import dev.emi.emi.data.RecipeDefaults;
 import dev.emi.emi.runtime.EmiPersistentData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class BoM {
-	private static List<RecipeDefault> defaults = List.of();
+	private static RecipeDefaults defaults = new RecipeDefaults();
 	public static MaterialTree tree;
 	public static Map<EmiIngredient, EmiRecipe> defaultRecipes = Maps.newHashMap();
 	public static Map<EmiIngredient, EmiRecipe> addedRecipes = Maps.newHashMap();
 	public static Set<EmiRecipe> disabledRecipes = Sets.newHashSet();
 	public static boolean craftingMode = false;
 
-	public static void setDefaults(List<RecipeDefault> defaults) {
+	public static void setDefaults(RecipeDefaults defaults) {
 		BoM.defaults = defaults;
 		MinecraftClient.getInstance().execute(() -> reload());
 	}
@@ -131,16 +130,7 @@ public class BoM {
 	}
 
 	public static void reload() {
-		for (RecipeDefault def : defaults) {
-			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(def.id());
-			if (recipe != null) {
-				for (EmiStack out : recipe.getOutputs()) {
-					if (def.matchAll() || out.isEqual(def.stack())) {
-						defaultRecipes.put(out, recipe);
-					}
-				}
-			}
-		}
+		defaultRecipes = defaults.bake();
 	}
 
 	public static boolean isRecipeEnabled(EmiRecipe recipe) {

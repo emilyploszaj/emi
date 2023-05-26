@@ -2,11 +2,9 @@ package dev.emi.emi.platform;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
@@ -19,12 +17,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Identifier;
 
 public class EmiClient {
 	public static final Map<Consumer<ItemUsageContext>, List<ItemConvertible>> HOE_ACTIONS = Maps.newHashMap();
 	public static boolean onServer = false;
-	public static Set<Identifier> excludedTags = Sets.newHashSet();
 
 	public static void init() {
 		EmiConfig.loadConfig();

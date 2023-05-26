@@ -159,16 +159,16 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
-		drawTooltip(screen, matrices, components, x, y, screen.width);
+		drawTooltip(screen, matrices, components, x, y, screen.width / 2);
 	}
 
-	private static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y, int width) {
+	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y, int maxWidth) {
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();
 		int wrapWidth = Math.max(components.stream()
 			.map(c -> c instanceof OrderedTextTooltipComponent ? 0 : c.getWidth(CLIENT.textRenderer))
-			.max(Integer::compare).orElse(0), width / 2);
+			.max(Integer::compare).orElse(0), maxWidth);
 		for (TooltipComponent comp : components) {
 			if (comp instanceof OrderedTextTooltipComponent ottc && ottc.getWidth(CLIENT.textRenderer) > wrapWidth) {
 				try {
