@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import dev.emi.emi.config.ConfigEnum;
 import dev.emi.emi.config.EmiConfig;
@@ -91,19 +92,16 @@ public class ConfigScreen extends Screen {
 
 	@SuppressWarnings("unchecked")
 	public static List<TooltipComponent> getFieldTooltip(Field field) {
-		MinecraftClient client = MinecraftClient.getInstance();
 		List<TooltipComponent> text;
 		ConfigValue annot = field.getAnnotation(ConfigValue.class);
 		String key = "config.emi.tooltip." + annot.value().replace('-', '_');
 		Comment comment = field.getAnnotation(Comment.class);
 		if (I18n.hasTranslation(key)) {
 			text = (List<TooltipComponent>) (Object) Arrays.stream(I18n.translate(key).split("\n"))
-				.map(s -> client.textRenderer.wrapLines(StringVisitable.plain(s), maxWidth))
-				.flatMap(l -> l.stream()).map(TooltipComponent::of).toList();
+				.map(EmiPort::literal).map(EmiTooltipComponents::of).toList();
 		} else if (comment != null) {
 			text = (List<TooltipComponent>) (Object) Arrays.stream(comment.value().split("\n"))
-				.map(s -> client.textRenderer.wrapLines(StringVisitable.plain(s), maxWidth))
-				.flatMap(l -> l.stream()).map(TooltipComponent::of).toList();
+				.map(EmiPort::literal).map(EmiTooltipComponents::of).toList();
 		} else {
 			text = null;
 		}
@@ -370,7 +368,7 @@ public class ConfigScreen extends Screen {
 		list.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
-			EmiRenderHelper.drawTooltip(this, matrices, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(this, matrices, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2, maxWidth));
 		}
 	}
 	
