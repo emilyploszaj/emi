@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.data.EmiData;
@@ -96,16 +97,13 @@ public class EmiStackList {
 		for (Supplier<IndexStackData> supplier : EmiData.stackData) {
 			IndexStackData ssd = supplier.get();
 			if (!ssd.removed().isEmpty()) {
-				stacks.removeIf(s -> {
-					for (EmiIngredient invalidator : ssd.removed()) {
-						for (EmiStack stack : invalidator.getEmiStacks()) {
-							if (stack.equals(s)) {
-								return true;
-							}
-						}
+				Set<EmiStack> removed = Sets.newHashSet();
+				for (EmiIngredient invalidator : ssd.removed()) {
+					for (EmiStack stack : invalidator.getEmiStacks()) {
+						removed.add(stack.copy().comparison(c -> Comparison.compareNbt()));
 					}
-					return false;
-				});
+				}
+				stacks.removeAll(removed);
 			}
 			for (IndexStackData.Added added : ssd.added()) {
 				if (added.added().isEmpty()) {

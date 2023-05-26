@@ -122,7 +122,7 @@ public class EmiUtil {
 	}
 
 	public static EmiRecipe getPreferredRecipe(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
-		if (ingredient.getEmiStacks().size() == 1) {
+		if (ingredient.getEmiStacks().size() == 1 && !ingredient.isEmpty()) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
 			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack), inventory, requireCraftable);
 		}
@@ -165,7 +165,7 @@ public class EmiUtil {
 	}
 
 	public static EmiRecipe getRecipeResolution(EmiIngredient ingredient, EmiPlayerInventory inventory) {
-		if (ingredient.getEmiStacks().size() == 1) {
+		if (ingredient.getEmiStacks().size() == 1 && !ingredient.isEmpty()) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
 			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
 					return r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack));
