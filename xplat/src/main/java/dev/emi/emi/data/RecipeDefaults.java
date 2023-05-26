@@ -27,7 +27,7 @@ public class RecipeDefaults {
 	}
 
 	public void add(Identifier id, JsonArray arr) {
-		resolutions.add(new Resolution(id, arr.asList()));
+		resolutions.add(new Resolution(id, Lists.newArrayList(arr)));
 	}
 
 	public void addTag(JsonElement tag, JsonElement stack) {
