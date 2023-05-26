@@ -273,7 +273,7 @@ public class BoMScreen extends Screen {
 			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
 			List<TooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
-			EmiRenderHelper.drawTooltip(this, matrices, list, width - 18, height - 18);
+			EmiRenderHelper.drawTooltip(this, matrices, list, width - 18, height - 18, width);
 		}
 	}
 
@@ -422,10 +422,7 @@ public class BoMScreen extends Screen {
 				consumer.accept(hover.stack, new EmiResolutionRecipe(hover.stack, stacks.get(0)));
 				return true;
 			} else {
-				EmiRecipe recipe = EmiUtil.getRecipeResolution(hover.stack, inv, true);
-				if (recipe == null) {
-					recipe = EmiUtil.getRecipeResolution(hover.stack, inv, false);
-				}
+				EmiRecipe recipe = EmiUtil.getRecipeResolution(hover.stack, inv);
 				if (recipe != null) {
 					consumer.accept(hover.stack, recipe);
 					return true;

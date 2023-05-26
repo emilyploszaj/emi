@@ -1,5 +1,8 @@
 {
   "exclusions": [
+    "c:hidden_from_recipe_viewers"
+  ],
+  "item": [
     "minecraft:occludes_vibration_signals",
     "minecraft:cluster_max_harvestables",
     "minecraft:completes_find_tree_tutorial",
@@ -9,18 +12,11 @@
     "c:pickaxes",
     "c:shovels",
     "c:swords",
-    "c:hidden_from_recipe_viewers",
     "c:ore_bearing_ground/stone",
     "c:ore_bearing_ground/deepslate",
     "c:ore_bearing_ground/netherrack",
     "c:ore_rates/singular",
     "c:ore_rates/dense",
-    "c:ore_rates/sparse",
-    "forge:ore_bearing_ground/deepslate",
-    "forge:ore_bearing_ground/netherrack",
-    "forge:ore_bearing_ground/stone",
-    "forge:ore_rates/dense",
-    "forge:ore_rates/singular",
-    "forge:ore_rates/sparse"
+    "c:ore_rates/sparse"
   ]
 }
