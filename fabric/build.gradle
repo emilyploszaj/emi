@@ -172,7 +172,7 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		gameVersions = [rootProject.minecraft_version]
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
-		changelog = file('CHANGELOG.md').text
+		changelog = file('../CHANGELOG.md').text
 	}
 }
 
@@ -183,7 +183,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			id = '580555'
 			releaseType = 'release'
 			changelogType = 'markdown'
-			changelog = file('CHANGELOG.md')
+			changelog = file('../CHANGELOG.md')
 
 			addGameVersion rootProject.minecraft_version
 			addGameVersion 'Fabric'
