@@ -1,3 +1,14 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+	}
+}
+
 plugins {
 	id "dev.architectury.loom"
 	id "com.github.johnrengelman.shadow" version "7.1.2"
