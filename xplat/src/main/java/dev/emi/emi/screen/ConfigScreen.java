@@ -368,7 +368,7 @@ public class ConfigScreen extends Screen {
 		list.render(matrices, mouseX, mouseY, delta);
 		super.render(matrices, mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
-			EmiRenderHelper.drawTooltip(this, matrices, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2, maxWidth));
+			EmiRenderHelper.drawTooltip(this, matrices, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}
 	}
 	

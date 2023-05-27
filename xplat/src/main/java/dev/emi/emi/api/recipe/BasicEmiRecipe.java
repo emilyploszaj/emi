@@ -10,6 +10,9 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.util.Identifier;
 
+/**
+ * A convenience type for easy implementation of {@link EmiRecipe}
+ */
 public abstract class BasicEmiRecipe implements EmiRecipe {
 	protected List<EmiIngredient> inputs = Lists.newArrayList();
 	protected List<EmiIngredient> catalysts = Lists.newArrayList();
