@@ -59,7 +59,7 @@ jobs:
           prerelease: false
 
       - name: Upload Fabric Release Asset
-        id: upload_release_asset
+        id: upload_fabric_release_asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
           asset_content_type: application/java-archive
 
       - name: Upload Forge Release Asset
-        id: upload_release_asset
+        id: upload_forge_release_asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
