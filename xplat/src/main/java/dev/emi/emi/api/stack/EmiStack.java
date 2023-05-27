@@ -182,20 +182,14 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
-		if (fluid instanceof FlowableFluid ff) {
-			fluid = ff.getStill();
-		}
-		if (!fluid.isStill(fluid.getDefaultState()) || fluid == Fluids.EMPTY) {
-			return EmiStack.EMPTY;
-		}
-		return new FluidEmiStack(fluid, nbt);
+		return of(fluid, nbt, 0);
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt, long amount) {
-		if (fluid instanceof FlowableFluid ff) {
+		if (fluid instanceof FlowableFluid ff && ff.getStill() != Fluids.EMPTY) {
 			fluid = ff.getStill();
 		}
-		if (!fluid.isStill(fluid.getDefaultState()) || fluid == Fluids.EMPTY) {
+		if (fluid == Fluids.EMPTY) {
 			return EmiStack.EMPTY;
 		}
 		return new FluidEmiStack(fluid, nbt, amount);
