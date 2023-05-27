@@ -32,17 +32,18 @@ jobs:
         run: grep "mod_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
 
       - name: Get Platform Version
-        id: platform_version
-        run: grep "platform_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
+        id: minecraft_version
+        run: grep "minecraft_version" gradle.properties | sed "s/\s//g" >> $GITHUB_OUTPUT
 
       - name: Get Composite Version
         id: composite_version
-        run: echo "composite_version=${{ steps.mod_version.outputs.mod_version }}+${{ steps.platform_version.outputs.platform_version }}" >> $GITHUB_OUTPUT
+        run: echo "composite_version=${{ steps.mod_version.outputs.mod_version }}+${{ steps.minecraft_version.outputs.minecraft_version }}" >> $GITHUB_OUTPUT
 
       - name: Publish
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          RELEASE: true
         run: ./gradlew build publish modrinth curseforge -PmavenUrl="${{ secrets.MAVEN_URL }}" -PmavenUsername="${{ secrets.MAVEN_USERNAME }}" -PmavenPassword="${{ secrets.MAVEN_PASSWORD }}"
 
       - name: Create Release
@@ -57,13 +58,24 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
-        id: upload_release_asset 
+      - name: Upload Fabric Release Asset
+        id: upload_fabric_release_asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/libs/emi-${{ steps.composite_version.outputs.composite_version }}.jar
-          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}.jar
+          asset_path: ./fabric/build/libs/emi-${{ steps.composite_version.outputs.composite_version }}+fabric.jar
+          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}+fabric.jar
+          asset_content_type: application/java-archive
+
+      - name: Upload Forge Release Asset
+        id: upload_forge_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./forge/build/libs/emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
+          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
           asset_content_type: application/java-archive

@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -36,6 +37,7 @@ public class EmiPlayerInventory {
 	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
 	@Deprecated
+	@ApiStatus.Internal
 	public EmiPlayerInventory(PlayerEntity entity) {
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
 		if (screen != null && screen.getScreenHandler() != null) {

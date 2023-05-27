@@ -20,7 +20,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /**
- * An abstract representation of an object in EMI.
+ * An abstract representation of a resource in EMI.
  * Can be an item, a fluid, or something else.
  */
 public abstract class EmiStack implements EmiIngredient {
@@ -49,6 +49,11 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public EmiStack comparison(Function<Comparison, Comparison> comparison) {
 		this.comparison = comparison.apply(this.comparison);
+		return this;
+	}
+
+	public EmiStack comparison(Comparison comparison) {
+		this.comparison = comparison;
 		return this;
 	}
 

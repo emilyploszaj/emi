@@ -158,7 +158,7 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
-		drawTooltip(screen, matrices, components, x, y, screen.width / 2);
+		drawTooltip(screen, matrices, components, x, y, screen.width / 2 - 16);
 	}
 
 	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y, int maxWidth) {

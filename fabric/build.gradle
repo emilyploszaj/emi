@@ -1,6 +1,23 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+	}
+}
+
 plugins {
 	id "dev.architectury.loom"
 	id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+if (System.getenv("MODRINTH_TOKEN")) {
+	apply plugin: "com.modrinth.minotaur"
+}
+if (System.getenv("CURSEFORGE_TOKEN")) {
+	apply plugin: "com.matthewprenger.cursegradle"
 }
 evaluationDependsOn ':xplat'
 
@@ -140,6 +157,46 @@ void setupRepositories(RepositoryHandler repositories) {
 				username project.mavenUsername
 				password project.mavenPassword
 			}
+		}
+	}
+}
+
+if (System.getenv("MODRINTH_TOKEN")) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = 'emi'
+		versionNumber = project.version
+		versionName = project.version
+		versionType = 'release'
+		uploadFile = remapJar
+		gameVersions = [rootProject.minecraft_version]
+		loaders = ['fabric', 'quilt']
+		detectLoaders = false
+		changelog = file('../CHANGELOG.md').text
+	}
+}
+
+if (System.getenv("CURSEFORGE_TOKEN")) {
+	curseforge {
+		apiKey = System.getenv("CURSEFORGE_TOKEN")
+		project {
+			id = '580555'
+			releaseType = 'release'
+			changelogType = 'markdown'
+			changelog = file('../CHANGELOG.md')
+
+			addGameVersion rootProject.minecraft_version
+			addGameVersion 'Fabric'
+			addGameVersion 'Quilt'
+
+			mainArtifact(remapJar) {
+				displayName = 'emi-' + project.version
+			}
+		}
+		options {
+			javaIntegration = false
+			forgeGradleIntegration = false
+			javaVersionAutoDetect = false
 		}
 	}
 }
