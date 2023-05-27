@@ -1,3 +1,14 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath 'com.modrinth.minotaur:Minotaur:2.4.3'
+		classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+	}
+}
+
 plugins {
 	id "dev.architectury.loom"
 	id "com.github.johnrengelman.shadow" version "7.1.2"
@@ -158,10 +169,10 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		versionName = project.version
 		versionType = 'release'
 		uploadFile = remapJar
-		gameVersions = [project.platform_version]
+		gameVersions = [rootProject.minecraft_version]
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
-		changelog = file('CHANGELOG.md').text
+		changelog = file('../CHANGELOG.md').text
 	}
 }
 
@@ -172,9 +183,9 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			id = '580555'
 			releaseType = 'release'
 			changelogType = 'markdown'
-			changelog = file('CHANGELOG.md')
+			changelog = file('../CHANGELOG.md')
 
-			addGameVersion project.platform_version
+			addGameVersion rootProject.minecraft_version
 			addGameVersion 'Fabric'
 			addGameVersion 'Quilt'
 
