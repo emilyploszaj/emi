@@ -18,7 +18,7 @@ allprojects {
 
 	archivesBaseName = rootProject.archives_base_name
 	ext.mavenVersion = "${rootProject.mod_version}"
-	if (System.getenv().RELEASE == null) {
+	if (System.getenv("RELEASE") == null) {
 		ext.mavenVersion += "-SNAPSHOT"
 	}
 	ext.mavenVersion += "+${rootProject.minecraft_version}"
