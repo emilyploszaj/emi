@@ -169,7 +169,7 @@ if (System.getenv("MODRINTH_TOKEN")) {
 		versionName = project.version
 		versionType = 'release'
 		uploadFile = remapJar
-		gameVersions = [project.platform_version]
+		gameVersions = [rootProject.minecraft_version]
 		loaders = ['fabric', 'quilt']
 		detectLoaders = false
 		changelog = file('CHANGELOG.md').text
@@ -185,7 +185,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			changelogType = 'markdown'
 			changelog = file('CHANGELOG.md')
 
-			addGameVersion project.platform_version
+			addGameVersion rootProject.minecraft_version
 			addGameVersion 'Fabric'
 			addGameVersion 'Quilt'
 
