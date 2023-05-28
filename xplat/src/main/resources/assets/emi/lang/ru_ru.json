@@ -131,7 +131,7 @@
 
   "config.emi.dev.dev_mode": "Режим разработчика",
   "config.emi.dev.log_untranslated_tags": "Логгировать непереведенные теги",
-  "config.emi.dev.log_non_tag_ingredients": "Log Non-Tag Ingredients",
+  "config.emi.dev.log_non_tag_ingredients": "Логгировать ингредиенты без тегов",
   "config.emi.dev.show_recipe_ids": "Показывать ID рецептов",
   "config.emi.dev.highlight_defaulted": "Подсвечивать стандартные",
   "config.emi.dev.highlight_exclusion_areas": "Подсвечивать зоны исключения",
