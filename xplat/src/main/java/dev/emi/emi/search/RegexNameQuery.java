@@ -22,7 +22,7 @@ public class RegexNameQuery extends Query {
 		if (pattern == null) {
 			return false;
 		}
-		Matcher m = pattern.matcher(stack.getName().getString());
+		Matcher m = pattern.matcher(NameQuery.getText(stack).getString());
 		return m.find();
 	}
 }

@@ -22,4 +22,16 @@ public class LogicalAndQuery extends Query {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean matchesUnbaked(EmiStack stack) {
+		for (int i = 0; i < queries.size(); i++) {
+			Query q = queries.get(i);
+			boolean failure = q.negated;
+			if (q.matchesUnbaked(stack) == failure) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
