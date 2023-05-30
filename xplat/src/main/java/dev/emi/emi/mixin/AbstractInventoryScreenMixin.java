@@ -54,21 +54,30 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		throw new UnsupportedOperationException();
 	}
 
-	@Inject(at = @At("HEAD"), method = "drawStatusEffects", cancellable = true)
+	@Inject(at = @At(value = "INVOKE",
+			target = "net/minecraft/client/gui/screen/ingame/AbstractInventoryScreen.drawStatusEffectBackgrounds(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;Z)V"),
+		method = "drawStatusEffects")
 	private void drawStatusEffects(MatrixStack matrices, int mouseX, int mouseY, CallbackInfo info) {
 		if (EmiConfig.effectLocation == EffectLocation.TOP) {
-			if (emi$drawCenteredEffects(matrices, mouseX, mouseY)) {
-				info.cancel();
-			}
+			emi$drawCenteredEffects(matrices, mouseX, mouseY);
 		}
 	}
 
-	private boolean emi$drawCenteredEffects(MatrixStack matrices, int mouseX, int mouseY) {
+	@ModifyVariable(at = @At(value = "INVOKE", target = "java/util/Collection.size()I", ordinal = 0),
+		method = "drawStatusEffects", ordinal = 0)
+	private Collection<StatusEffectInstance> drawStatusEffects(Collection<StatusEffectInstance> original) {
+		if (EmiConfig.effectLocation == EffectLocation.TOP) {
+			return List.of();
+		}
+		return original;
+	}
+
+	private void emi$drawCenteredEffects(MatrixStack matrices, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Collection<StatusEffectInstance> effects = Ordering.natural().sortedCopy(this.client.player.getStatusEffects());
 		int size = effects.size();
 		if (size == 0) {
-			return true;
+			return;
 		}
 		boolean wide = size == 1;
 		int y = this.y - 34;
@@ -93,10 +102,10 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			for (StatusEffectInstance inst : effects) {
 				int ew = wide ? 120 : 32;
 				List<StatusEffectInstance> single = List.of(inst);
-				this.drawStatusEffectBackgrounds(matrices, x, 0, single, wide);
-				this.drawStatusEffectSprites(matrices, x, 0, single, wide);
+				this.drawStatusEffectBackgrounds(matrices, x, 32, single, wide);
+				this.drawStatusEffectSprites(matrices, x, 32, single, wide);
 				if (wide) {
-					this.drawStatusEffectDescriptions(matrices, x, 0, single);
+					this.drawStatusEffectDescriptions(matrices, x, 32, single);
 				}
 				if (mouseX >= x && mouseX < x + ew && mouseY >= y && mouseY < y + 32) {
 					hovered = inst;
@@ -110,7 +119,6 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			List<Text> list = List.of(this.getStatusEffectDescription(hovered), StatusEffectUtil.durationToString(hovered, 1.0f));
 			this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
 		}
-		return true;
 	}
 	
 	@ModifyVariable(at = @At(value = "STORE", ordinal = 0),
