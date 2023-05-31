@@ -53,6 +53,9 @@ public class EmiStackList {
 			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
 			item.appendStacks(ItemGroup.SEARCH, itemStacks);
 			List<EmiStack> stacks = itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).toList();
+			if (stacks.isEmpty()) {
+				stacks = List.of(EmiStack.of(item.getDefaultStack()));
+			}
 			if (!stacks.isEmpty()) {
 				namespaceGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
 			}
