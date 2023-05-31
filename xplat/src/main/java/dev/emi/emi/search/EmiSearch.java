@@ -1,6 +1,7 @@
 package dev.emi.emi.search;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -8,9 +9,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.compress.utils.Lists;
 
+import com.google.common.collect.Sets;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
@@ -35,6 +39,7 @@ public class EmiSearch {
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile EmiPlayerInventory inv;
 	public static volatile CompiledQuery compiledQuery;
+	public static Set<EmiStack> bakedStacks;
 	public static SuffixArray<EmiStack> names, tooltips, mods, aliases;
 
 	public static void bake() {
@@ -42,20 +47,23 @@ public class EmiSearch {
 		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> aliases = new SuffixArray<EmiStack>();
+		Set<EmiStack> bakedStacks = Sets.newHashSet();
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
 			try {
-				Text name = stack.getName();
+				EmiStack strictStack = stack.copy().comparison(Comparison.compareNbt());
+				bakedStacks.add(stack);
+				Text name = NameQuery.getText(stack);
 				if (name != null) {
-					names.add(stack, name.getString().toLowerCase());
+					names.add(strictStack, name.getString().toLowerCase());
 				}
 				List<Text> tooltip = stack.getTooltipText();
 				if (tooltip != null) {
 					for (int i = 1; i < tooltip.size(); i++) {
 						Text text = tooltip.get(i);
 						if (text != null) {
-							tooltips.add(stack, text.getString().toLowerCase());
+							tooltips.add(strictStack, text.getString().toLowerCase());
 						}
 					}
 				}
@@ -85,7 +93,7 @@ public class EmiSearch {
 				String text = I18n.translate(key).toLowerCase();
 				for (EmiIngredient ing : alias.stacks()) {
 					for (EmiStack stack : ing.getEmiStacks()) {
-						aliases.add(stack, text);
+						aliases.add(stack.copy().comparison(Comparison.compareNbt()), text);
 					}
 				}
 			}
@@ -99,6 +107,7 @@ public class EmiSearch {
 		EmiSearch.tooltips = tooltips;
 		EmiSearch.mods = mods;
 		EmiSearch.aliases = aliases;
+		EmiSearch.bakedStacks = bakedStacks;
 	}
 
 	public static void update() {
@@ -194,8 +203,10 @@ public class EmiSearch {
 		public boolean test(EmiStack stack) {
 			if (fullQuery == null) {
 				return true;
-			} else {
+			} else if (EmiSearch.bakedStacks.contains(stack)) {
 				return fullQuery.matches(stack);
+			} else {
+				return fullQuery.matchesUnbaked(stack);
 			}
 		}
 

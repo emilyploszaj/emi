@@ -3,7 +3,6 @@ package dev.emi.emi.api.stack;
 import java.util.Arrays;
 import java.util.List;
 
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -12,7 +11,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
-import net.minecraft.util.registry.RegistryEntry;
 
 public interface EmiIngredient extends EmiRenderable {
 	public static final int RENDER_ICON = 1;
@@ -68,12 +66,12 @@ public interface EmiIngredient extends EmiRenderable {
 		return true;
 	}
 
-	public static EmiIngredient of(TagKey<Item> key) {
+	public static <T> EmiIngredient of(TagKey<T> key) {
 		return of(key, 1);
 	}
-	
-	public static EmiIngredient of(TagKey<Item> key, long amount) {
-		List<EmiStack> stacks = EmiUtil.values(key).map(RegistryEntry::value).map(EmiStack::of).toList();
+
+	public static <T> EmiIngredient of(TagKey<T> key, long amount) {
+		List<EmiStack> stacks = EmiTags.getValues(key);
 		if (stacks.isEmpty()) {
 			return EmiStack.EMPTY;
 		} else if (stacks.size() == 1) {

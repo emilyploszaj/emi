@@ -39,6 +39,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
 import dev.emi.emi.api.render.EmiRenderable;
+import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -188,8 +189,10 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.none());
 		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
-		FUEL = new EmiRecipeCategory(new Identifier("emi:fuel"), simplifiedRenderer(224, 240),
-			simplifiedRenderer(224, 240), EmiRecipeSorting.compareInputThenOutput());
+		EmiRenderable flame = (matrices, x, y, delta) -> {
+			EmiTexture.FULL_FLAME.render(matrices, x + 1, y + 1, delta);
+		};
+		FUEL = new EmiRecipeCategory(new Identifier("emi:fuel"), flame, flame, EmiRecipeSorting.compareInputThenOutput());
 		COMPOSTING = new EmiRecipeCategory(new Identifier("emi:composting"), EmiStack.of(Items.COMPOSTER),
 			EmiStack.of(Items.COMPOSTER), EmiRecipeSorting.compareInputThenOutput());
 		INFO = new EmiRecipeCategory(new Identifier("emi:info"),
