@@ -497,7 +497,7 @@ public class EmiScreenManager {
 					int x = (mouseX - space.tx) / ENTRY_SIZE;
 					int y = (mouseY - space.ty) / ENTRY_SIZE;
 					int n = space.getRawOffset(x, y);
-					if (space == panel.space) {
+					if (n >= 0 && space == panel.space) {
 						n += space.pageSize * panel.page;
 					}
 					if (n >= 0 && n < space.getStacks().size()) {

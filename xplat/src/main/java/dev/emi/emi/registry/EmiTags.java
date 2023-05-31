@@ -44,6 +44,19 @@ public class EmiTags {
 	public static final List<TagKey<?>> TAGS = Lists.newArrayList();
 	public static TagExclusions exclusions = new TagExclusions();
 
+	@SuppressWarnings("unchecked")
+	public static <T> List<EmiStack> getValues(TagKey<T> key) {
+		if (TAG_VALUES.containsKey(key)) {
+			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
+			if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
+				return values.stream().map(t -> EmiStack.of((Item) t)).toList();
+			} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
+				return values.stream().map(t -> EmiStack.of((Fluid) t)).toList();
+			}
+		}
+		return List.of();
+	}
+
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<EmiStack> stacks, long amount) {
 		Registry<T> registry;
