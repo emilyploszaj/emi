@@ -2,6 +2,7 @@ package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +39,12 @@ import net.minecraft.screen.slot.SlotActionType;
 
 public class EmiRecipeFiller {
 	public static Map<ScreenHandlerType<?>, List<EmiRecipeHandler<?>>> handlers = Maps.newHashMap();
+	public static BiFunction<ScreenHandler, EmiRecipe, EmiRecipeHandler<?>> extraHandlers = (h, r) -> null;
+
+	public static void clear() {
+		handlers.clear();
+		extraHandlers = (h, r) -> null;
+	}
 
 	public static boolean isSupported(EmiRecipe recipe) {
 		for (List<EmiRecipeHandler<?>> list : handlers.values()) {
@@ -47,8 +54,15 @@ public class EmiRecipeFiller {
 				}
 			}
 		}
-		for (EmiRecipeHandler<?> handler : getAllHandlers(EmiApi.getHandledScreen())) {
-			if (handler.supportsRecipe(recipe)) {
+		HandledScreen<?> hs = EmiApi.getHandledScreen();
+		if (hs != null) {
+			for (EmiRecipeHandler<?> handler : getAllHandlers(hs)) {
+				if (handler.supportsRecipe(recipe)) {
+					return true;
+				}
+			}
+			EmiRecipeHandler<?> handler = extraHandlers.apply(hs.getScreenHandler(), recipe);
+			if (handler != null && handler.supportsRecipe(recipe)) {
 				return true;
 			}
 		}
@@ -80,13 +94,14 @@ public class EmiRecipeFiller {
 		return List.of();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, HandledScreen<T> screen) {
 		for (EmiRecipeHandler<T> handler : getAllHandlers(screen)) {
 			if (handler.supportsRecipe(recipe)) {
 				return handler;
 			}
 		}
-		return null;
+		return (EmiRecipeHandler<T>) extraHandlers.apply(screen.getScreenHandler(), recipe);
 	}
 
 	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen, EmiFillAction action, int amount) {

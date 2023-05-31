@@ -152,7 +152,7 @@ public class EmiRenderHelper {
 		int original = screen.width;
 		try {
 			screen.width = x;
-			drawTooltip(screen, matrices, components, x, y, original);
+			drawTooltip(screen, matrices, components, x, y, original / 2 - 16);
 		} finally {
 			screen.width = original;
 		}

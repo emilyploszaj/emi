@@ -1,6 +1,5 @@
 package dev.emi.emi.search;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,9 +23,8 @@ public class RegexTooltipQuery extends Query {
 		if (pattern == null) {
 			return false;
 		}
-		List<Text> lines = stack.getTooltipText();
-		for (int i = 1; i < lines.size(); i++) {
-			Matcher m = pattern.matcher(lines.get(i).getString());
+		for (Text text : TooltipQuery.getText(stack)) {
+			Matcher m = pattern.matcher(text.getString());
 			if (m.find()) {
 				return true;
 			}

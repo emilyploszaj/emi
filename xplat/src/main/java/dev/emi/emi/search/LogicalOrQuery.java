@@ -22,4 +22,16 @@ public class LogicalOrQuery extends Query {
 		}
 		return false;
 	}
+
+	@Override
+	public boolean matchesUnbaked(EmiStack stack) {
+		for (int i = 0; i < queries.size(); i++) {
+			Query q = queries.get(i);
+			boolean success = !q.negated;
+			if (q.matchesUnbaked(stack) == success) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

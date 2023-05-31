@@ -13,18 +13,23 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
+import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.jemi.runtime.JemiBookmarkOverlay;
+import dev.emi.emi.jemi.runtime.JemiDragDropHandler;
 import dev.emi.emi.jemi.runtime.JemiIngredientFilter;
 import dev.emi.emi.jemi.runtime.JemiIngredientListOverlay;
 import dev.emi.emi.jemi.runtime.JemiRecipesGui;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadManager;
@@ -43,9 +48,11 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRuntimeRegistration;
+import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
@@ -54,6 +61,7 @@ import net.minecraft.util.Identifier;
 
 @JeiPlugin
 public class JemiPlugin implements IModPlugin, EmiPlugin {
+	private static final Map<EmiRecipeCategory, IRecipeCategory<?>> CATEGORY_MAP = Maps.newHashMap();
 	private static ISubtypeManager subtypeManager;
 	public static IJeiRuntime runtime;
 
@@ -115,6 +123,13 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			}
 		});
 
+		registry.addGenericStackProvider((screen, x, y) -> {
+			return new EmiStackInteraction(runtime.getScreenHelper().getClickableIngredientUnderMouse(screen, x, y)
+					.map(IClickableIngredient::getTypedIngredient).map(JemiUtil::getStack).findFirst().orElse(EmiStack.EMPTY), null, false);
+		});
+
+		registry.addGenericDragDropHandler(new JemiDragDropHandler());
+
 		EmiReloadManager.step(EmiPort.literal("Processing JEI recipes..."), 5_000);
 		Set<Identifier> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
 		Map<RecipeType, EmiRecipeCategory> categoryMap = Maps.newHashMap();
@@ -130,6 +145,9 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		categoryMap.put(RecipeTypes.FUELING, VanillaEmiRecipeCategories.FUEL);
 		categoryMap.put(RecipeTypes.COMPOSTING, VanillaEmiRecipeCategories.COMPOSTING);
 		categoryMap.put(RecipeTypes.INFORMATION, VanillaEmiRecipeCategories.INFO);
+		
+		CATEGORY_MAP.clear();
+		EmiRecipeFiller.extraHandlers = JemiPlugin::getRecipeHandler;
 
 		List<IRecipeCategory<?>> categories = runtime.getRecipeManager().createRecipeCategoryLookup().includeHidden().get().toList();
 		for (IRecipeCategory<?> c : categories) {
@@ -141,6 +159,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(type).includeHidden().get().map(JemiUtil::getStack).toList();
 				if (categoryMap.containsKey(type)) {
 					EmiRecipeCategory category = categoryMap.get(type);
+					CATEGORY_MAP.put(category, c);
 					for (EmiStack catalyst : catalysts) {
 						if (!catalyst.isEmpty()) {
 							registry.addWorkstation(category, catalyst);
@@ -160,6 +179,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					continue;
 				}
 				EmiRecipeCategory category = new JemiCategory(c);
+				CATEGORY_MAP.put(category, c);
 				registry.addCategory(category);
 				for (EmiStack catalyst : catalysts) {
 					if (!catalyst.isEmpty()) {
@@ -247,5 +267,13 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				}
 			}
 		}
+	}
+
+	private static EmiRecipeHandler<?> getRecipeHandler(ScreenHandler handler, EmiRecipe recipe) {
+		IRecipeCategory<?> category = CATEGORY_MAP.getOrDefault(recipe.getCategory(), null);
+		if (category != null) {
+			return runtime.getRecipeTransferManager().getRecipeTransferHandler(handler, category).map(JemiRecipeHandler::new).orElse(null);
+		}
+		return null;
 	}
 }

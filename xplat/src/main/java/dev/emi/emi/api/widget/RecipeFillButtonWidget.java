@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 public class RecipeFillButtonWidget extends RecipeButtonWidget {
-	private final boolean canFill;
+	private boolean canFill;
 	private List<TooltipComponent> tooltip;
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -33,12 +33,17 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 		if (handler == null) {
 			canFill = false;
 		} else {
-			EmiPlayerInventory inv = handler.getInventory(hs);
-			boolean applicable = handler.supportsRecipe(recipe);
-			EmiCraftContext context = new EmiCraftContext<>(hs, inv, EmiCraftContext.Type.FILL_BUTTON);
-			canFill = applicable && handler.canCraft(recipe, context);
-			if (applicable) {
-				tooltip = handler.getTooltip(recipe, context);
+			try {
+				EmiPlayerInventory inv = handler.getInventory(hs);
+				boolean applicable = handler.supportsRecipe(recipe);
+				EmiCraftContext context = new EmiCraftContext<>(hs, inv, EmiCraftContext.Type.FILL_BUTTON);
+				canFill = applicable && handler.canCraft(recipe, context);
+				if (applicable) {
+					tooltip = handler.getTooltip(recipe, context);
+				}
+			} catch (Exception e) {
+				canFill = false;
+				tooltip = List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.initialize"))));
 			}
 		}
 	}

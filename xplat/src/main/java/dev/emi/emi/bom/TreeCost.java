@@ -67,7 +67,6 @@ public class TreeCost {
 	private void addRemainder(EmiStack stack, long amount, ChanceState chance) {
 		if (amount > 0) {
 			stack = stack.copy().setAmount(1);
-			chance = chance.consume(stack.getChance());
 			if (chance.chanced()) {
 				if (chanceRemainders.containsKey(stack)) {
 					chanceRemainders.get(stack).merge(amount, chance.chance());
@@ -220,11 +219,11 @@ public class TreeCost {
 				calculateCost(n, minBatches * n.amount, produced.consume(n.consumeChance), trackProgress);
 			}
 			EmiStack stack = node.ingredient.getEmiStacks().get(0);
-			addRemainder(stack, effectiveCrafts - amount, chance);
+			addRemainder(stack, effectiveCrafts - amount, produced);
 
 			for (EmiStack es : recipe.getOutputs()) {
 				if (!stack.equals(es)) {
-					addRemainder(es, minBatches * es.getAmount(), chance);
+					addRemainder(es, minBatches * es.getAmount(), produced.consume(es.getChance()));
 				}
 			}
 

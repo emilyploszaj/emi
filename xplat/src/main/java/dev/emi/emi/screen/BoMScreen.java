@@ -479,7 +479,7 @@ public class BoMScreen extends Screen {
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			BoM.craftingMode = !BoM.craftingMode;
 			recalculateTree();
-		} else if (batches.contains(mx, my)) {
+		} else if (batches.contains(mx, my) && BoM.tree != null) {
 			long ideal = BoM.tree.cost.getIdealBatch(BoM.tree.goal, 1, 1);
 			if (ideal != BoM.tree.batches) {
 				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));

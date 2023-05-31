@@ -125,7 +125,7 @@ public class EmiReloadManager {
 					EmiExclusionAreas.clear();
 					EmiDragDropHandlers.clear();
 					EmiStackProviders.clear();
-					EmiRecipeFiller.handlers.clear();
+					EmiRecipeFiller.clear();
 					if (clear) {
 						clear = false;
 						continue;
