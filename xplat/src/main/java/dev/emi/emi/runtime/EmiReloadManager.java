@@ -111,6 +111,7 @@ public class EmiReloadManager {
 
 		@Override
 		public void run() {
+			int retries = 3;
 			outer:
 			do {
 				try {
@@ -207,6 +208,9 @@ public class EmiReloadManager {
 					EmiLog.error("Critical error occured during reload:");
 					e.printStackTrace();
 					status = -1;
+					if (retries-- > 0) {
+						restart = true;
+					}
 				}
 			} while (restart);
 			thread = null;

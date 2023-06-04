@@ -45,6 +45,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.brewing.BrewingRecipe;
+import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -163,6 +165,24 @@ public class EmiAgnosForge extends EmiAgnos {
 								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.f_43534_.get()), potion)), id));
 						}
 					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		for (IBrewingRecipe ibr : net.minecraftforge.common.brewing.BrewingRecipeRegistry.getRecipes()) {
+			try {
+				if (ibr instanceof BrewingRecipe recipe) {
+					for (ItemStack is : recipe.getInput().getMatchingStacks()) {
+						EmiStack input = EmiStack.of(is);
+						EmiIngredient ingredient = EmiIngredient.of(recipe.getIngredient());
+						EmiStack output = EmiStack.of(recipe.getOutput(is, recipe.getIngredient().getMatchingStacks()[0]));
+						Identifier id = new Identifier("emi", "brewing/forge/"
+							+ EmiUtil.subId(input.getId()) + "/"
+							+ EmiUtil.subId(ingredient.getEmiStacks().get(0).getId()) + "/"
+							+ EmiUtil.subId(output.getId()));
+						registry.addRecipe(new EmiBrewingRecipe(input, ingredient, output, id));
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
