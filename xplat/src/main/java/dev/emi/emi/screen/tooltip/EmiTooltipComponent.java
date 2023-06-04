@@ -3,6 +3,7 @@ package dev.emi.emi.screen.tooltip;
 import org.joml.Matrix4f;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -14,7 +15,7 @@ import net.minecraft.text.Text;
 
 public interface EmiTooltipComponent extends TooltipComponent {
 
-	default void drawTooltip(MatrixStack matrices, TooltipRenderData tooltip) {
+	default void drawTooltip(EmiDrawContext context, TooltipRenderData tooltip) {
 	}
 
 	default void drawTooltipText(TextRenderData text) {
@@ -24,7 +25,7 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer) {
 		matrices.push();
 		matrices.translate(x, y, 0);
-		drawTooltip(matrices, new TooltipRenderData(textRenderer, itemRenderer, x, y));
+		drawTooltip(EmiDrawContext.wrap(matrices), new TooltipRenderData(textRenderer, itemRenderer, x, y));
 		matrices.pop();
 	}
 

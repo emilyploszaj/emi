@@ -90,6 +90,7 @@ public class EmiReloadManager {
 	}
 
 	public static void step(Text text) {
+		EmiLog.info(text.getString());
 		step(text, 5_000);
 	}
 
