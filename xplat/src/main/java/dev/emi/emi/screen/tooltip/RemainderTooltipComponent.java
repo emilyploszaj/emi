@@ -7,9 +7,8 @@ import org.apache.commons.compress.utils.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.client.MinecraftClient;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -42,11 +41,11 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
+	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
-			remainder.inputs.get(0).render(matrices, 0, 18 * i, MinecraftClient.getInstance().getTickDelta(), EmiIngredient.RENDER_ICON);
-			remainder.remainder.render(matrices, 18 * 2, 18 * i, MinecraftClient.getInstance().getTickDelta(), -1);
+			context.drawStack(remainder.inputs.get(0), 0, 18 * i, EmiIngredient.RENDER_ICON);
+			context.drawStack(remainder.remainder, 18 * 2, 18 * i);
 		}
 	}
 	

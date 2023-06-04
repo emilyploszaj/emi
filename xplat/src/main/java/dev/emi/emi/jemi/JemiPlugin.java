@@ -130,6 +130,27 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 		registry.addGenericDragDropHandler(new JemiDragDropHandler());
 
+		EmiReloadManager.step(EmiPort.literal("Processing JEI stacks..."), 5_000);
+		for (IIngredientType<?> type : runtime.getIngredientManager().getRegisteredIngredientTypes()) {
+			if (type == JemiUtil.getFluidType() || type == VanillaTypes.ITEM_STACK) {
+				continue;
+			}
+			for (Object o : runtime.getIngredientManager().getAllIngredients(type)) {
+				EmiStack stack = JemiUtil.getStack(type, o);
+				if (!stack.isEmpty()) {
+					registry.addEmiStack(stack);
+				}
+			}
+		}
+
+		registry.removeEmiStacks(s -> {
+			Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(s);
+			if (opt.isPresent()) {
+				return !runtime.getIngredientVisibility().isIngredientVisible(opt.get());
+			}
+			return false;
+		});
+
 		EmiReloadManager.step(EmiPort.literal("Processing JEI recipes..."), 5_000);
 		Set<Identifier> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
 		Map<RecipeType, EmiRecipeCategory> categoryMap = Maps.newHashMap();

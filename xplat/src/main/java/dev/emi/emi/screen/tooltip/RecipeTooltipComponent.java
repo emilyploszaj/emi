@@ -2,8 +2,8 @@ package dev.emi.emi.screen.tooltip;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class RecipeTooltipComponent implements EmiTooltipComponent {
 	private final EmiRecipe recipe;
@@ -41,7 +41,7 @@ public class RecipeTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
-		EmiRenderHelper.renderRecipe(recipe, matrices, 0, 0, showMissing, overlayColor);
+	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
+		EmiRenderHelper.renderRecipe(recipe, context.raw(), 0, 0, showMissing, overlayColor);
 	}
 }

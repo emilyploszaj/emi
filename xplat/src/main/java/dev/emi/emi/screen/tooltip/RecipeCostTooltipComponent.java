@@ -13,9 +13,8 @@ import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.registry.EmiStackList;
-import net.minecraft.client.MinecraftClient;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -92,10 +91,10 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public void drawTooltip(MatrixStack matrices, TooltipRenderData render) {
+	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
 		for (Node node : nodes) {
-			node.stack.render(matrices, node.x, node.y, MinecraftClient.getInstance().getTickDelta());
-			EmiRenderHelper.renderAmount(matrices, node.x, node.y, node.text);
+			context.drawStack(node.stack, node.x, node.y);
+			EmiRenderHelper.renderAmount(context.raw(), node.x, node.y, node.text);
 		}
 	}
 
