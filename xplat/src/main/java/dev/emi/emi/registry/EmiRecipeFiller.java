@@ -96,12 +96,20 @@ public class EmiRecipeFiller {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, HandledScreen<T> screen) {
+		EmiRecipeHandler<T> ret = null;
 		for (EmiRecipeHandler<T> handler : getAllHandlers(screen)) {
 			if (handler.supportsRecipe(recipe)) {
-				return handler;
+				ret = handler;
+				break;
 			}
 		}
-		return (EmiRecipeHandler<T>) extraHandlers.apply(screen.getScreenHandler(), recipe);
+		if (ret == null || ret instanceof CoercedRecipeHandler) {
+			EmiRecipeHandler<T> extra = (EmiRecipeHandler<T>) extraHandlers.apply(screen.getScreenHandler(), recipe);
+			if (extra != null) {
+				ret = extra;
+			}
+		}
+		return ret;
 	}
 
 	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen, EmiFillAction action, int amount) {

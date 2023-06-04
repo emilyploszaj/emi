@@ -102,7 +102,7 @@ public class EmiRecipes {
 		}
 
 		public Manager(List<EmiRecipeCategory> categories, Map<EmiRecipeCategory, List<EmiIngredient>> workstations, List<EmiRecipe> recipes) {
-			this.categories = List.copyOf(categories);
+			this.categories = categories.stream().distinct().toList();
 			this.workstations = workstations;
 			this.recipes = List.copyOf(recipes);
 

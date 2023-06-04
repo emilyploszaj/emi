@@ -1,12 +1,9 @@
 package dev.emi.emi.chess;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.EmiTooltipComponent;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 class ChessTooltipComponent implements EmiTooltipComponent {
@@ -30,10 +27,9 @@ class ChessTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public void drawTooltip(MatrixStack matrices, TooltipRenderData tooltip) {
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.PIECES);
-		DrawableHelper.drawTexture(matrices, 0, 14, 100, dragged.type().u, dragged.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
-		DrawableHelper.drawTexture(matrices, 32, 14, 100, hovered.type().u, hovered.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
+	public void drawTooltip(EmiDrawContext context, TooltipRenderData tooltip) {
+		context.drawTexture(EmiRenderHelper.PIECES, 0, 14, 100, dragged.type().u, dragged.color() == PieceColor.BLACK ? 0 : 16, 16, 16);
+		context.drawTexture(EmiRenderHelper.PIECES, 32, 14, 100, hovered.type().u, hovered.color() == PieceColor.BLACK ? 0 : 16, 16, 16);
 	}
 
 	@Override

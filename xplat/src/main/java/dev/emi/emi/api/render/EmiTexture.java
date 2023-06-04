@@ -1,10 +1,7 @@
 package dev.emi.emi.api.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
-import net.minecraft.client.gui.DrawableHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
@@ -40,8 +37,7 @@ public class EmiTexture implements EmiRenderable {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, texture);
-		DrawableHelper.drawTexture(matrices, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}
 }

@@ -32,8 +32,14 @@
   "emi:world_interaction": {
     "order": -600
   },
-  "emi:info": {
+  "emi:fuel": {
     "order": 900
+  },
+  "emi:composting": {
+    "order": 910
+  },
+  "emi:info": {
+    "order": 950
   },
   "emi:tag": {
     "order": 1000
