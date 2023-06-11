@@ -15,6 +15,7 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
 import net.minecraft.client.MinecraftClient;
@@ -113,6 +114,7 @@ public class TagEmiIngredient implements EmiIngredient {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		if ((flags & RENDER_ICON) != 0) {
@@ -161,7 +163,7 @@ public class TagEmiIngredient implements EmiIngredient {
 			if (amount != 1) {
 				count += amount;
 			}
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
+			EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
 			EmiRender.renderTagIcon(this, matrices, x, y);

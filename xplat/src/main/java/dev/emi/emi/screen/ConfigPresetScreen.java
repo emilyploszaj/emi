@@ -12,6 +12,7 @@ import dev.emi.emi.config.ConfigPresets;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.EmiConfig.ConfigGroup;
 import dev.emi.emi.config.EmiConfig.ConfigValue;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.config.EmiNameWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
 import net.minecraft.client.MinecraftClient;
@@ -70,14 +71,15 @@ public class ConfigPresetScreen extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderBackgroundTexture(matrices);
-		list.render(matrices, mouseX, mouseY, delta);
-		super.render(matrices, mouseX, mouseY, delta);
+		this.renderBackgroundTexture(context.raw());
+		list.render(context.raw(), mouseX, mouseY, delta);
+		super.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {
 			if (widget.button.isHovered()) {
-				EmiRenderHelper.drawTooltip(this, matrices, widget.tooltip, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(this, context, widget.tooltip, mouseX, mouseY);
 			}
 		}
 	}
@@ -136,11 +138,11 @@ public class ConfigPresetScreen extends Screen {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+		public void render(MatrixStack raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 				boolean hovered, float delta) {
 			button.y = y;
 			button.x = x + width / 2 - button.getWidth() / 2;
-			button.render(matrices, mouseX, mouseY, delta);
+			button.render(raw, mouseX, mouseY, delta);
 		}
 
 		@Override
@@ -162,8 +164,9 @@ public class ConfigPresetScreen extends Screen {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
-			EmiPort.drawCenteredText(matrices, textRenderer, text, x + width / 2, y + 3, -1, true);
+		public void render(MatrixStack raw, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
+			EmiDrawContext context = EmiDrawContext.wrap(raw);
+			context.drawCenteredTextWithShadow(text, x + width / 2, y + 3, -1);
 		}
 
 		@Override

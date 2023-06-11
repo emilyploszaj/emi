@@ -9,9 +9,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,7 +27,8 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		ChessPiece piece = EmiChess.getBoard().get(position);
 		RenderSystem.enableDepthTest();
 		EmiChess chess = EmiChess.get();
@@ -44,36 +45,34 @@ class ChessEmiStack extends EmiStack {
 				type = PieceType.BISHOP;
 			}
 			if (type != null) {
-				matrices.push();
-				matrices.translate(0, 0, 10);
-				DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55000000);
-				matrices.translate(0, 0, 90);
-				RenderSystem.setShaderTexture(0, EmiRenderHelper.PIECES);
-				DrawableHelper.drawTexture(matrices, x, y, 100, type.u, chess.pendingPromotion > 31 ? 0 : 16, 16, 16, 256, 256);
-				matrices.pop();
+				context.push();
+				context.matrices().translate(0, 0, 10);
+				context.fill(x - 1, y - 1, 18, 18, 0x55000000);
+				context.matrices().translate(0, 0, 90);
+				context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, type.u, chess.pendingPromotion > 31 ? 0 : 16, 16, 16, 256, 256);
+				context.pop();
 				return;
 			}
 		}
-		matrices.push();
-		matrices.translate(0, 0, 10);
+		context.push();
+		context.matrices().translate(0, 0, 10);
 		if (chess.isTarget(position)) {
-			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x5555ff00);
+			context.fill(x - 1, y - 1, 18, 18, 0x5555ff00);
 		}
 		boolean dragging = !EmiScreenManager.draggedStack.isEmpty();
 		ChessMove move = chess.board.lastMove;
 		if (!dragging &&move != null && (move.start() == position || move.end() == position)) {
-			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55aaaa00);
+			context.fill(x - 1, y - 1, 18, 18, 0x55aaaa00);
 		}
 		if (!dragging && piece != null && piece.type() == PieceType.KING && chess.board.isChecked(piece.color())) {
-			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x55ff0000);
+			context.fill(x - 1, y - 1, 18, 18, 0x55ff0000);
 		}
-		matrices.pop();
+		context.pop();
 		if (piece != null) {
-			matrices.push();
-			matrices.translate(0, 0, 100);
-			RenderSystem.setShaderTexture(0, EmiRenderHelper.PIECES);
-			DrawableHelper.drawTexture(matrices, x, y, 100, piece.type().u, piece.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
-			matrices.pop();
+			context.push();
+			context.matrices().translate(0, 0, 100);
+			context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, piece.type().u, piece.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
+			context.pop();
 		}
 	}
 

@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -63,17 +64,16 @@ public class SizedButtonWidget extends ButtonWidget {
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, texture);
+	public void renderButton(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		RenderSystem.enableDepthTest();
-		drawTexture(matrices, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height, 256, 256);
+		context.drawTexture(texture, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height);
 		if (this.isMouseOver(mouseX, mouseY) && text != null && this.active) {
-			matrices.push();
+			context.push();
 			RenderSystem.disableDepthTest();
 			MinecraftClient client = MinecraftClient.getInstance();
-			EmiRenderHelper.drawTooltip(client.currentScreen, matrices, text.get().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList(), mouseX, mouseY);
-			matrices.pop();
+			EmiRenderHelper.drawTooltip(client.currentScreen, context, text.get().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList(), mouseX, mouseY);
+			context.pop();
 		}
 	}
 }

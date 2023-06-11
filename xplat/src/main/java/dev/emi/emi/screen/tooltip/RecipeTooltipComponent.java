@@ -42,6 +42,6 @@ public class RecipeTooltipComponent implements EmiTooltipComponent {
 
 	@Override
 	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
-		EmiRenderHelper.renderRecipe(recipe, context.raw(), 0, 0, showMissing, overlayColor);
+		EmiRenderHelper.renderRecipe(recipe, context, 0, 0, showMissing, overlayColor);
 	}
 }

@@ -28,6 +28,7 @@ import dev.emi.emi.config.SidebarPages;
 import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiBind.ModifiedKey;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
@@ -362,13 +363,14 @@ public class ConfigScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderBackgroundTexture(matrices);
-		list.render(matrices, mouseX, mouseY, delta);
-		super.render(matrices, mouseX, mouseY, delta);
+		this.renderBackgroundTexture(context.raw());
+		list.render(context.raw(), mouseX, mouseY, delta);
+		super.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
-			EmiRenderHelper.drawTooltip(this, matrices, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
+			EmiRenderHelper.drawTooltip(this, context, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}
 	}
 	

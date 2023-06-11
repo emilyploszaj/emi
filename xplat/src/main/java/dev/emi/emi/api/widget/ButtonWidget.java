@@ -4,10 +4,9 @@ import java.util.function.BooleanSupplier;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
@@ -42,8 +41,7 @@ public class ButtonWidget extends Widget {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, texture);
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		int v = this.v;
 		boolean active = this.isActive.getAsBoolean();
 		if (!active) {
@@ -52,7 +50,7 @@ public class ButtonWidget extends Widget {
 			v += this.height;
 		}
 		RenderSystem.enableDepthTest();
-		DrawableHelper.drawTexture(matrices, this.x, this.y, this.u, v, this.width, this.height, 256, 256);
+		context.drawTexture(texture, this.x, this.y, this.u, v, this.width, this.height);
 	}
 
 	@Override

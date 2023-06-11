@@ -10,6 +10,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import net.minecraft.client.MinecraftClient;
@@ -82,6 +83,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
 			DiffuseLighting.enableGuiDepthLighting();
@@ -94,7 +96,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			if (amount != 1) {
 				count += amount;
 			}
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
+			EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
 			EmiRender.renderRemainderIcon(this, matrices, x, y);

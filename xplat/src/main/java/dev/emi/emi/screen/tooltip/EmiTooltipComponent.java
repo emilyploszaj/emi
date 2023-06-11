@@ -22,11 +22,12 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	}
 
 	@Override
-	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer) {
-		matrices.push();
-		matrices.translate(x, y, 0);
-		drawTooltip(EmiDrawContext.wrap(matrices), new TooltipRenderData(textRenderer, itemRenderer, x, y));
-		matrices.pop();
+	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack raw, ItemRenderer itemRenderer) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.push();
+		context.matrices().translate(x, y, 0);
+		drawTooltip(context, new TooltipRenderData(textRenderer, itemRenderer, x, y));
+		context.pop();
 	}
 
 	@Override

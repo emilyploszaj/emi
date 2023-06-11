@@ -52,7 +52,7 @@ public class EmiStackList {
 	public static void reload() {
 		try {
 			MinecraftClient client = MinecraftClient.getInstance();
-			ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.player.world.getRegistryManager());
+			ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.world.getRegistryManager());
 		} catch (Throwable t) {
 			EmiLog.error("Failed to update creative tabs. Using fallback index.");
 			t.printStackTrace();
