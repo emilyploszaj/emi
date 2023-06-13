@@ -19,7 +19,7 @@ public class ButtonWidget extends Widget {
 	protected final Identifier texture;
 
 	public ButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, ClickAction action) {
-		this(x, y, width, height, u, v, EmiRenderHelper.WIDGETS, isActive, action);
+		this(x, y, width, height, u, v, EmiRenderHelper.BUTTONS, isActive, action);
 	}
 
 	public ButtonWidget(int x, int y, int width, int height, int u, int v, Identifier texture, BooleanSupplier isActive, ClickAction action) {

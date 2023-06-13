@@ -83,11 +83,11 @@ public class EmiInfoRecipe implements EmiRecipe {
 		int y = stackHeight * 18 + PADDING;
 		int lineCount = (widgets.getHeight() - y) / CLIENT.textRenderer.fontHeight;
 		PageManager manager = new PageManager(text, lineCount);
-		if (widgets.getHeight() < getDisplayHeight()) {
-			widgets.addButton(2, 2, 12, 12, 0, 64, () -> true, (mouseX, mouseY, button) -> {
+		if (lineCount < text.size()) {
+			widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(-1);
 			});
-			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(1);
 			});
 		}

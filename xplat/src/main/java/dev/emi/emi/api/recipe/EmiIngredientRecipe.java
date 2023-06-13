@@ -56,10 +56,10 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		int pageSize = (ph + 1) * 8;
 		PageManager manager = new PageManager(stacks, pageSize);
 		if (pageSize < stacks.size()) {
-			widgets.addButton(2, 2, 12, 12, 0, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(-1);
 			});
-			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(1);
 			});
 		}

@@ -235,9 +235,17 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			MutableText text = EmiPort.literal("");
 			for (IJeiIngredientInfoRecipe recipe : group.getValue()) {
 				for (StringVisitable sv : recipe.getDescription()) {
+					MutableText current = EmiPort.literal("");
 					sv.visit((style, string) -> {
-						return Optional.of(EmiPort.literal(string, style));
-					}, Style.EMPTY).ifPresent(t -> text.append(" ").append(t));
+						current.append(EmiPort.literal(string, style));
+						return Optional.empty();
+					}, Style.EMPTY);
+					if (!current.getString().isBlank()) {
+						if (!text.getString().isEmpty()) {
+							text.append(" ");
+						}
+						text.append(current);
+					}
 				}
 			}
 			identical.computeIfAbsent(text, k -> Lists.newArrayList()).addAll(group.getKey());
