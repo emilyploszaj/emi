@@ -41,7 +41,7 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		context.push();
 		context.matrices().translate(x, y, 0);
-		consumer.render(matrices, mouseX, mouseY, delta);
+		consumer.render(context.raw(), mouseX, mouseY, delta);
 		context.pop();
 	}
 

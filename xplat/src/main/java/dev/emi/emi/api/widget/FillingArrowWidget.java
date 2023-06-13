@@ -14,6 +14,6 @@ public class FillingArrowWidget extends AnimatedTextureWidget {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		context.drawTexture(this.texture, x, y, width, height, u, 0, regionWidth, regionHeight, textureWidth, textureHeight);
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(context.raw(), mouseX, mouseY, delta);
 	}
 }

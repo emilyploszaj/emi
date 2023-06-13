@@ -6,6 +6,7 @@ import java.util.function.Function;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class GeneratedSlotWidget extends SlotWidget {
@@ -23,14 +24,15 @@ public class GeneratedSlotWidget extends SlotWidget {
 	
 	@Override
 	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		if (!getStack().isEmpty()) {
 			int off = 1;
 			if (output) {
 				off = 5;
 			}
-			EmiRender.renderIngredientIcon(getStack(), matrices, x + off, y + off);
+			EmiRender.renderIngredientIcon(getStack(), context.raw(), x + off, y + off);
 		}
-		super.drawOverlay(matrices, mouseX, mouseY, delta);
+		super.drawOverlay(context.raw(), mouseX, mouseY, delta);
 	}
 	
 	@Override

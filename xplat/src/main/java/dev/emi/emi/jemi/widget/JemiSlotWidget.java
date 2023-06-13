@@ -81,7 +81,7 @@ public class JemiSlotWidget extends SlotWidget {
 			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
 			RenderSystem.enableBlend();
 			context.push();
-			context.raw().translate(xOff, yOff, 0);
+			context.matrices().translate(xOff, yOff, 0);
 			renderer.render(context.raw(), typed.getIngredient());
 			context.pop();
 			return;

@@ -88,8 +88,8 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		if ((flags & RENDER_ICON) != 0) {
 			DiffuseLighting.enableGuiDepthLighting();
 			ItemRenderer itemRenderer = client.getItemRenderer();
-			itemRenderer.renderInGui(matrices, stack, x, y);
-			itemRenderer.renderGuiItemOverlay(matrices, client.textRenderer, stack, x, y, "");
+			itemRenderer.renderInGui(context.raw(), stack, x, y);
+			itemRenderer.renderGuiItemOverlay(context.raw(), client.textRenderer, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
@@ -99,7 +99,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRender.renderRemainderIcon(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, context.raw(), x, y);
 		}
 	}
 	
@@ -122,17 +122,18 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		ItemStack stack = getItemStack();
 		ItemRenderer ir = client.getItemRenderer();
 		BakedModel model = ir.getModel(stack, null, null, 0);
-		matrices.push();
+		context.push();
 		try {
-			matrices.translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
-			matrices.translate(8.0, 8.0, 0.0);
-			matrices.scale(16.0f, 16.0f, 16.0f);
-			ir.renderItem(stack, ModelTransformationMode.GUI, false, matrices, vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
+			context.matrices().translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
+			context.matrices().translate(8.0, 8.0, 0.0);
+			context.matrices().scale(16.0f, 16.0f, 16.0f);
+			ir.renderItem(stack, ModelTransformationMode.GUI, false, context.raw(), vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
 		} finally {
-			matrices.pop();
+			context.pop();
 		}
 	}
 

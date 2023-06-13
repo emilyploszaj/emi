@@ -69,7 +69,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
+	public void render(DrawContext raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (recipe != null) {
 			flags |= EmiIngredient.RENDER_AMOUNT;
@@ -113,9 +113,9 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack raw, int x, int y, int z, float delta) {
 		if (stack instanceof Batchable b) {
-			b.renderForBatch(vcp, matrices, x, y, z, delta);
+			b.renderForBatch(vcp, raw, x, y, z, delta);
 		}
 	}
 
@@ -126,8 +126,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
-			super.render(matrices, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
+		public void render(MatrixStack raw, int x, int y, float delta, int flags) {
+			super.render(raw, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
 		}
 	}
 

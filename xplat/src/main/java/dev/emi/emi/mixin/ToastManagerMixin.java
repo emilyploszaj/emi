@@ -15,7 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 public class ToastManagerMixin {
 	
 	@Inject(at = @At("HEAD"), method = "draw", cancellable = true)
-	private void drawHead(MatrixStack matrices, CallbackInfo info) {
+	private void drawHead(MatrixStack raw, CallbackInfo info) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if (client.currentScreen != null && EmiConfig.enabled && EmiApi.getHandledScreen() != null) {
 			info.cancel();
