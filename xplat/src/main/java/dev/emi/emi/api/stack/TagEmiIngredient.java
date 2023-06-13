@@ -19,6 +19,7 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -113,8 +114,8 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
-		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		if ((flags & RENDER_ICON) != 0) {

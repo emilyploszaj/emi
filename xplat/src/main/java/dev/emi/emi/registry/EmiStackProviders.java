@@ -15,7 +15,7 @@ import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
@@ -56,7 +56,7 @@ public class EmiStackProviders {
 					if (s instanceof CraftingResultSlot craf) {
 						// Emi be making assumptions
 						try {
-							CraftingInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
+							RecipeInputInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
 							MinecraftClient client = MinecraftClient.getInstance();
 							List<CraftingRecipe> list
 								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);

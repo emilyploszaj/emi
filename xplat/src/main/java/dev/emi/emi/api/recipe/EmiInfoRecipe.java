@@ -59,7 +59,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayHeight() {
-		int stackHeight = ((Math.min(stacks.size(), MAX_STACKS) - 1) / 6 + 1) * 18;
+		int stackHeight = ((Math.min(stacks.size(), MAX_STACKS) - 1) / STACK_WIDTH + 1) * 18;
 		return stackHeight + CLIENT.textRenderer.fontHeight * text.size() + PADDING;
 	}
 

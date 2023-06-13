@@ -8,10 +8,10 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.config.EmiConfig.ConfigGroup;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.config.ListWidget.Entry;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public abstract class ConfigEntryWidget extends Entry {
@@ -39,7 +39,7 @@ public abstract class ConfigEntryWidget extends Entry {
 	}
 
 	@Override
-	public void render(MatrixStack raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (group != null) {

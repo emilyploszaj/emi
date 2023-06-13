@@ -696,10 +696,6 @@ public class EmiScreenManager {
 		}
 		if (cursor.isEmpty() && draggedStack.isEmpty()) {
 			client.getProfiler().swap("hover");
-			MatrixStack view = RenderSystem.getModelViewStack();
-			view.push();
-			view.translate(0, 0, 200);
-			RenderSystem.applyModelViewMatrix();
 			EmiIngredient hov = EmiStack.EMPTY;
 			SidebarType sidebar = SidebarType.NONE;
 			if (getHoveredStack(mouseX, mouseY, false) instanceof SidebarEmiStackInteraction sesi) {
@@ -723,8 +719,6 @@ public class EmiScreenManager {
 			} else {
 				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
 			}
-			view.pop();
-			RenderSystem.applyModelViewMatrix();
 			client.getProfiler().pop();
 		}
 		lastStackTooltipRendered = null;
@@ -743,7 +737,7 @@ public class EmiScreenManager {
 				context.drawTextWithShadow(EmiPort.literal(warnCount), 48, screen.height - 21, color);
 				int width = Math.max(client.textRenderer.getWidth(title), client.textRenderer.getWidth(warnCount));
 				if (mouseX >= 48 && mouseX < width + 48 && mouseY > screen.height - 28) {
-					screen.renderTooltip(context.raw(), Stream.concat(Stream.of(" EMI detected some issues, see log for full details"),
+					context.raw().drawTooltip(client.textRenderer, Stream.concat(Stream.of(" EMI detected some issues, see log for full details"),
 							EmiReloadLog.warnings.stream()).map(s -> {
 								String a = s;
 								if (a.length() > 10 && client.textRenderer.getWidth(a) > screen.width - 20) {

@@ -4,11 +4,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.LegacySmithingRecipe;
+import net.minecraft.recipe.SmithingTrimRecipe;
 
-@Mixin(LegacySmithingRecipe.class)
-public interface LegacySmithingRecipeAccessor {
-	
+@Mixin(SmithingTrimRecipe.class)
+public interface SmithingTrimRecipeAccessor {
+
+	@Accessor("template")
+	Ingredient getTemplate();
+
 	@Accessor("base")
 	Ingredient getBase();
 

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class TextureWidget extends Widget implements WidgetTooltipHolder<TextureWidget> {
@@ -53,8 +53,8 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.resetColor();
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}	

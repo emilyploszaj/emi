@@ -4,7 +4,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.platform.EmiAgnos;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.Identifier;
 
@@ -31,7 +31,7 @@ public class TankWidget extends SlotWidget {
 	}
 
 	@Override
-	public void drawStack(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawStack(DrawContext draw, int mouseX, int mouseY, float delta) {
 		EmiIngredient ingredient = getStack();
 		for (EmiStack stack : ingredient.getEmiStacks()) {
 			if (stack.getKey() instanceof Fluid fluid) {
@@ -49,9 +49,9 @@ public class TankWidget extends SlotWidget {
 					for (int ox = 0; ox < w; ox += 16) {
 						int rw = Math.min(16, w - ox);
 						if (floaty) {
-							EmiAgnos.renderFluid(fes, matrices, x + ox, sy + oy, delta, 0, 0, rw, rh);
+							EmiAgnos.renderFluid(fes, draw.getMatrices(), x + ox, sy + oy, delta, 0, 0, rw, rh);
 						} else {
-							EmiAgnos.renderFluid(fes, matrices, x + ox, sy + (oy + rh) * -1, delta, 0, 16 - rh, rw, rh);
+							EmiAgnos.renderFluid(fes, draw.getMatrices(), x + ox, sy + (oy + rh) * -1, delta, 0, 16 - rh, rw, rh);
 						}
 					}
 				}

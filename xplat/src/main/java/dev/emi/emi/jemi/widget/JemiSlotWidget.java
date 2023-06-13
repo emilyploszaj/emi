@@ -20,8 +20,8 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class JemiSlotWidget extends SlotWidget {
@@ -62,7 +62,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		if (slot.background != null) {
 			slot.background.drawable().draw(raw, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
 		}
@@ -71,7 +71,7 @@ public class JemiSlotWidget extends SlotWidget {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void drawStack(MatrixStack raw, int mouseX, int mouseY, float delta) {
+	public void drawStack(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		IIngredientRenderer renderer = getRenderer();
 		if (renderer != null) {
@@ -90,7 +90,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void drawOverlay(MatrixStack raw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
 			RenderSystem.enableBlend();

@@ -32,11 +32,11 @@ import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -164,7 +164,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
-	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.renderBackground(context.raw());
 		context.resetColor();
@@ -250,7 +250,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
 		if (categoryHovered) {
-			this.renderTooltip(context.raw(), List.of(
+			context.raw().drawTooltip(client.textRenderer, List.of(
 				tab.category.getName(),
 				EmiPort.translatable("emi.view_all_recipes")
 			), mouseX, mouseY);

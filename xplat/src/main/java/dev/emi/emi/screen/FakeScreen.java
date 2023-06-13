@@ -17,14 +17,13 @@ public class FakeScreen extends Screen {
 	protected FakeScreen() {
 		super(EmiPort.literal(""));
 		this.client = MinecraftClient.getInstance();
-		this.itemRenderer = client.getItemRenderer();
 		this.textRenderer = client.textRenderer;
 		this.width = 99999;
 		this.height = 99999;
 	}
 
 	public List<TooltipComponent> getTooltipComponentListFromItem(ItemStack stack) {
-		List<TooltipComponent> list = this.getTooltipFromItem(stack)
+		List<TooltipComponent> list = Screen.getTooltipFromItem(client, stack)
 			.stream().map(EmiPort::ordered).map(TooltipComponent::of).collect(Collectors.toList());
 		Optional<TooltipData> data = stack.getTooltipData();
 		if (data.isPresent()) {

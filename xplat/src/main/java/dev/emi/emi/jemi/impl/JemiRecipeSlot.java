@@ -15,7 +15,7 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 @SuppressWarnings("unchecked")
 public class JemiRecipeSlot implements IRecipeSlotView {
@@ -95,7 +95,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	}
 
 	@Override
-	public void drawHighlight(MatrixStack raw, int color) {
+	public void drawHighlight(DrawContext raw, int color) {
 	}
 
 	public static record OffsetDrawable(IDrawable drawable, int xOff, int yOff){

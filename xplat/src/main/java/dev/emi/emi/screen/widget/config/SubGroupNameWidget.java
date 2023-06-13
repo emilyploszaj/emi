@@ -2,7 +2,7 @@ package dev.emi.emi.screen.widget.config;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class SubGroupNameWidget extends GroupNameWidget {
@@ -13,7 +13,7 @@ public class SubGroupNameWidget extends GroupNameWidget {
 	}
 
 	@Override
-	public void render(MatrixStack raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.drawTextWithShadow(text, x + 20, y + 3);

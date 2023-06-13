@@ -5,7 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -13,30 +13,30 @@ import net.minecraft.util.Identifier;
 
 public class EmiDrawContext {
 	private final MinecraftClient client = MinecraftClient.getInstance();
-	private final MatrixStack matrices;
+	private final DrawContext context;
 	
-	private EmiDrawContext(MatrixStack matrices) {
-		this.matrices = matrices;
+	private EmiDrawContext(DrawContext context) {
+		this.context = context;
 	}
 
-	public static EmiDrawContext wrap(MatrixStack matrices) {
-		return new EmiDrawContext(matrices);
+	public static EmiDrawContext wrap(DrawContext context) {
+		return new EmiDrawContext(context);
 	}
 
-	public MatrixStack raw() {
-		return matrices;
+	public DrawContext raw() {
+		return context;
 	}
 
 	public MatrixStack matrices() {
-		return matrices;
+		return context.getMatrices();
 	}
 
 	public void push() {
-		matrices.push();
+		matrices().push();
 	}
 
 	public void pop() {
-		matrices.pop();
+		matrices().pop();
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int u, int v, int width, int height) {
@@ -49,18 +49,16 @@ public class EmiDrawContext {
 
 	public void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
 		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, texture);
-		DrawableHelper.drawTexture(matrices, x, y, z, u, v, width, height, textureWidth, textureHeight);
+		context.drawTexture(texture, x, y, z, u, v, width, height, textureWidth, textureHeight);
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
 		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderTexture(0, texture);
-		DrawableHelper.drawTexture(matrices, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}
 
 	public void fill(int x, int y, int width, int height, int color) {
-		DrawableHelper.fill(matrices, x, y, x + width, y + height, color);
+		context.fill(x, y, x + width, y + height, color);
 	}
 
 	public void drawText(Text text, int x, int y) {
@@ -68,11 +66,11 @@ public class EmiDrawContext {
 	}
 
 	public void drawText(Text text, int x, int y, int color) {
-		client.textRenderer.draw(matrices, text, x, y, color);
+		context.drawText(client.textRenderer, text, x, y, color, false);
 	}
 
 	public void drawText(OrderedText text, int x, int y, int color) {
-		client.textRenderer.draw(matrices, text, x, y, color);
+		context.drawText(client.textRenderer, text, x, y, color, false);
 	}
 
 	public void drawTextWithShadow(Text text, int x, int y) {
@@ -80,11 +78,11 @@ public class EmiDrawContext {
 	}
 
 	public void drawTextWithShadow(Text text, int x, int y, int color) {
-		client.textRenderer.drawWithShadow(matrices, text, x, y, color);
+		context.drawText(client.textRenderer, text, x, y, color, true);
 	}
 
 	public void drawTextWithShadow(OrderedText text, int x, int y, int color) {
-		client.textRenderer.drawWithShadow(matrices, text, x, y, color);
+		context.drawText(client.textRenderer, text, x, y, color, true);
 	}
 
 	public void drawCenteredText(Text text, int x, int y) {
@@ -92,7 +90,7 @@ public class EmiDrawContext {
 	}
 
 	public void drawCenteredText(Text text, int x, int y, int color) {
-		client.textRenderer.draw(matrices, text, x - client.textRenderer.getWidth(text) / 2, y, color);
+		context.drawText(client.textRenderer, text, x - client.textRenderer.getWidth(text) / 2, y, color, false);
 	}
 
 	public void drawCenteredTextWithShadow(Text text, int x, int y) {
@@ -100,7 +98,7 @@ public class EmiDrawContext {
 	}
 
 	public void drawCenteredTextWithShadow(Text text, int x, int y, int color) {
-		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer, text.asOrderedText(), x, y, color);
+		context.drawCenteredTextWithShadow(client.textRenderer, text.asOrderedText(), x, y, color);
 	}
 
 	public void resetColor() {

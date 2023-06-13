@@ -58,6 +58,8 @@ import dev.emi.emi.mixin.accessor.AxeItemAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
+import dev.emi.emi.mixin.accessor.SmithingTransformRecipeAccessor;
+import dev.emi.emi.mixin.accessor.SmithingTrimRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
@@ -83,6 +85,7 @@ import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingBookRecipe;
 import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingRecipe;
 import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
+import dev.emi.emi.recipe.special.EmiSmithingTrimRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -179,7 +182,7 @@ public class VanillaPlugin implements EmiPlugin {
 		STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
 			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240), EmiRecipeSorting.compareInputThenOutput());
 		SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
-			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
+			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareInputThenOutput());
 		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
 			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
 		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
@@ -414,7 +417,15 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, CAMPFIRE_COOKING, 1, true), recipe);
 		}
 		for (SmithingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMITHING)) {
-			addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
+			//addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
+			MinecraftClient client = MinecraftClient.getInstance();
+			if (recipe instanceof SmithingTransformRecipeAccessor stra) {
+				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
+					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), recipe.getId()), recipe);
+			} else if (recipe instanceof SmithingTrimRecipeAccessor stra) {
+				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
+					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), recipe), recipe);
+			}
 		}
 		for (StonecuttingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.STONECUTTING)) {
 			addRecipeSafe(registry, () -> new EmiStonecuttingRecipe(recipe), recipe);

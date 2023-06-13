@@ -11,11 +11,11 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.config.EmiNameWidget;
 import dev.emi.emi.screen.widget.config.ListWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class ConfigEnumScreen<T> extends Screen {
@@ -48,7 +48,7 @@ public class ConfigEnumScreen<T> extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
 		this.renderBackgroundTexture(context.raw());
@@ -102,7 +102,7 @@ public class ConfigEnumScreen<T> extends Screen {
 		}
 
 		@Override
-		public void render(MatrixStack raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+		public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 				boolean hovered, float delta) {
 			button.y = y;
 			button.x = x + width / 2 - button.getWidth() / 2;
