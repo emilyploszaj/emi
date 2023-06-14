@@ -16,7 +16,6 @@ import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
@@ -199,7 +198,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.setEditable(EmiConfig.enabled);
 		String lower = getText().toLowerCase();

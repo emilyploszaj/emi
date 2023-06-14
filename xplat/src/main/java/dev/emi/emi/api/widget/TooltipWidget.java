@@ -3,8 +3,8 @@ package dev.emi.emi.api.widget;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class TooltipWidget extends Widget {
 	private final Bounds bounds;
@@ -26,6 +26,6 @@ public class TooltipWidget extends Widget {
 	}
 
 	@Override
-	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 	}
 }

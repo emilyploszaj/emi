@@ -2,6 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -9,21 +10,21 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.mixin.accessor.LegacySmithingRecipeAccessor;
+import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.util.Identifier;
 
 public class EmiSmithingRecipe implements EmiRecipe {
-	protected final Identifier id;
-	protected final EmiIngredient template;
-	protected final EmiIngredient input;
-	protected final EmiIngredient addition;
-	protected final EmiStack output;
+	private final Identifier id;
+	private final EmiIngredient input;
+	private final EmiIngredient addition;
+	private final EmiStack output;
 	
-	public EmiSmithingRecipe(EmiIngredient template, EmiIngredient input, EmiIngredient addition, EmiStack output, Identifier id) {
-		this.id = id;
-		this.template = template;
-		this.input = input;
-		this.addition = addition;
-		this.output = output;
+	public EmiSmithingRecipe(SmithingRecipe recipe) {
+		this.id = recipe.getId();
+		input = EmiIngredient.of(((LegacySmithingRecipeAccessor) recipe).getBase());
+		addition = EmiIngredient.of(((LegacySmithingRecipeAccessor) recipe).getAddition());
+		output = EmiStack.of(EmiPort.getOutput(recipe));
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class EmiSmithingRecipe implements EmiRecipe {
 
 	@Override
 	public List<EmiIngredient> getInputs() {
-		return List.of(template, input, addition);
+		return List.of(input, addition);
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class EmiSmithingRecipe implements EmiRecipe {
 
 	@Override
 	public int getDisplayWidth() {
-		return 112;
+		return 125;
 	}
 
 	@Override
@@ -58,10 +59,10 @@ public class EmiSmithingRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		widgets.addTexture(EmiTexture.EMPTY_ARROW, 62, 1);
-		widgets.addSlot(template, 0, 0);
-		widgets.addSlot(input, 18, 0);
-		widgets.addSlot(addition, 36, 0);
-		widgets.addSlot(output, 94, 0).recipeContext(this);
+		widgets.addTexture(EmiTexture.PLUS, 27, 3);
+		widgets.addTexture(EmiTexture.EMPTY_ARROW, 75, 1);
+		widgets.addSlot(input, 0, 0);
+		widgets.addSlot(addition, 49, 0);
+		widgets.addSlot(output, 107, 0).recipeContext(this);
 	}
 }

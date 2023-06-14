@@ -28,7 +28,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -84,7 +84,7 @@ public class EmiRecipeFiller {
 			}
 			for (Slot slot : screen.getScreenHandler().slots) {
 				if (slot instanceof CraftingResultSlot crs) {
-					RecipeInputInventory inv = ((CraftingResultSlotAccessor) crs).getInput();
+					CraftingInventory inv = ((CraftingResultSlotAccessor) crs).getInput();
 					if (inv != null && inv.getWidth() > 0 && inv.getHeight() > 0) {
 						return List.of(new CoercedRecipeHandler<T>(crs));
 					}
@@ -241,7 +241,7 @@ public class EmiRecipeFiller {
 		List<ItemStack> stacks = Lists.newArrayList();
 		Slot output = handler.getOutputSlot(screen.getScreenHandler());
 		if (output != null && !output.getStack().isEmpty() && recipe.getOutputs().size() > 0
-				&& !ItemStack.areEqual(output.getStack(), recipe.getOutputs().get(0).getItemStack())) {
+				&& !output.getStack().isItemEqual(recipe.getOutputs().get(0).getItemStack())) {
 			return 0;
 		}
 		for (Slot slot : handler.getCraftingSlots(recipe, screen.getScreenHandler())) {

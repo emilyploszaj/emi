@@ -16,9 +16,9 @@ import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class EmiFavorite implements EmiIngredient, Batchable {
@@ -69,7 +69,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (recipe != null) {
 			flags |= EmiIngredient.RENDER_AMOUNT;
@@ -113,7 +113,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void renderForBatch(VertexConsumerProvider vcp, DrawContext raw, int x, int y, int z, float delta) {
+	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack raw, int x, int y, int z, float delta) {
 		if (stack instanceof Batchable b) {
 			b.renderForBatch(vcp, raw, x, y, z, delta);
 		}
@@ -126,7 +126,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 			super.render(raw, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
 		}
 	}
@@ -153,7 +153,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			int color = 0xff2200;
 			if (state == 1) {

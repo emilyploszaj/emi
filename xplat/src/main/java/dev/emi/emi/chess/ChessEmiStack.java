@@ -12,8 +12,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -27,7 +27,7 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		ChessPiece piece = EmiChess.getBoard().get(position);
 		RenderSystem.enableDepthTest();

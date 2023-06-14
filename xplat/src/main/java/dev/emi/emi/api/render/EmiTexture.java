@@ -2,7 +2,7 @@ package dev.emi.emi.api.render;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class EmiTexture implements EmiRenderable {
@@ -36,8 +36,8 @@ public class EmiTexture implements EmiRenderable {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta) {
-		EmiDrawContext context = EmiDrawContext.wrap(draw);
+	public void render(MatrixStack matrices, int x, int y, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}
 }

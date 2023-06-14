@@ -20,8 +20,8 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -86,13 +86,13 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 	}
 
 	@Override
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext draw) {
-		renderMissing(recipe, context.getInventory(), widgets, draw);
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, MatrixStack matrices) {
+		renderMissing(recipe, context.getInventory(), widgets, matrices);
 	}
 
 	@ApiStatus.Internal
-	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, DrawContext draw) {
-		EmiDrawContext context = EmiDrawContext.wrap(draw);
+	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, MatrixStack matrices) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		RenderSystem.enableDepthTest();
 		Map<EmiIngredient, Boolean> availableForCrafting = getAvailable(recipe, inv);
 		for (Widget w : widgets) {

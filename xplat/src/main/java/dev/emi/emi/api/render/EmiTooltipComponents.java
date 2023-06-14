@@ -1,11 +1,8 @@
 package dev.emi.emi.api.render;
 
-import java.util.List;
-
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -34,13 +31,6 @@ public class EmiTooltipComponents {
 	 */
 	public static TooltipComponent getRecipeCostTooltipComponent(EmiRecipe recipe) {
 		return new RecipeCostTooltipComponent(recipe);
-	}
-
-	/**
-	 * @return A tooltip component that displays a collection of stacks to represent an ingredient
-	 */
-	public static TooltipComponent getIngredientTooltipComponent(List<? extends EmiIngredient> stacks) {
-		return new IngredientTooltipComponent(stacks);
 	}
 
 	/**

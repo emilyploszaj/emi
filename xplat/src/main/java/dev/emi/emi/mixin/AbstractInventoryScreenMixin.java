@@ -18,10 +18,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.config.EffectLocation;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.screen.ScreenHandler;
@@ -40,26 +40,26 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 	}
 
 	@Shadow
-	private void drawStatusEffectBackgrounds(DrawContext draw, int x, int height, Iterable<StatusEffectInstance> statusEffects, boolean wide) {
+	private void drawStatusEffectBackgrounds(MatrixStack matrices, int x, int height, Iterable<StatusEffectInstance> statusEffects, boolean wide) {
 		throw new UnsupportedOperationException();
 	}
 	
 	@Shadow
-	private void drawStatusEffectSprites(DrawContext draw, int x, int height, Iterable<StatusEffectInstance> statusEffects, boolean wide) {
+	private void drawStatusEffectSprites(MatrixStack matrices, int x, int height, Iterable<StatusEffectInstance> statusEffects, boolean wide) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Shadow
-	private void drawStatusEffectDescriptions(DrawContext draw, int x, int height, Iterable<StatusEffectInstance> statusEffects) {
+	private void drawStatusEffectDescriptions(MatrixStack matrices, int x, int height, Iterable<StatusEffectInstance> statusEffects) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Inject(at = @At(value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/ingame/AbstractInventoryScreen.drawStatusEffectBackgrounds(Lnet/minecraft/client/gui/DrawContext;IILjava/lang/Iterable;Z)V"),
+			target = "net/minecraft/client/gui/screen/ingame/AbstractInventoryScreen.drawStatusEffectBackgrounds(Lnet/minecraft/client/util/math/MatrixStack;IILjava/lang/Iterable;Z)V"),
 		method = "drawStatusEffects")
-	private void drawStatusEffects(DrawContext draw, int mouseX, int mouseY, CallbackInfo info) {
+	private void drawStatusEffects(MatrixStack matrices, int mouseX, int mouseY, CallbackInfo info) {
 		if (EmiConfig.effectLocation == EffectLocation.TOP) {
-			emi$drawCenteredEffects(draw, mouseX, mouseY);
+			emi$drawCenteredEffects(matrices, mouseX, mouseY);
 		}
 	}
 
@@ -72,7 +72,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		return original;
 	}
 
-	private void emi$drawCenteredEffects(DrawContext draw, int mouseX, int mouseY) {
+	private void emi$drawCenteredEffects(MatrixStack matrices, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Collection<StatusEffectInstance> effects = Ordering.natural().sortedCopy(this.client.player.getStatusEffects());
 		int size = effects.size();
@@ -102,10 +102,10 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			for (StatusEffectInstance inst : effects) {
 				int ew = wide ? 120 : 32;
 				List<StatusEffectInstance> single = List.of(inst);
-				this.drawStatusEffectBackgrounds(draw, x, 32, single, wide);
-				this.drawStatusEffectSprites(draw, x, 32, single, wide);
+				this.drawStatusEffectBackgrounds(matrices, x, 32, single, wide);
+				this.drawStatusEffectSprites(matrices, x, 32, single, wide);
 				if (wide) {
-					this.drawStatusEffectDescriptions(draw, x, 32, single);
+					this.drawStatusEffectDescriptions(matrices, x, 32, single);
 				}
 				if (mouseX >= x && mouseX < x + ew && mouseY >= y && mouseY < y + 32) {
 					hovered = inst;
@@ -116,8 +116,8 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			this.y = restoreY;
 		}
 		if (hovered != null && size > 1) {
-			List<Text> list = List.of(this.getStatusEffectDescription(hovered), StatusEffectUtil.getDurationText(hovered, 1.0f));
-			draw.drawTooltip(client.textRenderer, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
+			List<Text> list = List.of(this.getStatusEffectDescription(hovered), StatusEffectUtil.durationToString(hovered, 1.0f));
+			this.renderTooltip(matrices, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
 		}
 	}
 	

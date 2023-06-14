@@ -13,8 +13,8 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 
 public class EmiNameWidget implements Drawable {
@@ -99,7 +99,7 @@ public class EmiNameWidget implements Drawable {
 		return ret;
 	}
 
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		long time = System.currentTimeMillis();
 		long progress = time % 5_000;

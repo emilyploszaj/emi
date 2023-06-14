@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.compress.utils.Lists;
 import org.joml.Matrix4f;
-import org.joml.Vector2i;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -19,8 +18,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.mixin.accessor.DrawContextAccessor;
 import dev.emi.emi.mixin.accessor.OrderedTextTooltipComponentAccessor;
+import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -30,7 +29,6 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat.DrawMode;
@@ -151,15 +149,13 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawLeftTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y) {
-		drawTooltip(screen, context, components, x, y, screen.width / 2 - 16,
-			(screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> {
-				Vector2i pos = new Vector2i(mouseX, mouseY).add(12, -12);
-				pos.x = Math.max(pos.x - 24 - tooltipWidth, 4);
-				if (pos.y + tooltipHeight + 3 > screenHeight) {
-					pos.y = screenHeight - tooltipHeight - 3;
-				}
-				return pos;
-		});
+		int original = screen.width;
+		try {
+			screen.width = x;
+			drawTooltip(screen, context, components, x, y, original / 2 - 16);
+		} finally {
+			screen.width = original;
+		}
 	}
 
 	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y) {
@@ -167,10 +163,6 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y, int maxWidth) {
-		drawTooltip(screen, context, components, x, y, maxWidth, HoveredTooltipPositioner.INSTANCE);
-	}
-
-	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y, int maxWidth, TooltipPositioner positioner) {
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();
@@ -198,15 +190,12 @@ public class EmiRenderHelper {
 				mutable.add(comp);
 			}
 		}
-		RenderSystem.enableDepthTest();
-		EmiPort.setPositionTexShader();
-		context.resetColor();
-		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner);
+		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(context.raw(), mutable, x, y, HoveredTooltipPositioner.INSTANCE);
 	}
 
 	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h) {
 		context.push();
-		context.matrices().translate(0, 0, 200);
+		context.matrices().translate(0, 0, 100);
 		RenderSystem.colorMask(true, true, true, false);
 		context.fill(x, y, w, h, -2130706433);
 		RenderSystem.colorMask(true, true, true, true);
@@ -340,8 +329,10 @@ public class EmiRenderHelper {
 				}
 			};
 
-			context.push();
-			context.matrices().translate(x + 4, y + 4, 0);
+			MatrixStack view = RenderSystem.getModelViewStack();
+			view.push();
+			view.translate(x + 4, y + 4, 0);
+			RenderSystem.applyModelViewMatrix();
 
 			recipe.addWidgets(holder);
 			float delta = MinecraftClient.getInstance().getTickDelta();
@@ -362,7 +353,8 @@ public class EmiRenderHelper {
 				}
 			}
 
-			context.pop();
+			view.pop();
+			RenderSystem.applyModelViewMatrix();
 
 			// Force translucency to match that of the recipe background
 			RenderSystem.disableBlend();

@@ -14,8 +14,8 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class ResolutionButtonWidget extends ButtonWidget {
 	public Supplier<Widget> hoveredWidget;
@@ -31,11 +31,11 @@ public class ResolutionButtonWidget extends ButtonWidget {
 	}
 	
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
 		super.render(raw, mouseX, mouseY, delta);
 		if (this.isHovered()) {
 			MinecraftClient client = MinecraftClient.getInstance();
-			raw.drawTooltip(client.textRenderer, List.of(
+			client.currentScreen.renderTooltip(raw, List.of(
 				EmiPort.translatable("tooltip.emi.resolution"),
 				EmiPort.translatable("tooltip.emi.select_resolution"),
 				EmiPort.translatable("tooltip.emi.default_resolution"),
@@ -46,7 +46,7 @@ public class ResolutionButtonWidget extends ButtonWidget {
 	}
 
 	@Override
-	public void renderButton(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void renderButton(MatrixStack raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int u = 0;
 		if (this.isHovered()) {

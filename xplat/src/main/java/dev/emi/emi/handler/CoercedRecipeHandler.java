@@ -10,14 +10,14 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 
 public class CoercedRecipeHandler<T extends ScreenHandler> implements StandardRecipeHandler<T> {
 	private CraftingResultSlot output;
-	private RecipeInputInventory inv;
+	private CraftingInventory inv;
 
 	public CoercedRecipeHandler(CraftingResultSlot output) {
 		this.output = output;
