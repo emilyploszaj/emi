@@ -145,7 +145,6 @@ public class EmiSearchWidget extends TextFieldWidget {
 	@Override
 	public void setFocused(boolean focused) {
 		isFocused = focused;
-		super.setFocused(focused);
 	}
 
 	@Override
@@ -160,9 +159,6 @@ public class EmiSearchWidget extends TextFieldWidget {
 			return false;
 		} else {
 			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
-			if (isMouseOver(mouseX, mouseY)) {
-				setFocused(true);
-			}
 			if (this.isFocused()) {
 				if (button == 0) {
 					if (System.currentTimeMillis() - lastClick < 500) {
