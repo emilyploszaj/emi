@@ -76,7 +76,7 @@ public class EmiTags {
 		if (map.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (map.size() == 1) {
-			return map.values().stream().toList().get(0);
+			return map.values().stream().toList().get(0).copy().setAmount(amount);
 		}
 		List<TagKey<T>> keys = (List<TagKey<T>>) (List) CACHED_TAGS.get(map.keySet());
 

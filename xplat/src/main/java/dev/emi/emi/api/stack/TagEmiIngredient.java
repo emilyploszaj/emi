@@ -15,6 +15,7 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
 import net.minecraft.client.MinecraftClient;
@@ -113,12 +114,13 @@ public class TagEmiIngredient implements EmiIngredient {
 
 	@Override
 	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		if ((flags & RENDER_ICON) != 0) {
 			if (!EmiTags.hasCustomModel(key)) {
 				if (stacks.size() > 0) {
-					stacks.get(0).render(matrices, x, y, delta, -1 ^ RENDER_AMOUNT);
+					stacks.get(0).render(context.raw(), x, y, delta, -1 ^ RENDER_AMOUNT);
 				}
 			} else {
 				BakedModel model = ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
@@ -126,7 +128,7 @@ public class TagEmiIngredient implements EmiIngredient {
 					
 				MatrixStack vs = RenderSystem.getModelViewStack();
 				vs.push();
-				vs.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
+				vs.multiplyPositionMatrix(context.matrices().peek().getPositionMatrix());
 				vs.translate(x, y, 100.0f);
 				vs.translate(8.0, 8.0, 0.0);
 				vs.scale(1.0f, -1.0f, 1.0f);
@@ -161,13 +163,13 @@ public class TagEmiIngredient implements EmiIngredient {
 			if (amount != 1) {
 				count += amount;
 			}
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
+			EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_INGREDIENT) != 0) {
-			EmiRender.renderTagIcon(this, matrices, x, y);
+			EmiRender.renderTagIcon(this, context.raw(), x, y);
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRender.renderRemainderIcon(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, context.raw(), x, y);
 		}
 	}
 

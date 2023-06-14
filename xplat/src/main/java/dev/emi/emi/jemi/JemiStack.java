@@ -8,6 +8,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -42,13 +43,14 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
-		matrices.push();
-		matrices.translate(x + xOff, y + yOff, 0);
-		renderer.render(matrices, ingredient);
-		matrices.pop();
+		context.push();
+		context.matrices().translate(x + xOff, y + yOff, 0);
+		renderer.render(context.raw(), ingredient);
+		context.pop();
 	}
 
 	@Override

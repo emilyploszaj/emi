@@ -27,6 +27,7 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarSide;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
@@ -163,29 +164,26 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, TEXTURE);
-		EmiRenderHelper.drawNinePatch(matrices, x, y, backgroundWidth, backgroundHeight, 0, 0, 4, 1);
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		this.renderBackground(context.raw());
+		context.resetColor();
+		EmiRenderHelper.drawNinePatch(context, TEXTURE, x, y, backgroundWidth, backgroundHeight, 0, 0, 4, 1);
 
 		int tp = tabPage * tabPageSize;
 		int off = 0;
 		for (int i = tp; i < tabs.size() && i < tp + tabPageSize; i++) {
 			RecipeTab tab = tabs.get(i);
-			RenderSystem.setShaderTexture(0, TEXTURE);
 			int sOff = (i == this.tab ? 2 : 0);
-			EmiRenderHelper.drawNinePatch(matrices, x + tabOff + off * 24 + 16, y - 24 - sOff, 24, 27 + sOff,
+			EmiRenderHelper.drawNinePatch(context, TEXTURE, x + tabOff + off * 24 + 16, y - 24 - sOff, 24, 27 + sOff,
 				i == this.tab ? 9 : 18, 0, 4, 1);
-			tab.category.render(matrices, x + tabOff + off++ * 24 + 20, y - 20 - (i == this.tab ? 2 : 0), delta);
+			tab.category.render(context.raw(), x + tabOff + off++ * 24 + 20, y - 20 - (i == this.tab ? 2 : 0), delta);
 		}
 
-		RenderSystem.setShaderTexture(0, TEXTURE);
-		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 5, minimumWidth - 38, 12, 0, 16, 3, 6);
-		//EmiRenderHelper.drawScroll(matrices, x + 19 + buttonOff, y + 5 + 10, minimumWidth - 38, 2, tab, tabs.size(), -1);
-		EmiRenderHelper.drawNinePatch(matrices, x + 19 + buttonOff, y + 19, minimumWidth - 38, 12, 0, 16, 3, 6);
-		//EmiRenderHelper.drawScroll(matrices, x + 19 + buttonOff, y + 19 + 10, minimumWidth - 38, 2, page, tabs.get(tab).getPageCount(), -1);
+		EmiRenderHelper.drawNinePatch(context, TEXTURE, x + 19 + buttonOff, y + 5, minimumWidth - 38, 12, 0, 16, 3, 6);
+		//EmiRenderHelper.drawScroll(context, x + 19 + buttonOff, y + 5 + 10, minimumWidth - 38, 2, tab, tabs.size(), -1);
+		EmiRenderHelper.drawNinePatch(context, TEXTURE, x + 19 + buttonOff, y + 19, minimumWidth - 38, 12, 0, 16, 3, 6);
+		//EmiRenderHelper.drawScroll(context, x + 19 + buttonOff, y + 19 + 10, minimumWidth - 38, 2, page, tabs.get(tab).getPageCount(), -1);
 		
 		boolean categoryHovered = mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY < y + 5 + 12;
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
@@ -196,36 +194,35 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			int extraWidth = client.textRenderer.getWidth("...");
 			text = EmiPort.literal(client.textRenderer.trimToWidth(text, (minimumWidth - 40) - extraWidth).getString() + "...");
 		}
-		EmiPort.drawCenteredText(matrices, textRenderer, text, x + backgroundWidth / 2, y + 7, categoryNameColor, true);
-		EmiPort.drawCenteredText(matrices, textRenderer, EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
-			x + backgroundWidth / 2, y + 21, 0xffffff, true);
+		context.drawCenteredTextWithShadow(text, x + backgroundWidth / 2, y + 7, categoryNameColor);
+		context.drawCenteredTextWithShadow(EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
+			x + backgroundWidth / 2, y + 21, 0xffffff);
 
 		List<EmiIngredient> workstations = EmiApi.getRecipeManager().getWorkstations(tab.category);
 		int workstationAmount = Math.min(workstations.size(), getMaxWorkstations());
 		if (workstationAmount > 0 || resolve != null) {
-			RenderSystem.setShaderTexture(0, TEXTURE);
 			Bounds bounds = getWorkstationBounds(-1);
 			int offset = getResolveOffset();
 			if (workstationAmount <= 0) {
 				offset = 18;
 			}
 			if (EmiConfig.workstationLocation == SidebarSide.LEFT) {
-				EmiRenderHelper.drawNinePatch(matrices, bounds.x() - 5, bounds.y() - 5, 28, 10 + 18 * workstationAmount + offset, 36, 0, 5, 1);
+				EmiRenderHelper.drawNinePatch(context, TEXTURE, bounds.x() - 5, bounds.y() - 5, 28, 10 + 18 * workstationAmount + offset, 36, 0, 5, 1);
 			} else if (EmiConfig.workstationLocation == SidebarSide.RIGHT) {
-				EmiRenderHelper.drawNinePatch(matrices, bounds.x() - 5, bounds.y() - 5, 28, 10 + 18 * workstationAmount + offset, 47, 0, 5, 1);
+				EmiRenderHelper.drawNinePatch(context, TEXTURE, bounds.x() - 5, bounds.y() - 5, 28, 10 + 18 * workstationAmount + offset, 47, 0, 5, 1);
 			} else if (EmiConfig.workstationLocation == SidebarSide.BOTTOM) {
-				EmiRenderHelper.drawNinePatch(matrices, bounds.x() - 5, bounds.y() - 5, 10 + 18 * workstationAmount + offset, 28, 58, 0, 5, 1);
+				EmiRenderHelper.drawNinePatch(context, TEXTURE, bounds.x() - 5, bounds.y() - 5, 10 + 18 * workstationAmount + offset, 28, 58, 0, 5, 1);
 			}
 		}
 		for (WidgetGroup group : currentPage) {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
-			matrices.push();
-			matrices.translate(group.x(), group.y(), 0);
+			context.push();
+			context.matrices().translate(group.x(), group.y(), 0);
 			RenderSystem.applyModelViewMatrix();
 			try {
 				for (Widget widget : group.widgets) {
-					widget.render(matrices, mx, my, delta);
+					widget.render(context.raw(), mx, my, delta);
 				}
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -237,23 +234,23 @@ public class RecipeScreen extends Screen implements EmiScreen {
 						HandledScreen hs = EmiApi.getHandledScreen();
 						EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(group.recipe, hs);
 						if (handler != null) {
-							handler.render(group.recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), group.widgets, matrices);
+							handler.render(group.recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), group.widgets, context.raw());
 						} else if (EmiScreenManager.lastPlayerInventory != null) {
-							StandardRecipeHandler.renderMissing(group.recipe, EmiScreenManager.lastPlayerInventory, group.widgets, matrices);
+							StandardRecipeHandler.renderMissing(group.recipe, EmiScreenManager.lastPlayerInventory, group.widgets, context.raw());
 						}
 						break;
 					}
 				}
 			}
-			matrices.pop();
+			context.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
-		EmiScreenManager.drawBackground(matrices, mouseX, mouseY, delta);
-		EmiScreenManager.render(matrices, mouseX, mouseY, delta);
-		EmiScreenManager.drawForeground(matrices, mouseX, mouseY, delta);
-		super.render(matrices, mouseX, mouseY, delta);
+		EmiScreenManager.drawBackground(context, mouseX, mouseY, delta);
+		EmiScreenManager.render(context, mouseX, mouseY, delta);
+		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
+		super.render(context.raw(), mouseX, mouseY, delta);
 		if (categoryHovered) {
-			this.renderTooltip(matrices, List.of(
+			this.renderTooltip(context.raw(), List.of(
 				tab.category.getName(),
 				EmiPort.translatable("emi.view_all_recipes")
 			), mouseX, mouseY);
@@ -268,7 +265,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 					if (widget.getBounds().contains(mx, my)) {
 						List<TooltipComponent> tooltip = widget.getTooltip(mx, my);
 						if (!tooltip.isEmpty()) {
-							EmiRenderHelper.drawTooltip(this, matrices, tooltip, mouseX, mouseY);
+							EmiRenderHelper.drawTooltip(this, context, tooltip, mouseX, mouseY);
 							hoveredWidget = widget;
 							break outer;
 						}
@@ -282,7 +279,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 		RecipeTab rTab = getTabAt(mouseX, mouseY);
 		if (rTab != null) {
-			EmiRenderHelper.drawTooltip(this, matrices, rTab.category.getTooltip(), mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(this, context, rTab.category.getTooltip(), mouseX, mouseY);
 		}
 	}
 

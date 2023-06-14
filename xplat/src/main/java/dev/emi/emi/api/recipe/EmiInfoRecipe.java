@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -82,15 +83,16 @@ public class EmiInfoRecipe implements EmiRecipe {
 		int y = stackHeight * 18 + PADDING;
 		int lineCount = (widgets.getHeight() - y) / CLIENT.textRenderer.fontHeight;
 		PageManager manager = new PageManager(text, lineCount);
-		if (widgets.getHeight() < getDisplayHeight()) {
-			widgets.addButton(2, 2, 12, 12, 0, 64, () -> true, (mouseX, mouseY, button) -> {
+		if (lineCount < text.size()) {
+			widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(-1);
 			});
-			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(1);
 			});
 		}
-		widgets.addDrawable(0, y, 0, 0, (matrices, mouseX, mouseY, delta) -> {
+		widgets.addDrawable(0, y, 0, 0, (raw, mouseX, mouseY, delta) -> {
+			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			int lo = manager.start();
 			for (int i = 0; i < lineCount; i++) {
 				int l = lo + i;
@@ -98,7 +100,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 					return;
 				}
 				OrderedText text = manager.lines.get(l);
-				CLIENT.textRenderer.draw(matrices, text, 0, y - y + i * CLIENT.textRenderer.fontHeight, 0);
+				context.drawText(text, 0, y - y + i * CLIENT.textRenderer.fontHeight, 0);
 			}
 		});
 	}

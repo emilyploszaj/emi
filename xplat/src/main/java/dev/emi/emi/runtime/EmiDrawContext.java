@@ -7,6 +7,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmiDrawContext {
@@ -55,6 +57,50 @@ public class EmiDrawContext {
 		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderTexture(0, texture);
 		DrawableHelper.drawTexture(matrices, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+	}
+
+	public void fill(int x, int y, int width, int height, int color) {
+		DrawableHelper.fill(matrices, x, y, x + width, y + height, color);
+	}
+
+	public void drawText(Text text, int x, int y) {
+		drawText(text, x, y, -1);
+	}
+
+	public void drawText(Text text, int x, int y, int color) {
+		client.textRenderer.draw(matrices, text, x, y, color);
+	}
+
+	public void drawText(OrderedText text, int x, int y, int color) {
+		client.textRenderer.draw(matrices, text, x, y, color);
+	}
+
+	public void drawTextWithShadow(Text text, int x, int y) {
+		drawTextWithShadow(text, x, y, -1);
+	}
+
+	public void drawTextWithShadow(Text text, int x, int y, int color) {
+		client.textRenderer.drawWithShadow(matrices, text, x, y, color);
+	}
+
+	public void drawTextWithShadow(OrderedText text, int x, int y, int color) {
+		client.textRenderer.drawWithShadow(matrices, text, x, y, color);
+	}
+
+	public void drawCenteredText(Text text, int x, int y) {
+		drawCenteredText(text, x, y, -1);
+	}
+
+	public void drawCenteredText(Text text, int x, int y, int color) {
+		client.textRenderer.draw(matrices, text, x - client.textRenderer.getWidth(text) / 2, y, color);
+	}
+
+	public void drawCenteredTextWithShadow(Text text, int x, int y) {
+		drawCenteredTextWithShadow(text, x, y, -1);
+	}
+
+	public void drawCenteredTextWithShadow(Text text, int x, int y, int color) {
+		DrawableHelper.drawCenteredTextWithShadow(matrices, client.textRenderer, text.asOrderedText(), x, y, color);
 	}
 
 	public void resetColor() {

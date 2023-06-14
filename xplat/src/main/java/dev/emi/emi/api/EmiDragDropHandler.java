@@ -15,7 +15,7 @@ import com.google.common.collect.Maps;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
-import net.minecraft.client.gui.DrawableHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -69,8 +69,9 @@ public interface EmiDragDropHandler<T extends Screen> {
 
 		@Override
 		public void render(T screen, EmiIngredient dragged, MatrixStack matrices, int mouseX, int mouseY, float delta) {
+			EmiDrawContext context = EmiDrawContext.wrap(matrices);
 			for (Bounds b : bounds.apply(screen).keySet()) {
-				DrawableHelper.fill(matrices, b.x(), b.y(), b.x() + b.width(), b.y() + b.height(), 0x8822BB33);
+				context.fill(b.x(), b.y(), b.width(), b.height(), 0x8822BB33);
 			}
 		}
 	}

@@ -20,9 +20,9 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.OrderedTextTooltipComponentAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
@@ -53,7 +53,7 @@ public class EmiRenderHelper {
 	public static final Identifier CONFIG = new Identifier("emi", "textures/gui/config.png");
 	public static final Identifier PIECES = new Identifier("emi", "textures/gui/pieces.png");
 
-	public static void drawNinePatch(MatrixStack matrices, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
+	public static void drawNinePatch(EmiDrawContext context, Identifier texture, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
 		int cor = cornerLength;
 		int cen = centerLength;
 		int corcen = cor + cen;
@@ -62,23 +62,23 @@ public class EmiRenderHelper {
 		int coriw = cor + innerWidth;
 		int corih = cor + innerHeight;
 		// TL
-		DrawableHelper.drawTexture(matrices, x,         y,         cor,        cor,         u,          v,          cor, cor, 256, 256);
+		context.drawTexture(texture, x,         y,         cor,        cor,         u,          v,          cor, cor, 256, 256);
 		// T
-		DrawableHelper.drawTexture(matrices, x + cor,   y,         innerWidth, cor,         u + cor,    v,          cen, cor, 256, 256);
+		context.drawTexture(texture, x + cor,   y,         innerWidth, cor,         u + cor,    v,          cen, cor, 256, 256);
 		// TR
-		DrawableHelper.drawTexture(matrices, x + coriw, y,         cor,        cor,         u + corcen, v,          cor, cor, 256, 256);
+		context.drawTexture(texture, x + coriw, y,         cor,        cor,         u + corcen, v,          cor, cor, 256, 256);
 		// L
-		DrawableHelper.drawTexture(matrices, x,         y + cor,   cor,        innerHeight, u,          v + cor,    cor, cen, 256, 256);
+		context.drawTexture(texture, x,         y + cor,   cor,        innerHeight, u,          v + cor,    cor, cen, 256, 256);
 		// C
-		DrawableHelper.drawTexture(matrices, x + cor,   y + cor,   innerWidth, innerHeight, u + cor,    v + cor,    cen, cen, 256, 256);
+		context.drawTexture(texture, x + cor,   y + cor,   innerWidth, innerHeight, u + cor,    v + cor,    cen, cen, 256, 256);
 		// R
-		DrawableHelper.drawTexture(matrices, x + coriw, y + cor,   cor,        innerHeight, u + corcen, v + cor,    cor, cen, 256, 256);
+		context.drawTexture(texture, x + coriw, y + cor,   cor,        innerHeight, u + corcen, v + cor,    cor, cen, 256, 256);
 		// BL
-		DrawableHelper.drawTexture(matrices, x,         y + corih, cor,        cor,         u,          v + corcen, cor, cor, 256, 256);
+		context.drawTexture(texture, x,         y + corih, cor,        cor,         u,          v + corcen, cor, cor, 256, 256);
 		// B
-		DrawableHelper.drawTexture(matrices, x + cor,   y + corih, innerWidth, cor,         u + cor,    v + corcen, cen, cor, 256, 256);
+		context.drawTexture(texture, x + cor,   y + corih, innerWidth, cor,         u + cor,    v + corcen, cen, cor, 256, 256);
 		// BR
-		DrawableHelper.drawTexture(matrices, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
+		context.drawTexture(texture, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
 	}
 
 	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
@@ -111,7 +111,7 @@ public class EmiRenderHelper {
 		EmiPort.draw(bufferBuilder);
 	}
 
-	public static void drawScroll(MatrixStack matrices, int x, int y, int width, int height, int progress, int total, int color) {
+	public static void drawScroll(EmiDrawContext context, int x, int y, int width, int height, int progress, int total, int color) {
 		if (total <= 1) {
 			return;
 		}
@@ -121,7 +121,7 @@ public class EmiRenderHelper {
 			end = x + width;
 			start = end - Math.max(width / total, 1);
 		}
-		DrawableHelper.fill(matrices, start, y, end, y + height, color);
+		context.fill(start, y, end - start, height, color);
 	}
 
 	public static Text getEmiText() {
@@ -147,21 +147,21 @@ public class EmiRenderHelper {
 		return text;
 	}
 
-	public static void drawLeftTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
+	public static void drawLeftTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y) {
 		int original = screen.width;
 		try {
 			screen.width = x;
-			drawTooltip(screen, matrices, components, x, y, original / 2 - 16);
+			drawTooltip(screen, context, components, x, y, original / 2 - 16);
 		} finally {
 			screen.width = original;
 		}
 	}
 
-	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y) {
-		drawTooltip(screen, matrices, components, x, y, screen.width / 2 - 16);
+	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y) {
+		drawTooltip(screen, context, components, x, y, screen.width / 2 - 16);
 	}
 
-	public static void drawTooltip(Screen screen, MatrixStack matrices, List<TooltipComponent> components, int x, int y, int maxWidth) {
+	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y, int maxWidth) {
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();
@@ -189,16 +189,16 @@ public class EmiRenderHelper {
 				mutable.add(comp);
 			}
 		}
-		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(matrices, mutable, x, y);
+		((ScreenAccessor) screen).invokeRenderTooltipFromComponents(context.raw(), mutable, x, y);
 	}
 
-	public static void drawSlotHightlight(MatrixStack matrices, int x, int y, int w, int h) {
-		matrices.push();
-		matrices.translate(0, 0, 100);
+	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h) {
+		context.push();
+		context.matrices().translate(0, 0, 100);
 		RenderSystem.colorMask(true, true, true, false);
-		DrawableHelper.fill(matrices, x, y, x + w, y + h, -2130706433);
+		context.fill(x, y, w, h, -2130706433);
 		RenderSystem.colorMask(true, true, true, true);
-		matrices.pop();
+		context.pop();
 	}
 
 	public static Text getAmountText(EmiIngredient stack) {
@@ -238,84 +238,78 @@ public class EmiRenderHelper {
 		}
 	}
 
-	public static void renderAmount(MatrixStack matrices, int x, int y, Text amount) {
-		matrices.push();
-		matrices.translate(0, 0, 200);
+	public static void renderAmount(EmiDrawContext context, int x, int y, Text amount) {
+		context.push();
+		context.matrices().translate(0, 0, 200);
 		int tx = x + 17 - Math.min(14, CLIENT.textRenderer.getWidth(amount));
-		CLIENT.textRenderer.drawWithShadow(matrices, amount, tx, y + 9, -1);
-		matrices.pop();
+		context.drawTextWithShadow(amount, tx, y + 9, -1);
+		context.pop();
 	}
 
-	public static void renderIngredient(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+	public static void renderIngredient(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		RenderSystem.enableDepthTest();
-		matrices.push();
-		matrices.translate(0, 0, 200);
+		context.push();
+		context.matrices().translate(0, 0, 200);
 		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-		DrawableHelper.drawTexture(matrices, x, y, 8, 252, 4, 4, 256, 256);
-		matrices.pop();
+		context.drawTexture(WIDGETS, x, y, 8, 252, 4, 4);
+		context.pop();
 	}
 
-	public static void renderTag(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+	public static void renderTag(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		if (ingredient.getEmiStacks().size() > 1) {
 			RenderSystem.enableDepthTest();
-			matrices.push();
-			matrices.translate(0, 0, 200);
-			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-			DrawableHelper.drawTexture(matrices, x, y + 12, 0, 252, 4, 4, 256, 256);
-			matrices.pop();
+			context.push();
+			context.matrices().translate(0, 0, 200);
+			context.drawTexture(WIDGETS, x, y + 12, 0, 252, 4, 4);
+			context.pop();
 		}
 	}
 
-	public static void renderRemainder(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+	public static void renderRemainder(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		for (EmiStack stack : ingredient.getEmiStacks()) {
 			EmiStack remainder = stack.getRemainder();
 			if (!remainder.isEmpty()) {
 				if (remainder.equals(ingredient)) {
-					renderCatalyst(ingredient, matrices, x, y);
+					renderCatalyst(ingredient, context, x, y);
 				} else {
+					context.push();
+					context.matrices().translate(0, 0, 200);
 					RenderSystem.enableDepthTest();
-					matrices.push();
-					matrices.translate(0, 0, 200);
-					RenderSystem.setShaderTexture(0, WIDGETS);
-					DrawableHelper.drawTexture(matrices, x + 12, y, 4, 252, 4, 4, 256, 256);
-					matrices.pop();
+					context.drawTexture(WIDGETS, x + 12, y, 4, 252, 4, 4);
+					context.pop();
 				}
 				return;
 			}
 		}
 	}
 
-	public static void renderCatalyst(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
+	public static void renderCatalyst(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		RenderSystem.enableDepthTest();
-		matrices.push();
-		matrices.translate(0, 0, 200);
-		RenderSystem.setShaderTexture(0, WIDGETS);
-		DrawableHelper.drawTexture(matrices, x + 12, y, 12, 252, 4, 4, 256, 256);
-		matrices.pop();
+		context.push();
+		context.matrices().translate(0, 0, 200);
+		context.drawTexture(WIDGETS, x + 12, y, 12, 252, 4, 4);
+		context.pop();
 		return;
 	}
 
-	public static void renderRecipeFavorite(EmiIngredient ingredient, MatrixStack matrices, int x, int y) {
-		matrices.push();
-		matrices.translate(0, 0, 200);
+	public static void renderRecipeFavorite(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
+		context.push();
+		context.matrices().translate(0, 0, 200);
 		RenderSystem.enableDepthTest();
-		RenderSystem.setShaderTexture(0, WIDGETS);
-		DrawableHelper.drawTexture(matrices, x + 12, y, 16, 252, 4, 4, 256, 256);
-		matrices.pop();
+		context.drawTexture(WIDGETS, x + 12, y, 16, 252, 4, 4);
+		context.pop();
 		return;
 	}
 
-	public static void renderRecipeBackground(EmiRecipe recipe, MatrixStack matrices, int x, int y) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, BACKGROUND);
-		EmiRenderHelper.drawNinePatch(matrices, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 27, 0, 4, 1);
+	public static void renderRecipeBackground(EmiRecipe recipe, EmiDrawContext context, int x, int y) {
+		context.resetColor();
+		EmiRenderHelper.drawNinePatch(context, BACKGROUND, x, y, recipe.getDisplayWidth() + 8, recipe.getDisplayHeight() + 8, 27, 0, 4, 1);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public static void renderRecipe(EmiRecipe recipe, MatrixStack matrices, int x, int y, boolean showMissing, int overlayColor) {
+	public static void renderRecipe(EmiRecipe recipe, EmiDrawContext context, int x, int y, boolean showMissing, int overlayColor) {
 		try {
-			renderRecipeBackground(recipe, matrices, x, y);
+			renderRecipeBackground(recipe, context, x, y);
 
 			List<Widget> widgets = Lists.newArrayList();
 			WidgetHolder holder = new WidgetHolder() {
@@ -342,19 +336,19 @@ public class EmiRenderHelper {
 			recipe.addWidgets(holder);
 			float delta = MinecraftClient.getInstance().getTickDelta();
 			for (Widget widget : widgets) {
-				widget.render(matrices, -1000, -1000, delta);
+				widget.render(context.raw(), -1000, -1000, delta);
 			}
 			if (overlayColor != -1) {
-				DrawableHelper.fill(matrices, -1, -1, recipe.getDisplayWidth() + 1, recipe.getDisplayHeight() + 1, overlayColor);
+				context.fill(-1, -1, recipe.getDisplayWidth() + 2, recipe.getDisplayHeight() + 2, overlayColor);
 			}
 
 			if (showMissing) {
 				HandledScreen hs = EmiApi.getHandledScreen();
 				EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 				if (handler != null) {
-					handler.render(recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), widgets, matrices);
+					handler.render(recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), widgets, context.raw());
 				} else if (EmiScreenManager.lastPlayerInventory != null) {
-					StandardRecipeHandler.renderMissing(recipe, EmiScreenManager.lastPlayerInventory, widgets, matrices);
+					StandardRecipeHandler.renderMissing(recipe, EmiScreenManager.lastPlayerInventory, widgets, context.raw());
 				}
 			}
 
@@ -365,7 +359,7 @@ public class EmiRenderHelper {
 			RenderSystem.disableBlend();
 			RenderSystem.colorMask(false, false, false, true);
 			RenderSystem.disableDepthTest();
-			renderRecipeBackground(recipe, matrices, x, y);
+			renderRecipeBackground(recipe, context, x, y);
 			RenderSystem.enableDepthTest();
 			RenderSystem.colorMask(true, true, true, true);
 			// Blend should be off by default

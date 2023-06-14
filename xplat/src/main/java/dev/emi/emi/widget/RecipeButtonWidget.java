@@ -1,14 +1,11 @@
 package dev.emi.emi.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
@@ -43,10 +40,9 @@ public class RecipeButtonWidget extends Widget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.BUTTONS);
-		DrawableHelper.drawTexture(matrices, x, y, 12, 12, u, v + getTextureOffset(mouseX, mouseY), 12, 12, 256, 256);
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.resetColor();
+		context.drawTexture(EmiRenderHelper.BUTTONS, x, y, 12, 12, u, v + getTextureOffset(mouseX, mouseY), 12, 12, 256, 256);
 	}
 }

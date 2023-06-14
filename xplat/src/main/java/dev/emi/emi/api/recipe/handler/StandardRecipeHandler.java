@@ -18,8 +18,8 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -92,6 +92,7 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 
 	@ApiStatus.Internal
 	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, MatrixStack matrices) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
 		RenderSystem.enableDepthTest();
 		Map<EmiIngredient, Boolean> availableForCrafting = getAvailable(recipe, inv);
 		for (Widget w : widgets) {
@@ -100,9 +101,9 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 				Bounds bounds = sw.getBounds();
 				if (sw.getRecipe() == null && availableForCrafting.containsKey(stack) && !stack.isEmpty()) {
 					if (availableForCrafting.get(stack)) {
-						//DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x4400FF00);
+						//context.fill(bounds.x(), bounds.y(), bounds.width(), bounds.height(), 0x4400FF00);
 					} else {
-						DrawableHelper.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
+						context.fill(bounds.x(), bounds.y(), bounds.width(), bounds.height(), 0x44FF0000);
 					}
 				}
 			}

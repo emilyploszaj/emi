@@ -7,9 +7,9 @@ import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.jemi.JemiPlugin;
 import dev.emi.emi.jemi.JemiUtil;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Rect2i;
@@ -28,9 +28,9 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void render(Screen screen, EmiIngredient dragged, MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(Screen screen, EmiIngredient dragged, MatrixStack raw, int mouseX, int mouseY, float delta) {
 		try {
-			this.<Object>render(screen, matrices, (Optional<ITypedIngredient<Object>>) (Optional) JemiUtil.getTyped(dragged.getEmiStacks().get(0)));
+			this.<Object>render(screen, EmiDrawContext.wrap(raw), (Optional<ITypedIngredient<Object>>) (Optional) JemiUtil.getTyped(dragged.getEmiStacks().get(0)));
 		} catch (Exception e) {
 		}
 	}
@@ -47,11 +47,11 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 		return false;
 	}
 
-	private <I> void render(Screen screen, MatrixStack matrices, Optional<ITypedIngredient<I>> optional) {
+	private <I> void render(Screen screen, EmiDrawContext context, Optional<ITypedIngredient<I>> optional) {
 		if (optional.isPresent()) {
 			for (IGhostIngredientHandler.Target<I> target : getTargets(screen, optional.get())) {
 				Rect2i r = target.getArea();
-				DrawableHelper.fill(matrices, r.getX(), r.getY(), r.getX() + r.getWidth(), r.getY() + r.getHeight(), 0x8822BB33);
+				context.fill(r.getX(), r.getY(), r.getWidth(), r.getHeight(), 0x8822BB33);
 			}
 		}
 	}

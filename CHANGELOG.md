@@ -1,11 +1,8 @@
-### Tweaks
-* EMI should now display Forge custom brewing recipes
-* Fuel and Composting recipe categories should now be at the end of tabs instead of in the middle
-* EMI will now attempt to recover from critical errors during reload with redundancy
-
 ### Fixes
-* Fixed certain mods using JEI's namespace for plugins missing their recipes in EMI
-* Much better compatibility with JEI recipe fillers #194
-* Minor data integrity to better handle misbehaving plugins #191
-* EMI should now hide items hidden in JEI #189
-* EMI should now display custom ingredient types from JEI in the index
+* Fixed searching not being selectable in 1.20 #214
+* Fixed niche amount parsing for ingredients in recipes #210
+* Fixed misconfigured recipes being able to crash EMI #209
+* Fixed certain page buttons not showing up in recipes
+* Fixed JEMI info recipe parsing sometimes being incorrect
+* Fixed item decoration not displaying in 1.20
+* Fixed stacks rarely being duplicated in the index
