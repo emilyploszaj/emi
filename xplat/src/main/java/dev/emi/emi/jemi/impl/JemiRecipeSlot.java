@@ -95,7 +95,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	}
 
 	@Override
-	public void drawHighlight(MatrixStack stack, int color) {
+	public void drawHighlight(MatrixStack raw, int color) {
 	}
 
 	public static record OffsetDrawable(IDrawable drawable, int xOff, int yOff){

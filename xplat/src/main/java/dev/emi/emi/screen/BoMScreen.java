@@ -37,13 +37,13 @@ import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -190,7 +190,8 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(MatrixStack raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.renderBackgroundTexture(0);
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
@@ -209,71 +210,69 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 
-		MatrixStack viewMatrices = RenderSystem.getModelViewStack();
-		viewMatrices.push();
-		viewMatrices.translate(width / 2, height / 2, 0);
-		viewMatrices.scale(scale, scale, 1);
-		viewMatrices.translate(offX, offY, 0);
+		MatrixStack view = RenderSystem.getModelViewStack();
+		view.push();
+		view.translate(width / 2, height / 2, 0);
+		view.scale(scale, scale, 1);
+		view.translate(offX, offY, 0);
 		RenderSystem.applyModelViewMatrix();
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
-			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.total_cost"), 0, cy - 16, -1);
+			context.drawCenteredText(EmiPort.translatable("emi.total_cost"), 0, cy - 16);
 			if (hasRemainders) {
-				EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40, -1);
+				context.drawCenteredText(EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40);
 			}
 			for (Cost cost : costs) {
-				cost.render(matrices);
+				cost.render(context);
 			}
 			for (Node node : nodes) {
-				node.render(matrices, mx, my, delta);
+				node.render(context, mx, my, delta);
 			}
 			int color = -1;
 			if (batches.contains(mx, my)) {
 				color = 0xff8099ff;
 			}
-			drawTextWithShadow(matrices, textRenderer, EmiPort.literal("x" + BoM.tree.batches),
+			context.drawTextWithShadow(EmiPort.literal("x" + BoM.tree.batches),
 					batches.x() + 6, batches.y() + batches.height() / 2 - 4, color);
 
 			if (mode.contains(mx, my)) {
 				RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
 			}
-			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-			drawTexture(matrices, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
+			context.drawTexture(EmiRenderHelper.WIDGETS, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			batcher.draw();
 		} else {
-			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72, -1);
-			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.no_tree"), 0, -48, -1);
-			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree"), 0, -24, -1);
-			EmiPort.drawCenteredText(matrices, textRenderer, EmiPort.translatable("emi.random_tree_input"), 0, 0, -1);
+			context.drawCenteredText(EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72);
+			context.drawCenteredText(EmiPort.translatable("emi.no_tree"), 0, -48);
+			context.drawCenteredText(EmiPort.translatable("emi.random_tree"), 0, -24);
+			context.drawCenteredText(EmiPort.translatable("emi.random_tree_input"), 0, 0);
 		}
 
-		viewMatrices.pop();
+		view.pop();
 		RenderSystem.applyModelViewMatrix();
 
 		if (help.contains(mouseX, mouseY)) {
 			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
 		}
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-		drawTexture(matrices, help.x(), help.y(), 0, 200, help.width(), help.height());
+		context.drawTexture(EmiRenderHelper.WIDGETS, help.x(), help.y(), 0, 200, help.width(), help.height());
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
 		Hover hover = getHoveredStack(mouseX, mouseY);
 		if (hover != null) {
-			hover.drawTooltip(this, matrices, mouseX, mouseY);
+			hover.drawTooltip(this, context, mouseX, mouseY);
 		} else if (BoM.tree != null && batches.contains(mx, my)) {
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches));
 			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.ideal", LEFT_CLICK.getBindText())));
-			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (BoM.tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
 			List<TooltipComponent> list = EmiTooltip.splitTranslate(key, BoM.tree.batches);
-			EmiRenderHelper.drawTooltip(this, matrices, list, mouseX, mouseY);
+			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
 			List<TooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
-			EmiRenderHelper.drawTooltip(this, matrices, list, width - 18, height - 18, width);
+			EmiRenderHelper.drawTooltip(this, context, list, width - 18, height - 18, width);
 		}
 	}
 
@@ -338,16 +337,16 @@ public class BoMScreen extends Screen {
 		return new TreeVolume(node, multiplier, depth * NODE_VERTICAL_SPACING, chance);
 	}
 
-	private static void drawLine(MatrixStack matrices, int x1, int y1, int x2, int y2) {
+	private static void drawLine(EmiDrawContext context, int x1, int y1, int x2, int y2) {
 		if (x2 < x1) {
-			drawLine(matrices, x2, y1, x1, y2);
+			drawLine(context, x2, y1, x1, y2);
 			return;
 		}
 		if (y2 < y1) {
-			drawLine(matrices, x1, y2, x2, y1);
+			drawLine(context, x1, y2, x2, y1);
 			return;
 		}
-		fill(matrices, x1, y1, x2 + 1, y2 + 1, 0xFFFFFFFF);
+		context.fill(x1, y1, x2 - x1 + 1, y2 - y1 + 1, 0xFFFFFFFF);
 	}
 
 	public float getScale() {
@@ -554,9 +553,9 @@ public class BoMScreen extends Screen {
 			this.remainder = remainder;
 		}
 
-		public void render(MatrixStack matrices) {
-			batcher.render(cost.ingredient, matrices, x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
-			EmiRenderHelper.renderAmount(matrices, x, y, getAmountText());
+		public void render(EmiDrawContext context) {
+			batcher.render(cost.ingredient, context.raw(), x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
+			EmiRenderHelper.renderAmount(context, x, y, getAmountText());
 		}
 
 		public Text getAmountText() {
@@ -606,7 +605,7 @@ public class BoMScreen extends Screen {
 			this.node = node;
 		}
 
-		public boolean drawTooltip(Screen screen, MatrixStack matrices, int mouseX, int mouseY) {
+		public boolean drawTooltip(Screen screen, EmiDrawContext context, int mouseX, int mouseY) {
 			if (stack != null) {
 				List<TooltipComponent> list = Lists.newArrayList();
 				list.addAll(stack.getTooltip());
@@ -631,10 +630,10 @@ public class BoMScreen extends Screen {
 						list.add(EmiTooltip.chance("produce", node.produceChance));
 					}
 				}
-				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
 				return true;
 			} else if (category != null) {
-				EmiRenderHelper.drawTooltip(screen, matrices, category.getTooltip(), mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(screen, context, category.getTooltip(), mouseX, mouseY);
 				return true;
 			}
 			return false;
@@ -665,12 +664,11 @@ public class BoMScreen extends Screen {
 			midOffset = tw / -2;
 		}
 
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		public void render(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 			if (parent != null) {
-				matrices.push();
+				context.push();
 
-				setColor(parent.node, node.consumeChance != 1
-					|| (resolution != null && resolution.consumeChance != 1), false);
+				setColor(parent.node, node.consumeChance != 1 || (resolution != null && resolution.consumeChance != 1), false);
 				
 				int nx = x;
 				int ny = y;
@@ -678,16 +676,15 @@ public class BoMScreen extends Screen {
 				int py = parent.y;
 				int off = NODE_VERTICAL_SPACING - 1;
 				if (resolution != null) {
-					RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-					DrawableHelper.drawTexture(matrices, x - 3, y - 19, 9, 192, 7, 7, 256, 256);
-					drawLine(matrices, nx, y - 12, nx, ny - 11);
-					drawLine(matrices, nx, py + off, nx, y - 19);
+					context.drawTexture(EmiRenderHelper.WIDGETS, x - 3, y - 19, 9, 192, 7, 7);
+					drawLine(context, nx, y - 12, nx, ny - 11);
+					drawLine(context, nx, py + off, nx, y - 19);
 				} else {
-					drawLine(matrices, nx, ny - 11, nx, py + off);
+					drawLine(context, nx, ny - 11, nx, py + off);
 				}
 				setColor(parent.node, false, false);
-				drawLine(matrices, px, py + off, nx, py + off);
-				matrices.pop();
+				drawLine(context, px, py + off, nx, py + off);
+				context.pop();
 			}
 			int xo = 0;
 			if (node.recipe != null) {
@@ -695,34 +692,34 @@ public class BoMScreen extends Screen {
 				int ly = y - 11;
 				int hx = x + width / 2;
 				int hy = y + 10;
-				matrices.push();
+				context.push();
 
 				setColor(node, node.produceChance != 1, false);
 
 				if (node.state != FoldState.EXPANDED) {
-					drawLine(matrices, x, hy + 1, x, hy + 3);
+					drawLine(context, x, hy + 1, x, hy + 3);
 				} else {
-					drawLine(matrices, x, hy + 1, x, hy + 8);
+					drawLine(context, x, hy + 1, x, hy + 8);
 				}
 
 				boolean hovered = mouseX >= lx && mouseY >= ly && mouseX <= hx && mouseY <= hy;
 				setColor(node, node.produceChance != 1, hovered);
-				drawLine(matrices, lx, ly, lx, hy);
-				drawLine(matrices, hx, ly, hx, hy);
-				drawLine(matrices, lx, ly, hx, ly);
-				drawLine(matrices, lx, hy, hx, hy);
+				drawLine(context, lx, ly, lx, hy);
+				drawLine(context, hx, ly, hx, hy);
+				drawLine(context, lx, ly, hx, ly);
+				drawLine(context, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
 				if (EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
-					batcher.render(b, matrices, x - 18 + midOffset, y - 8, delta);
+					batcher.render(b, context.raw(), x - 18 + midOffset, y - 8, delta);
 				} else {
-					cat.renderSimplified(matrices, x - 18 + midOffset, y - 8, delta);
+					cat.renderSimplified(context.raw(), x - 18 + midOffset, y - 8, delta);
 				}
 				xo = 11;
-				matrices.pop();
+				context.pop();
 			}
 			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-			batcher.render(node.ingredient, matrices, x + xo - 8 + midOffset, y - 8, 0);
-			EmiRenderHelper.renderAmount(matrices, x + xo - 8 + midOffset, y - 8, getAmountText());
+			batcher.render(node.ingredient, context.raw(), x + xo - 8 + midOffset, y - 8, 0);
+			EmiRenderHelper.renderAmount(context, x + xo - 8 + midOffset, y - 8, getAmountText());
 		}
 
 		public void setColor(MaterialNode node, boolean chanced, boolean hovered) {

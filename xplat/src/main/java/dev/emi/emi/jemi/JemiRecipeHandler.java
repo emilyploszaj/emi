@@ -75,14 +75,14 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 	}
 
 	@Override
-	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, MatrixStack matrices) {
+	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, MatrixStack raw) {
 		/*IRecipeTransferError err = jeiCraft(recipe, context, false);
 		if (err != null) {
 			R rawRecipe = getRawRecipe(recipe);
 			
 			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe);
 			if (view != null) {
-				err.showError(matrices, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
+				err.showError(raw, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
 			}
 		}*/
 	}

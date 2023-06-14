@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -20,6 +19,7 @@ import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
@@ -111,10 +111,11 @@ public class JemiRecipe<T> implements EmiRecipe {
 		Optional<IRecipeLayoutDrawable<T>> opt = JemiPlugin.runtime.getRecipeManager().createRecipeLayoutDrawable(category, recipe, FocusGroup.EMPTY);
 		if (opt.isPresent()) {
 			IRecipeLayoutDrawable<T> drawable = opt.get();
-			widgets.addDrawable(0, 0, getDisplayWidth(), getDisplayHeight(), (matrices, mouseX, mouseY, delta) -> {
-				category.getBackground().draw(matrices);
-				category.draw(recipe, drawable.getRecipeSlotsView(), matrices, mouseX, mouseY);
-				RenderSystem.setShaderColor(1, 1, 1, 1);
+			widgets.addDrawable(0, 0, getDisplayWidth(), getDisplayHeight(), (raw, mouseX, mouseY, delta) -> {
+				EmiDrawContext context = EmiDrawContext.wrap(raw);
+				category.getBackground().draw(context.raw());
+				category.draw(recipe, drawable.getRecipeSlotsView(), context.raw(), mouseX, mouseY);
+				context.resetColor();
 			}).tooltip((x, y) -> {
 				return category.getTooltipStrings(recipe, drawable.getRecipeSlotsView(), x, y).stream().map(t -> TooltipComponent.of(t.asOrderedText())).toList();
 			});

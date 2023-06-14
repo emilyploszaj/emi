@@ -46,6 +46,7 @@ import dev.emi.emi.registry.EmiDragDropHandlers;
 import dev.emi.emi.registry.EmiExclusionAreas;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiStackProviders;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHidden;
@@ -59,7 +60,6 @@ import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.Screen;
@@ -532,7 +532,7 @@ public class EmiScreenManager {
 		lastMouseY = mouseY;
 	}
 
-	public static void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public static void drawBackground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 		updateMouse(mouseX, mouseY);
 		recalculate();
 		Screen screen = client.currentScreen;
@@ -542,12 +542,12 @@ public class EmiScreenManager {
 		if (screen instanceof EmiScreen emi) {
 			client.getProfiler().push("sidebar");
 			for (SidebarPanel panel : panels) {
-				panel.drawBackground(matrices, mouseX, mouseY, delta);
+				panel.drawBackground(context, mouseX, mouseY, delta);
 			}
 		}
 	}
 
-	public static void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public static void render(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 		client.getProfiler().push("emi");
 		updateMouse(mouseX, mouseY);
 		recalculate();
@@ -564,14 +564,14 @@ public class EmiScreenManager {
 		if (isDisabled()) {
 			if (!EmiReloadManager.isLoaded()) {
 				if (EmiReloadManager.getStatus() == -1) {
-					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.error"), 4, screen.height - 16, -1);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.error"), 4, screen.height - 16);
 				} else if (EmiReloadManager.getStatus() == 0) {
-					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 16, -1);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 16);
 				} else {
-					client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading"), 4, screen.height - 16, -1);
-					client.textRenderer.drawWithShadow(matrices, EmiReloadManager.reloadStep, 4, screen.height - 26, -1);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading"), 4, screen.height - 16);
+					context.drawTextWithShadow(EmiReloadManager.reloadStep, 4, screen.height - 26);
 					if (System.currentTimeMillis() > EmiReloadManager.reloadWorry) {
-						client.textRenderer.drawWithShadow(matrices, EmiPort.translatable("emi.reloading.worry"), 4, screen.height - 36, -1);
+						context.drawTextWithShadow(EmiPort.translatable("emi.reloading.worry"), 4, screen.height - 36);
 					}
 				}
 			}
@@ -579,46 +579,46 @@ public class EmiScreenManager {
 			lastHoveredCraftable = null;
 			return;
 		}
-		renderWidgets(matrices, mouseX, mouseY, delta, screen);
+		renderWidgets(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().push("sidebars");
 		if (screen instanceof EmiScreen emi) {
 			client.getProfiler().push("sidebar");
 			for (SidebarPanel panel : panels) {
-				panel.render(matrices, mouseX, mouseY, delta);
+				panel.render(context, mouseX, mouseY, delta);
 			}
 
-			renderLastHoveredCraftable(matrices, mouseX, mouseY, delta, screen);
+			renderLastHoveredCraftable(context, mouseX, mouseY, delta, screen);
 
 			client.getProfiler().pop();
 		}
 
-		renderDevMode(matrices, mouseX, mouseY, delta, screen);
+		renderDevMode(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().pop();
 
-		renderExclusionAreas(matrices, mouseX, mouseY, delta, screen);
+		renderExclusionAreas(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().pop();
 
 		RenderSystem.disableDepthTest();
 	}
 
-	public static void drawForeground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public static void drawForeground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 		Screen screen = client.currentScreen;
 		if (screen instanceof EmiScreen && !isDisabled()) {
-			renderDraggedStack(matrices, mouseX, mouseY, delta, screen);
-			renderCurrentTooltip(matrices, mouseX, mouseY, delta, screen);
+			renderDraggedStack(context, mouseX, mouseY, delta, screen);
+			renderCurrentTooltip(context, mouseX, mouseY, delta, screen);
 		}
 	}
 
-	private static void renderWidgets(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
-		matrices.push();
-		matrices.translate(0, 0, 100);
-		emi.render(matrices, mouseX, mouseY, delta);
-		tree.render(matrices, mouseX, mouseY, delta);
-		search.render(matrices, mouseX, mouseY, delta);
-		matrices.pop();
+	private static void renderWidgets(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+		context.push();
+		context.matrices().translate(0, 0, 100);
+		emi.render(context.raw(), mouseX, mouseY, delta);
+		tree.render(context.raw(), mouseX, mouseY, delta);
+		search.render(context.raw(), mouseX, mouseY, delta);
+		context.pop();
 	}
 
-	private static void renderLastHoveredCraftable(MatrixStack matrices, int mouseX, int mouseY, float delta,
+	private static void renderLastHoveredCraftable(EmiDrawContext context, int mouseX, int mouseY, float delta,
 			Screen screen) {
 		if (lastHoveredCraftable != null && lastHoveredCraftableOffset != -1) {
 			EmiStackInteraction cur = getHoveredStack(mouseX, mouseY, false, true);
@@ -631,8 +631,8 @@ public class EmiScreenManager {
 					RenderSystem.applyModelViewMatrix();
 					int lhx = space.getRawX(lastHoveredCraftableOffset);
 					int lhy = space.getRawY(lastHoveredCraftableOffset);
-					DrawableHelper.fill(matrices, lhx, lhy, lhx + 18, lhy + 18, 0x44AA00FF);
-					lastHoveredCraftable.getStack().render(matrices, lhx + 1, lhy + 1, delta,
+					context.fill(lhx, lhy, 18, 18, 0x44AA00FF);
+					lastHoveredCraftable.getStack().render(context.raw(), lhx + 1, lhy + 1, delta,
 							EmiIngredient.RENDER_ICON);
 					view.pop();
 					RenderSystem.applyModelViewMatrix();
@@ -641,7 +641,7 @@ public class EmiScreenManager {
 		}
 	}
 
-	private static void renderDraggedStack(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderDraggedStack(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
 		if (!draggedStack.isEmpty()) {
 			SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
 			if (panel != null) {
@@ -657,27 +657,27 @@ public class EmiScreenManager {
 						index = space.getStacks().size() - pageSize * page;
 					}
 					if (index >= 0) {
-						matrices.push();
-						matrices.translate(0, 0, 200);
+						context.push();
+						context.matrices().translate(0, 0, 200);
 						int dx = space.getEdgeX(index);
 						int dy = space.getEdgeY(index);
-						DrawableHelper.fill(matrices, dx - 1, dy, dx + 1, dy + 18, 0xFF00FFFF);
-						matrices.pop();
+						context.fill(dx - 1, dy, 2, 18, 0xFF00FFFF);
+						context.pop();
 					}
 				}
 			}
-			EmiDragDropHandlers.render(screen, draggedStack, matrices, mouseX, mouseY, delta);
+			EmiDragDropHandlers.render(screen, draggedStack, context.raw(), mouseX, mouseY, delta);
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
 			view.translate(0, 0, 400);
 			RenderSystem.applyModelViewMatrix();
-			draggedStack.render(matrices, mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
+			draggedStack.render(context.raw(), mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
 		}
 	}
 
-	private static void renderCurrentTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderCurrentTooltip(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
 		ItemStack cursor = ItemStack.EMPTY;
 		if (client.currentScreen instanceof HandledScreen<?> handled) {
 			cursor = handled.getScreenHandler().getCursorStack();
@@ -689,9 +689,9 @@ public class EmiScreenManager {
 				TooltipComponent.of(EmiPort.ordered(EmiConfig.deleteCursorStack.getBindText()))
 			);
 			if (space.rtl) {
-				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
+				EmiRenderHelper.drawLeftTooltip(screen, context, list, mouseX, mouseY);
 			} else {
-				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
 			}
 		}
 		if (cursor.isEmpty() && draggedStack.isEmpty()) {
@@ -719,9 +719,9 @@ public class EmiScreenManager {
 				list.add(TooltipComponent.of(EmiPort.translatable("emi.edit_mode.hide_all", EmiConfig.hideStackById.getBindText()).asOrderedText()));
 			}
 			if (space != null && space.rtl) {
-				EmiRenderHelper.drawLeftTooltip(screen, matrices, list, mouseX, mouseY);
+				EmiRenderHelper.drawLeftTooltip(screen, context, list, mouseX, mouseY);
 			} else {
-				EmiRenderHelper.drawTooltip(screen, matrices, list, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
 			}
 			view.pop();
 			RenderSystem.applyModelViewMatrix();
@@ -730,20 +730,20 @@ public class EmiScreenManager {
 		lastStackTooltipRendered = null;
 	}
 
-	private static void renderDevMode(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderDevMode(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
 		if (EmiConfig.devMode) {
 			client.getProfiler().swap("dev");
 			int color = 0xFFFFFF;
-			String title = "EMI Dev Mode";
+			Text title = EmiPort.literal("EMI Dev Mode");
 			int off = -16;
 			if (!EmiReloadLog.warnings.isEmpty()) {
 				color = 0xFF0000;
 				off = -11;
 				String warnCount = EmiReloadLog.warningCount + " Warnings";
-				client.textRenderer.drawWithShadow(matrices, warnCount, 48, screen.height - 21, color);
+				context.drawTextWithShadow(EmiPort.literal(warnCount), 48, screen.height - 21, color);
 				int width = Math.max(client.textRenderer.getWidth(title), client.textRenderer.getWidth(warnCount));
 				if (mouseX >= 48 && mouseX < width + 48 && mouseY > screen.height - 28) {
-					screen.renderTooltip(matrices, Stream.concat(Stream.of(" EMI detected some issues, see log for full details"),
+					screen.renderTooltip(context.raw(), Stream.concat(Stream.of(" EMI detected some issues, see log for full details"),
 							EmiReloadLog.warnings.stream()).map(s -> {
 								String a = s;
 								if (a.length() > 10 && client.textRenderer.getWidth(a) > screen.width - 20) {
@@ -754,18 +754,17 @@ public class EmiScreenManager {
 							.collect(Collectors.toList()), 0, 20);
 				}
 			}
-			client.textRenderer.drawWithShadow(matrices, title, 48, screen.height + off, color);
+			context.drawTextWithShadow(title, 48, screen.height + off, color);
 		}
 	}
 
-	private static void renderExclusionAreas(MatrixStack matrices, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderExclusionAreas(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
 		if (EmiConfig.highlightExclusionAreas) {
 			if (screen instanceof EmiScreen emi) {
 				for (SidebarPanel panel : panels) {
 					if (panel.isVisible()) {
 						Bounds bounds = panel.getBounds();
-						DrawableHelper.fill(matrices, bounds.left(), bounds.top(), bounds.right(), bounds.bottom(),
-								0x440000ff);
+						context.fill(bounds.left(), bounds.top(), bounds.width(), bounds.height(), 0x440000ff);
 					}
 				}
 				List<Bounds> exclusions = EmiExclusionAreas.getExclusion(screen);
@@ -774,8 +773,7 @@ public class EmiScreenManager {
 				}
 				for (int i = 0; i < exclusions.size(); i++) {
 					Bounds b = exclusions.get(i);
-					DrawableHelper.fill(matrices, b.x(), b.y(), b.x() + b.width(), b.y() + b.height(),
-							i == 0 ? 0x4400ff00 : 0x44ff0000);
+					context.fill(b.x(), b.y(), b.width(), b.height(), i == 0 ? 0x4400ff00 : 0x44ff0000);
 				}
 			}
 		}
@@ -1288,7 +1286,7 @@ public class EmiScreenManager {
 			setSidebarPage(page);
 		}
 
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		public void render(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 			cycleType(0);
 			if (getType() == SidebarType.CHESS) {
 				EmiChess.get().update();
@@ -1298,26 +1296,26 @@ public class EmiScreenManager {
 			}
 			if (isVisible()) {
 				client.getProfiler().swap(side.getName());
-				matrices.push();
-				matrices.translate(0, 0, 100);
-				pageLeft.render(matrices, mouseX, mouseY, delta);
-				cycle.render(matrices, mouseX, mouseY, delta);
-				pageRight.render(matrices, mouseX, mouseY, delta);
-				matrices.pop();
+				context.push();
+				context.matrices().translate(0, 0, 100);
+				pageLeft.render(context.raw(), mouseX, mouseY, delta);
+				cycle.render(context.raw(), mouseX, mouseY, delta);
+				pageRight.render(context.raw(), mouseX, mouseY, delta);
+				context.pop();
 				int totalPages = (space.getStacks().size() - 1) / space.pageSize + 1;
 				wrapPage();
-				drawHeader(matrices, mouseX, mouseY, delta, page, totalPages);
+				drawHeader(context, mouseX, mouseY, delta, page, totalPages);
 				for (ScreenSpace space : getSpaces()) {
 					if (space == this.space) {
-						space.render(matrices, mouseX, mouseY, delta, space.pageSize * page);
+						space.render(context, mouseX, mouseY, delta, space.pageSize * page);
 					} else {
-						space.render(matrices, mouseX, mouseY, delta, 0);
+						space.render(context, mouseX, mouseY, delta, 0);
 					}
 				}
 			}
 		}
 
-		private void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		private void drawBackground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 			cycleType(0);
 			if (getType() == SidebarType.CHESS) {
 				if (space.tw != 8 || space.th != 8) {
@@ -1326,23 +1324,20 @@ public class EmiScreenManager {
 			}
 			if (isVisible()) {
 				RenderSystem.enableDepthTest();
-				EmiPort.setPositionTexShader();
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				context.resetColor();
 				int headerOffset = header ? 18 : 0;
 				if (theme == SidebarTheme.VANILLA) {
 					int totalHeight = 18 + headerOffset;
 					for (ScreenSpace space : getSpaces()) {
 						totalHeight += space.th * ENTRY_SIZE + SUBPANEL_SEPARATOR_SIZE;
 					}
-					RenderSystem.setShaderTexture(0, EmiRenderHelper.BACKGROUND);
-					EmiRenderHelper.drawNinePatch(matrices, space.tx - 9, space.ty - 9 - headerOffset,
+					EmiRenderHelper.drawNinePatch(context, EmiRenderHelper.BACKGROUND, space.tx - 9, space.ty - 9 - headerOffset,
 						space.tw * ENTRY_SIZE + 18, totalHeight, 0, 32, 8, 1);
 				} else if (theme == SidebarTheme.MODERN) {
 					int offset = 2;
 					for (ScreenSpace space : getSpaces()) {
-						RenderSystem.setShaderTexture(0, EmiRenderHelper.GRID);
 						RenderSystem.enableBlend();
-						DrawableHelper.drawTexture(matrices, space.tx, space.ty, space.tw * ENTRY_SIZE,
+						context.drawTexture(EmiRenderHelper.GRID, space.tx, space.ty, space.tw * ENTRY_SIZE,
 							space.th * ENTRY_SIZE, 0, 0, space.tw, space.th, 2, offset);
 						if (space.th % 2 == 1) {
 							offset *= -1;
@@ -1352,14 +1347,13 @@ public class EmiScreenManager {
 				}
 				for (ScreenSpace space : getSpaces()) {
 					if (space != this.space) {
-						RenderSystem.setShaderTexture(0, EmiRenderHelper.DASH);
-						DrawableHelper.drawTexture(matrices, space.tx + 1, space.ty - 2, space.tw * ENTRY_SIZE, 1, 0, 0, space.tw * ENTRY_SIZE, 1, 6, 1);
+						context.drawTexture(EmiRenderHelper.DASH, space.tx + 1, space.ty - 2, space.tw * ENTRY_SIZE, 1, 0, 0, space.tw * ENTRY_SIZE, 1, 6, 1);
 					}
 				}
 			}
 		}
 
-		private void drawHeader(MatrixStack matrices, int mouseX, int mouseY, float delta, int page, int totalPages) {
+		private void drawHeader(EmiDrawContext context, int mouseX, int mouseY, float delta, int page, int totalPages) {
 			if (header) {
 				Text text = EmiRenderHelper.getPageText(page + 1, totalPages, (space.tw - 3) * ENTRY_SIZE);
 				int x = space.tx + (space.tw * ENTRY_SIZE) / 2;
@@ -1368,14 +1362,13 @@ public class EmiScreenManager {
 				if (w > maxLeft) {
 					x += (w - maxLeft);
 				}
-				EmiPort.drawCenteredText(matrices, client.textRenderer, text, x, space.ty - 15, 0xFFFFFF);
+				context.drawCenteredText(text, x, space.ty - 15);
 				if (totalPages > 1 && space.tw > 2) {
 					int scrollLeft = space.tx + 18;
 					int scrollWidth = space.tw * ENTRY_SIZE - 36;
 					int scrollY = space.ty - 4;
-					DrawableHelper.fill(matrices, scrollLeft, scrollY, scrollLeft + scrollWidth, scrollY + 2,
-							0x55555555);
-					EmiRenderHelper.drawScroll(matrices, scrollLeft, scrollY, scrollWidth, 2, page, totalPages, 0xFFFFFFFF);
+					context.fill(scrollLeft, scrollY, scrollWidth, 2, 0x55555555);
+					EmiRenderHelper.drawScroll(context, scrollLeft, scrollY, scrollWidth, 2, page, totalPages, 0xFFFFFFFF);
 				}
 			}
 		}
@@ -1515,7 +1508,7 @@ public class EmiScreenManager {
 			return typeSupplier.get();
 		}
 
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, int startIndex) {
+		public void render(EmiDrawContext context, int mouseX, int mouseY, float delta, int startIndex) {
 			if (this.pageSize > 0) {
 				RenderSystem.enableDepthTest();
 				EmiPort.setPositionTexShader();
@@ -1528,10 +1521,10 @@ public class EmiScreenManager {
 				if (hovered != -1 && EmiConfig.showHoverOverlay && startIndex + hovered < stacks.size()) {
 					hx = this.getRawX(hovered);
 					hy = this.getRawY(hovered);
-					EmiRenderHelper.drawSlotHightlight(matrices, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
+					EmiRenderHelper.drawSlotHightlight(context, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
 				}
-				matrices.push();
-				matrices.translate(0, 0, 100);
+				context.push();
+				context.matrices().translate(0, 0, 100);
 				outer: for (int yo = 0; yo < this.th; yo++) {
 					for (int xo = 0; xo < this.getWidth(yo); xo++) {
 						if (i >= stacks.size()) {
@@ -1540,24 +1533,24 @@ public class EmiScreenManager {
 						int cx = this.getX(xo, yo);
 						int cy = this.getY(xo, yo);
 						EmiIngredient stack = stacks.get(i++);
-						batcher.render(stack, matrices, cx + 1, cy + 1, delta);
+						batcher.render(stack, context.raw(), cx + 1, cy + 1, delta);
 						if (getType() == SidebarType.INDEX) {
 							if (EmiConfig.editMode) {
 								if (EmiHidden.isHidden(stack)) {
 									RenderSystem.enableDepthTest();
-									DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x33ff0000);
+									context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x33ff0000);
 								}
 							} else if (EmiConfig.highlightDefaulted) {
 								if (BoM.getRecipe(stack) != null) {
 									RenderSystem.enableDepthTest();
-									DrawableHelper.fill(matrices, cx, cy, cx + ENTRY_SIZE, cy + ENTRY_SIZE, 0x3300ff00);
+									context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x3300ff00);
 								}
 							}
 						}
 					}
 				}
 				batcher.draw();
-				matrices.pop();
+				context.pop();
 			}
 		}
 

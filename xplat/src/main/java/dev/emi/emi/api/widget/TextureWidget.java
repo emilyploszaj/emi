@@ -3,10 +3,7 @@ package dev.emi.emi.api.widget;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import dev.emi.emi.EmiPort;
-import net.minecraft.client.gui.DrawableHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -57,9 +54,8 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, this.texture);
-		DrawableHelper.drawTexture(matrices, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+		context.resetColor();
+		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}	
 }

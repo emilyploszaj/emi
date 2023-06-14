@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
 import dev.emi.emi.api.EmiEntrypoint;
@@ -86,6 +85,7 @@ import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
@@ -98,7 +98,6 @@ import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.enchantment.Enchantment;
@@ -740,9 +739,9 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static EmiRenderable simplifiedRenderer(int u, int v) {
-		return (matrices, x, y, delta) -> {
-			RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-			DrawableHelper.drawTexture(matrices, x, y, u, v, 16, 16, 256, 256);
+		return (raw, x, y, delta) -> {
+			EmiDrawContext context = EmiDrawContext.wrap(raw);
+			context.drawTexture(EmiRenderHelper.WIDGETS, x, y, u, v, 16, 16);
 		};
 	}
 

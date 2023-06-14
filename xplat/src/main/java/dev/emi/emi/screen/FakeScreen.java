@@ -16,11 +16,11 @@ public class FakeScreen extends Screen {
 
 	protected FakeScreen() {
 		super(EmiPort.literal(""));
-        this.client = MinecraftClient.getInstance();
-        this.itemRenderer = client.getItemRenderer();
-        this.textRenderer = client.textRenderer;
-        this.width = 99999;
-        this.height = 99999;
+		this.client = MinecraftClient.getInstance();
+		this.itemRenderer = client.getItemRenderer();
+		this.textRenderer = client.textRenderer;
+		this.width = 99999;
+		this.height = 99999;
 	}
 
 	public List<TooltipComponent> getTooltipComponentListFromItem(ItemStack stack) {
