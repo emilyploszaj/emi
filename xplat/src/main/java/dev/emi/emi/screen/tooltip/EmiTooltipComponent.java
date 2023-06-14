@@ -4,13 +4,14 @@ import org.joml.Matrix4f;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.font.TextRenderer.TextLayerType;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider.Immediate;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public interface EmiTooltipComponent extends TooltipComponent {
@@ -22,11 +23,13 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	}
 
 	@Override
-	default void drawItems(TextRenderer textRenderer, int x, int y, MatrixStack matrices, ItemRenderer itemRenderer) {
-		matrices.push();
-		matrices.translate(x, y, 0);
-		drawTooltip(EmiDrawContext.wrap(matrices), new TooltipRenderData(textRenderer, itemRenderer, x, y));
-		matrices.pop();
+	default void drawItems(TextRenderer textRenderer, int x, int y, DrawContext raw) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.push();
+		context.matrices().translate(x, y, 0);
+		MinecraftClient client = MinecraftClient.getInstance();
+		drawTooltip(context, new TooltipRenderData(textRenderer, client.getItemRenderer(), x, y));
+		context.pop();
 	}
 
 	@Override

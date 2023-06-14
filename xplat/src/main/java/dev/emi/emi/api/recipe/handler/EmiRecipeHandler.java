@@ -6,9 +6,9 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.Widget;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 
@@ -65,6 +65,6 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 	 * Render feedback about the status of the current fill.
 	 * Common use is to render an overlay on missing ingredients
 	 */
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, MatrixStack matrices) {
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext draw) {
 	}
 }

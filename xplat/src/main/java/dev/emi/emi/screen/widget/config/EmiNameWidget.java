@@ -6,14 +6,15 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.runtime.EmiDrawContext;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 
 public class EmiNameWidget implements Drawable {
@@ -98,7 +99,8 @@ public class EmiNameWidget implements Drawable {
 		return ret;
 	}
 
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		long time = System.currentTimeMillis();
 		long progress = time % 5_000;
 		Random rand = new Random(time / 5_000);
@@ -121,15 +123,12 @@ public class EmiNameWidget implements Drawable {
 			parts[2] = transformString(rand, parts[2], p);
 		}
 
-		EmiPort.drawCenteredText(matrices, client.textRenderer,
-			EmiPort.append(
-				EmiPort.append(
-					EmiPort.append(
-						EmiPort.append(
-							EmiPort.literal(parts[0], Style.EMPTY.withColor(0xeb7bfc)),
-							EmiPort.literal("  ")),
-						EmiPort.literal(parts[1], Style.EMPTY.withColor(0x7bfca2))),
-					EmiPort.literal("  ")),
-				EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc))), x, y, -1, true);
+		context.drawCenteredTextWithShadow(
+			EmiPort.literal(parts[0], Style.EMPTY.withColor(0xeb7bfc))
+				.append(EmiPort.literal("  "))
+				.append(EmiPort.literal(parts[1], Style.EMPTY.withColor(0x7bfca2)))
+				.append(EmiPort.literal("  "))
+				.append(EmiPort.literal(parts[2], Style.EMPTY.withColor(0x7bebfc))),
+			x, y, -1);
 	}
 }

@@ -1,7 +1,8 @@
 package dev.emi.emi.api.widget;
 
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
 
 public class TextWidget extends Widget {
@@ -40,17 +41,18 @@ public class TextWidget extends Widget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		matrices.push();
+	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
+		context.push();
 		int xOff = horizontalAlignment.offset(CLIENT.textRenderer.getWidth(text));
 		int yOff = verticalAlignment.offset(CLIENT.textRenderer.fontHeight);
-		matrices.translate(xOff, yOff, 300);
+		context.matrices().translate(xOff, yOff, 300);
 		if (shadow) {
-			CLIENT.textRenderer.drawWithShadow(matrices, text, x, y, color);
+			context.drawTextWithShadow(text, x, y, color);
 		} else {
-			CLIENT.textRenderer.draw(matrices, text, x, y, color);
+			context.drawText(text, x, y, color);
 		}
-		matrices.pop();
+		context.pop();
 	}
 
 	public enum Alignment {

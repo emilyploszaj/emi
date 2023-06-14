@@ -16,10 +16,9 @@ import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class EmiFavorite implements EmiIngredient, Batchable {
@@ -70,13 +69,14 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (recipe != null) {
 			flags |= EmiIngredient.RENDER_AMOUNT;
 		}
-		stack.render(matrices, x, y, delta, flags);
+		stack.render(context.raw(), x, y, delta, flags);
 		if ((flags & EmiIngredient.RENDER_INGREDIENT) > 0 && recipe != null) {
-			EmiRenderHelper.renderRecipeFavorite(stack, matrices, x, y);
+			EmiRenderHelper.renderRecipeFavorite(stack, context, x, y);
 		}
 	}
 
@@ -113,9 +113,9 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+	public void renderForBatch(VertexConsumerProvider vcp, DrawContext raw, int x, int y, int z, float delta) {
 		if (stack instanceof Batchable b) {
-			b.renderForBatch(vcp, matrices, x, y, z, delta);
+			b.renderForBatch(vcp, raw, x, y, z, delta);
 		}
 	}
 
@@ -126,8 +126,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
-			super.render(matrices, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
+		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+			super.render(raw, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
 		}
 	}
 
@@ -153,7 +153,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			int color = 0xff2200;
 			if (state == 1) {
 				color = 0xaa00ff;
@@ -162,12 +163,12 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			} else if (state == -1) {
 				color = 0xea842a;
 			}
-			DrawableHelper.fill(matrices, x - 1, y - 1, x + 17, y + 17, 0x44000000 | color);
-			stack.render(matrices, x, y, delta, flags & (~EmiIngredient.RENDER_AMOUNT));
+			context.fill(x - 1, y - 1, 18, 18, 0x44000000 | color);
+			stack.render(context.raw(), x, y, delta, flags & (~EmiIngredient.RENDER_AMOUNT));
 			if (recipe != null) {
-				EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal("" + amount));
+				EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal("" + amount));
 			} else {
-				EmiRenderHelper.renderAmount(matrices, x, y, EmiRenderHelper.getAmountText(stack, amount));
+				EmiRenderHelper.renderAmount(context, x, y, EmiRenderHelper.getAmountText(stack, amount));
 			}
 		}
 

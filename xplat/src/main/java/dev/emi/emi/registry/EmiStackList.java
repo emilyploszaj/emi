@@ -31,7 +31,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemStackSet;
 import net.minecraft.registry.tag.TagKey;
 
 public class EmiStackList {
@@ -52,7 +51,7 @@ public class EmiStackList {
 	public static void reload() {
 		try {
 			MinecraftClient client = MinecraftClient.getInstance();
-			ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.player.world.getRegistryManager());
+			ItemGroups.updateDisplayContext(client.player.networkHandler.getEnabledFeatures(), false, client.world.getRegistryManager());
 		} catch (Throwable t) {
 			EmiLog.error("Failed to update creative tabs. Using fallback index.");
 			t.printStackTrace();
@@ -63,16 +62,11 @@ public class EmiStackList {
 			EmiStack stack = EmiStack.of(item);
 			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
 		}
-		Set<ItemStack> iss = ItemStackSet.create();
 		for (ItemGroup group : ItemGroups.getGroups()) {
 			Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
 			IndexGroup ig = new IndexGroup();
 			Collection<ItemStack> searchStacks = group.getSearchTabStacks();
 			for (ItemStack stack : searchStacks) {
-				if (iss.contains(stack)) {
-					continue;
-				}
-				iss.add(stack);
 				EmiStack es = EmiStack.of(stack);
 				String namespace = es.getId().getNamespace();
 				usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
@@ -97,11 +91,18 @@ public class EmiStackList {
 			}
 		}
 		groups.add(fluidGroup);
+
+		Set<EmiStack> added = Sets.newHashSet();
 		
 		stacks = Lists.newLinkedList();
 		for (IndexGroup group : groups) {
 			if (group.shouldDisplay()) {
-				stacks.addAll(group.stacks);
+				for (EmiStack stack : group.stacks) {
+					if (!added.contains(stack)) {
+						stacks.add(stack);
+						added.add(stack.copy().comparison(Comparison.compareNbt()));
+					}
+				}
 			}
 		}
 	}

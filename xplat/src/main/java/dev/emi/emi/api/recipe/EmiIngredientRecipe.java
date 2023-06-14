@@ -2,8 +2,6 @@ package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -11,8 +9,8 @@ import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.bom.BoM;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.gui.DrawContext;
 
 /**
  * Represents a recipe that disambiguates an ingredient.
@@ -58,10 +56,10 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		int pageSize = (ph + 1) * 8;
 		PageManager manager = new PageManager(stacks, pageSize);
 		if (pageSize < stacks.size()) {
-			widgets.addButton(2, 2, 12, 12, 0, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(-1);
 			});
-			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 64, () -> true, (mouseX, mouseY, button) -> {
+			widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 0, () -> true, (mouseX, mouseY, button) -> {
 				manager.scroll(1);
 			});
 		}
@@ -129,18 +127,18 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		}
 
 		@Override
-		public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
 			if (!getStack().isEmpty()) {
-				super.render(matrices, mouseX, mouseY, delta);
+				super.render(draw, mouseX, mouseY, delta);
 			}
 		}
 		
 		@Override
-		public void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-			super.drawBackground(matrices, mouseX, mouseY, delta);
+		public void drawBackground(DrawContext draw, int mouseX, int mouseY, float delta) {
+			super.drawBackground(draw, mouseX, mouseY, delta);
+			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			if (BoM.getRecipe(getIngredient()) instanceof EmiResolutionRecipe err && err.stack.equals(getStack())) {
-				RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
-				DrawableHelper.drawTexture(matrices, x, y, 36, 128, 18, 18, 256, 256);
+				context.drawTexture(EmiRenderHelper.WIDGETS, x, y, 36, 128, 18, 18);
 			}
 		}
 	}

@@ -1,8 +1,8 @@
 package dev.emi.emi.screen.widget.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class SubGroupNameWidget extends GroupNameWidget {
@@ -13,16 +13,17 @@ public class SubGroupNameWidget extends GroupNameWidget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
-		DrawableHelper.drawTextWithShadow(matrices, CLIENT.textRenderer, text, x + 20, y + 3, -1);
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.drawTextWithShadow(text, x + 20, y + 3);
 		if (hovered || collapsed) {
 			String collapse = "[-]";
 			int cx = x;
 			if (collapsed) {
 				collapse = "[+]";
 			}
-			DrawableHelper.drawTextWithShadow(matrices, CLIENT.textRenderer, EmiPort.literal(collapse), cx, y + 3, -1);
+			context.drawTextWithShadow(EmiPort.literal(collapse), cx, y + 3);
 		}
 	}
 

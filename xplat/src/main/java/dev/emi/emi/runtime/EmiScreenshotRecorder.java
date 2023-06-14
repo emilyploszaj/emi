@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
@@ -72,11 +73,11 @@ public class EmiScreenshotRecorder {
 		RenderSystem.applyModelViewMatrix();
 
 		Matrix4f backupProj = RenderSystem.getProjectionMatrix();
-		RenderSystem.setProjectionMatrix(new Matrix4f().identity());
+		RenderSystem.setProjectionMatrix(new Matrix4f().identity(), VertexSorter.BY_Z);
 
 		renderer.run();
 
-		RenderSystem.setProjectionMatrix(backupProj);
+		RenderSystem.setProjectionMatrix(backupProj, VertexSorter.BY_Z);
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
 

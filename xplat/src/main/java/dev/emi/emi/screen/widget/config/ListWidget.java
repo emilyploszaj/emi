@@ -14,10 +14,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -27,7 +28,6 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -152,7 +152,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
 		int o;
 		int n;
 		int m;
@@ -164,7 +164,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
 
 		{	// Render background
-			RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 			bufferBuilder.vertex((double)this.left, (double)this.bottom, 0.0)
@@ -188,12 +188,12 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		
 		int k = this.getRowLeft();
 		int l = this.top + 4 - (int)this.getScrollAmount();
-		this.renderList(matrices, k, l, mouseX, mouseY, delta);
+		this.renderList(draw, k, l, mouseX, mouseY, delta);
 
 
 		{	// Render horizontal shadows
 			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-			RenderSystem.setShaderTexture(0, DrawableHelper.OPTIONS_BACKGROUND_TEXTURE);
+			RenderSystem.setShaderTexture(0, Screen.OPTIONS_BACKGROUND_TEXTURE);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthFunc(519);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -449,7 +449,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return mouseY >= (double)this.top && mouseY <= (double)this.bottom && mouseX >= (double)this.left && mouseX <= (double)this.right;
 	}
 
-	protected void renderList(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta) {
+	protected void renderList(DrawContext draw, int x, int y, int mouseX, int mouseY, float delta) {
 		int i = this.getEntryCount();
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
@@ -487,7 +487,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 				tessellator.draw();
 			}
 			p = this.getRowLeft();
-			((Entry)entry).render(matrices, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
+			((Entry)entry).render(draw, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
 		}
 	}
 
@@ -573,7 +573,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	public static abstract class Entry extends AbstractParentElement {
 		public ListWidget parentList;
 
-		public abstract void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+		public abstract void render(DrawContext draw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta);
 
 		@Override

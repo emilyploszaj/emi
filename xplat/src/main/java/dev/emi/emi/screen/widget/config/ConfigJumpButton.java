@@ -6,7 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class ConfigJumpButton extends SizedButtonWidget {
@@ -22,11 +22,11 @@ public class ConfigJumpButton extends SizedButtonWidget {
 	}
 
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void renderButton(DrawContext raw, int mouseX, int mouseY, float delta) {
 		if (this.isMouseOver(mouseX, mouseY)) {
 			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
 		}
-		super.renderButton(matrices, mouseX, mouseY, delta);
+		super.renderButton(raw, mouseX, mouseY, delta);
 		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 	}
 }

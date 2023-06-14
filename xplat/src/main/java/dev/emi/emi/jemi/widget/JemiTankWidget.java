@@ -7,9 +7,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.TankWidget;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class JemiTankWidget extends TankWidget {
 	private final JemiRecipeSlot slot;
@@ -27,23 +28,25 @@ public class JemiTankWidget extends TankWidget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.background != null) {
-			slot.background.drawable().draw(matrices, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
+			slot.background.drawable().draw(context.raw(), x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
 		}
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(context.raw(), mouseX, mouseY, delta);
 	}
 
 	@Override
-	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
 			RenderSystem.enableBlend();
-			matrices.push();
-			matrices.translate(0, 0, 200);
-			slot.overlay.drawable().draw(matrices, x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
-			matrices.pop();
+			context.push();
+			context.matrices().translate(0, 0, 200);
+			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
+			context.pop();
 		}
-		super.drawOverlay(matrices, mouseX, mouseY, delta);
+		super.drawOverlay(context.raw(), mouseX, mouseY, delta);
 	}
 
 	@Override

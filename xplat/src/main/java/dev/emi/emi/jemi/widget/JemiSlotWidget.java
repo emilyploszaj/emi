@@ -16,11 +16,12 @@ import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class JemiSlotWidget extends SlotWidget {
@@ -61,16 +62,17 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		if (slot.background != null) {
-			slot.background.drawable().draw(matrices, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
+			slot.background.drawable().draw(raw, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
 		}
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(raw, mouseX, mouseY, delta);
 	}
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void drawStack(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawStack(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		IIngredientRenderer renderer = getRenderer();
 		if (renderer != null) {
 			ITypedIngredient<?> typed = getIngredient();
@@ -78,25 +80,26 @@ public class JemiSlotWidget extends SlotWidget {
 			int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
 			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
 			RenderSystem.enableBlend();
-			matrices.push();
-			matrices.translate(xOff, yOff, 0);
-			renderer.render(matrices, typed.getIngredient());
-			matrices.pop();
+			context.push();
+			context.matrices().translate(xOff, yOff, 0);
+			renderer.render(context.raw(), typed.getIngredient());
+			context.pop();
 			return;
 		}
-		super.drawStack(matrices, mouseX, mouseY, delta);
+		super.drawStack(context.raw(), mouseX, mouseY, delta);
 	}
 
 	@Override
-	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
 			RenderSystem.enableBlend();
-			matrices.push();
-			matrices.translate(0, 0, 200);
-			slot.overlay.drawable().draw(matrices, x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
-			matrices.pop();
+			context.push();
+			context.matrices().translate(0, 0, 200);
+			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
+			context.pop();
 		}
-		super.drawOverlay(matrices, mouseX, mouseY, delta);
+		super.drawOverlay(context.raw(), mouseX, mouseY, delta);
 	}
 
 	@SuppressWarnings("unchecked")

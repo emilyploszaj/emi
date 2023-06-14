@@ -8,15 +8,16 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -42,13 +43,14 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
-		matrices.push();
-		matrices.translate(x + xOff, y + yOff, 0);
-		renderer.render(matrices, ingredient);
-		matrices.pop();
+		context.push();
+		context.matrices().translate(x + xOff, y + yOff, 0);
+		renderer.render(context.raw(), ingredient);
+		context.pop();
 	}
 
 	@Override

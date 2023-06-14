@@ -5,9 +5,11 @@ import java.util.List;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiScreenshotRecorder;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreenshotButtonWidget extends RecipeButtonWidget {
@@ -36,8 +38,10 @@ public class RecipeScreenshotButtonWidget extends RecipeButtonWidget {
 
 		int width = recipe.getDisplayWidth() + 8;
 		int height = recipe.getDisplayHeight() + 8;
+		MinecraftClient client = MinecraftClient.getInstance();
+		DrawContext context = new DrawContext(client, client.getBufferBuilders().getEntityVertexConsumers());
 		EmiScreenshotRecorder.saveScreenshot("emi/recipes/" + path, width, height,
-			() -> EmiRenderHelper.renderRecipe(recipe, new MatrixStack(), 0, 0, false, -1));
+			() -> EmiRenderHelper.renderRecipe(recipe, EmiDrawContext.wrap(context), 0, 0, false, -1));
 
 		return true;
 	}

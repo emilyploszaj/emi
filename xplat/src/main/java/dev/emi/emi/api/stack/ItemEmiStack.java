@@ -10,9 +10,11 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.DiffuseLighting;
@@ -22,7 +24,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -81,23 +82,23 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int x, int y, float delta, int flags) {
+	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
 			DiffuseLighting.enableGuiDepthLighting();
-			ItemRenderer itemRenderer = client.getItemRenderer();
-			itemRenderer.renderInGui(matrices, stack, x, y);
-			itemRenderer.renderGuiItemOverlay(matrices, client.textRenderer, stack, x, y, "");
+			draw.drawItem(stack, x, y);
+			draw.drawItemInSlot(client.textRenderer, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
 			if (amount != 1) {
 				count += amount;
 			}
-			EmiRenderHelper.renderAmount(matrices, x, y, EmiPort.literal(count));
+			EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal(count));
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRender.renderRemainderIcon(this, matrices, x, y);
+			EmiRender.renderRemainderIcon(this, context.raw(), x, y);
 		}
 	}
 	
@@ -119,18 +120,19 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 	
 	@Override
-	public void renderForBatch(VertexConsumerProvider vcp, MatrixStack matrices, int x, int y, int z, float delta) {
+	public void renderForBatch(VertexConsumerProvider vcp, DrawContext draw, int x, int y, int z, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		ItemStack stack = getItemStack();
 		ItemRenderer ir = client.getItemRenderer();
 		BakedModel model = ir.getModel(stack, null, null, 0);
-		matrices.push();
+		context.push();
 		try {
-			matrices.translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
-			matrices.translate(8.0, 8.0, 0.0);
-			matrices.scale(16.0f, 16.0f, 16.0f);
-			ir.renderItem(stack, ModelTransformationMode.GUI, false, matrices, vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
+			context.matrices().translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
+			context.matrices().translate(8.0, 8.0, 0.0);
+			context.matrices().scale(16.0f, 16.0f, 16.0f);
+			ir.renderItem(stack, ModelTransformationMode.GUI, false, context.matrices(), vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
 		} finally {
-			matrices.pop();
+			context.pop();
 		}
 	}
 

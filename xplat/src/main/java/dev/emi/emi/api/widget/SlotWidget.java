@@ -20,15 +20,15 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.input.EmiBind;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -154,53 +154,52 @@ public class SlotWidget extends Widget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
 		EmiPort.setPositionTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		drawBackground(matrices, mouseX, mouseY, delta);
-		drawStack(matrices, mouseX, mouseY, delta);
-		drawOverlay(matrices, mouseX, mouseY, delta);
+		drawBackground(draw, mouseX, mouseY, delta);
+		drawStack(draw, mouseX, mouseY, delta);
+		drawOverlay(draw, mouseX, mouseY, delta);
 	}
 
-	public void drawBackground(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawBackground(DrawContext draw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		Bounds bounds = getBounds();
 		int width = bounds.width();
 		int height = bounds.height();
 		if (drawBack) {
 			if (textureId != null) {
-				RenderSystem.setShaderTexture(0, textureId);
-				DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), width, height, u, v, width, height, 256, 256);
+				context.drawTexture(textureId, bounds.x(), bounds.y(), width, height, u, v, width, height, 256, 256);
 			} else {
-				RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 				int v = getStack().getChance() != 1 ? bounds.height() : 0;
 				if (output) {
-					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 26, 26, 18, v, 26, 26, 256, 256);
+					context.drawTexture(EmiRenderHelper.WIDGETS, bounds.x(), bounds.y(), 26, 26, 18, v, 26, 26, 256, 256);
 				} else {
-					DrawableHelper.drawTexture(matrices, bounds.x(), bounds.y(), 18, 18, 0, v, 18, 18, 256, 256);
+					context.drawTexture(EmiRenderHelper.WIDGETS, bounds.x(), bounds.y(), 18, 18, 0, v, 18, 18, 256, 256);
 				}
 			}
 		}
 	}
 
-	public void drawStack(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawStack(DrawContext draw, int mouseX, int mouseY, float delta) {
 		Bounds bounds = getBounds();
 		int xOff = (bounds.width() - 16) / 2;
 		int yOff = (bounds.height() - 16) / 2;
-		getStack().render(matrices, bounds.x() + xOff, bounds.y() + yOff, delta);
+		getStack().render(draw, bounds.x() + xOff, bounds.y() + yOff, delta);
 	}
 
-	public void drawOverlay(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(DrawContext draw, int mouseX, int mouseY, float delta) {
 		Bounds bounds = getBounds();
 		int width = bounds.width();
 		int height = bounds.height();
 		int xOff = (width - 16) / 2;
 		int yOff = (height - 16) / 2;
 		if (catalyst) {
-			EmiRender.renderCatalystIcon(getStack(), matrices, x + xOff, y + yOff);
+			EmiRender.renderCatalystIcon(getStack(), draw, x + xOff, y + yOff);
 		}
 
 		if (shouldDrawSlotHighlight(mouseX, mouseY)) {
-			drawSlotHighlight(matrices, bounds);
+			drawSlotHighlight(draw, bounds);
 		}
 	}
 
@@ -208,9 +207,9 @@ public class SlotWidget extends Widget {
 		return getBounds().contains(mouseX, mouseY) && EmiConfig.showHoverOverlay;
 	}
 
-	public void drawSlotHighlight(MatrixStack matrices, Bounds bounds) {
+	public void drawSlotHighlight(DrawContext draw, Bounds bounds) {
 		RenderSystem.disableDepthTest();
-		EmiRenderHelper.drawSlotHightlight(matrices, bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
+		EmiRenderHelper.drawSlotHightlight(EmiDrawContext.wrap(draw), bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
 	}
 	
 	@Override

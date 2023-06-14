@@ -1,10 +1,7 @@
 package dev.emi.emi.api.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import dev.emi.emi.EmiPort;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
 public class AnimatedTextureWidget extends TextureWidget {
@@ -26,10 +23,8 @@ public class AnimatedTextureWidget extends TextureWidget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, this.texture);
+	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		int subTime = (int) (System.currentTimeMillis() % time);
 		if (endToStart ^ fullToEmpty) {
 			subTime = time - subTime;
@@ -59,6 +54,6 @@ public class AnimatedTextureWidget extends TextureWidget {
 				mrh = regionHeight * subTime / time;
 			}
 		}
-		DrawableHelper.drawTexture(matrices, mx, my, mw, mh, mu, mv, mrw, mrh, textureWidth, textureHeight);
+		context.drawTexture(this.texture, mx, my, mw, mh, mu, mv, mrw, mrh, textureWidth, textureHeight);
 	}	
 }

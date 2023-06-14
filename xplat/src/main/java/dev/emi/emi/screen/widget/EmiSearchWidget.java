@@ -11,10 +11,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
@@ -144,6 +146,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	@Override
 	public void setFocused(boolean focused) {
 		isFocused = focused;
+		super.setFocused(focused);
 	}
 
 	@Override
@@ -158,6 +161,9 @@ public class EmiSearchWidget extends TextFieldWidget {
 			return false;
 		} else {
 			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
+			if (isMouseOver(mouseX, mouseY)) {
+				setFocused(true);
+			}
 			if (this.isFocused()) {
 				if (button == 0) {
 					if (System.currentTimeMillis() - lastClick < 500) {
@@ -193,7 +199,8 @@ public class EmiSearchWidget extends TextFieldWidget {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.setEditable(EmiConfig.enabled);
 		String lower = getText().toLowerCase();
 
@@ -223,13 +230,13 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 
 		if (EmiConfig.enabled) {
-			super.render(matrices, mouseX, mouseY, delta);
+			super.render(context.raw(), mouseX, mouseY, delta);
 			if (highlight) {
 				int border = 0xffeeee00;
-				TextFieldWidget.fill(matrices, this.x - 1, this.y - 1, this.x + this.width + 1, this.y, border);
-				TextFieldWidget.fill(matrices, this.x - 1, this.y + this.height, this.x + this.width + 1, this.y + this.height + 1, border);
-				TextFieldWidget.fill(matrices, this.x - 1, this.y - 1, this.x, this.y + this.height + 1, border);
-				TextFieldWidget.fill(matrices, this.x + this.width, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, border);
+				context.fill(this.x - 1, this.y - 1, this.width + 2, 1, border);
+				context.fill(this.x - 1, this.y + this.height, this.width + 2, 1, border);
+				context.fill(this.x - 1, this.y - 1, 1, this.height + 2, border);
+				context.fill(this.x + this.width, this.y - 1, 1, this.height + 2, border);
 			}
 		}
 		RenderSystem.setShaderColor(1, 1, 1, 1);

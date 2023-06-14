@@ -5,12 +5,12 @@ import java.util.List;
 import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.config.ListWidget.Entry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
@@ -27,16 +27,17 @@ public class GroupNameWidget extends Entry {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
-		EmiPort.drawCenteredText(matrices, CLIENT.textRenderer, text, x + width / 2, y + 3, -1, true);
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.drawCenteredTextWithShadow(text, x + width / 2, y + 3, -1);
 		if (hovered || collapsed) {
 			String collapse = "[-]";
 			int cx = x + width / 2 - CLIENT.textRenderer.getWidth(text) / 2 - 20;
 			if (collapsed) {
 				collapse = "[+]";
 			}
-			DrawableHelper.drawTextWithShadow(matrices, CLIENT.textRenderer, EmiPort.literal(collapse), cx, y + 3, -1);
+			context.drawTextWithShadow(EmiPort.literal(collapse), cx, y + 3, -1);
 		}
 	}
 

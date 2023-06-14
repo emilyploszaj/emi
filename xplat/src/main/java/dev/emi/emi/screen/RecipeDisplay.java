@@ -67,9 +67,19 @@ public class RecipeDisplay {
 		int wHeight = Math.min(availableHeight, height);
 		WidgetGroup widgets = new WidgetGroup(recipe, wx, wy, wWidth, wHeight);
 		if (recipe != null) {
-			recipe.addWidgets(widgets);
-			addButtons(widgets, leftButtons, 0 - 4 - 13, -14);
-			addButtons(widgets, rightButtons, width + 5, 14);
+			try {
+				recipe.addWidgets(widgets);
+				addButtons(widgets, leftButtons, 0 - 4 - 13, -14);
+				addButtons(widgets, rightButtons, width + 5, 14);
+			} catch (Throwable t) {
+				widgets = new WidgetGroup(recipe, wx, wy, wWidth, wHeight);
+				widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.render")),
+					wWidth / 2, wHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));
+				if (exception != null) {
+					List<Text> text = EmiUtil.getStackTrace(exception).stream().map(s -> (Text) EmiPort.literal(s)).toList();
+					widgets.addTooltipText(text, 0, 0, wWidth, wHeight);
+				}
+			}
 		} else {
 			widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.initialize")),
 				wWidth / 2, wHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));

@@ -3,8 +3,6 @@ package dev.emi.emi.screen.widget;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiTexture;
@@ -12,12 +10,12 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ResolutionButtonWidget extends ButtonWidget {
 	public Supplier<Widget> hoveredWidget;
@@ -33,23 +31,23 @@ public class ResolutionButtonWidget extends ButtonWidget {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		super.render(raw, mouseX, mouseY, delta);
 		if (this.isHovered()) {
 			MinecraftClient client = MinecraftClient.getInstance();
-			client.currentScreen.renderTooltip(matrices, List.of(
+			raw.drawTooltip(client.textRenderer, List.of(
 				EmiPort.translatable("tooltip.emi.resolution"),
 				EmiPort.translatable("tooltip.emi.select_resolution"),
 				EmiPort.translatable("tooltip.emi.default_resolution"),
 				EmiPort.translatable("tooltip.emi.clear_resolution")
 			), mouseX, mouseY);
 		}
-		stack.render(matrices, x + 1, y + 1, delta);
+		stack.render(raw, x + 1, y + 1, delta);
 	}
 
 	@Override
-	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+	public void renderButton(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int u = 0;
 		if (this.isHovered()) {
 			u = 18;
@@ -60,7 +58,7 @@ public class ResolutionButtonWidget extends ButtonWidget {
 				u = 36;
 			}
 		}
-		EmiTexture.SLOT.render(matrices, x, y, delta);
-		DrawableHelper.drawTexture(matrices, x, y, u, 128, width, height, 256, 256);
+		EmiTexture.SLOT.render(context.raw(), x, y, delta);
+		context.drawTexture(EmiRenderHelper.WIDGETS, x, y, u, 128, width, height);
 	}
 }
