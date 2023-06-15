@@ -144,9 +144,12 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		}
 
 		registry.removeEmiStacks(s -> {
-			Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(s);
-			if (opt.isPresent()) {
-				return !runtime.getIngredientVisibility().isIngredientVisible(opt.get());
+			try {
+				Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(s);
+				if (opt.isPresent()) {
+					return !runtime.getIngredientVisibility().isIngredientVisible(opt.get());
+				}
+			} catch (Throwable t) {
 			}
 			return false;
 		});

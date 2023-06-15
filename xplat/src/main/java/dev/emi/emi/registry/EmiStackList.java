@@ -110,23 +110,32 @@ public class EmiStackList {
 	@SuppressWarnings("deprecation")
 	public static void bake() {
 		stacks.removeIf(s -> {
-			for (Predicate<EmiStack> invalidator : invalidators) {
-				if (invalidator.test(s)) {
+			try {
+				if (s.isEmpty()) {
 					return true;
 				}
+				for (Predicate<EmiStack> invalidator : invalidators) {
+					if (invalidator.test(s)) {
+						return true;
+					}
+				}
+				if (s.getKey() instanceof Item i) {
+					if (i instanceof BlockItem bi && bi.getBlock().getDefaultState().isIn(BLOCK_HIDDEN)) {
+						return true;
+					} else if (s.getItemStack().isIn(ITEM_HIDDEN)) {
+						return true;
+					}
+				} else if (s.getKey() instanceof Fluid f) {
+					if (f.isIn(FLUID_HIDDEN)) {
+						return true;
+					}
+				}
+				return false;
+			} catch (Throwable t) {
+				EmiLog.error("Stack threw error while baking");
+				t.printStackTrace();
+				return true;
 			}
-			if (s.getKey() instanceof Item i) {
-				if (i instanceof BlockItem bi && bi.getBlock().getDefaultState().isIn(BLOCK_HIDDEN)) {
-					return true;
-				} else if (s.getItemStack().isIn(ITEM_HIDDEN)) {
-					return true;
-				}
-			} else if (s.getKey() instanceof Fluid f) {
-				if (f.isIn(FLUID_HIDDEN)) {
-					return true;
-				}
-			}
-			return false;
 		});
 		for (Supplier<IndexStackData> supplier : EmiData.stackData) {
 			IndexStackData ssd = supplier.get();
