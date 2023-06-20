@@ -26,6 +26,8 @@ import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BasicBakedModel;
@@ -43,6 +45,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.brewing.BrewingRecipe;
@@ -208,6 +211,12 @@ public class EmiAgnosForge extends EmiAgnos {
 			}
 			return Stream.empty();
 		}).distinct().toList();
+	}
+
+	@Override
+	protected List<TooltipComponent> getItemTooltipAgnos(ItemStack stack) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		return ForgeHooksClient.gatherTooltipComponents(stack, Screen.getTooltipFromItem(client, stack), stack.getTooltipData(), 0, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
 	}
 
 	@Override

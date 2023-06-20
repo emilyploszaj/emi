@@ -18,6 +18,7 @@ import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.screen.FakeScreen;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
@@ -27,6 +28,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
@@ -144,6 +146,11 @@ public class EmiAgnosFabric extends EmiAgnos {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	protected List<TooltipComponent> getItemTooltipAgnos(ItemStack stack) {
+		return FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -34,10 +33,9 @@ import net.minecraft.util.Identifier;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
-	private static volatile String query = "";
-	public static Thread thread;
+	private static volatile SearchWorker currentWorker = null;
+	public static volatile Thread searchThread = null;
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
-	public static volatile EmiPlayerInventory inv;
 	public static volatile CompiledQuery compiledQuery;
 	public static Set<EmiStack> bakedStacks;
 	public static SuffixArray<EmiStack> names, tooltips, mods, aliases;
@@ -47,12 +45,12 @@ public class EmiSearch {
 		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
 		SuffixArray<EmiStack> aliases = new SuffixArray<EmiStack>();
-		Set<EmiStack> bakedStacks = Sets.newHashSet();
+		Set<EmiStack> bakedStacks = Sets.newIdentityHashSet();
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
 			try {
-				EmiStack strictStack = stack.copy().comparison(Comparison.compareNbt());
+				EmiStack strictStack = stack;
 				bakedStacks.add(stack);
 				Text name = NameQuery.getText(stack);
 				if (name != null) {
@@ -111,25 +109,27 @@ public class EmiSearch {
 	}
 
 	public static void update() {
-		search(query);
+		search(EmiScreenManager.search.getText());
 	}
 
 	public static void search(String query) {
 		synchronized (EmiSearch.class) {
-			inv = EmiScreenManager.lastPlayerInventory;
-			EmiSearch.query = query;
-			if (thread == null || !thread.isAlive()) {
-				thread = new Thread(new SearchWorker());
-				thread.setDaemon(true);
-				thread.start();
-			}
+			SearchWorker worker = new SearchWorker(query, EmiScreenManager.getSearchSource());
+			currentWorker = worker;
+			
+			searchThread = new Thread(worker);
+			searchThread.setDaemon(true);
+			searchThread.start();
 		}
 	}
 
-	public static void apply(List<? extends EmiIngredient> stacks) {
+	public static void apply(SearchWorker worker, List<? extends EmiIngredient> stacks) {
 		synchronized (EmiSearch.class) {
-			EmiSearch.stacks = stacks;
-			thread = null;
+			if (worker == currentWorker) {
+				EmiSearch.stacks = stacks;
+				currentWorker = null;
+				searchThread = null;
+			}
 		}
 	}
 
@@ -223,32 +223,42 @@ public class EmiSearch {
 	}
 
 	private static class SearchWorker implements Runnable {
+		private final String query;
+		private final List<? extends EmiIngredient> source;
+
+		public SearchWorker(String query, List<? extends EmiIngredient> source) {
+			this.query = query;
+			this.source = source;
+		}
 
 		@Override
 		public void run() {
 			try {
-				List<? extends EmiIngredient> stacks;
-				String query;
-				do {
-					query = EmiSearch.query;
-					CompiledQuery compiled = new CompiledQuery(query);
-					compiledQuery = compiled;
-					List<? extends EmiIngredient> source = EmiScreenManager.getSearchSource();
-					if (compiled.isEmpty()) {
-						stacks = source;
-						continue;
-					}
-					stacks = source.stream().filter(stack -> {
-						List<EmiStack> ess = stack.getEmiStacks();
-						// TODO properly support ingredients?
-						if (ess.size() != 1) {
-							return false;
+				CompiledQuery compiled = new CompiledQuery(query);
+				compiledQuery = compiled;
+				if (compiled.isEmpty()) {
+					apply(this, source);
+					return;
+				}
+				List<EmiIngredient> stacks = Lists.newArrayList();
+				int processed = 0;
+				for (EmiIngredient stack : source) {
+					if (processed++ >= 1024) {
+						processed = 0;
+						if (this != currentWorker) {
+							return;
 						}
+					}
+					List<EmiStack> ess = stack.getEmiStacks();
+					// TODO properly support ingredients?
+					if (ess.size() == 1) {
 						EmiStack es = ess.get(0);
-						return compiled.test(es);
-					}).toList();
-				} while (query != EmiSearch.query);
-				apply(stacks);
+						if (compiled.test(es)) {
+							stacks.add(stack);
+						}
+					}
+				}
+				apply(this, List.copyOf(stacks));
 			} catch (Exception e) {
 				EmiLog.error("Error when attempting to search:");
 				e.printStackTrace();
