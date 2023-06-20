@@ -58,7 +58,7 @@ public class JemiUtil {
 		if (stack.isEmpty()) {
 			return Optional.empty();
 		} else if (stack.getKey() instanceof Fluid f) {
-			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f, stack.getAmount(), stack.getNbt()));
+			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f, stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getNbt()));
 		} else if (stack instanceof JemiStack js) {
 			return JemiPlugin.runtime.getIngredientManager().getIngredientTypeChecked(js.ingredient)
 				.map(t -> (Optional) JemiPlugin.runtime.getIngredientManager().createTypedIngredient(t, js.ingredient))

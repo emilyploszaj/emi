@@ -13,7 +13,7 @@ public class NameQuery extends Query {
 	
 	public NameQuery(String name) {
 		valid = Sets.newHashSet(EmiSearch.names.findAll(name.toLowerCase()));
-		this.name = name;
+		this.name = name.toLowerCase();
 	}
 
 	@Override
