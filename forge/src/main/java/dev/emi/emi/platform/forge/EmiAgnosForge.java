@@ -216,7 +216,7 @@ public class EmiAgnosForge extends EmiAgnos {
 	@Override
 	protected List<TooltipComponent> getItemTooltipAgnos(ItemStack stack) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		List<Text> text = stack.getTooltip(client.player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC);;
+		List<Text> text = stack.getTooltip(client.player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);;
 		return ForgeHooksClient.gatherTooltipComponents(stack, text, stack.getTooltipData(), 0, Integer.MAX_VALUE, Integer.MAX_VALUE, null, client.textRenderer);
 	}
 
