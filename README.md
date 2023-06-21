@@ -26,7 +26,7 @@ dependencies {
 	modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
 	modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
 
-	// Forge
+	// Forge (see below block as well if you use Forge Gradle)
 	compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}:api")
 	runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}") 
 
@@ -35,5 +35,20 @@ dependencies {
 
 	// MultiLoader Template/VanillaGradle
 	compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}:api"
+}
+```
+
+For Forge Gradle users, you will need to enable Mixin refmaps in your client sourceset. This can be done by adding 2 lines inside of your client runs, to look like below.
+
+```gradle
+runs {
+	client {
+		// Add these two lines
+		property 'mixin.env.remapRefMap', 'true'
+		property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+		// The rest of the code that was already here
+		// ...
+	}
 }
 ```
