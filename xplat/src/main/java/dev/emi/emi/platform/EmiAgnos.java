@@ -8,6 +8,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -82,6 +83,12 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract void addBrewingRecipesAgnos(EmiRegistry registry);
+
+	public static List<TooltipComponent> getItemTooltip(ItemStack stack) {
+		return delegate.getItemTooltipAgnos(stack);
+	}
+
+	protected abstract List<TooltipComponent> getItemTooltipAgnos(ItemStack stack);
 
 	public static Text getFluidName(Fluid fluid, NbtCompound nbt) {
 		return delegate.getFluidNameAgnos(fluid, nbt);

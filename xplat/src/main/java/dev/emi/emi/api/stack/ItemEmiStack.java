@@ -12,7 +12,6 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
-import dev.emi.emi.screen.FakeScreen;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -157,7 +156,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		ItemStack stack = getItemStack();
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (!isEmpty()) {
-			list.addAll(FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack));
+			list.addAll(EmiAgnos.getItemTooltip(stack));
 			//String namespace = EmiPort.getItemRegistry().getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
 			//list.add(TooltipComponent.of(EmiLang.literal(mod, Formatting.BLUE, Formatting.ITALIC)));

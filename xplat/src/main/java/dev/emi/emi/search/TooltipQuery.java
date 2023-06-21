@@ -14,7 +14,7 @@ public class TooltipQuery extends Query {
 
 	public TooltipQuery(String name) {
 		valid = Sets.newHashSet(EmiSearch.tooltips.findAll(name.toLowerCase()));
-		this.name = name;
+		this.name = name.toLowerCase();
 	}
 
 	@Override
