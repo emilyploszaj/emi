@@ -18,6 +18,7 @@ import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.EmiSearch.CompiledQuery;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
@@ -34,7 +35,8 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 
 	@Inject(at = @At(value = "TAIL"), method = "init")
 	private void init(CallbackInfo info) {
-		this.client.keyboard.setRepeatEvents(true);
+		MinecraftClient client = MinecraftClient.getInstance();
+		client.keyboard.setRepeatEvents(true);
 		EmiScreenManager.addWidgets(this);
 	}
 
