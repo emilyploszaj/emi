@@ -696,10 +696,6 @@ public class EmiScreenManager {
 		}
 		if (cursor.isEmpty() && draggedStack.isEmpty()) {
 			client.getProfiler().swap("hover");
-			MatrixStack view = RenderSystem.getModelViewStack();
-			view.push();
-			view.translate(0, 0, 200);
-			RenderSystem.applyModelViewMatrix();
 			EmiIngredient hov = EmiStack.EMPTY;
 			SidebarType sidebar = SidebarType.NONE;
 			if (getHoveredStack(mouseX, mouseY, false) instanceof SidebarEmiStackInteraction sesi) {
@@ -723,8 +719,6 @@ public class EmiScreenManager {
 			} else {
 				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
 			}
-			view.pop();
-			RenderSystem.applyModelViewMatrix();
 			client.getProfiler().pop();
 		}
 		lastStackTooltipRendered = null;
