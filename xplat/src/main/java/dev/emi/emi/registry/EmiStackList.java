@@ -147,6 +147,17 @@ public class EmiStackList {
 					}
 				}
 				stacks.removeAll(removed);
+				if (!ssd.filters().isEmpty()) {
+					stacks.removeIf(s -> {
+						String id = "" + s.getId();
+						for (IndexStackData.Filter filter : ssd.filters()) {
+							if (filter.filter().test(id)) {
+								return true;
+							}
+						}
+						return false;
+					});
+				}
 			}
 			for (IndexStackData.Added added : ssd.added()) {
 				if (added.added().isEmpty()) {

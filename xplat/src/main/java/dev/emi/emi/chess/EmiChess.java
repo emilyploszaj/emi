@@ -3,9 +3,8 @@ package dev.emi.emi.chess;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.compress.utils.Lists;
-
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;

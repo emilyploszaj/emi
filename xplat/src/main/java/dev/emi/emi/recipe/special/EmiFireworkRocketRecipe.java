@@ -1,5 +1,11 @@
 package dev.emi.emi.recipe.special;
 
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import com.google.common.collect.Lists;
+
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
@@ -11,11 +17,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import org.apache.commons.compress.utils.Lists;
-
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Stream;
 
 
 public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {

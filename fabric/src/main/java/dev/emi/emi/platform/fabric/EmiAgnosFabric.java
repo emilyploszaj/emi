@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -34,12 +35,14 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.PotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -128,7 +131,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					String gid = EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem());
 					String iid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput());
 					String oid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput());
-					EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
+					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						Potion potion = entry.value();
 						if (potion == Potions.EMPTY) {
 							return;
@@ -140,7 +143,12 @@ public class EmiAgnosFabric extends EmiAgnos {
 								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()), potion)), EmiIngredient.of(recipeIngredient),
 								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput()), potion)), id));
 						}
-					});
+					};
+					if ((((BrewingRecipeRegistryRecipeAccessor) recipe).getInput() instanceof PotionItem)) {
+						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
+					} else {
+						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
