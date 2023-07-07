@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.VanillaPlugin;

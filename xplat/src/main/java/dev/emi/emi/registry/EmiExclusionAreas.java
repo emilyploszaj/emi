@@ -3,9 +3,8 @@ package dev.emi.emi.registry;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import org.apache.commons.compress.utils.Lists;
 
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.widget.Bounds;

@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.EmiExclusionArea;

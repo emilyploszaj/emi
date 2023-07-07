@@ -7,9 +7,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;

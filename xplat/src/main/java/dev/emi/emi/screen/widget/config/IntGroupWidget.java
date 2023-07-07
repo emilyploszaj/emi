@@ -3,7 +3,7 @@ package dev.emi.emi.screen.widget.config;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.IntGroup;
