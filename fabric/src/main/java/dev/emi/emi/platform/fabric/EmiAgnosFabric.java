@@ -42,9 +42,9 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryEntry;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -147,7 +147,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					if ((((BrewingRecipeRegistryRecipeAccessor) recipe).getInput() instanceof PotionItem)) {
 						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
 					} else {
-						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));
+						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(EmiPort.getPotionRegistry().getRawId(Potions.AWKWARD)).get());
 					}
 				}
 			} catch (Exception e) {

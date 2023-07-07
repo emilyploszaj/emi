@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import net.minecraft.item.PotionItem;
-import net.minecraft.registry.entry.RegistryEntry;
 import org.objectweb.asm.Type;
 
 import com.google.common.collect.Lists;
@@ -39,6 +37,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.PotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
@@ -48,6 +47,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeHooks;
@@ -174,7 +174,7 @@ public class EmiAgnosForge extends EmiAgnos {
 					if ((recipe.f_43532_.get() instanceof PotionItem)) {
 						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
 					} else {
-						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));
+						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(EmiPort.getPotionRegistry().getRawId(Potions.AWKWARD)).get());
 					}
 
 				}
