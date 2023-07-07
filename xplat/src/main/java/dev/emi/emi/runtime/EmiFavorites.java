@@ -4,8 +4,7 @@ import java.util.AbstractList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.compress.utils.Lists;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

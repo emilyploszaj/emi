@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;

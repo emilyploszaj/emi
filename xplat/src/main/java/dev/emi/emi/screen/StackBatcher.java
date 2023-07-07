@@ -45,7 +45,7 @@ import net.minecraft.item.ItemStack;
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
-	private static boolean isSodiumLoaded = EmiAgnos.isModLoaded("sodium");
+	private static boolean isSodiumLoaded = EmiAgnos.isModLoaded("sodium") || EmiAgnos.isModLoaded("rubidium");
 	
 	static {
 		try {

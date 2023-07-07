@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.EmiApi;

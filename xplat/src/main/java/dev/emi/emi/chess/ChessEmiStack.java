@@ -2,8 +2,7 @@ package dev.emi.emi.chess;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
-
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;

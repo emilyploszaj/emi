@@ -3,10 +3,10 @@ package dev.emi.emi.screen;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;

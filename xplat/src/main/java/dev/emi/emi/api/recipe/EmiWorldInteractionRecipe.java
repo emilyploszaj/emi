@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;

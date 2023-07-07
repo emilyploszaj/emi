@@ -3,8 +3,9 @@ package dev.emi.emi.api.recipe;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;

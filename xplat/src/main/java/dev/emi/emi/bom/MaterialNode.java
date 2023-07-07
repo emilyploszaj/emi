@@ -2,8 +2,9 @@ package dev.emi.emi.bom;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;

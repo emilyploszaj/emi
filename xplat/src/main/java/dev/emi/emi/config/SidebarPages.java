@@ -3,8 +3,7 @@ package dev.emi.emi.config;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.compress.utils.Lists;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class SidebarPages {

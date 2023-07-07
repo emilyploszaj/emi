@@ -136,9 +136,10 @@ public class EmiData {
 		register.accept(
 			new EmiDataLoader<List<Supplier<IndexStackData>>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
-				(list, json, id) -> list.add(() -> {
+				(list, json, oid) -> list.add(() -> {
 					List<IndexStackData.Added> added = Lists.newArrayList();
 					List<EmiIngredient> removed = Lists.newArrayList();
+					List<IndexStackData.Filter> filters = Lists.newArrayList();
 					if (JsonHelper.hasArray(json, "added")) {
 						for (JsonElement el : json.getAsJsonArray("added")) {
 							if (el.isJsonObject()) {
@@ -157,7 +158,21 @@ public class EmiData {
 							removed.add(EmiIngredientSerializer.getDeserialized(el));
 						}
 					}
-					return new IndexStackData(added, removed);
+					if (JsonHelper.hasArray(json, "filters")) {
+						for (JsonElement el : json.getAsJsonArray("filters")) {
+							if (JsonHelper.isString(el)) {
+								String id = el.getAsString();
+								if (id.startsWith("/") && id.endsWith("/")) {
+									Pattern pat = Pattern.compile(id.substring(1, id.length() - 1));
+									filters.add(new IndexStackData.Filter(s -> pat.matcher(s).find()));
+								} else {
+									filters.add(new IndexStackData.Filter(s -> s.equals(id)));
+								}
+							}
+						}
+					}
+					boolean disable = JsonHelper.getBoolean(json, "disable", false);
+					return new IndexStackData(disable, added, removed, filters);
 				}), list -> stackData = list));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiAlias>>>(

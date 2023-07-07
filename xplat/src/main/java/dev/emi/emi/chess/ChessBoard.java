@@ -2,7 +2,7 @@ package dev.emi.emi.chess;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import net.minecraft.util.math.MathHelper;
 
