@@ -3,7 +3,7 @@ package dev.emi.emi.chess;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 class StandardMoveGenerator extends MoveGenerator {
 	public ChessEvaluation eval = new ChessEvaluation();

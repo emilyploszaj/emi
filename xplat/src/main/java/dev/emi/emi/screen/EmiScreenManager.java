@@ -6,10 +6,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
@@ -973,7 +973,7 @@ public class EmiScreenManager {
 		if (depthBail <= 0) {
 			return false;
 		}
-		for (Element e : client.currentScreen.children()) {
+		for (Element e : parent.children()) {
 			if (e instanceof TextFieldWidget tfw && tfw.isActive() && tfw.visible) {
 				return true;
 			} else if (e instanceof ParentElement p) {

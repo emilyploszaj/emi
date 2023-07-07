@@ -2,7 +2,7 @@ package dev.emi.emi.runtime;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.EmiApi;
 import net.minecraft.client.MinecraftClient;

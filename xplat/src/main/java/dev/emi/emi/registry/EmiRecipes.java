@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -27,6 +27,7 @@ import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -58,9 +59,39 @@ public class EmiRecipes {
 
 	public static void bake() {
 		long start = System.currentTimeMillis();
-		recipes.addAll(EmiData.recipes.stream().map(Supplier::get).toList());
+		recipes.addAll(EmiData.recipes.stream().map(r -> r.get()).toList());
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 		invalidators.addAll(EmiData.recipeFilters);
+
+		List<IndexStackData> isds = EmiData.stackData.stream().map(i -> i.get()).filter(i -> i.disable() && (!i.filters().isEmpty() || !i.removed().isEmpty())).toList();
+		Map<String, Boolean> bakedIdFilters = Maps.newHashMap();
+		invalidators.add(r -> {
+			for (EmiIngredient i : Iterables.concat(r.getInputs(), r.getOutputs(), r.getCatalysts())) {
+				for (IndexStackData data : isds) {
+					if (data.removed().contains(i)) {
+						return true;
+					}
+					for (EmiStack stack : i.getEmiStacks()) {
+						if (data.removed().contains(stack)) {
+							return true;
+						}
+						boolean filtered = bakedIdFilters.computeIfAbsent("" + stack.getId(), id -> {
+							for (IndexStackData.Filter filter : data.filters()) {
+								if (filter.filter().test(id)) {
+									return true;
+								}
+							}
+							return false;
+						});
+						if (filtered) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		});
+
 		List<EmiRecipe> filtered = recipes.stream().filter(r -> {
 			for (Predicate<EmiRecipe> predicate : invalidators) {
 				if (predicate.test(r)) {

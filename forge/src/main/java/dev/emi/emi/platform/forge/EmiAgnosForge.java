@@ -4,8 +4,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import net.minecraft.item.PotionItem;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.objectweb.asm.Type;
 
 import com.google.common.collect.Lists;
@@ -155,7 +158,7 @@ public class EmiAgnosForge extends EmiAgnos {
 					String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
 					String iid = EmiUtil.subId(recipe.f_43532_.get());
 					String oid = EmiUtil.subId(recipe.f_43534_.get());
-					EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
+					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						Potion potion = entry.value();
 						if (potion == Potions.EMPTY) {
 							return;
@@ -167,7 +170,13 @@ public class EmiAgnosForge extends EmiAgnos {
 								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.f_43532_.get()), potion)), EmiIngredient.of(recipe.ingredient),
 								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.f_43534_.get()), potion)), id));
 						}
-					});
+					};
+					if ((recipe.f_43532_.get() instanceof PotionItem)) {
+						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
+					} else {
+						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));
+					}
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
