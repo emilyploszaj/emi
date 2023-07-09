@@ -2,17 +2,23 @@ package dev.emi.emi.platform.forge;
 
 import java.util.Arrays;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.screen.ConfigScreen;
+import dev.emi.emi.screen.EmiScreen;
+import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.ForgeRenderTypes;
+import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
@@ -33,6 +39,7 @@ public class EmiClientForge {
 		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.sendToServer(packet));
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::recipesReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::tagsReloaded);
+		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::renderScreenForeground);
 		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
 	}
@@ -54,5 +61,19 @@ public class EmiClientForge {
 
 	public static void tagsReloaded(TagsUpdatedEvent event) {
 		EmiReloadManager.reloadTags();
+	}
+
+	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
+		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
+		HandledScreen<?> screen = event.getContainerScreen();
+		if (screen instanceof EmiScreen emi) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			context.push();
+			context.matrices().translate(-emi.emi$getLeft(), -emi.emi$getTop(), 0.0);
+			EmiPort.setPositionTexShader();
+			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
+			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
+			context.pop();
+		}
 	}
 }

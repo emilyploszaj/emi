@@ -37,6 +37,13 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 		this.outputIngredients = builder.output;
 		this.outputs = builder.output.stream().map(i -> (EmiStack) i.stack).toList();
 		this.supportsRecipeTree = builder.supportsRecipeTree;
+		for (EmiIngredient catalyst : catalysts) {
+			for (EmiStack stack : catalyst.getEmiStacks()) {
+				if (stack.getRemainder().isEmpty()) {
+					stack.setRemainder(stack.copy());
+				}
+			}
+		}
 		totalSize = left.size() + right.size() + outputs.size();
 		if (totalSize > 5) {
 			int[] portions = new int[] {
