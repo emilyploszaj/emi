@@ -158,8 +158,9 @@
   "config.emi.presets.binds": "Binds",
   "config.emi.presets.restore": "Restore",
 
-  "config.emi.presets.empty_search_craftable": "Empty Search Craftable",
+  "config.emi.presets.productive": "Productive",
   "config.emi.presets.recipe_book_plus": "Recipe Book Plus",
+  "config.emi.presets.empty_search_craftable": "Empty Search Craftable",
 
   "config.emi.presets.author_binds": "Author Binds",
 
