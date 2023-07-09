@@ -31,6 +31,10 @@ public interface WidgetHolder {
 		return addSlot(EmiStack.EMPTY, x, y);
 	}
 
+	default TankWidget addTank(EmiIngredient stack, int x, int y, int width, int height, int capacity) {
+		return add(new TankWidget(stack, x, y, width, height, capacity));
+	}
+
 	default TextureWidget addTexture(Identifier texture, int x, int y, int width, int height, int u, int v) {
 		return add(new TextureWidget(texture, x, y, width, height, u, v));
 	}

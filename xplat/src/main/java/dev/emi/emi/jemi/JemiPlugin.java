@@ -130,6 +130,8 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 		registry.addGenericDragDropHandler(new JemiDragDropHandler());
 
+		registry.addIngredientSerializer(JemiStack.class, new JemiStackSerializer(runtime.getIngredientManager()));
+
 		EmiReloadManager.step(EmiPort.literal("Processing JEI stacks..."), 5_000);
 		for (IIngredientType<?> type : runtime.getIngredientManager().getRegisteredIngredientTypes()) {
 			if (type == JemiUtil.getFluidType() || type == VanillaTypes.ITEM_STACK) {

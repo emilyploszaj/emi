@@ -228,10 +228,11 @@ public class TreeCost {
 			}
 
 			for (MaterialNode n : node.children) {
-				if (n.ingredient.getEmiStacks().size() == 1) {
-					EmiStack r = n.ingredient.getEmiStacks().get(0).getRemainder();
-					if (!r.isEmpty()) {
-						addRemainder(r, minBatches * n.amount * r.getAmount(), produced.consume(n.consumeChance));
+				if (!n.remainder.isEmpty() && n.remainderAmount > 0) {
+					if (isCatalyst(n.ingredient)) {
+						addRemainder(n.remainder, n.remainderAmount, produced.consume(n.consumeChance));
+					} else {
+						addRemainder(n.remainder, minBatches * n.remainderAmount, produced.consume(n.consumeChance));
 					}
 				}
 			}

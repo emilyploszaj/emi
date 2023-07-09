@@ -9,6 +9,7 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
@@ -22,28 +23,33 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 	}
 
 	public static void setRemainders(List<EmiIngredient> input, CraftingRecipe recipe) {
-		CraftingInventory inv = EmiUtil.getCraftingInventory();
-		for (int i = 0; i < input.size(); i++) {
-			if (input.get(i).isEmpty()) {
-				continue;
-			}
-			for (int j = 0; j < input.size(); j++) {
-				if (j == i) {
+		try {
+			CraftingInventory inv = EmiUtil.getCraftingInventory();
+			for (int i = 0; i < input.size(); i++) {
+				if (input.get(i).isEmpty()) {
 					continue;
 				}
-				if (!input.get(j).isEmpty()) {
-					inv.setStack(j, input.get(j).getEmiStacks().get(0).getItemStack().copy());
+				for (int j = 0; j < input.size(); j++) {
+					if (j == i) {
+						continue;
+					}
+					if (!input.get(j).isEmpty()) {
+						inv.setStack(j, input.get(j).getEmiStacks().get(0).getItemStack().copy());
+					}
 				}
-			}
-			List<EmiStack> stacks = input.get(i).getEmiStacks();
-			for (EmiStack stack : stacks) {
-				inv.setStack(i, stack.getItemStack().copy());
-				ItemStack remainder = recipe.getRemainder(inv).get(i);
-				if (!remainder.isEmpty()) {
-					stack.setRemainder(EmiStack.of(remainder));
+				List<EmiStack> stacks = input.get(i).getEmiStacks();
+				for (EmiStack stack : stacks) {
+					inv.setStack(i, stack.getItemStack().copy());
+					ItemStack remainder = recipe.getRemainder(inv).get(i);
+					if (!remainder.isEmpty()) {
+						stack.setRemainder(EmiStack.of(remainder));
+					}
 				}
+				inv.clear();
 			}
-			inv.clear();
+		} catch (Exception e) {
+			EmiLog.error("Exception thrown setting remainders for " + recipe.getId());
+			e.printStackTrace();
 		}
 	}
 
