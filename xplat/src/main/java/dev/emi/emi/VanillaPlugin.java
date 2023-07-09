@@ -400,7 +400,7 @@ public class VanillaPlugin implements EmiPlugin {
 						} else {
 							int width = recipe.fits(2, 3) ? recipe.fits(1, 3) ? 1 : 2 : 3;
 							input = Lists.newArrayList();
-							for (int i = 0; i < input.size(); i++) {
+							for (int i = 0; i < recipe.getIngredients().size(); i++) {
 								input.add(EmiIngredient.of(recipe.getIngredients().get(i)));
 								if ((i + 1) % width == 0) {
 									for (int j = width; j < 3; j++) {
