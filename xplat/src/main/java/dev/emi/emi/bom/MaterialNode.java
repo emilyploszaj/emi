@@ -12,11 +12,13 @@ import dev.emi.emi.api.stack.EmiStack;
 
 public class MaterialNode {
 	public final EmiIngredient ingredient;
+	public final EmiStack remainder;
 	public @Nullable EmiRecipe recipe;
 	public @Nullable List<MaterialNode> children;
 	public float consumeChance = 1, produceChance = 1;
 	public long amount = 1;
 	public long divisor = 1;
+	public long remainderAmount = 0;
 	// Should these be decoupled from material nodes?
 	public FoldState state = FoldState.EXPANDED;
 	public ProgressState progress = ProgressState.UNSTARTED;
@@ -25,13 +27,22 @@ public class MaterialNode {
 	public MaterialNode(EmiIngredient ingredient) {
 		this.amount = ingredient.getAmount();
 		this.ingredient = ingredient.copy().setAmount(1).setChance(1);
+		if (this.ingredient.getEmiStacks().size() == 1) {
+			this.remainder = this.ingredient.getEmiStacks().get(0).getRemainder();
+			this.remainderAmount = remainder.getAmount();
+			this.remainder.setAmount(1);
+		} else {
+			this.remainder = EmiStack.EMPTY;
+		}
 	}
 
 	public MaterialNode(MaterialNode node) {
 		this.ingredient = node.ingredient;
+		this.remainder = node.remainder;
 		this.recipe = node.recipe;
 		this.amount = node.amount;
 		this.divisor = node.divisor;
+		this.remainderAmount = node.remainderAmount;
 	}
 
 	public void recalculate(MaterialTree tree) {
@@ -73,9 +84,14 @@ public class MaterialNode {
 		this.children = Lists.newArrayList();
 		outer:
 		for (EmiIngredient i : recipe.getInputs()) {
+			EmiStack remainder = EmiStack.EMPTY;
+			if (i.getEmiStacks().size() == 1) {
+				remainder = i.getEmiStacks().get(0).getRemainder();
+			}
 			for (MaterialNode node : children) {
-				if (EmiIngredient.areEqual(i, node.ingredient)) {
+				if (EmiIngredient.areEqual(i, node.ingredient) && EmiIngredient.areEqual(remainder, node.remainder)) {
 					node.amount += i.getAmount();
+					node.remainderAmount += remainder.getAmount();
 					continue outer;
 				}
 			}
