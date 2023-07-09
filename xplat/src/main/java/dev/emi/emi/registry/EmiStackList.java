@@ -49,14 +49,29 @@ public class EmiStackList {
 	public static void reload() {
 		List<IndexGroup> groups = Lists.newArrayList();
 		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
+		Map<String, IndexGroup> creativeGroups = new LinkedHashMap<>();
+		for (Item item : EmiPort.getItemRegistry()) {
+			EmiStack stack = EmiStack.of(item);
+			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+		}
 		for (Item item : EmiPort.getItemRegistry()) {
 			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
 			item.appendStacks(ItemGroup.SEARCH, itemStacks);
 			List<EmiStack> stacks = itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).toList();
 			if (!stacks.isEmpty()) {
-				namespaceGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
+				creativeGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
 			}
 		}
+		for (String namespace : namespaceGroups.keySet()) {
+			if (creativeGroups.containsKey(namespace)) {
+				IndexGroup ng = namespaceGroups.get(namespace);
+				IndexGroup cg = creativeGroups.get(namespace);
+				if (cg.stacks.size() * 3 >= ng.stacks.size()) {
+					ng.suppressedBy.add(cg);
+				}
+			}
+		}
+		groups.addAll(creativeGroups.values());
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();
 		for (Fluid fluid : EmiPort.getFluidRegistry()) {
