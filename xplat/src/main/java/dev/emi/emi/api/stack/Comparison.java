@@ -1,5 +1,6 @@
 package dev.emi.emi.api.stack;
 
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.nbt.NbtCompound;
 
 public class Comparison {
@@ -13,7 +14,7 @@ public class Comparison {
 		}
 	}); 
 	public static final Comparison DEFAULT_COMPARISON = Comparison.of((a, b) -> true);
-	private final Predicate predicate;
+	private Predicate predicate;
 
 	private Comparison(Predicate comparator) {
 		this.predicate = comparator;
@@ -28,7 +29,14 @@ public class Comparison {
 	}
 
 	public boolean compare(EmiStack a, EmiStack b) {
-		return predicate.test(a, b);
+		try {
+			return predicate.test(a, b);
+		} catch (Throwable t) {
+			predicate = (na, nb) -> true;
+			EmiLog.error("Comparison threw an exception, disabling");
+			t.printStackTrace();
+		}
+		return true;
 	}
 
 	public static interface Predicate {

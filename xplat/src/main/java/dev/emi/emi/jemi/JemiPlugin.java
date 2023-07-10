@@ -32,6 +32,7 @@ import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiLog;
+import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.runtime.EmiReloadManager;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -224,9 +225,8 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				t.printStackTrace();
 			}
 		}
-
 		EmiReloadManager.step(EmiPort.literal("Processing JEI subtypes..."), 5_000);
-		parseSubtypes(registry);
+		safely("subtype comparison", () -> parseSubtypes(registry));
 	}
 
 	private void addInfoRecipes(EmiRegistry registry, IRecipeCategory<IJeiIngredientInfoRecipe> category) {
@@ -270,32 +270,37 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				if (type instanceof IIngredientTypeWithSubtypes iitws) {
 					List<Object> ings = Lists.newArrayList(im.getAllIngredients(type));
 					for (Object o : ings) {
-						String info = subtypeManager.getSubtypeInfo(iitws, o, UidContext.Recipe);
-						if (info != IIngredientSubtypeInterpreter.NONE) {
-							if (type == VanillaTypes.ITEM_STACK) {
-								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-									return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
-										.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
-								}));
-							} else if (type == JemiUtil.getFluidType()) {
-								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-									ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
-									ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
-									if (ta != null && tb != null) {
-										return subtypeManager.getSubtypeInfo(iitws, ta.getIngredient(), UidContext.Recipe)
-											.equals(subtypeManager.getSubtypeInfo(iitws, tb.getIngredient(), UidContext.Recipe));
-									}
-									return false;
-								}));
-							} else {
-								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-									if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
-										return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
-											.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
-									}
-									return false;
-								}));
+						try {
+							String info = subtypeManager.getSubtypeInfo(iitws, o, UidContext.Recipe);
+							if (info != IIngredientSubtypeInterpreter.NONE) {
+								if (type == VanillaTypes.ITEM_STACK) {
+									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+										return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
+											.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
+									}));
+								} else if (type == JemiUtil.getFluidType()) {
+									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+										ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
+										ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
+										if (ta != null && tb != null) {
+											return subtypeManager.getSubtypeInfo(iitws, ta.getIngredient(), UidContext.Recipe)
+												.equals(subtypeManager.getSubtypeInfo(iitws, tb.getIngredient(), UidContext.Recipe));
+										}
+										return false;
+									}));
+								} else {
+									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+										if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
+											return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
+												.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
+										}
+										return false;
+									}));
+								}
 							}
+						} catch (Throwable t) {
+							EmiReloadLog.warn("Exception adding default comparison for JEI ingredient");
+							EmiReloadLog.error(t);
 						}
 					}
 				}
@@ -309,5 +314,14 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			return runtime.getRecipeTransferManager().getRecipeTransferHandler(handler, category).map(JemiRecipeHandler::new).orElse(null);
 		}
 		return null;
+	}
+
+	private static void safely(String name, Runnable runnable) {
+		try {
+			runnable.run();
+		} catch (Throwable t) {
+			EmiReloadLog.warn("Exception thrown when reloading " + name  + " step in JEMI plugin");
+			EmiReloadLog.error(t);
+		}
 	}
 }
