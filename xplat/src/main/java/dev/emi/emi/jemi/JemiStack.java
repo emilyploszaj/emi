@@ -42,6 +42,10 @@ public class JemiStack<T> extends EmiStack {
 		}
 	}
 
+	public String getJeiUid() {
+		return helper.getUniqueId(ingredient, UidContext.Ingredient);
+	}
+
 	@Override
 	public void render(DrawContext raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
