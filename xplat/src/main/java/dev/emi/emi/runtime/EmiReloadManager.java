@@ -137,7 +137,9 @@ public class EmiReloadManager {
 						EmiReloadLog.warn("Recipe Manager is null");
 						break;
 					}
-	
+
+					EmiHidden.reload();
+
 					step(EmiPort.literal("Processing tags"));
 					EmiTags.reload();
 
