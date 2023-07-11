@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -116,9 +115,6 @@ public class EmiRecipes {
 			this.categories = categories.stream().distinct().toList();
 			this.workstations = workstations;
 			this.recipes = List.copyOf(recipes);
-
-			Map<EmiStack, Set<EmiRecipe>> byInput = Maps.newHashMap();
-			Map<EmiStack, Set<EmiRecipe>> byOutput = Maps.newHashMap();
 	
 			Object2IntMap<Identifier> duplicateIds = new Object2IntOpenHashMap<>();
 			for (EmiRecipe recipe : recipes) {
@@ -162,19 +158,13 @@ public class EmiRecipes {
 				byCategory.put(category, cRecipes);
 				for (EmiRecipe recipe : cRecipes) {
 					recipe.getInputs().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
 					recipe.getCatalysts().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
 					recipe.getOutputs().stream().forEach(i -> byOutput
-						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
 				}
 			}
-			this.byInput = byInput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
-				return m.getValue().stream().toList();
-			}));
-			this.byOutput = byOutput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
-				return m.getValue().stream().toList();
-			}));
 			for (EmiRecipeCategory category : workstations.keySet()) {
 				workstations.put(category, workstations.get(category).stream().distinct().toList());
 			}
