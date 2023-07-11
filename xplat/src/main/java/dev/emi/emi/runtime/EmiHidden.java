@@ -1,8 +1,13 @@
 package dev.emi.emi.runtime;
 
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -10,10 +15,31 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.data.EmiData;
+import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.registry.EmiStackList;
 
 public class EmiHidden {
+	// Data loaded
+	public static Set<EmiIngredient> disabledStacks = Sets.newHashSet();
+	public static List<IndexStackData.Filter> disabledFilters = Lists.newArrayList();
+	public static Map<String, Boolean> disabledFilterLookup = Maps.newHashMap();
+	// User edited
 	public static Set<EmiIngredient> hiddenStacks = new LinkedHashSet<>();
+
+	public static void reload() {
+		disabledStacks.clear();
+		disabledFilters.clear();
+		disabledFilterLookup.clear();
+		List<IndexStackData> isds = EmiData.stackData.stream().map(i -> i.get()).filter(i -> i.disable() && (!i.filters().isEmpty() || !i.removed().isEmpty())).toList();
+		for (IndexStackData data : isds) {
+			for (EmiIngredient stack : data.removed()) {
+				disabledStacks.add(stack);
+				disabledStacks.addAll(stack.getEmiStacks());
+			}
+			disabledFilters.addAll(data.filters());
+		}
+	}
 
 	public static JsonArray save() {
 		JsonArray arr = new JsonArray();
@@ -42,6 +68,27 @@ public class EmiHidden {
 
 	public static boolean isHidden(EmiIngredient stack) {
 		return hiddenStacks.contains(stack);
+	}
+
+	public static boolean isDisabled(EmiIngredient stack) {
+		for (EmiStack s : stack.getEmiStacks()) {
+			if (disabledStacks.contains(s)) {
+				continue;
+			}
+			boolean filtered = disabledFilterLookup.computeIfAbsent("" + s.getId(), id -> {
+				for (IndexStackData.Filter filter : disabledFilters) {
+					if (filter.filter().test(id)) {
+						return true;
+					}
+				}
+				return false;
+			});
+			if (filtered) {
+				continue;
+			}
+			return false;
+		}
+		return !stack.isEmpty();
 	}
 
 	public static void setVisibility(EmiIngredient stack, boolean hide, boolean similar) {
