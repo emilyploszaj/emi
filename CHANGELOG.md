@@ -1,3 +1,6 @@
+### Tweaks
+* Tags ingredients now omit disabled stacks
+
 ### Fixes
-* Fixed impolite comparisons crashing EMI
-* Fixed JEI stack favoriting
+* Recipes that are removed by disabled stacks are now more refined
+* Fixed potential async recipe baking exception

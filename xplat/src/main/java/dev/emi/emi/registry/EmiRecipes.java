@@ -27,7 +27,7 @@ import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
-import dev.emi.emi.data.IndexStackData;
+import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -63,30 +63,10 @@ public class EmiRecipes {
 		categories.sort((a, b) -> EmiRecipeCategoryProperties.getOrder(a) - EmiRecipeCategoryProperties.getOrder(b));
 		invalidators.addAll(EmiData.recipeFilters);
 
-		List<IndexStackData> isds = EmiData.stackData.stream().map(i -> i.get()).filter(i -> i.disable() && (!i.filters().isEmpty() || !i.removed().isEmpty())).toList();
-		Map<String, Boolean> bakedIdFilters = Maps.newHashMap();
 		invalidators.add(r -> {
 			for (EmiIngredient i : Iterables.concat(r.getInputs(), r.getOutputs(), r.getCatalysts())) {
-				for (IndexStackData data : isds) {
-					if (data.removed().contains(i)) {
-						return true;
-					}
-					for (EmiStack stack : i.getEmiStacks()) {
-						if (data.removed().contains(stack)) {
-							return true;
-						}
-						boolean filtered = bakedIdFilters.computeIfAbsent("" + stack.getId(), id -> {
-							for (IndexStackData.Filter filter : data.filters()) {
-								if (filter.filter().test(id)) {
-									return true;
-								}
-							}
-							return false;
-						});
-						if (filtered) {
-							return true;
-						}
-					}
+				if (EmiHidden.isDisabled(i)) {
+					return true;
 				}
 			}
 			return false;
@@ -182,11 +162,11 @@ public class EmiRecipes {
 				byCategory.put(category, cRecipes);
 				for (EmiRecipe recipe : cRecipes) {
 					recipe.getInputs().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 					recipe.getCatalysts().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 					recipe.getOutputs().stream().forEach(i -> byOutput
-						.computeIfAbsent(i, b -> Sets.newLinkedHashSet()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 				}
 			}
 			this.byInput = byInput.entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), m -> {
