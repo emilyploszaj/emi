@@ -17,10 +17,10 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ListEmiIngredient;
-import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.TagExclusions;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
@@ -38,6 +38,7 @@ public class EmiTags {
 	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
+	private static final Map<TagKey<?>, List<?>> TAG_CONTENTS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
 	private static final Map<Identifier, List<TagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<Registry<?>> REGISTRIES = List.of(EmiPort.getItemRegistry(), EmiPort.getFluidRegistry());
@@ -82,14 +83,14 @@ public class EmiTags {
 
 		if (keys != null) {
 			for (TagKey<T> key : keys) {
-				List<T> values = (List<T>) TAG_VALUES.get(key);
+				List<T> values = (List<T>) TAG_CONTENTS.get(key);
 				map.keySet().removeAll(values);
 			}
 		} else {
 			keys = Lists.newArrayList();
 			Set<T> original = new HashSet<>(map.keySet());
 			for (TagKey<T> key : getTags(registry)) {
-				List<T> values = (List<T>) TAG_VALUES.get(key);
+				List<T> values = (List<T>) TAG_CONTENTS.get(key);
 				if (values.size() < 2) {
 					continue;
 				}
@@ -108,13 +109,13 @@ public class EmiTags {
 			return new ListEmiIngredient(stacks.stream().toList(), amount);
 		} else if (map.isEmpty()) {
 			if (keys.size() == 1) {
-				return new TagEmiIngredient(keys.get(0), amount);
+				return EmiIngredient.of(keys.get(0), amount);
 			} else {
-				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList(), amount);
+				return new ListEmiIngredient(keys.stream().map(k -> EmiIngredient.of(k, 1)).toList(), amount);
 			}
 		} else {
 			return new ListEmiIngredient(List.of(map.values().stream().map(i -> i.copy().setAmount(1)).toList(),
-					keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList())
+					keys.stream().map(k -> EmiIngredient.of(k, 1)).toList())
 				.stream().flatMap(a -> a.stream()).toList(), amount);
 		}
 	}
@@ -202,6 +203,7 @@ public class EmiTags {
 	public static void reload() {
 		TAGS.clear();
 		SORTED_TAGS.clear();
+		TAG_CONTENTS.clear();
 		TAG_VALUES.clear();
 		CACHED_TAGS.clear();
 		for (Registry<?> registry : REGISTRIES) {
@@ -219,13 +221,29 @@ public class EmiTags {
 		logUntranslatedTags(tags);
 		tags = consolodateTags(tags);
 		for (TagKey<T> key : tags) {
-			TAG_VALUES.put(key, EmiUtil.values(key).map(i -> i.value()).toList());
+			List<T> contents = EmiUtil.values(key).map(i -> i.value()).toList();
+			TAG_CONTENTS.put(key, contents);
+			List<T> values = contents.stream().filter(s -> !EmiHidden.isDisabled(stackFromKey(key, s))).toList();
+			if (values.isEmpty()) {
+				TAG_VALUES.put(key, contents);
+			} else {
+				TAG_VALUES.put(key, values);
+			}
 		}
 		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.toString().compareTo(b.toString())).toList());
 		tags = tags.stream()
 			.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
 			.toList();
 		EmiTags.SORTED_TAGS.put(registry.getKey().getValue(), (List) tags);
+	}
+
+	private static <T> EmiStack stackFromKey(TagKey<T> key, T t) {
+		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
+			return EmiStack.of((Item) t);
+		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
+			return EmiStack.of((Fluid) t);
+		}
+		throw new UnsupportedOperationException("Unsupported tag registry " + key);
 	}
 
 	private static <T> void logUntranslatedTags(List<TagKey<T>> tags) {

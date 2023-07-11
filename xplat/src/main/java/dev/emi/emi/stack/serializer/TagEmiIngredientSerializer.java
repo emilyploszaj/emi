@@ -32,7 +32,7 @@ public class TagEmiIngredientSerializer implements EmiIngredientSerializer<TagEm
 			if (m.matches()) {
 				Identifier registry = new Identifier(m.group(1));
 				Identifier id = new Identifier(m.group(2), m.group(3));
-				return new TagEmiIngredient(TagKey.of(RegistryKey.ofRegistry(registry), id), 1);
+				return EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), 1);
 			}
 		} else if (element.isJsonObject()) {
 			JsonObject json = element.getAsJsonObject();
@@ -40,7 +40,7 @@ public class TagEmiIngredientSerializer implements EmiIngredientSerializer<TagEm
 			Identifier id = new Identifier(json.get("id").getAsString());
 			long amount = JsonHelper.getLong(json, "amount", 1);
 			float chance = JsonHelper.getFloat(json, "chance", 1);
-			TagEmiIngredient stack = new TagEmiIngredient(TagKey.of(RegistryKey.ofRegistry(registry), id), amount);
+			EmiIngredient stack = EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), amount);
 			if (chance != 1) {
 				stack.setChance(chance);
 			}
