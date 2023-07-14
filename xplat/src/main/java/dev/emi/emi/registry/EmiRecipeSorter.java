@@ -7,7 +7,6 @@ import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -44,10 +43,7 @@ public class EmiRecipeSorter {
 			if (stack.isEmpty()) {
 				continue;
 			}
-			int value = Integer.MAX_VALUE;
-			for (EmiStack s : stack.getEmiStacks()) {
-				value = Math.min(value, EmiStackList.indices.getOrDefault(s, value));
-			}
+			int value = EmiStackList.indices.getOrDefault(stack.getEmiStacks().get(0), Integer.MAX_VALUE);
 			list.add(value);
 		}
 		return list;

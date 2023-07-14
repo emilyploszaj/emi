@@ -197,10 +197,11 @@ public class EmiReloadManager {
 					}
 					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
-					step(EmiPort.literal("Finishing up"));
 					BoM.reload();
 					EmiPersistentData.load();
+					step(EmiPort.literal("Baking search"), 15_000);
 					EmiSearch.bake();
+					step(EmiPort.literal("Finishing up"));
 					EmiScreenManager.search.update();
 					EmiScreenManager.forceRecalculate();
 					EmiReloadLog.bake();
