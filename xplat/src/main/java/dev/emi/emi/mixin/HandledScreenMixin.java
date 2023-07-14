@@ -31,11 +31,6 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 
 	private HandledScreenMixin() { super(null); }
 
-	@Inject(at = @At(value = "TAIL"), method = "init")
-	private void init(CallbackInfo info) {
-		EmiScreenManager.addWidgets(this);
-	}
-
 	@Intrinsic @Override
 	public void renderBackground(MatrixStack raw) {
 		super.renderBackground(raw);
