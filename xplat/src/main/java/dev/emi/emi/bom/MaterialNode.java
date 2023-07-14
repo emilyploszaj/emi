@@ -73,12 +73,18 @@ public class MaterialNode {
 			return;
 		}
 		this.recipe = recipe;
-		divisor = 1;
+		divisor = 0;
 		for (EmiStack stack : recipe.getOutputs()) {
 			if (stack.equals(ingredient)) {
-				divisor = stack.getAmount();
-				produceChance = stack.getChance();
-				break;
+				if (divisor > 0) {
+					if (produceChance != 1 || stack.getChance() != 1) {
+						produceChance = (stack.getAmount() * stack.getChance() + divisor * produceChance) / (divisor + stack.getAmount());
+					}
+					divisor += stack.getAmount();
+				} else {
+					divisor = stack.getAmount();
+					produceChance = stack.getChance();
+				}
 			}
 		}
 		this.children = Lists.newArrayList();

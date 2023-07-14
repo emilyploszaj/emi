@@ -183,7 +183,7 @@ public class EmiStackList {
 				}
 				name = stack.toString();
 				id = stack.getId().toString();
-				if (name != null && stack.getKey() != null && stack.getName() != null && stack.getTooltip() != null) {
+				if (name != null && stack.getKey() != null && stack.getName() != null) {
 					return true;
 				}
 				EmiLog.warn("Hiding stack " + name + " with id " + id + " from index due to returning dangerous values");

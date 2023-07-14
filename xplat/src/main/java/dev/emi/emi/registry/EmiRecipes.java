@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -145,6 +146,9 @@ public class EmiRecipes {
 				EmiReloadLog.warn(duplicateIds.getInt(id) + " recipes loaded with the same id: " + id);
 			}
 	
+			Map<EmiStack, Set<EmiRecipe>> byInput = Maps.newHashMap();
+			Map<EmiStack, Set<EmiRecipe>> byOutput = Maps.newHashMap();
+
 			for (EmiRecipeCategory category : byCategory.keySet()) {
 				String key = EmiUtil.translateId("emi.category.", category.getId());
 				if (category.getName().equals(EmiPort.translatable(key)) && !I18n.hasTranslation(key)) {
@@ -154,16 +158,23 @@ public class EmiRecipes {
 				Comparator<EmiRecipe> sort = EmiRecipeCategoryProperties.getSort(category);
 				if (sort != EmiRecipeSorting.none()) {
 					cRecipes = cRecipes.stream().sorted(sort).collect(Collectors.toList());
+					EmiRecipeSorter.clear();
 				}
 				byCategory.put(category, cRecipes);
 				for (EmiRecipe recipe : cRecipes) {
 					recipe.getInputs().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 					recipe.getCatalysts().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> byInput
-						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 					recipe.getOutputs().stream().forEach(i -> byOutput
-						.computeIfAbsent(i.copy(), b -> Lists.newArrayList()).add(recipe));
+						.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe));
 				}
+			}
+			for (EmiStack key : byInput.keySet()) {
+				this.byInput.put(key, byInput.get(key).stream().toList());
+			}
+			for (EmiStack key : byOutput.keySet()) {
+				this.byOutput.put(key, byOutput.get(key).stream().toList());
 			}
 			for (EmiRecipeCategory category : workstations.keySet()) {
 				workstations.put(category, workstations.get(category).stream().distinct().toList());
