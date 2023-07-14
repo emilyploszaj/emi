@@ -17,11 +17,13 @@ import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ListEmiIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.TagExclusions;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
+import net.minecraft.block.Block;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.fluid.Fluid;
@@ -54,6 +56,17 @@ public class EmiTags {
 			} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
 				return values.stream().map(t -> EmiStack.of((Fluid) t)).toList();
 			}
+		}
+		return List.of();
+	}
+
+	public static <T> List<EmiStack> getRawValues(TagKey<T> key) {
+		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
+			return EmiUtil.values(key).map(e -> EmiStack.of((Item) e.value())).toList();
+		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
+			return EmiUtil.values(key).map(e -> EmiStack.of((Fluid) e.value())).toList();
+		} else if (key.registry().equals(EmiPort.getBlockRegistry().getKey())) {
+			return EmiUtil.values(key).map(e -> EmiStack.of((Block) e.value())).toList();
 		}
 		return List.of();
 	}
@@ -109,13 +122,13 @@ public class EmiTags {
 			return new ListEmiIngredient(stacks.stream().toList(), amount);
 		} else if (map.isEmpty()) {
 			if (keys.size() == 1) {
-				return EmiIngredient.of(keys.get(0), amount);
+				return new TagEmiIngredient(keys.get(0), amount);
 			} else {
-				return new ListEmiIngredient(keys.stream().map(k -> EmiIngredient.of(k, 1)).toList(), amount);
+				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList(), amount);
 			}
 		} else {
 			return new ListEmiIngredient(List.of(map.values().stream().map(i -> i.copy().setAmount(1)).toList(),
-					keys.stream().map(k -> EmiIngredient.of(k, 1)).toList())
+					keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList())
 				.stream().flatMap(a -> a.stream()).toList(), amount);
 		}
 	}
