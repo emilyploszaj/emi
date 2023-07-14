@@ -71,13 +71,7 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	public static <T> EmiIngredient of(TagKey<T> key, long amount) {
-		List<EmiStack> stacks = EmiTags.getValues(key);
-		if (stacks.isEmpty()) {
-			return EmiStack.EMPTY;
-		} else if (stacks.size() == 1) {
-			return stacks.get(0);
-		}
-		return new TagEmiIngredient(key, stacks, amount);
+		return EmiIngredient.of(EmiTags.getRawValues(key), amount);
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {

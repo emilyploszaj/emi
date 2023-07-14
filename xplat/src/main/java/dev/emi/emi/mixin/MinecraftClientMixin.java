@@ -35,7 +35,7 @@ public class MinecraftClientMixin {
 	}
 
 	@Inject(at = @At("HEAD"), method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V")
-	public void disconnect(CallbackInfo info) {
+	private void disconnect(CallbackInfo info) {
 		EmiLog.info("Disconnecting from server, EMI data cleared");
 		EmiReloadManager.clear();
 		EmiClient.onServer = false;
