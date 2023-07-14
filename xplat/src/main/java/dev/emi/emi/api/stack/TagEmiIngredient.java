@@ -3,9 +3,9 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Matrix4f;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -28,6 +28,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Formatting;
@@ -111,32 +112,37 @@ public class TagEmiIngredient implements EmiIngredient {
 			} else {
 				BakedModel model = ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
 					.getOrDefault(EmiTags.getCustomModel(key), client.getBakedModelManager().getMissingModel());
-
-				context.matrices().push();
-				context.matrices().translate(x + 8, y + 8, 150);
-				context.matrices().multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 1.0f));
-				context.matrices().scale(16.0f, 16.0f, 16.0f);
+					
+				MatrixStack vs = RenderSystem.getModelViewStack();
+				vs.push();
+				vs.multiplyPositionMatrix(context.matrices().peek().getPositionMatrix());
+				vs.translate(x, y, 100.0f);
+				vs.translate(8.0, 8.0, 0.0);
+				vs.scale(1.0f, -1.0f, 1.0f);
+				vs.scale(16.0f, 16.0f, 16.0f);
+				RenderSystem.applyModelViewMatrix();
 				
-				model.getTransformation().getTransformation(ModelTransformationMode.GUI).apply(false, context.matrices());
-				context.matrices().translate(-0.5f, -0.5f, -0.5f);
+				MatrixStack ms = new MatrixStack();
+				model.getTransformation().getTransformation(ModelTransformationMode.GUI).apply(false, ms);
+				ms.translate(-0.5, -0.5, -0.5);
 				
 				if (!model.isSideLit()) {
 					DiffuseLighting.disableGuiDepthLighting();
 				}
-				VertexConsumerProvider.Immediate immediate = context.raw().getVertexConsumers();
-				
+				VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 				((ItemRendererAccessor) client.getItemRenderer())
 					.invokeRenderBakedItemModel(model,
-						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, context.matrices(), 
+						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, ms, 
 						ItemRenderer.getDirectItemGlintConsumer(immediate,
 							TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
 				immediate.draw();
-				
+
 				if (!model.isSideLit()) {
 					DiffuseLighting.enableGuiDepthLighting();
 				}
 
-				context.matrices().pop();
+				vs.pop();
+				RenderSystem.applyModelViewMatrix();
 			}
 		}
 		if ((flags & RENDER_AMOUNT) != 0 && !key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
