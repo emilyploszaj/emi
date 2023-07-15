@@ -457,15 +457,17 @@ public class VanillaPlugin implements EmiPlugin {
 				if (i.getMaxDamage() > 0) {
 					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().getRepairIngredient() != null
 							&& !ai.getMaterial().getRepairIngredient().isEmpty()) {
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient())));
+						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ai.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
+						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient()), id));
 					} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
 							&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient())));
+						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ti.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
+						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient()), id));
 					}
 				}
 				if (i.isDamageable()) {
-					addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i));
-					addRecipeSafe(registry, () -> new EmiGrindstoneRecipe(i));
+					addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i, synthetic("anvil/repairing/tool", EmiUtil.subId(i))));
+					addRecipeSafe(registry, () -> new EmiGrindstoneRecipe(i, synthetic("grindstone/repairing", EmiUtil.subId(i))));
 				}
 			} catch (Throwable t) {
 				EmiLog.error("Exception thrown registering repair recipes");
@@ -478,15 +480,16 @@ public class VanillaPlugin implements EmiPlugin {
 						int max = e.getMaxLevel();
 						int min = e.getMinLevel();
 						while (min <= max) {
-							int finalMin = min;
-							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, finalMin));
+							final int level = min;
+							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, level,
+								synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + level)));
 							min++;
 						}
 						acceptableEnchantments++;
 					}
 				}
 				if (acceptableEnchantments > 0) {
-					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i));
+					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i, synthetic("grindstone/disenchanting/tool", EmiUtil.subId(i))));
 				}
 			} catch (Throwable t) {
 				EmiReloadLog.warn("Exception thrown registering enchantment recipes");
@@ -497,16 +500,19 @@ public class VanillaPlugin implements EmiPlugin {
 						synthetic("world/flower_duping", EmiUtil.subId(i)), false));
 			}
 		}
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE)));
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS)));
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE),
+			synthetic("anvil/repairing/material", EmiUtil.subId(Items.ELYTRA) + "/" + EmiUtil.subId(Items.PHANTOM_MEMBRANE))));
+		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS),
+			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
 			if (!e.isCursed()) {
 				int max = e.getMaxLevel();
 				int min = e.getMinLevel();
 				while (min <= max) {
-					int finalMin = min;
-					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingBookRecipe(e, finalMin));
+					int level = min;
+					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingBookRecipe(e, level,
+						synthetic("grindstone/disenchanting/book", EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + level)));
 					min++;
 				}
 			}

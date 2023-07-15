@@ -87,6 +87,9 @@ public class MaterialNode {
 				}
 			}
 		}
+		if (divisor <= 0) {
+			divisor = 1;
+		}
 		this.children = Lists.newArrayList();
 		outer:
 		for (EmiIngredient i : recipe.getInputs()) {

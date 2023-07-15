@@ -22,9 +22,11 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	private final Item tool;
+	private final Identifier id;
 
-	public EmiGrindstoneDisenchantingRecipe(Item tool) {
+	public EmiGrindstoneDisenchantingRecipe(Item tool, Identifier id) {
 		this.tool = tool;
+		this.id = id;
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 
 	@Override
 	public Identifier getId() {
-		return null;
+		return id;
 	}
 
 	@Override

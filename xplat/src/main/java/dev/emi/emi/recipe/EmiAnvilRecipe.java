@@ -17,11 +17,13 @@ import net.minecraft.util.Identifier;
 public class EmiAnvilRecipe implements EmiRecipe {
 	private final EmiStack tool;
 	private final EmiIngredient resource;
+	private final Identifier id;
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	
-	public EmiAnvilRecipe(EmiStack tool, EmiIngredient resource) {
+	public EmiAnvilRecipe(EmiStack tool, EmiIngredient resource, Identifier id) {
 		this.tool = tool;
 		this.resource = resource;
+		this.id = id;
 	}
 
 	@Override
@@ -31,7 +33,7 @@ public class EmiAnvilRecipe implements EmiRecipe {
 
 	@Override
 	public Identifier getId() {
-		return null;
+		return id;
 	}
 
 	@Override
