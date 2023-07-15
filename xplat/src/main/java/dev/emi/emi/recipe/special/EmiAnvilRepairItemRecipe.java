@@ -19,10 +19,12 @@ import net.minecraft.util.Identifier;
 
 public class EmiAnvilRepairItemRecipe implements EmiRecipe {
 	private final Item tool;
+	private final Identifier id;
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
-	public EmiAnvilRepairItemRecipe(Item tool) {
+	public EmiAnvilRepairItemRecipe(Item tool, Identifier id) {
 		this.tool = tool;
+		this.id = id;
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class EmiAnvilRepairItemRecipe implements EmiRecipe {
 
 	@Override
 	public Identifier getId() {
-		return null;
+		return id;
 	}
 
 	@Override
