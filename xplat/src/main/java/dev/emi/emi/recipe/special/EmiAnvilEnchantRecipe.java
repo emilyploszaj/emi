@@ -24,11 +24,13 @@ public class EmiAnvilEnchantRecipe implements EmiRecipe {
 	private final Item tool;
 	private final Enchantment enchantment;
 	private final int level;
+	private final Identifier id;
 
-	public EmiAnvilEnchantRecipe(Item tool, Enchantment enchantment, int level) {
+	public EmiAnvilEnchantRecipe(Item tool, Enchantment enchantment, int level, Identifier id) {
 		this.tool = tool;
 		this.enchantment = enchantment;
 		this.level = level;
+		this.id = id;
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class EmiAnvilEnchantRecipe implements EmiRecipe {
 
 	@Override
 	public Identifier getId() {
-		return null;
+		return id;
 	}
 
 	@Override
