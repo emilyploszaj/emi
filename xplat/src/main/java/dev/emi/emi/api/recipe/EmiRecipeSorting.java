@@ -2,13 +2,10 @@ package dev.emi.emi.api.recipe;
 
 import java.util.Comparator;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import dev.emi.emi.registry.EmiRecipeSorter;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.util.Identifier;
 
-@ApiStatus.Experimental
 public class EmiRecipeSorting {
 	private static final Comparator<EmiRecipe> NONE = (a, b) -> 0;
 
