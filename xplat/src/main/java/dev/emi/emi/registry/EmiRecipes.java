@@ -137,13 +137,16 @@ public class EmiRecipes {
 				if (id != null) {
 					if (byId.containsKey(id)) {
 						duplicateIds.put(id, duplicateIds.getOrDefault(id, 1) + 1);
+					} else {
+						byId.put(id, recipe);
 					}
-					byId.put(id, recipe);
 				}
 			}
 	
-			for (Identifier id : duplicateIds.keySet()) {
-				EmiReloadLog.warn(duplicateIds.getInt(id) + " recipes loaded with the same id: " + id);
+			if (EmiConfig.devMode) {
+				for (Identifier id : duplicateIds.keySet()) {
+					EmiReloadLog.warn(duplicateIds.getInt(id) + " recipes loaded with the same id: " + id);
+				}
 			}
 	
 			Map<EmiStack, Set<EmiRecipe>> byInput = Maps.newHashMap();

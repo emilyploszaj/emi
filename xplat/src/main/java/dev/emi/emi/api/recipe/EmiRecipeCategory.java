@@ -3,7 +3,6 @@ package dev.emi.emi.api.recipe;
 import java.util.Comparator;
 import java.util.List;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -23,7 +22,6 @@ import net.minecraft.util.Identifier;
 public class EmiRecipeCategory implements EmiRenderable {
 	public Identifier id;
 	public EmiRenderable icon, simplified;
-	@ApiStatus.Experimental
 	public Comparator<EmiRecipe> sorter;
 	
 	/**
@@ -46,7 +44,6 @@ public class EmiRecipeCategory implements EmiRenderable {
 	/**
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	@ApiStatus.Experimental
 	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
 		this.id = id;
 		this.icon = icon;
@@ -84,7 +81,6 @@ public class EmiRecipeCategory implements EmiRenderable {
 		return list;
 	}
 
-	@ApiStatus.Experimental
 	public @Nullable Comparator<EmiRecipe> getSort() {
 		return sorter;
 	}
