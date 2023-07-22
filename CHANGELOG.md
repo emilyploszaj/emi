@@ -1,5 +1,6 @@
 ### Tweaks
-* All anvil and grinstone enchantment, disenchantment, and repairing recipes have been given IDs
+* Effort was made to reduce anvil/grindstone recipe spam for "universal" enchantments
+* Experimental annotations were removed from stable APIs
 
 ### Fixes
-* Fixed ingredient counts turning to 2 billion if a tag was resolved in the recipe tree
+* Duplicate recipe IDs are now only logged in dev mode #249
