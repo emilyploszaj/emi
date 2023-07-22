@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -93,7 +92,6 @@ public class EmiApi {
 	 * @return Recipe context associated with specific ingredient implementations.
 	 *  This could be favorites, craftables, or something else.
 	 */
-	@ApiStatus.Experimental
 	public static @Nullable EmiRecipe getRecipeContext(EmiIngredient stack) {
 		if (stack instanceof EmiFavorite fav) {
 			return fav.getRecipe();

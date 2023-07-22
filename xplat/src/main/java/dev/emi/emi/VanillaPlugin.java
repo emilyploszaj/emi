@@ -449,6 +449,18 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static void addRepair(EmiRegistry registry, Set<Item> hiddenItems) {
+		List<Enchantment> targetedEnchantments = Lists.newArrayList();
+		List<Enchantment> universalEnchantments = Lists.newArrayList();
+		for (Enchantment enchantment : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+			try {
+				if (enchantment.isAcceptableItem(ItemStack.EMPTY)) {
+					universalEnchantments.add(enchantment);
+					continue;
+				}
+			} catch (Throwable t) {
+			}
+			targetedEnchantments.add(enchantment);
+		}
 		for (Item i : EmiPort.getItemRegistry()) {
 			if (hiddenItems.contains(i)) {
 				continue;
@@ -474,21 +486,31 @@ public class VanillaPlugin implements EmiPlugin {
 				t.printStackTrace();
 			}
 			try {
+				ItemStack defaultStack = i.getDefaultStack();
 				int acceptableEnchantments = 0;
-				for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
-					if (e.isAcceptableItem(i.getDefaultStack())) {
-						int max = e.getMaxLevel();
-						int min = e.getMinLevel();
-						while (min <= max) {
-							final int level = min;
-							addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, level,
-								synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + level)));
-							min++;
-						}
+				Consumer<Enchantment> consumer = e -> {
+					int max = e.getMaxLevel();
+					int min = e.getMinLevel();
+					while (min <= max) {
+						final int level = min;
+						addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, level,
+							synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + level)));
+						min++;
+					}
+				};
+				for (Enchantment e : targetedEnchantments) {
+					if (e.isAcceptableItem(defaultStack)) {
+						consumer.accept(e);
 						acceptableEnchantments++;
 					}
 				}
 				if (acceptableEnchantments > 0) {
+					for (Enchantment e : universalEnchantments) {
+						if (e.isAcceptableItem(defaultStack)) {
+							consumer.accept(e);
+							acceptableEnchantments++;
+						}
+					}
 					addRecipeSafe(registry, () -> new EmiGrindstoneDisenchantingRecipe(i, synthetic("grindstone/disenchanting/tool", EmiUtil.subId(i))));
 				}
 			} catch (Throwable t) {
