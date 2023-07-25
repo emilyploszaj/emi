@@ -136,6 +136,9 @@ public class EmiUtil {
 		HandledScreen<?> hs = EmiApi.getHandledScreen();
 		EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
 		for (EmiRecipe recipe : recipes) {
+			if (!recipe.supportsRecipeTree()) {
+				continue;
+			}
 			int weight = 0;
 			EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
 			if (handler != null && handler.canCraft(recipe, context)) {
@@ -168,7 +171,7 @@ public class EmiUtil {
 		if (ingredient.getEmiStacks().size() == 1 && !ingredient.isEmpty()) {
 			EmiStack stack = ingredient.getEmiStacks().get(0);
 			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
-					return r.supportsRecipeTree() && r.getOutputs().stream().anyMatch(i -> i.isEqual(stack));
+					return r.getOutputs().stream().anyMatch(i -> i.isEqual(stack));
 				}).toList(), inventory, false);
 		}
 		return null;

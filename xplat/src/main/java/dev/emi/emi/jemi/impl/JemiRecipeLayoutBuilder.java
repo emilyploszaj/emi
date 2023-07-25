@@ -12,6 +12,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 	public final List<JemiIngredientAcceptor> ingredients = Lists.newArrayList();
 	public final List<JemiRecipeSlotBuilder> slots = Lists.newArrayList();
+	public boolean shapeless = false;
 
 	@Override
 	public IRecipeSlotBuilder addSlot(RecipeIngredientRole recipeIngredientRole, int x, int y) {
@@ -34,12 +35,12 @@ public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 
 	@Override
 	public void setShapeless() {
-		// TODO
+		shapeless = true;
 	}
 
 	@Override
 	public void setShapeless(int posX, int posY) {
-		// TODO
+		shapeless = true;
 	}
 
 	@Override
