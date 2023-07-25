@@ -125,14 +125,25 @@ public class EmiTags {
 			return new ListEmiIngredient(stacks.stream().toList(), amount);
 		} else if (map.isEmpty()) {
 			if (keys.size() == 1) {
-				return new TagEmiIngredient(keys.get(0), amount);
+				return tagIngredient(keys.get(0), amount);
 			} else {
-				return new ListEmiIngredient(keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList(), amount);
+				return new ListEmiIngredient(keys.stream().map(k -> tagIngredient(k, 1)).toList(), amount);
 			}
 		} else {
 			return new ListEmiIngredient(List.of(map.values().stream().map(i -> i.copy().setAmount(1)).toList(),
-					keys.stream().map(k -> new TagEmiIngredient(k, 1)).toList())
+					keys.stream().map(k -> tagIngredient(k, 1)).toList())
 				.stream().flatMap(a -> a.stream()).toList(), amount);
+		}
+	}
+
+	private static EmiIngredient tagIngredient(TagKey<?> key, long amount) {
+		List<?> list = TAG_VALUES.get(key);
+		if (list == null || list.isEmpty()) {
+			return EmiStack.EMPTY;
+		} else if (list.size() == 1) {
+			return new TagEmiIngredient(key, amount).getEmiStacks().get(0).copy().setAmount(amount);
+		} else {
+			return new TagEmiIngredient(key, amount);
 		}
 	}
 
