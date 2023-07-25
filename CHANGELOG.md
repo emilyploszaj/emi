@@ -1,6 +1,9 @@
+### Additions
+* JEMI now takes custom crafting recipes from JEI properly
+
 ### Tweaks
-* Effort was made to reduce anvil/grindstone recipe spam for "universal" enchantments
-* Experimental annotations were removed from stable APIs
+* Tweaked how recipe assuming works to pick better targets and avoid common but undesireable recipes
+* Tweaked how certain tags are constructed to avoid wiping data
 
 ### Fixes
-* Duplicate recipe IDs are now only logged in dev mode #249
+* Favorites now distinguish between NBT again #253

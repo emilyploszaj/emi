@@ -416,7 +416,9 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				for (Widget widget : group.widgets) {
 					if (widget.getBounds().contains(ox, oy)) {
 						if (widget instanceof SlotWidget slot) {
-							pressedSlot = widget;
+							if (pressedSlot == null) {
+								pressedSlot = widget;
+							}
 						} else {
 							if (widget.mouseClicked(ox, oy, button)) {
 								return true;

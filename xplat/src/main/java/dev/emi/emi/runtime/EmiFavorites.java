@@ -84,7 +84,7 @@ public class EmiFavorites {
 
 	private static int indexOf(EmiIngredient stack) {
 		for (int i = 0; i < favorites.size(); i++) {
-			if (favorites.get(i).equals(stack) && favorites.get(i).getRecipe() == EmiApi.getRecipeContext(stack)) {
+			if (favorites.get(i).strictEquals(stack) && favorites.get(i).getRecipe() == EmiApi.getRecipeContext(stack)) {
 				return i;
 			}
 		}
@@ -128,7 +128,7 @@ public class EmiFavorites {
 			}
 			for (int i = 0; i < favorites.size(); i++) {
 				EmiFavorite fav = favorites.get(i);
-				if (fav.getRecipe() == null && fav.getStack().equals(stack)) {
+				if (fav.getRecipe() == null && fav.strictEquals(stack)) {
 					favorites.remove(i--);
 				}
 			}
@@ -166,7 +166,7 @@ public class EmiFavorites {
 				if (!es.isEmpty()) {
 					for (int i = 0; i < favorites.size(); i++) {
 						EmiFavorite fav = favorites.get(i);
-						if (fav.getRecipe() == context && fav.getStack().equals(es)) {
+						if (fav.getRecipe() == context && fav.strictEquals(es)) {
 							return;
 						}
 					}
@@ -178,7 +178,7 @@ public class EmiFavorites {
 				}
 				for (int i = 0; i < favorites.size(); i++) {
 					EmiFavorite fav = favorites.get(i);
-					if (fav.getRecipe() == null && fav.getStack().equals(stack)) {
+					if (fav.getRecipe() == null && fav.strictEquals(stack)) {
 						return;
 					}
 				}
