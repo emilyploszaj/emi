@@ -10,6 +10,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
@@ -89,6 +90,20 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 			list.add(new RecipeTooltipComponent(recipe, true));
 		}
 		return list;
+	}
+
+	public boolean strictEquals(EmiIngredient other) {
+		List<EmiStack> as = this.getEmiStacks();
+		List<EmiStack> bs = other.getEmiStacks();
+		if (as.size() != bs.size()) {
+			return false;
+		}
+		for (int i = 0; i < as.size(); i++) {
+			if (!as.get(i).isEqual(bs.get(i), Comparison.compareNbt())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
