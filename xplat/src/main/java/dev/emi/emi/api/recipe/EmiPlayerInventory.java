@@ -138,8 +138,8 @@ public class EmiPlayerInventory {
 			.map(r -> new EmiFavorite.Craftable(r))
 			.sorted((a, b) -> {
 				int i = Integer.compare(
-					EmiStackList.indices.getOrDefault(a.getStack(), Integer.MAX_VALUE),
-					EmiStackList.indices.getOrDefault(b.getStack(), Integer.MAX_VALUE));
+					EmiStackList.getIndex(a.getStack()),
+					EmiStackList.getIndex(b.getStack()));
 				if (i != 0) {
 					return i;
 				}

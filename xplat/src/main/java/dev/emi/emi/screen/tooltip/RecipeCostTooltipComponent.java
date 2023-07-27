@@ -41,8 +41,8 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 			tree.cost.costs.values().stream(),
 			tree.cost.chanceCosts.values().stream()
 		).sorted((a, b) -> Integer.compare(
-			EmiStackList.indices.getOrDefault(a.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE),
-			EmiStackList.indices.getOrDefault(b.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE)
+			EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
+			EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
 		)).toList();
 		for (FlatMaterialCost cost : costs) {
 			if (cost instanceof ChanceMaterialCost cmc) {
