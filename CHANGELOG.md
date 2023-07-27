@@ -1,2 +1,6 @@
+### Tweaks
+* Anvil screen has significantly less redundant enchantment information
+
 ### Fixes
-* Properly collapse tags into singleton ingredients
+* Fixed certain mods causing index/recipe baking delays #259
+* Fixed certain JEI subtype information not being caught for comparisons

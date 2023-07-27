@@ -490,13 +490,8 @@ public class VanillaPlugin implements EmiPlugin {
 				int acceptableEnchantments = 0;
 				Consumer<Enchantment> consumer = e -> {
 					int max = e.getMaxLevel();
-					int min = e.getMinLevel();
-					while (min <= max) {
-						final int level = min;
-						addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, level,
-							synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + level)));
-						min++;
-					}
+					addRecipeSafe(registry, () -> new EmiAnvilEnchantRecipe(i, e, max,
+						synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + max)));
 				};
 				for (Enchantment e : targetedEnchantments) {
 					if (e.isAcceptableItem(defaultStack)) {

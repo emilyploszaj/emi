@@ -18,8 +18,11 @@ import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
+import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
@@ -28,6 +31,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -38,12 +42,14 @@ public class EmiStackList {
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = List.of();
 	public static List<EmiStack> filteredStacks = List.of();
-	public static Object2IntMap<EmiStack> indices = new Object2IntOpenHashMap<>();
+	private static Object2IntMap<EmiStack> strictIndices = new Object2IntOpenCustomHashMap<>(new StrictHashStrategy());
+	private static Object2IntMap<Object> keyIndices = new Object2IntOpenHashMap<>();
 
 	public static void clear() {
 		invalidators.clear();
 		stacks = List.of();
-		indices.clear();
+		strictIndices.clear();
+		keyIndices.clear();
 	}
 
 	public static void reload() {
@@ -82,7 +88,7 @@ public class EmiStackList {
 		}
 		groups.add(fluidGroup);
 
-		Set<EmiStack> added = Sets.newHashSet();
+		Set<EmiStack> added = new ObjectOpenCustomHashSet<>(new StrictHashStrategy());
 		
 		stacks = Lists.newLinkedList();
 		for (IndexGroup group : groups) {
@@ -185,13 +191,24 @@ public class EmiStackList {
 			}
 		}).toList();
 		for (int i = 0; i < stacks.size(); i++) {
-			indices.put(stacks.get(i), i);
+			EmiStack stack = stacks.get(i);
+			strictIndices.put(stack, i);
+			keyIndices.put(stack.getKey(), i);
 		}
 		bakeFiltered();
 	}
 
 	public static void bakeFiltered() {
 		filteredStacks = stacks.stream().filter(s -> !EmiHidden.isHidden(s)).toList();
+	}
+
+	public static int getIndex(EmiIngredient ingredient) {
+		EmiStack stack = ingredient.getEmiStacks().get(0);
+		int ret = strictIndices.getOrDefault(stack, Integer.MAX_VALUE);
+		if (ret != Integer.MAX_VALUE) {
+			ret = keyIndices.getOrDefault(stack, ret);
+		}
+		return ret;
 	}
 
 	public static class IndexGroup {
@@ -205,6 +222,31 @@ public class EmiStackList {
 				}
 			}
 			return true;
+		}
+	}
+
+	public static class StrictHashStrategy implements Hash.Strategy<EmiStack> {
+
+		@Override
+		public boolean equals(EmiStack a, EmiStack b) {
+			if (a == b) {
+				return true;
+			} else if (a == null || b == null) {
+				return false;
+			} else if (a.isEmpty() && b.isEmpty()) {
+				return true;
+			}
+			return a.isEqual(b, Comparison.compareNbt());
+		}
+
+		@Override
+		public int hashCode(EmiStack stack) {
+			if (stack != null) {
+				NbtCompound nbtCompound = stack.getNbt();
+				int i = 31 + stack.getKey().hashCode();
+				return 31 * i + (nbtCompound == null ? 0 : nbtCompound.hashCode());
+			}
+			return 0;
 		}
 	}
 }
