@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
@@ -57,10 +58,15 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRuntimeRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.library.ingredients.subtypes.SubtypeInterpreters;
+import mezz.jei.library.load.registration.SubtypeRegistration;
 import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Item;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
@@ -74,10 +80,32 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	private static final Map<EmiRecipeCategory, IRecipeCategory<?>> CATEGORY_MAP = Maps.newHashMap();
 	private static ISubtypeManager subtypeManager;
 	public static IJeiRuntime runtime;
+	public static BiPredicate<IIngredientTypeWithSubtypes<? extends Object, ? extends Object>, Object> hasSubtype = (a, b) -> true;
 
 	@Override
 	public Identifier getPluginUid() {
 		return new Identifier("emi:jemi");
+	}
+
+	public void registerItemSubtypes(ISubtypeRegistration registration) {
+		try {
+			if (((SubtypeRegistration) registration).getInterpreters() != null) {
+				hasSubtype = (type, ingredient) -> {
+					@SuppressWarnings("unchecked")
+					IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
+					SubtypeInterpreters interpreters = ((SubtypeRegistration) registration).getInterpreters();
+					return interpreters.contains(castedType, castedType.getBase(ingredient));
+				};
+			}
+			return;
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		hasSubtype = (type, ingredient) -> {
+			@SuppressWarnings("unchecked")
+			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
+			return subtypeManager.getSubtypeInfo(castedType, ingredient, UidContext.Recipe) != IIngredientSubtypeInterpreter.NONE;
+		};
 	}
 
 	@Override
@@ -334,43 +362,50 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		registry.removeRecipes(r -> r instanceof EmiCraftingRecipe && replaced.contains(r.getId()) && !replacements.contains(r));
 	}
 
-
 	@SuppressWarnings({"unchecked"})
 	private void parseSubtypes(EmiRegistry registry) {
 		if (subtypeManager != null) {
 			IIngredientManager im = runtime.getIngredientManager();
 			List<IIngredientType<?>> types = Lists.newArrayList(im.getRegisteredIngredientTypes());
+			for (Item item : EmiPort.getItemRegistry()) {
+				if (hasSubtype.test(VanillaTypes.ITEM_STACK, item.getDefaultStack())) {
+					registry.setDefaultComparison(item, Comparison.of((a, b) -> {
+						return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
+							.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
+					}));
+				}
+			}
+			for (Fluid fluid : EmiPort.getFluidRegistry()) {
+				IIngredientTypeWithSubtypes<Object, Object> type = (IIngredientTypeWithSubtypes<Object, Object>) JemiUtil.getFluidType();
+				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid, 1000))) {
+					System.out.println("JEMI Fluid Subtype " + fluid);
+					registry.setDefaultComparison(fluid, Comparison.of((a, b) -> {
+						ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
+						ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
+						if (ta != null && tb != null) {
+							return subtypeManager.getSubtypeInfo(type, ta.getIngredient(), UidContext.Recipe)
+								.equals(subtypeManager.getSubtypeInfo(type, tb.getIngredient(), UidContext.Recipe));
+						}
+						return false;
+					}));
+				}
+			}
 			for (IIngredientType<?> type : types) {
+				if (type == VanillaTypes.ITEM_STACK || type == JemiUtil.getFluidType()) {
+					continue;
+				}
 				if (type instanceof IIngredientTypeWithSubtypes iitws) {
 					List<Object> ings = Lists.newArrayList(im.getAllIngredients(type));
 					for (Object o : ings) {
 						try {
-							String info = subtypeManager.getSubtypeInfo(iitws, o, UidContext.Recipe);
-							if (info != IIngredientSubtypeInterpreter.NONE) {
-								if (type == VanillaTypes.ITEM_STACK) {
-									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-										return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
-											.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
-									}));
-								} else if (type == JemiUtil.getFluidType()) {
-									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-										ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
-										ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
-										if (ta != null && tb != null) {
-											return subtypeManager.getSubtypeInfo(iitws, ta.getIngredient(), UidContext.Recipe)
-												.equals(subtypeManager.getSubtypeInfo(iitws, tb.getIngredient(), UidContext.Recipe));
-										}
-										return false;
-									}));
-								} else {
-									registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-										if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
-											return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
-												.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
-										}
-										return false;
-									}));
-								}
+							if (hasSubtype.test(iitws, o)) {
+								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
+									if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
+										return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
+											.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
+									}
+									return false;
+								}));
 							}
 						} catch (Throwable t) {
 							EmiReloadLog.warn("Exception adding default comparison for JEI ingredient");

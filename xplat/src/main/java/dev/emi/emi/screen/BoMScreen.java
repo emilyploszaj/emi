@@ -123,8 +123,8 @@ public class BoMScreen extends Screen {
 				BoM.tree.cost.costs.values().stream(),
 				BoM.tree.cost.chanceCosts.values().stream()
 			).sorted((a, b) -> Integer.compare(
-				EmiStackList.indices.getOrDefault(a.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE),
-				EmiStackList.indices.getOrDefault(b.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE)
+				EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
+				EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
 			)).toList();
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			int costX = 0;
@@ -164,8 +164,8 @@ public class BoMScreen extends Screen {
 				BoM.tree.cost.remainders.values().stream(),
 				BoM.tree.cost.chanceRemainders.values().stream()
 			).sorted((a, b) -> Integer.compare(
-				EmiStackList.indices.getOrDefault(a.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE),
-				EmiStackList.indices.getOrDefault(b.ingredient.getEmiStacks().get(0), Integer.MAX_VALUE)
+				EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
+				EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
 			)).toList();
 			cy += 40;
 			int remainderX = 0;
