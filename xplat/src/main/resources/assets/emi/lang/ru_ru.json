@@ -70,7 +70,7 @@
   "emi.recipe_book_action.toggle_visibility": "Переключение видимости",
 
   "config.emi.group.general": "Основное",
-  "config.emi.group.general.search": "Search",
+  "config.emi.group.general.search": "Поиск",
   "config.emi.group.ui": "UI",
   "config.emi.group.ui.mod_id": "ID Мода",
   "config.emi.group.ui.recipe_screen": "Экран рецептов",
