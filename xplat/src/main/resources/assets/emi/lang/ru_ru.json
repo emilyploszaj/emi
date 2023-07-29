@@ -187,7 +187,7 @@
   "emi.too_small": "Невозможно вместить все ингредиенты на ремесленном столе",
   "emi.favorite_recipe": "Нажмите %s, чтобы добавить рецепт в избранное",
   "emi.resolve.resolve": "Нажмите %s, чтобы просмотреть дерево рецептов",
-  "emi.resolve.default": "Нажмите %s, Press %s to default for all trees",
+  "emi.resolve.default": "Нажмите %s, чтобы сделать стандартным для всех деревьев",
   "emi.page": "Страница %s из %s",
   "emi.page.short": "%s/%s",
   "emi.total_cost": "Общая стоимость",
