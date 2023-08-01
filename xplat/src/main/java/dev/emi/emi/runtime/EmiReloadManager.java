@@ -90,11 +90,11 @@ public class EmiReloadManager {
 	}
 
 	public static void step(Text text) {
-		EmiLog.info(text.getString());
 		step(text, 5_000);
 	}
 
 	public static void step(Text text, long worry) {
+		EmiLog.info(text.getString());
 		reloadStep = text;
 		reloadWorry = System.currentTimeMillis() + worry;
 	}

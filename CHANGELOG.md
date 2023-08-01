@@ -1,6 +1,4 @@
-### Tweaks
-* Anvil screen has significantly less redundant enchantment information
-
 ### Fixes
-* Fixed certain mods causing index/recipe baking delays #259
-* Fixed certain JEI subtype information not being caught for comparisons
+* Fixed significant reload time increase when loaded with certain mods after 1.0.13
+* Fixed certain EMI reload steps not getting properly logged
+* Fixed excessive grindstone recipes when mods add uncapped enchantments #260
