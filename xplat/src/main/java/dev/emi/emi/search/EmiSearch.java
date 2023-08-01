@@ -37,42 +37,43 @@ public class EmiSearch {
 	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
 	public static volatile CompiledQuery compiledQuery;
 	public static Set<EmiStack> bakedStacks;
-	public static SuffixArray<EmiStack> names, tooltips, mods, aliases;
+	public static SuffixArray<SearchStack> names, tooltips, mods;
+	public static SuffixArray<EmiStack> aliases;
 
 	public static void bake() {
-		SuffixArray<EmiStack> names = new SuffixArray<EmiStack>();
-		SuffixArray<EmiStack> tooltips = new SuffixArray<EmiStack>();
-		SuffixArray<EmiStack> mods = new SuffixArray<EmiStack>();
-		SuffixArray<EmiStack> aliases = new SuffixArray<EmiStack>();
+		SuffixArray<SearchStack> names = new SuffixArray<>();
+		SuffixArray<SearchStack> tooltips = new SuffixArray<>();
+		SuffixArray<SearchStack> mods = new SuffixArray<>();
+		SuffixArray<EmiStack> aliases = new SuffixArray<>();
 		Set<EmiStack> bakedStacks = Sets.newIdentityHashSet();
 		boolean old = EmiConfig.appendItemModId;
 		EmiConfig.appendItemModId = false;
 		for (EmiStack stack : EmiStackList.stacks) {
 			try {
-				EmiStack strictStack = stack;
+				SearchStack searchStack = new SearchStack(stack);
 				bakedStacks.add(stack);
 				Text name = NameQuery.getText(stack);
 				if (name != null) {
-					names.add(strictStack, name.getString().toLowerCase());
+					names.add(searchStack, name.getString().toLowerCase());
 				}
 				List<Text> tooltip = stack.getTooltipText();
 				if (tooltip != null) {
 					for (int i = 1; i < tooltip.size(); i++) {
 						Text text = tooltip.get(i);
 						if (text != null) {
-							tooltips.add(strictStack, text.getString().toLowerCase());
+							tooltips.add(searchStack, text.getString().toLowerCase());
 						}
 					}
 				}
 				Identifier id = stack.getId();
 				if (id != null) {
-					mods.add(stack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
+					mods.add(searchStack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
 				}
 				if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
 					for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
 						Identifier eid = EmiPort.getEnchantmentRegistry().getId(e);
 						if (eid != null && !eid.getNamespace().equals("minecraft")) {
-							mods.add(stack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
+							mods.add(searchStack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
 						}
 					}
 				}
