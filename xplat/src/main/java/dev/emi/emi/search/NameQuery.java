@@ -8,11 +8,11 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.text.Text;
 
 public class NameQuery extends Query {
-	private final Set<EmiStack> valid;
+	private final Set<EmiStack> valid = Sets.newIdentityHashSet();
 	private final String name;
 	
 	public NameQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.names.findAll(name.toLowerCase()));
+		EmiSearch.names.findAll(name.toLowerCase()).forEach(s -> valid.add(s.stack));
 		this.name = name.toLowerCase();
 	}
 
