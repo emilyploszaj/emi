@@ -7,10 +7,10 @@ import com.google.common.collect.Sets;
 import dev.emi.emi.api.stack.EmiStack;
 
 public class ModQuery extends Query {
-	private final Set<EmiStack> valid;
+	private final Set<EmiStack> valid = Sets.newIdentityHashSet();
 
 	public ModQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.mods.findAll(name.toLowerCase()));
+		EmiSearch.mods.findAll(name.toLowerCase()).forEach(s -> valid.add(s.stack));
 	}
 
 	@Override
