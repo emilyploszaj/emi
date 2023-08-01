@@ -9,11 +9,11 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.text.Text;
 
 public class TooltipQuery extends Query {
-	private final Set<EmiStack> valid;
+	private final Set<EmiStack> valid = Sets.newIdentityHashSet();
 	private final String name;
 
 	public TooltipQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.tooltips.findAll(name.toLowerCase()));
+		EmiSearch.tooltips.findAll(name.toLowerCase()).forEach(s -> valid.add(s.stack));
 		this.name = name.toLowerCase();
 	}
 
