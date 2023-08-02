@@ -369,24 +369,20 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			List<IIngredientType<?>> types = Lists.newArrayList(im.getRegisteredIngredientTypes());
 			for (Item item : EmiPort.getItemRegistry()) {
 				if (hasSubtype.test(VanillaTypes.ITEM_STACK, item.getDefaultStack())) {
-					registry.setDefaultComparison(item, Comparison.of((a, b) -> {
-						return subtypeManager.getSubtypeInfo(a.getItemStack(), UidContext.Recipe)
-							.equals(subtypeManager.getSubtypeInfo(b.getItemStack(), UidContext.Recipe));
+					registry.setDefaultComparison(item, Comparison.compareData(stack -> {
+						return subtypeManager.getSubtypeInfo(stack.getItemStack(), UidContext.Recipe);
 					}));
 				}
 			}
 			for (Fluid fluid : EmiPort.getFluidRegistry()) {
 				IIngredientTypeWithSubtypes<Object, Object> type = (IIngredientTypeWithSubtypes<Object, Object>) JemiUtil.getFluidType();
 				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid, 1000))) {
-					System.out.println("JEMI Fluid Subtype " + fluid);
-					registry.setDefaultComparison(fluid, Comparison.of((a, b) -> {
-						ITypedIngredient<?> ta = JemiUtil.getTyped(a).orElse(null);
-						ITypedIngredient<?> tb = JemiUtil.getTyped(b).orElse(null);
-						if (ta != null && tb != null) {
-							return subtypeManager.getSubtypeInfo(type, ta.getIngredient(), UidContext.Recipe)
-								.equals(subtypeManager.getSubtypeInfo(type, tb.getIngredient(), UidContext.Recipe));
+					registry.setDefaultComparison(fluid, Comparison.compareData(stack -> {
+						ITypedIngredient<?> typed = JemiUtil.getTyped(stack).orElse(null);
+						if (typed != null) {
+							return subtypeManager.getSubtypeInfo(type, typed.getIngredient(), UidContext.Recipe);
 						}
-						return false;
+						return null;
 					}));
 				}
 			}
@@ -399,12 +395,11 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					for (Object o : ings) {
 						try {
 							if (hasSubtype.test(iitws, o)) {
-								registry.setDefaultComparison(iitws.getBase(o), Comparison.of((a, b) -> {
-									if (a instanceof JemiStack ja && b instanceof JemiStack jb) {
-										return subtypeManager.getSubtypeInfo(iitws, ja.ingredient, UidContext.Recipe)
-											.equals(subtypeManager.getSubtypeInfo(iitws, jb.ingredient, UidContext.Recipe));
+								registry.setDefaultComparison(iitws.getBase(o), Comparison.compareData(stack -> {
+									if (stack instanceof JemiStack jemi) {
+										return subtypeManager.getSubtypeInfo(iitws, jemi.ingredient, UidContext.Recipe);
 									}
-									return false;
+									return null;
 								}));
 							}
 						} catch (Throwable t) {
