@@ -84,7 +84,8 @@ public class EmiTags {
 		Map<T, EmiStack> map = Maps.newHashMap();
 		for (EmiStack stack : stacks) {
 			if (!stack.isEmpty()) {
-				if (map.containsKey(stack.getKey())) {
+				EmiStack existing = map.getOrDefault(stack.getKey(), null);
+				if (existing != null && !stack.equals(existing)) {
 					return new ListEmiIngredient(stacks, amount);
 				}
 				map.put((T) stack.getKey(), stack);
