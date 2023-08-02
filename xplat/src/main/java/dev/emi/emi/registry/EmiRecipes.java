@@ -34,7 +34,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 
@@ -103,9 +102,8 @@ public class EmiRecipes {
 		private final List<EmiRecipeCategory> categories;
 		private final Map<EmiRecipeCategory, List<EmiIngredient>> workstations;
 		private final List<EmiRecipe> recipes;
-		private Map<Object, Set<EmiStack>> lookupKeys = Maps.newIdentityHashMap();
-		private Map<EmiStack, List<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.StrictHashStrategy());
-		private Map<EmiStack, List<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.StrictHashStrategy());
+		private Map<EmiStack, List<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
+		private Map<EmiStack, List<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
 		private Map<EmiRecipeCategory, List<EmiRecipe>> byCategory = Maps.newHashMap();
 		private Map<Identifier, EmiRecipe> byId = Maps.newHashMap();
 
@@ -152,8 +150,8 @@ public class EmiRecipes {
 				}
 			}
 	
-			Map<EmiStack, Set<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.StrictHashStrategy());
-			Map<EmiStack, Set<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.StrictHashStrategy());
+			Map<EmiStack, Set<EmiRecipe>> byInput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
+			Map<EmiStack, Set<EmiRecipe>> byOutput = new Object2ObjectOpenCustomHashMap<>(new EmiStackList.ComparisonHashStrategy());
 
 			for (EmiRecipeCategory category : byCategory.keySet()) {
 				String key = EmiUtil.translateId("emi.category.", category.getId());
@@ -169,15 +167,12 @@ public class EmiRecipes {
 				byCategory.put(category, cRecipes);
 				for (EmiRecipe recipe : cRecipes) {
 					recipe.getInputs().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> {
-						lookupKeys.computeIfAbsent(i.getKey(), k -> new ObjectOpenCustomHashSet<EmiStack>(new EmiStackList.StrictHashStrategy())).add(i);
 						byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
 					});
 					recipe.getCatalysts().stream().flatMap(i -> i.getEmiStacks().stream()).forEach(i -> {
-						lookupKeys.computeIfAbsent(i.getKey(), k -> new ObjectOpenCustomHashSet<EmiStack>(new EmiStackList.StrictHashStrategy())).add(i);
 						byInput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
 					});
 					recipe.getOutputs().stream().forEach(i -> {
-						lookupKeys.computeIfAbsent(i.getKey(), k -> new ObjectOpenCustomHashSet<EmiStack>(new EmiStackList.StrictHashStrategy())).add(i);
 						byOutput.computeIfAbsent(i.copy(), b -> Sets.newLinkedHashSet()).add(recipe);
 					});
 				}
@@ -227,28 +222,12 @@ public class EmiRecipes {
 
 		@Override
 		public List<EmiRecipe> getRecipesByInput(EmiStack stack) {
-			return byInput.getOrDefault(getLookupKey(stack), List.of());
+			return byInput.getOrDefault(stack, List.of());
 		}
 
 		@Override
 		public List<EmiRecipe> getRecipesByOutput(EmiStack stack) {
-			return byOutput.getOrDefault(getLookupKey(stack), List.of());
-		}
-
-		private EmiStack getLookupKey(EmiStack stack) {
-			Set<EmiStack> possible = lookupKeys.getOrDefault(stack.getKey(), null);
-			if (possible != null) {
-				if (possible.contains(stack)) {
-					return stack;
-				} else {
-					for (EmiStack s : possible) {
-						if (s.equals(stack)) {
-							return s;
-						}
-					}
-				}
-			}
-			return stack;
+			return byOutput.getOrDefault(stack, List.of());
 		}
 	}
 }

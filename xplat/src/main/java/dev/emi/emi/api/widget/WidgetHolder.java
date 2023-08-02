@@ -73,7 +73,7 @@ public interface WidgetHolder {
 	}
 
 	default TooltipWidget addTooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier, int x, int y, int width, int height) {
-		return new TooltipWidget(tooltipSupplier, x, y, width, height);
+		return add(new TooltipWidget(tooltipSupplier, x, y, width, height));
 	}
 
 	default TooltipWidget addTooltip(List<TooltipComponent> tooltip, int x, int y, int width, int height) {

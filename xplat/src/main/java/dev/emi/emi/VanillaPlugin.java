@@ -308,7 +308,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		});
 
-		Comparison potionComparison = Comparison.of((a, b) -> PotionUtil.getPotionEffects(a.getNbt()).equals(PotionUtil.getPotionEffects(b.getNbt())));
+		Comparison potionComparison = Comparison.compareData(stack -> PotionUtil.getPotion(stack.getNbt()));
 
 		registry.setDefaultComparison(Items.POTION, potionComparison);
 		registry.setDefaultComparison(Items.SPLASH_POTION, potionComparison);

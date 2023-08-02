@@ -106,7 +106,7 @@ public class EmiStackList {
 				for (EmiStack stack : group.stacks) {
 					if (!added.contains(stack)) {
 						stacks.add(stack);
-						added.add(stack.copy().comparison(Comparison.compareNbt()));
+						added.add(stack);
 					}
 				}
 			}
@@ -255,6 +255,30 @@ public class EmiStackList {
 				NbtCompound nbtCompound = stack.getNbt();
 				int i = 31 + stack.getKey().hashCode();
 				return 31 * i + (nbtCompound == null ? 0 : nbtCompound.hashCode());
+			}
+			return 0;
+		}
+	}
+
+	public static class ComparisonHashStrategy implements Hash.Strategy<EmiStack> {
+
+		@Override
+		public boolean equals(EmiStack a, EmiStack b) {
+			if (a == b) {
+				return true;
+			} else if (a == null || b == null) {
+				return false;
+			} else if (a.isEmpty() && b.isEmpty()) {
+				return true;
+			}
+			return a.isEqual(b, EmiComparisonDefaults.get(a.getKey()));
+		}
+
+		@Override
+		public int hashCode(EmiStack stack) {
+			if (stack != null) {
+				int i = 31 + stack.getKey().hashCode();
+				return 31 * i + EmiComparisonDefaults.get(stack.getKey()).getHash(stack);
 			}
 			return 0;
 		}
