@@ -489,6 +489,12 @@ public class EmiConfig {
 			if (config.exists() && config.isFile()) {
 				QDCSS css = QDCSS.load(config);
 				loadConfig(css);
+			} else {
+				File defaultConfig = new File(EmiAgnos.getConfigDirectory().getParent().toFile(), "defaultconfigs/emi.css");
+				if (defaultConfig.exists() && defaultConfig.isFile()) {
+					QDCSS css = QDCSS.load(defaultConfig);
+					loadConfig(css);
+				}
 			}
 			if (startupConfig == null) {
 				startupConfig = getSavedConfig();
