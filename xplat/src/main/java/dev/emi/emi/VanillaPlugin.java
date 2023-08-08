@@ -524,7 +524,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
 			if (!e.isCursed()) {
-				int max = Math.max(10, e.getMaxLevel());
+				int max = Math.min(10, e.getMaxLevel());
 				int min = e.getMinLevel();
 				while (min <= max) {
 					int level = min;

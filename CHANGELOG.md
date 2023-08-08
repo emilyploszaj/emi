@@ -1,10 +1,6 @@
 ### Tweaks
-* Changed how potions are compared slightly for better lookups
-* Changed how recipe lookup baking works, it should be faster
-* Removed JEMI debug print
+* EMI now reads from defaultconfigs if a config is not present #272
+* Index recipe assumption will now be much more strict and try to not show nonsense recipes
 
 ### Fixes
-* Fixed mundane potion and water bottle lookups being the same thing in the recipe tree
-* Fixed WidgetHolder.addTooltip incorrect implementation #267
-* Fixed lookup baking adjustments causing some recipes to not show up correctly
-* Fixed EmiIngredients allowing multiple identical stacks to coexist and break tag coercion
+* Fixed displaying the wrong enchanted book grindstone recipes #260

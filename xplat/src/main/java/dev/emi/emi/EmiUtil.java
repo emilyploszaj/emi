@@ -124,8 +124,13 @@ public class EmiUtil {
 
 	public static EmiRecipe getPreferredRecipe(EmiIngredient ingredient, EmiPlayerInventory inventory, boolean requireCraftable) {
 		if (ingredient.getEmiStacks().size() == 1 && !ingredient.isEmpty()) {
+			HandledScreen<?> hs = EmiApi.getHandledScreen();
 			EmiStack stack = ingredient.getEmiStacks().get(0);
-			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack), inventory, requireCraftable);
+			return getPreferredRecipe(EmiApi.getRecipeManager().getRecipesByOutput(stack).stream().filter(r -> {
+				@SuppressWarnings("rawtypes")
+				EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(r, hs);
+				return handler != null && handler.supportsRecipe(r);
+			}).toList(), inventory, requireCraftable);
 		}
 		return null;
 	}
