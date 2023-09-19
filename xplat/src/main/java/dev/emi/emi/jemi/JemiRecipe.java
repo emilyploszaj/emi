@@ -109,6 +109,11 @@ public class JemiRecipe<T> implements EmiRecipe {
 	@SuppressWarnings("unchecked")
 	public void addWidgets(WidgetHolder widgets) {
 		Optional<IRecipeLayoutDrawable<T>> opt = JemiPlugin.runtime.getRecipeManager().createRecipeLayoutDrawable(category, recipe, FocusGroup.EMPTY);
+		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
+		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
+			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+		}
 		if (opt.isPresent()) {
 			IRecipeLayoutDrawable<T> drawable = opt.get();
 			widgets.addDrawable(0, 0, getDisplayWidth(), getDisplayHeight(), (raw, mouseX, mouseY, delta) -> {

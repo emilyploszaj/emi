@@ -29,7 +29,7 @@ public class CreateItemC2SPacket implements EmiPacket {
 	public void apply(PlayerEntity player) {
 		if ((player.hasPermissionLevel(2) || player.isCreative()) && player.currentScreenHandler != null) {
 			if (stack.isEmpty()) {
-				if (mode == 1) {
+				if (mode == 1 && !player.currentScreenHandler.getCursorStack().isEmpty()) {
 					EmiLog.info(player.getEntityName() + " deleted " + player.currentScreenHandler.getCursorStack());
 					player.currentScreenHandler.setCursorStack(stack);
 				}
