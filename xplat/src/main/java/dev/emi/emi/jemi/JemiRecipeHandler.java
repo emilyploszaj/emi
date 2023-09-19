@@ -5,10 +5,13 @@ import java.util.Optional;
 
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.api.widget.RecipeFillButtonWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
@@ -76,15 +79,22 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext raw) {
-		/*IRecipeTransferError err = jeiCraft(recipe, context, false);
+		IRecipeTransferError err = jeiCraft(recipe, context, false);
 		if (err != null) {
-			R rawRecipe = getRawRecipe(recipe);
-			
+			if (err.getType() == IRecipeTransferError.Type.COSMETIC) {
+				for (Widget widget : widgets) {
+					if (widget instanceof RecipeFillButtonWidget) {
+						Bounds b = widget.getBounds();
+						raw.fill(b.left(), b.top(), b.right(), b.bottom(), err.getButtonHighlightColor());
+					}
+				}
+			}
+			/*R rawRecipe = getRawRecipe(recipe);
 			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe);
 			if (view != null) {
 				err.showError(raw, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
-			}
-		}*/
+			}*/
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -120,9 +130,14 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 
 		if (builder == null) {
 			builder = new JemiRecipeLayoutBuilder();
-			addIngredients(builder, recipe.getInputs(), RecipeIngredientRole.INPUT);
-			addIngredients(builder, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
 			addIngredients(builder, recipe.getOutputs(), RecipeIngredientRole.OUTPUT);
+			addIngredients(builder, recipe.getInputs(), RecipeIngredientRole.INPUT);
+			if (recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING) {
+				for (int i = recipe.getInputs().size(); i < 9; i++) {
+					addIngredients(builder, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
+				}
+			}
+			addIngredients(builder, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
 		}
 
 		return new JemiRecipeSlotsView(builder.slots.stream().map(JemiRecipeSlot::new).toList());
