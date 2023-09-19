@@ -1,6 +1,7 @@
 ### Tweaks
-* EMI now reads from defaultconfigs if a config is not present #272
-* Index recipe assumption will now be much more strict and try to not show nonsense recipes
+* Made JEMI recipes without icons default to the first workstation, if present
 
 ### Fixes
-* Fixed displaying the wrong enchanted book grindstone recipes #260
+* Fixed crafting grid misplacement in misbehaving indexed storage mods #273 #280
+* Fixed cheat mode excessive logging #286
+* Fixed display of certain JEMI recipes that mutate at runtime #304
