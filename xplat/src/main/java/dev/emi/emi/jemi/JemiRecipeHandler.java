@@ -16,6 +16,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotsView;
+import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -79,13 +80,14 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext raw) {
+		EmiDrawContext draw = EmiDrawContext.wrap(raw);
 		IRecipeTransferError err = jeiCraft(recipe, context, false);
 		if (err != null) {
 			if (err.getType() == IRecipeTransferError.Type.COSMETIC) {
 				for (Widget widget : widgets) {
 					if (widget instanceof RecipeFillButtonWidget) {
 						Bounds b = widget.getBounds();
-						raw.fill(b.left(), b.top(), b.right(), b.bottom(), err.getButtonHighlightColor());
+						draw.fill(b.left(), b.top(), b.width(), b.height(), err.getButtonHighlightColor());
 					}
 				}
 			}
