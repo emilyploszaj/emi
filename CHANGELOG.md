@@ -1,7 +1,11 @@
-### Tweaks
-* Made JEMI recipes without icons default to the first workstation, if present
+### Additions
+* Synfavs will now highlight missing items in inventories like chests, for quickly finding them
+* Added a forward bind for navigating history
 
 ### Fixes
-* Fixed crafting grid misplacement in misbehaving indexed storage mods #273 #280
-* Fixed cheat mode excessive logging #286
-* Fixed display of certain JEMI recipes that mutate at runtime #304
+* Fixed getting disconnected when attempting to cheat in large nbt on vanilla servers #221
+* Fixed inventory overlay not working on screens that reimplement rendering #276
+* Fixed history navigation not working properly with non-handled screens #312
+* Fixed setting recipe defaults outside of recipe tree context #315
+* Fixed endless loop and div by zero caused by absurd abyss exclusion areas #300
+* Fixed #268

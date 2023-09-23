@@ -11,13 +11,19 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 
 public class EmiHistory {
 	private static final List<Screen> HISTORIES = Lists.newArrayList();
+	private static final List<Screen> FORWARD_HISTORIES = Lists.newArrayList();
 	
 	public static boolean isEmpty() {
 		return HISTORIES.isEmpty();
 	}
 
+	public static boolean isForwardEmpty() {
+		return FORWARD_HISTORIES.isEmpty();
+	}
+
 	public static void push(Screen history) {
 		HISTORIES.add(history);
+		FORWARD_HISTORIES.clear();
 	}
 
 	public static void pop() {
@@ -28,16 +34,27 @@ public class EmiHistory {
 		}
 		int i = HISTORIES.size() - 1;
 		HandledScreen<?> screen = EmiApi.getHandledScreen();
-		if (screen != null) {
-			if (i >= 0) {
-				client.setScreen(HISTORIES.remove(i));
-			} else {
-				client.setScreen(screen);
-			}
+		if (i >= 0) {
+			Screen popped = HISTORIES.remove(i);
+			FORWARD_HISTORIES.add(client.currentScreen);
+			client.setScreen(popped);
+		} else if (screen != null) {
+			client.setScreen(screen);
+		}
+	}
+
+	public static void forward() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		int i = FORWARD_HISTORIES.size() - 1;
+		if (i >= 0 && client.currentScreen != null) {
+			Screen popped = FORWARD_HISTORIES.remove(i);
+			HISTORIES.add(client.currentScreen);
+			client.setScreen(popped);
 		}
 	}
 
 	public static void clear() {
 		HISTORIES.clear();
+		FORWARD_HISTORIES.clear();
 	}
 }
