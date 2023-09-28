@@ -1,12 +1,6 @@
 package dev.emi.emi.jemi;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Lists;
-
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -24,8 +18,14 @@ import mezz.jei.api.gui.IRecipeLayoutDrawable;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.library.focus.FocusGroup;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class JemiRecipe<T> implements EmiRecipe {
 	public List<EmiIngredient> inputs = Lists.newArrayList();
@@ -123,7 +123,16 @@ public class JemiRecipe<T> implements EmiRecipe {
 				context.resetColor();
 			}).tooltip((x, y) -> {
 				return category.getTooltipStrings(recipe, drawable.getRecipeSlotsView(), x, y).stream().map(t -> TooltipComponent.of(t.asOrderedText())).toList();
-			});
+			}).mouseClickedHandler(
+				(mouseX, mouseY, button) -> category.handleInput(recipe, mouseX, mouseY, InputUtil.Type.MOUSE.createFromCode(button))
+			).keyPressedHandler(
+				(keyCode, scanCode, modifiers) -> {
+					MinecraftClient client = MinecraftClient.getInstance();
+					double mouseX = client.mouse.getX() * (double)client.getWindow().getScaledWidth() / (double)client.getWindow().getWidth();
+					double mouseY = client.mouse.getY() * (double)client.getWindow().getScaledHeight() / (double)client.getWindow().getHeight();
+					return category.handleInput(recipe, mouseX, mouseY, InputUtil.fromKeyCode(keyCode, scanCode));
+				}
+			);
 			for (JemiRecipeSlotBuilder sb : builder.slots) {
 				JemiRecipeSlot slot = new JemiRecipeSlot(sb);
 				if (slot.tankInfo != null && !slot.getIngredients(JemiUtil.getFluidType()).toList().isEmpty()) {
