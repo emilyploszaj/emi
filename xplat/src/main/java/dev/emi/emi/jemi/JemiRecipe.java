@@ -153,10 +153,9 @@ public class JemiRecipe<T> implements EmiRecipe {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			context.push();
 			context.matrices().translate(x, y, 0);
-			EmiDrawContext emiDrawContext = EmiDrawContext.wrap(context.raw());
 			category.getBackground().draw(context.raw());
 			category.draw(recipe, recipeLayoutDrawable.getRecipeSlotsView(), context.raw(), mouseX, mouseY);
-			emiDrawContext.resetColor();
+			context.resetColor();
 			context.pop();
 		}
 
