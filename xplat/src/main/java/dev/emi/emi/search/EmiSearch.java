@@ -165,6 +165,10 @@ public class EmiSearch {
 					constructors.add(constructor);
 					regexConstructors.add(regexConstructor);
 
+					if (EmiConfig.searchIdByDefault) {
+						constructors.add(QueryType.ID.queryConstructor);
+						regexConstructors.add(QueryType.ID.regexQueryConstructor);
+					}
 					if (EmiConfig.searchTooltipByDefault) {
 						constructors.add(QueryType.TOOLTIP.queryConstructor);
 						regexConstructors.add(QueryType.TOOLTIP.regexQueryConstructor);

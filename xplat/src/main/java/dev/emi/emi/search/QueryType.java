@@ -6,6 +6,7 @@ import net.minecraft.text.Style;
 
 public enum QueryType {
 	DEFAULT("",  0xffffff, 0xcc3737, 0xff5555, 0xfca955, NameQuery::new, RegexNameQuery::new),
+	ID(     "%", 0xff55ff, 0xff55ff, 0xf27b2b, 0xf75a20, IdQuery::new, RegexIdQuery::new),
 	MOD(    "@", 0x5555ff, 0x5555ff, 0x9b5cdb, 0xf22bf2, ModQuery::new, RegexModQuery::new),
 	TOOLTIP("$", 0xffff55, 0xffff55, 0xbdf486, 0xf4bd86, TooltipQuery::new, RegexTooltipQuery::new),
 	TAG(    "#", 0x55ff55, 0x55ff55, 0x41eace, 0x0098ea, TagQuery::new, RegexTagQuery::new),
