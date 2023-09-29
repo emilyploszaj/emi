@@ -2,6 +2,7 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
+
 import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
