@@ -2,9 +2,8 @@ package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -23,10 +22,11 @@ public class ConfigJumpButton extends SizedButtonWidget {
 
 	@Override
 	public void renderButton(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (this.isMouseOver(mouseX, mouseY)) {
-			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+			context.setColor(0.5f, 0.6f, 1f);
 		}
 		super.renderButton(raw, mouseX, mouseY, delta);
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+		context.resetColor();
 	}
 }

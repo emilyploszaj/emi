@@ -1566,7 +1566,7 @@ public class EmiScreenManager {
 			if (this.pageSize > 0) {
 				RenderSystem.enableDepthTest();
 				EmiPort.setPositionTexShader();
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 				int hx = -1, hy = -1;
 				batcher.begin(0, 0, 0);
 				int i = startIndex;

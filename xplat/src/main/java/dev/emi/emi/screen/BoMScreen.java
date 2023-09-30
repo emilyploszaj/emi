@@ -238,10 +238,10 @@ public class BoMScreen extends Screen {
 					batches.x() + 6, batches.y() + batches.height() / 2 - 4, color);
 
 			if (mode.contains(mx, my)) {
-				RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+				context.setColor(0.5f, 0.6f, 1f, 1f);
 			}
 			context.drawTexture(EmiRenderHelper.WIDGETS, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
-			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			context.setColor(1f, 1f, 1f, 1f);
 			batcher.draw();
 		} else {
 			context.drawCenteredText(EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72);
@@ -254,10 +254,10 @@ public class BoMScreen extends Screen {
 		RenderSystem.applyModelViewMatrix();
 
 		if (help.contains(mouseX, mouseY)) {
-			RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+			context.setColor(0.5f, 0.6f, 1f, 1f);
 		}
 		context.drawTexture(EmiRenderHelper.WIDGETS, help.x(), help.y(), 0, 200, help.width(), help.height());
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+		context.setColor(1f, 1f, 1f, 1f);
 
 		Hover hover = getHoveredStack(mouseX, mouseY);
 		if (hover != null) {
@@ -669,7 +669,7 @@ public class BoMScreen extends Screen {
 			if (parent != null) {
 				context.push();
 
-				setColor(parent.node, node.consumeChance != 1 || (resolution != null && resolution.consumeChance != 1), false);
+				setColor(context, parent.node, node.consumeChance != 1 || (resolution != null && resolution.consumeChance != 1), false);
 				
 				int nx = x;
 				int ny = y;
@@ -683,7 +683,7 @@ public class BoMScreen extends Screen {
 				} else {
 					drawLine(context, nx, ny - 11, nx, py + off);
 				}
-				setColor(parent.node, false, false);
+				setColor(context, parent.node, false, false);
 				drawLine(context, px, py + off, nx, py + off);
 				context.pop();
 			}
@@ -695,7 +695,7 @@ public class BoMScreen extends Screen {
 				int hy = y + 10;
 				context.push();
 
-				setColor(node, node.produceChance != 1, false);
+				setColor(context, node, node.produceChance != 1, false);
 
 				if (node.state != FoldState.EXPANDED) {
 					drawLine(context, x, hy + 1, x, hy + 3);
@@ -704,7 +704,7 @@ public class BoMScreen extends Screen {
 				}
 
 				boolean hovered = mouseX >= lx && mouseY >= ly && mouseX <= hx && mouseY <= hy;
-				setColor(node, node.produceChance != 1, hovered);
+				setColor(context, node, node.produceChance != 1, hovered);
 				drawLine(context, lx, ly, lx, hy);
 				drawLine(context, hx, ly, hx, hy);
 				drawLine(context, lx, ly, hx, ly);
@@ -718,25 +718,25 @@ public class BoMScreen extends Screen {
 				xo = 11;
 				context.pop();
 			}
-			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			context.setColor(1f, 1f, 1f, 1f);
 			batcher.render(node.ingredient, context.raw(), x + xo - 8 + midOffset, y - 8, 0);
 			EmiRenderHelper.renderAmount(context, x + xo - 8 + midOffset, y - 8, getAmountText());
 		}
 
-		public void setColor(MaterialNode node, boolean chanced, boolean hovered) {
-			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+		public void setColor(EmiDrawContext context, MaterialNode node, boolean chanced, boolean hovered) {
+			context.setColor(1f, 1f, 1f, 1f);
 			if (chanced) {
-				RenderSystem.setShaderColor(0.8f, 0.6f, 0.1f, 1f);
+				context.setColor(0.8f, 0.6f, 0.1f, 1f);
 			}
 			if (BoM.craftingMode) {
 				if (node.progress == ProgressState.COMPLETED) {
-					RenderSystem.setShaderColor(0.1f, 0.8f, 0.5f, 1f);
+					context.setColor(0.1f, 0.8f, 0.5f, 1f);
 				} else if (node.progress == ProgressState.PARTIAL) {
-					RenderSystem.setShaderColor(0.8f, 0.2f, 0.9f, 1f);
+					context.setColor(0.8f, 0.2f, 0.9f, 1f);
 				}
 			}
 			if (hovered) {
-				RenderSystem.setShaderColor(0.5f, 0.6f, 1f, 1f);
+				context.setColor(0.5f, 0.6f, 1f, 1f);
 			}
 		}
 

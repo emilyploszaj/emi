@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.common.collect.Ordering;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.config.EffectLocation;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
@@ -72,8 +72,9 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		return original;
 	}
 
-	private void emi$drawCenteredEffects(DrawContext draw, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+	private void emi$drawCenteredEffects(DrawContext raw, int mouseX, int mouseY) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.resetColor();
 		Collection<StatusEffectInstance> effects = Ordering.natural().sortedCopy(this.client.player.getStatusEffects());
 		int size = effects.size();
 		if (size == 0) {
@@ -102,10 +103,10 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 			for (StatusEffectInstance inst : effects) {
 				int ew = wide ? 120 : 32;
 				List<StatusEffectInstance> single = List.of(inst);
-				this.drawStatusEffectBackgrounds(draw, x, 32, single, wide);
-				this.drawStatusEffectSprites(draw, x, 32, single, wide);
+				this.drawStatusEffectBackgrounds(context.raw(), x, 32, single, wide);
+				this.drawStatusEffectSprites(context.raw(), x, 32, single, wide);
 				if (wide) {
-					this.drawStatusEffectDescriptions(draw, x, 32, single);
+					this.drawStatusEffectDescriptions(context.raw(), x, 32, single);
 				}
 				if (mouseX >= x && mouseX < x + ew && mouseY >= y && mouseY < y + 32) {
 					hovered = inst;
@@ -117,7 +118,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		}
 		if (hovered != null && size > 1) {
 			List<Text> list = List.of(this.getStatusEffectDescription(hovered), StatusEffectUtil.getDurationText(hovered, 1.0f));
-			draw.drawTooltip(client.textRenderer, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
+			context.raw().drawTooltip(client.textRenderer, list, Optional.empty(), mouseX, Math.max(mouseY, 16));
 		}
 	}
 	
