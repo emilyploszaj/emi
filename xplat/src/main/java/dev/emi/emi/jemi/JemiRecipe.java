@@ -16,11 +16,11 @@ import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.library.focus.FocusGroup;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.InputUtil;
@@ -174,10 +174,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 
 		@Override
 		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			double mouseX = client.mouse.getX() * (double)client.getWindow().getScaledWidth() / (double)client.getWindow().getWidth();
-			double mouseY = client.mouse.getY() * (double)client.getWindow().getScaledHeight() / (double)client.getWindow().getHeight();
-			return category.handleInput(recipe, mouseX, mouseY, InputUtil.fromKeyCode(keyCode, scanCode));
+			return category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputUtil.fromKeyCode(keyCode, scanCode));
 		}
 	}
 }
