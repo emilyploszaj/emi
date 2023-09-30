@@ -438,10 +438,10 @@ public class VanillaPlugin implements EmiPlugin {
 			MinecraftClient client = MinecraftClient.getInstance();
 			if (recipe instanceof SmithingTransformRecipeAccessor stra) {
 				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), EmiPort.getId(recipe)), recipe);
+					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe)), recipe);
 			} else if (recipe instanceof SmithingTrimRecipeAccessor stra) {
 				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), recipe), recipe);
+					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), recipe), recipe);
 			}
 		}
 		for (StonecuttingRecipe recipe : getRecipes(registry, RecipeType.STONECUTTING)) {
