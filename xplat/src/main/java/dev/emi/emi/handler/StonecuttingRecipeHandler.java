@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -56,7 +57,7 @@ public class StonecuttingRecipeHandler implements StandardRecipeHandler<Stonecut
 		Inventory inv = new SimpleInventory(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
 		List<StonecuttingRecipe> recipes = world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, inv, world);
 		for (int i = 0; i < recipes.size(); i++) {
-			if (recipes.get(i).getId() != null && recipes.get(i).getId().equals(recipe.getId())) {
+			if (EmiPort.getId(recipes.get(i)) != null && EmiPort.getId(recipes.get(i)).equals(recipe.getId())) {
 				StonecutterScreenHandler sh = context.getScreenHandler();
 				client.interactionManager.clickButton(sh.syncId, i);
 				if (context.getDestination() == EmiCraftContext.Destination.CURSOR) {

@@ -8,4 +8,5 @@
 * Fixed history navigation not working properly with non-handled screens #312
 * Fixed setting recipe defaults outside of recipe tree context #315
 * Fixed endless loop and div by zero caused by absurd abyss exclusion areas #300
+* Fixed not providing world to item model checking on Forge #296
 * Fixed #268

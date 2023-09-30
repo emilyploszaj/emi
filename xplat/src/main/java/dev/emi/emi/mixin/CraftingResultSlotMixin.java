@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.runtime.EmiSidebars;
@@ -33,7 +34,7 @@ public class CraftingResultSlotMixin {
 		if (world.isClient) {
 			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world);
 			if (opt.isPresent()) {
-				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(opt.get().getId());
+				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.getId(opt.get()));
 				if (recipe != null) {
 					EmiSidebars.craft(recipe);
 				}

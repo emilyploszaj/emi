@@ -110,6 +110,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeItem;
@@ -321,7 +322,8 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiPort.getDisabledItems()
 		).collect(Collectors.toSet());
 
-		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CRAFTING)) {
+		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
+			Identifier id = EmiPort.getId(recipe);
 			if (recipe instanceof MapExtendingRecipe map) {
 				EmiStack paper = EmiStack.of(Items.PAPER);
 				addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
@@ -330,7 +332,7 @@ public class VanillaPlugin implements EmiPlugin {
 						paper, paper, paper, paper
 				), 
 						EmiStack.of(Items.FILLED_MAP),
-						map.getId(), false), recipe);
+						id, false), recipe);
 			} else if (recipe instanceof ShapedRecipe shaped && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapedRecipe(shaped), recipe);
 			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
@@ -342,19 +344,19 @@ public class VanillaPlugin implements EmiPlugin {
 					}
 				}
 			} else if (recipe instanceof SuspiciousStewRecipe stew) {
-				addRecipeSafe(registry, () -> new EmiSuspiciousStewRecipe(stew.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiSuspiciousStewRecipe(id), recipe);
 			} else if (recipe instanceof ShulkerBoxColoringRecipe shulker) {
 				for (DyeColor dye : DyeColor.values()) {
 					DyeItem dyeItem = DyeItem.byColor(dye);
-					Identifier id = synthetic("crafting/shulker_box_dying", EmiUtil.subId(dyeItem));
+					Identifier sid = synthetic("crafting/shulker_box_dying", EmiUtil.subId(dyeItem));
 					addRecipeSafe(registry, () -> new EmiCraftingRecipe(
 						List.of(EmiStack.of(Items.SHULKER_BOX), EmiStack.of(dyeItem)),
-						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), id), recipe);
+						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), sid), recipe);
 				}
 			} else if (recipe instanceof ShieldDecorationRecipe shield) {
-				addRecipeSafe(registry, () -> new EmiBannerShieldRecipe(shield.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiBannerShieldRecipe(id), recipe);
 			} else if (recipe instanceof BookCloningRecipe book) {
-				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(book.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(id), recipe);
 			} else if (recipe instanceof TippedArrowRecipe tipped) {
 				EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
 					if (entry.value() == Potions.EMPTY) {
@@ -371,11 +373,11 @@ public class VanillaPlugin implements EmiPlugin {
 						false), recipe);
 				});
 			} else if (recipe instanceof FireworkStarRecipe star) {
-				addRecipeSafe(registry, () -> new EmiFireworkStarRecipe(star.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiFireworkStarRecipe(id), recipe);
 			} else if (recipe instanceof FireworkStarFadeRecipe star) {
-				addRecipeSafe(registry, () -> new EmiFireworkStarFadeRecipe(star.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiFireworkStarFadeRecipe(id), recipe);
 			} else if (recipe instanceof FireworkRocketRecipe rocket) {
-				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(rocket.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(id), recipe);
 			} else if (recipe instanceof BannerDuplicateRecipe banner) {
 				for (Item i : EmiBannerDuplicateRecipe.BANNERS) {
 					if (!hiddenItems.contains(i)) {
@@ -389,7 +391,7 @@ public class VanillaPlugin implements EmiPlugin {
 					}
 				}
 			} else if (recipe instanceof MapCloningRecipe map) {
-				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(map.getId()), recipe);
+				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(id), recipe);
 			} else if (!(recipe instanceof SpecialCraftingRecipe)) {
 				try {
 					if (!recipe.getIngredients().isEmpty() && !EmiPort.getOutput(recipe).isEmpty() && recipe.fits(3, 3)) {
@@ -410,39 +412,39 @@ public class VanillaPlugin implements EmiPlugin {
 							}
 						}
 						EmiShapedRecipe.setRemainders(input, recipe);
-						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(EmiPort.getOutput(recipe)), recipe.getId(), shapeless));
+						addRecipeSafe(registry, () -> new EmiCraftingRecipe(input, EmiStack.of(EmiPort.getOutput(recipe)), id, shapeless));
 					}
 				} catch (Exception e) {
-					EmiReloadLog.warn("Exception when parsing vanilla crafting recipe " + recipe.getId());
+					EmiReloadLog.warn("Exception when parsing vanilla crafting recipe " + id);
 					EmiReloadLog.error(e);
 				}
 			}
 		}
 
-		for (SmeltingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMELTING)) {
+		for (SmeltingRecipe recipe : getRecipes(registry, RecipeType.SMELTING)) {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, SMELTING, 1, false), recipe);
 		}
-		for (BlastingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.BLASTING)) {
+		for (BlastingRecipe recipe : getRecipes(registry, RecipeType.BLASTING)) {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, BLASTING, 2, false), recipe);
 		}
-		for (SmokingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMOKING)) {
+		for (SmokingRecipe recipe : getRecipes(registry, RecipeType.SMOKING)) {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, SMOKING, 2, false), recipe);
 		}
-		for (CampfireCookingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.CAMPFIRE_COOKING)) {
+		for (CampfireCookingRecipe recipe : getRecipes(registry, RecipeType.CAMPFIRE_COOKING)) {
 			addRecipeSafe(registry, () -> new EmiCookingRecipe(recipe, CAMPFIRE_COOKING, 1, true), recipe);
 		}
-		for (SmithingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.SMITHING)) {
+		for (SmithingRecipe recipe : getRecipes(registry, RecipeType.SMITHING)) {
 			//addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
 			MinecraftClient client = MinecraftClient.getInstance();
 			if (recipe instanceof SmithingTransformRecipeAccessor stra) {
 				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), recipe.getId()), recipe);
+					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), EmiPort.getId(recipe)), recipe);
 			} else if (recipe instanceof SmithingTrimRecipeAccessor stra) {
 				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
 					EmiIngredient.of(stra.getAddition()), EmiStack.of(recipe.getOutput(client.world.getRegistryManager())), recipe), recipe);
 			}
 		}
-		for (StonecuttingRecipe recipe : registry.getRecipeManager().listAllOfType(RecipeType.STONECUTTING)) {
+		for (StonecuttingRecipe recipe : getRecipes(registry, RecipeType.STONECUTTING)) {
 			addRecipeSafe(registry, () -> new EmiStonecuttingRecipe(recipe), recipe);
 		}
 
@@ -806,6 +808,10 @@ public class VanillaPlugin implements EmiPlugin {
 		return new Identifier("emi", "/" + type + "/" + name);
 	}
 
+	private static <C extends Inventory, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
+		return registry.getRecipeManager().listAllOfType(type).stream()::iterator;
+	}
+
 	private static void safely(String name, Runnable runnable) {
 		try {
 			runnable.run();
@@ -828,7 +834,7 @@ public class VanillaPlugin implements EmiPlugin {
 		try {
 			registry.addRecipe(supplier.get());
 		} catch (Throwable e) {
-			EmiReloadLog.warn("Exception thrown when parsing vanilla recipe " + recipe.getId());
+			EmiReloadLog.warn("Exception thrown when parsing vanilla recipe " + EmiPort.getId(recipe));
 			EmiReloadLog.error(e);
 		}
 	}

@@ -2,6 +2,7 @@ package dev.emi.emi.recipe.special;
 
 import java.util.Random;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.render.EmiTooltipComponents;
@@ -20,7 +21,7 @@ public class EmiSmithingTrimRecipe extends EmiSmithingRecipe {
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
 	public EmiSmithingTrimRecipe(EmiIngredient template, EmiIngredient input, EmiIngredient addition, EmiStack output, SmithingRecipe recipe) {
-		super(template, input, addition, output, recipe.getId());
+		super(template, input, addition, output, EmiPort.getId(recipe));
 		this.recipe = recipe;
 	}
 

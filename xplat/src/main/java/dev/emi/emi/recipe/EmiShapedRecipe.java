@@ -18,7 +18,7 @@ import net.minecraft.recipe.ShapedRecipe;
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
 	public EmiShapedRecipe(ShapedRecipe recipe) {
-		super(padIngredients(recipe), EmiStack.of(EmiPort.getOutput(recipe)), recipe.getId(), false);
+		super(padIngredients(recipe), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe), false);
 		setRemainders(input, recipe);
 	}
 
@@ -48,7 +48,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				inv.clear();
 			}
 		} catch (Exception e) {
-			EmiLog.error("Exception thrown setting remainders for " + recipe.getId());
+			EmiLog.error("Exception thrown setting remainders for " + EmiPort.getId(recipe));
 			e.printStackTrace();
 		}
 	}
