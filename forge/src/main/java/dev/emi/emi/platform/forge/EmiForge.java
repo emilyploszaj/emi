@@ -18,7 +18,7 @@ public class EmiForge {
 		EmiMain.init();
 		EmiPacketHandler.init();
 		EmiNetwork.initServer((player, packet) -> {
-			EmiPacketHandler.CHANNEL.send(packet, PacketDistributor.PLAYER.with(player));
+			EmiPacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
 		});
 		MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(this::playerConnect);

@@ -1,11 +1,8 @@
 package dev.emi.emi.platform.fabric;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
-
-import com.google.common.collect.Lists;
 
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.CommandS2CPacket;
@@ -17,7 +14,7 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiTags;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -53,14 +50,8 @@ public class EmiClientFabric implements ClientModInitializer {
 			});
 		});
 
-		PreparableModelLoadingPlugin.<List<Identifier>>register((manager, executor) -> {
-			return CompletableFuture.supplyAsync(() -> {
-				List<Identifier> ids = Lists.newArrayList();
-				EmiTags.registerTagModels(manager, id -> ids.add(id));
-				return ids;
-			}, executor);
-		}, (ids, context) -> {
-			context.addModels(ids);
+		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, consumer) -> {
+			EmiTags.registerTagModels(manager, consumer);
 		});
 
 		EmiNetwork.initClient(packet -> {

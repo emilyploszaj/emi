@@ -166,7 +166,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	@Override
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		this.renderInGameBackground(context.raw());
+		this.renderBackground(context.raw());
 		context.resetColor();
 		EmiRenderHelper.drawNinePatch(context, TEXTURE, x, y, backgroundWidth, backgroundHeight, 0, 0, 4, 1);
 
@@ -281,11 +281,6 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		if (rTab != null) {
 			EmiRenderHelper.drawTooltip(this, context, rTab.category.getTooltip(), mouseX, mouseY);
 		}
-	}
-
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-		// Prevent double background draw
 	}
 
 	public EmiIngredient getHoveredStack() {
@@ -499,7 +494,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (EmiScreenManager.mouseScrolled(mouseX, mouseY, amount)) {
 			return true;
 		} else if (mouseX > x && mouseX < x + backgroundWidth && mouseY < x + backgroundHeight) {
@@ -512,7 +507,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 				setPage(tabPage, tab, page - sa);
 			}
 		}
-		return super.mouseScrolled(mouseX, mouseY, horizontal, amount);
+		return super.mouseScrolled(mouseX, mouseY, amount);
 	}
 
 	@Override

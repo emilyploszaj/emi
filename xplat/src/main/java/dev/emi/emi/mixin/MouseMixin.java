@@ -81,7 +81,7 @@ public class MouseMixin {
 	}
 
 	@Inject(at = @At(value = "INVOKE", target =
-			"net/minecraft/client/gui/screen/Screen.mouseScrolled(DDDD)Z"),
+			"net/minecraft/client/gui/screen/Screen.mouseScrolled(DDD)Z"),
 		method = "onMouseScroll(JDD)V", cancellable = true)
 	private void onMouseScrolled(long window, double horizontal, double vertical, CallbackInfo info) {
 		try {

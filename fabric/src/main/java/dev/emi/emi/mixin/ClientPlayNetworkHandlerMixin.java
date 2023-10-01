@@ -3,14 +3,15 @@ package dev.emi.emi.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
+import net.minecraft.network.packet.s2c.play.SynchronizeTagsS2CPacket;
 
 /**
  * This entire mixin assumes that no one will modify how recipes and tags are synced.
@@ -29,8 +30,9 @@ public class ClientPlayNetworkHandlerMixin {
 		EmiReloadManager.reloadRecipes();
 	}
 
-	@Inject(at = @At("RETURN"), method = "refreshTagBasedData")
-	private void refreshTagBasedData(CallbackInfo info) {
+	@Inject(at = @At(value = "INVOKE", target = "java/util/Map.forEach(Ljava/util/function/BiConsumer;)V",
+		shift = Shift.AFTER), method = "onSynchronizeTags")
+	private void onSynchronizeTags(SynchronizeTagsS2CPacket packet, CallbackInfo info) {
 		EmiReloadManager.reloadTags();
 	}
 

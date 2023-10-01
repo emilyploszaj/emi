@@ -34,11 +34,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeManager;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
@@ -51,8 +47,6 @@ public class EmiRecipes {
 	private static List<EmiRecipe> recipes = Lists.newArrayList();
 
 	public static Map<EmiStack, List<EmiRecipe>> byWorkstation = Maps.newHashMap();
-
-	public static Map<Recipe<?>, Identifier> recipeIds = Map.of();
 	
 	public static void clear() {
 		lateRecipes.clear();
@@ -62,16 +56,6 @@ public class EmiRecipes {
 		recipes.clear();
 		byWorkstation.clear();
 		manager = Manager.EMPTY;
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world != null) {
-			RecipeManager manager = client.world.getRecipeManager();
-			recipeIds = Maps.newIdentityHashMap();
-			if (manager != null) {
-				for (RecipeEntry<?> entry : manager.values()) {
-					recipeIds.put(entry.value(), entry.id());
-				}
-			}
-		}
 	}
 
 	public static void bake() {

@@ -36,7 +36,7 @@ public class EmiClientForge {
 	public static void clientInit(FMLClientSetupEvent event) {
 		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(ForgeRenderTypes.values()).map(f -> f.get()).toList());
 		EmiClient.init();
-		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.send(packet, MinecraftClient.getInstance().getNetworkHandler().getConnection()));
+		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.sendToServer(packet));
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::recipesReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::tagsReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::renderScreenForeground);
