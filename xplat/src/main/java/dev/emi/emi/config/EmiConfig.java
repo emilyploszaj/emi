@@ -375,6 +375,10 @@ public class EmiConfig {
 	@ConfigValue("binds.back")
 	public static EmiBind back = new EmiBind("key.emi.back", GLFW.GLFW_KEY_BACKSPACE);
 
+	@Comment("Return to the next page in EMI after going back.")
+	@ConfigValue("binds.forward")
+	public static EmiBind forward = new EmiBind("key.emi.forward", InputUtil.UNKNOWN_KEY.getCode());
+
 	@ConfigGroup("binds.crafts")
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result.")

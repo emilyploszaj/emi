@@ -2,6 +2,7 @@ package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,20 +40,26 @@ public class EmiExclusionAreas {
 		try {
 			if (fromClass.containsKey(screen.getClass())) {
 				for (EmiExclusionArea exclusion : fromClass.get(screen.getClass())) {
-					exclusion.addExclusionArea(screen, rect -> {
-						list.add((Bounds) rect);
-					});
+					exclusion.addExclusionArea(screen, addBounds(list));
 				}
 			}
 			for (EmiExclusionArea exclusion : generic) {
-				exclusion.addExclusionArea(screen, rect -> {
-					list.add((Bounds) rect);
-				});
+				exclusion.addExclusionArea(screen, addBounds(list));
 			}
 		} catch (Exception e) {
 			EmiLog.error("Exception thrown when adding exclusion areas");
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	private static Consumer<Bounds> addBounds(List<Bounds> list) {
+		return rect -> {
+			// Impossible sizing, or integer overflow
+			if (rect.empty() || rect.right() <= rect.x() || rect.bottom() <= rect.y()) {
+				return;
+			}
+			list.add(rect);
+		};
 	}
 }

@@ -26,7 +26,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 	private final boolean infiniBurn;
 	
 	public EmiCookingRecipe(AbstractCookingRecipe recipe, EmiRecipeCategory category, int fuelMultiplier, boolean infiniBurn) {
-		this.id = recipe.getId();
+		this.id = EmiPort.getId(recipe);
 		this.category = category;
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
 		output = EmiStack.of(EmiPort.getOutput(recipe));

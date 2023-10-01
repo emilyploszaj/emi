@@ -288,6 +288,11 @@ public class SlotWidget extends Widget {
 				EmiHistory.pop();
 				return true;
 			}
+		} else {
+			if (function.apply(EmiConfig.defaultStack)) {
+				BoM.addRecipe(getStack(), getRecipe());
+				return true;
+			}
 		}
 		return false;
 	}

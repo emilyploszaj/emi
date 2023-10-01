@@ -182,6 +182,7 @@ public class EmiApi {
 			EmiHistory.push(bs);
 		} else {
 			EmiHistory.clear();
+			EmiHistory.push(client.currentScreen);
 		}
 	}
 

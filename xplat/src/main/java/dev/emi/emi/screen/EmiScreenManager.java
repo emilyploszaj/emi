@@ -1,6 +1,7 @@
 package dev.emi.emi.screen;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
@@ -19,6 +21,8 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
@@ -59,6 +63,7 @@ import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.emi.search.EmiSearch.CompiledQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.ParentElement;
@@ -69,7 +74,9 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -327,7 +334,7 @@ public class EmiScreenManager {
 	private static Bounds constrainBounds(List<Bounds> exclusion, Bounds bounds, ScreenAlign align, int headerOffset) {
 		for (int i = 0; i < exclusion.size(); i++) {
 			Bounds overlap = exclusion.get(i).overlap(bounds);
-			if (!overlap.empty()) {
+			if (!overlap.empty() && !bounds.empty()) {
 				if (overlap.top() < bounds.top() + ENTRY_SIZE + headerOffset || overlap.width() >= bounds.width() / 2
 						|| overlap.height() >= bounds.height() / 3) {
 					int widthFactor = overlap.width() * 10 / bounds.width();
@@ -596,6 +603,9 @@ public class EmiScreenManager {
 		client.getProfiler().pop();
 
 		renderExclusionAreas(context, mouseX, mouseY, delta, screen);
+
+		client.getProfiler().swap("slots");
+		renderSlotOverlays(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().pop();
 
 		RenderSystem.disableDepthTest();
@@ -770,6 +780,49 @@ public class EmiScreenManager {
 					context.fill(b.x(), b.y(), b.width(), b.height(), i == 0 ? 0x4400ff00 : 0x44ff0000);
 				}
 			}
+		}
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private static void renderSlotOverlays(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+		CompiledQuery query = null;
+		if (EmiScreenManager.search.highlight) {
+			query = EmiSearch.compiledQuery;
+		}
+		Set<Slot> ignoredSlots = Sets.newHashSet();
+		Set<EmiStack> synfavs = Sets.newHashSet();
+		if (BoM.craftingMode && BoM.tree != null) {
+			List<EmiFavorite.Synthetic> syntheticFavorites = EmiFavorites.syntheticFavorites;
+			for (EmiFavorite.Synthetic fav : syntheticFavorites) {
+				synfavs.addAll(fav.getEmiStacks());
+			}
+			
+			for (EmiRecipeHandler handler : EmiRecipeFiller.getAllHandlers(EmiApi.getHandledScreen())) {
+				if (handler instanceof StandardRecipeHandler standard) {
+					ignoredSlots.addAll(standard.getInputSources(EmiApi.getHandledScreen().getScreenHandler()));
+					ignoredSlots.addAll(standard.getCraftingSlots(EmiApi.getHandledScreen().getScreenHandler()));
+				}
+			}
+		}
+		if (screen instanceof HandledScreen<?> hs && screen instanceof EmiScreen emi) {
+			context.push();
+			context.matrices().translate(emi.emi$getLeft(), emi.emi$getTop(), 0);
+			for (Slot slot : hs.getScreenHandler().slots) {
+				EmiStack stack = EmiStack.of(slot.getStack());
+				context.push();
+				context.matrices().translate(0, 0, 300);
+				if (query != null) {
+					if (!query.test(stack)) {
+						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
+					}
+				} else if (BoM.craftingMode && BoM.tree != null) {
+					if (!(slot.inventory instanceof PlayerInventory) && !ignoredSlots.contains(slot) && synfavs.contains(stack)) {
+						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x7700BBFF);
+					}
+				}
+				context.pop();
+			}
+			context.pop();
 		}
 	}
 
@@ -1011,6 +1064,11 @@ public class EmiScreenManager {
 				EmiHistory.pop();
 				return true;
 			}
+		} else if (function.apply(EmiConfig.forward)) {
+			if (!EmiHistory.isForwardEmpty()) {
+				EmiHistory.forward();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1162,8 +1220,10 @@ public class EmiScreenManager {
 					command += is.getNbt().toString();
 				}
 				command += " " + amount;
-				client.player.networkHandler.sendChatCommand(command);
-				return true;
+				if (command.length() < 256) {
+					client.player.networkHandler.sendChatCommand(command);
+					return true;
+				}
 			}
 			return false;
 		}
@@ -1506,7 +1566,7 @@ public class EmiScreenManager {
 			if (this.pageSize > 0) {
 				RenderSystem.enableDepthTest();
 				EmiPort.setPositionTexShader();
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 				int hx = -1, hy = -1;
 				batcher.begin(0, 0, 0);
 				int i = startIndex;
