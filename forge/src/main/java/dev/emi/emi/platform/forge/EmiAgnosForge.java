@@ -268,7 +268,7 @@ public class EmiAgnosForge extends EmiAgnos {
 	protected boolean canBatchAgnos(ItemStack stack) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		ItemRenderer ir = client.getItemRenderer();
-		BakedModel model = ir.getModel(stack, null, null, 0);
+		BakedModel model = ir.getModel(stack, client.world, null, 0);
 		return model != null && model.getClass() == BasicBakedModel.class;
 	}
 

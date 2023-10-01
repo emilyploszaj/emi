@@ -221,7 +221,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			int amount = 0x3FF;
 			float h = ((lastRender & amount) % (float) amount) / (float) amount;
 			int rgb = MathHelper.hsvToRgb(h, 1, 1);
-			RenderSystem.setShaderColor(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb >> 0) & 0xFF) / 255f, 1);
+			context.setColor(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb >> 0) & 0xFF) / 255f);
 		}
 
 		if (EmiConfig.enabled) {
@@ -234,7 +234,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 				context.fill(this.x + this.width, this.y - 1, 1, this.height + 2, border);
 			}
 		}
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.resetColor();
 		view.pop();
 		RenderSystem.applyModelViewMatrix();
 	}

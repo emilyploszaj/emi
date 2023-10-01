@@ -172,4 +172,8 @@ public final class EmiPort {
 	public static Stream<Item> getDisabledItems() {
 		return Stream.empty();
 	}
+
+	public static Identifier getId(Recipe<?> recipe) {
+		return recipe.getId();
+	}
 }
