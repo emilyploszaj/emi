@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -21,8 +22,8 @@ public class MinecraftClientMixin {
 	@Shadow
 	public ClientWorld world;
 
-	@Inject(at = @At("RETURN"), method = "reloadResources(Z)Ljava/util/concurrent/CompletableFuture;")
-	private void reloadResources(boolean force, CallbackInfoReturnable<CompletableFuture<Void>> info) {
+	@Inject(at = @At("RETURN"), method = "reloadResources(ZLnet/minecraft/client/MinecraftClient$LoadingContext;)Ljava/util/concurrent/CompletableFuture;")
+	private void reloadResources(boolean force, @Coerce Object loadingContext, CallbackInfoReturnable<CompletableFuture<Void>> info) {
 		CompletableFuture<Void> future = info.getReturnValue();
 		if (future != null) {
 			future.thenRunAsync(() -> {

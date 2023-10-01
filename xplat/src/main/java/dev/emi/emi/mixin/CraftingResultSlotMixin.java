@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.world.World;
@@ -32,7 +33,7 @@ public class CraftingResultSlotMixin {
 	private void onCrafted(ItemStack stack, CallbackInfo info) {
 		World world = player.getWorld();
 		if (world.isClient) {
-			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world);
+			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world).map(RecipeEntry::value);
 			if (opt.isPresent()) {
 				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.getId(opt.get()));
 				if (recipe != null) {

@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
@@ -60,7 +61,8 @@ public class EmiStackProviders {
 							RecipeInputInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
 							MinecraftClient client = MinecraftClient.getInstance();
 							List<CraftingRecipe> list
-								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);
+								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world)
+									.stream().map(RecipeEntry::value).toList();
 							if (!list.isEmpty()) {
 								Identifier id = EmiPort.getId(list.get(0));
 								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);

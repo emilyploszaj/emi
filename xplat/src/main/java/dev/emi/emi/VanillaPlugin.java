@@ -809,7 +809,7 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static <C extends Inventory, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
-		return registry.getRecipeManager().listAllOfType(type).stream()::iterator;
+		return registry.getRecipeManager().listAllOfType(type).stream().map(e -> e.value())::iterator;
 	}
 
 	private static void safely(String name, Runnable runnable) {

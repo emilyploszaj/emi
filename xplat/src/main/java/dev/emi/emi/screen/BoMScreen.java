@@ -496,7 +496,7 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double amount) {
 		scrollAcc += amount;
 		amount = (int) scrollAcc;
 		scrollAcc %= 1;

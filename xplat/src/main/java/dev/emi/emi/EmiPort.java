@@ -11,6 +11,7 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.block.entity.BannerPattern;
@@ -104,7 +105,7 @@ public final class EmiPort {
 
 	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
 		try {
-			return tallFlowerBlock.isFertilizable(null, null, null, true) && tallFlowerBlock.canGrow(null, null, null, null);
+			return tallFlowerBlock.isFertilizable(null, null, null) && tallFlowerBlock.canGrow(null, null, null, null);
 		} catch(Exception e) {
 			return false;
 		}
@@ -166,7 +167,7 @@ public final class EmiPort {
 
 	public static ItemStack getOutput(Recipe<?> recipe) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		return recipe.getOutput(client.world.getRegistryManager());
+		return recipe.getResult(client.world.getRegistryManager());
 	}
 
 	public static void focus(TextFieldWidget widget, boolean focused) {
@@ -180,6 +181,6 @@ public final class EmiPort {
 	}
 
 	public static Identifier getId(Recipe<?> recipe) {
-		return recipe.getId();
+		return EmiRecipes.recipeIds.get(recipe);
 	}
 }

@@ -68,6 +68,7 @@ import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;
@@ -303,7 +304,8 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<CraftingRecipe> category) {
 		Set<Identifier> replaced = Sets.newHashSet();
 		Set<EmiRecipe> replacements = Sets.newHashSet();
-		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING)) {
+		for (RecipeEntry<CraftingRecipe> entry : registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING)) {
+			CraftingRecipe recipe = entry.value();
 			try {
 				if (category.isHandled(recipe)) {
 					JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();

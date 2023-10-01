@@ -388,7 +388,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double amount) {
 		this.setScrollAmount(this.getScrollAmount() - amount * 22);
 		return true;
 	}

@@ -50,7 +50,7 @@ public class EmiSuspiciousStewRecipe extends EmiPatternCraftingRecipe {
 		return new GeneratedSlotWidget(r -> {
 			FlowerBlock block = (FlowerBlock) ((BlockItem) getFlower(r)).getBlock();
 			ItemStack stack = new ItemStack(Items.SUSPICIOUS_STEW);
-			SuspiciousStewItem.addEffectToStew(stack, block.getEffectInStew(), block.getEffectInStewDuration());
+			SuspiciousStewItem.addEffectsToStew(stack, block.getStewEffects());
 			return EmiStack.of(stack);
 		}, unique, x, y);
 	}

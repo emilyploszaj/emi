@@ -373,6 +373,11 @@ public class ConfigScreen extends Screen {
 			EmiRenderHelper.drawTooltip(this, context, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}
 	}
+
+	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+		// Prevent double background draw
+	}
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
