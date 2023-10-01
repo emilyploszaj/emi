@@ -12,19 +12,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
-import dev.emi.emi.search.EmiSearch;
-import dev.emi.emi.search.EmiSearch.CompiledQuery;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.screen.slot.Slot;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin extends Screen implements EmiScreen {
@@ -66,20 +62,6 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
 		viewStack.pop();
 		RenderSystem.applyModelViewMatrix();
-	}
-
-	@Inject(at = @At("TAIL"), method = "drawSlot")
-	private void drawSlot(MatrixStack raw, Slot slot, CallbackInfo info) {
-		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		if (EmiScreenManager.search.highlight) {
-			CompiledQuery query = EmiSearch.compiledQuery;
-			if (query != null && !query.test(EmiStack.of(slot.getStack()))) {
-				context.push();
-				context.matrices().translate(0, 0, 300);
-				context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
-				context.pop();
-			}
-		}
 	}
 
 	@Override

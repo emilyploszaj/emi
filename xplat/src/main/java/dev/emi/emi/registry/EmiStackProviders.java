@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -61,7 +62,7 @@ public class EmiStackProviders {
 							List<CraftingRecipe> list
 								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);
 							if (!list.isEmpty()) {
-								Identifier id = list.get(0).getId();
+								Identifier id = EmiPort.getId(list.get(0));
 								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 								if (recipe != null) {
 									return new EmiStackInteraction(EmiStack.of(stack), recipe, false);

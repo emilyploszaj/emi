@@ -29,7 +29,7 @@ import net.minecraft.util.JsonHelper;
 
 public class EmiFavorites {
 	public static List<EmiFavorite> favorites = Lists.newArrayList();
-	public static List<EmiFavorite> syntheticFavorites = Lists.newArrayList();
+	public static List<EmiFavorite.Synthetic> syntheticFavorites = Lists.newArrayList();
 	public static List<EmiFavorite> favoriteSidebar = new CompoundList<>(favorites, syntheticFavorites);
 
 	public static JsonArray save() {
@@ -267,9 +267,9 @@ public class EmiFavorites {
 	}
 
 	private static class CompoundList<T> extends AbstractList<T> {
-		private List<T> a, b;
+		private List<? extends T> a, b;
 
-		public CompoundList(List<T> a, List<T> b) {
+		public CompoundList(List<? extends T> a, List<? extends T> b) {
 			this.a = a;
 			this.b = b;
 		}

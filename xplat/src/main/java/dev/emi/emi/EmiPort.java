@@ -177,4 +177,8 @@ public final class EmiPort {
 		FeatureSet fs = client.world.getEnabledFeatures();
 		return getItemRegistry().stream().filter(i -> !i.isEnabled(fs));
 	}
+
+	public static Identifier getId(Recipe<?> recipe) {
+		return recipe.getId();
+	}
 }
