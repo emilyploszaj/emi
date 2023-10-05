@@ -1589,16 +1589,12 @@ public class EmiScreenManager {
 						EmiIngredient stack = stacks.get(i++);
 						batcher.render(stack, context.raw(), cx + 1, cy + 1, delta);
 						if (getType() == SidebarType.INDEX) {
-							if (EmiConfig.editMode) {
-								if (EmiHidden.isHidden(stack)) {
-									RenderSystem.enableDepthTest();
-									context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x33ff0000);
-								}
-							} else if (EmiConfig.highlightDefaulted) {
-								if (BoM.getRecipe(stack) != null) {
-									RenderSystem.enableDepthTest();
-									context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x3300ff00);
-								}
+							if (EmiConfig.editMode && EmiHidden.isHidden(stack)) {
+								RenderSystem.enableDepthTest();
+								context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x33ff0000);
+							} else if (EmiConfig.highlightDefaulted && BoM.getRecipe(stack) != null) {
+								RenderSystem.enableDepthTest();
+								context.fill(cx, cy, ENTRY_SIZE, ENTRY_SIZE, 0x3300ff00);
 							}
 						}
 					}
