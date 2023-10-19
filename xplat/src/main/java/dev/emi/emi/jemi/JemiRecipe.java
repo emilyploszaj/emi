@@ -161,7 +161,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 
 		@Override
 		public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-			return category.getTooltipStrings(recipe, recipeLayoutDrawable.getRecipeSlotsView(), x, y)
+			return category.getTooltipStrings(recipe, recipeLayoutDrawable.getRecipeSlotsView(), mouseX, mouseY)
 				.stream()
 				.map(t -> TooltipComponent.of(t.asOrderedText()))
 				.toList();
