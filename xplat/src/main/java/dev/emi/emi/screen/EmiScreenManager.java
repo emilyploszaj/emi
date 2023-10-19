@@ -43,6 +43,7 @@ import dev.emi.emi.config.SidebarTheme;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
@@ -804,9 +805,9 @@ public class EmiScreenManager {
 				}
 			}
 		}
-		if (screen instanceof HandledScreen<?> hs && screen instanceof EmiScreen emi) {
+		if (screen instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
 			context.push();
-			context.matrices().translate(emi.emi$getLeft(), emi.emi$getTop(), 0);
+			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
 			for (Slot slot : hs.getScreenHandler().slots) {
 				EmiStack stack = EmiStack.of(slot.getStack());
 				context.push();
