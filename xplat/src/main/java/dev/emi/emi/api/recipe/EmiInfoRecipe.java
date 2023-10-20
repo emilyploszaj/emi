@@ -12,16 +12,17 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Unmodifiable;
 
 public class EmiInfoRecipe implements EmiRecipe {
 	private static final int STACK_WIDTH = 6, MAX_STACKS = STACK_WIDTH * 3;
 	private static final int PADDING = 4;
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-	private final List<EmiIngredient> stacks;
+	private final List<? extends EmiIngredient> stacks;
 	private final List<OrderedText> text;
 	private final Identifier id;
 
-	public EmiInfoRecipe(List<EmiIngredient> stacks, List<Text> text, @Nullable Identifier id) {
+	public EmiInfoRecipe(List<? extends EmiIngredient> stacks, List<? extends Text> text, @Nullable Identifier id) {
 		this.stacks = stacks;
 		this.text = text.stream().flatMap(t -> CLIENT.textRenderer.wrapLines(t, getDisplayWidth() - 4).stream()).toList();
 		this.id = id;
@@ -38,12 +39,12 @@ public class EmiInfoRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public List<EmiIngredient> getInputs() {
+	public @Unmodifiable List<? extends EmiIngredient> getInputs() {
 		return stacks;
 	}
 
 	@Override
-	public List<EmiStack> getOutputs() {
+	public @Unmodifiable List<? extends EmiStack> getOutputs() {
 		return stacks.stream().flatMap(ing -> ing.getEmiStacks().stream()).toList();
 	}
 

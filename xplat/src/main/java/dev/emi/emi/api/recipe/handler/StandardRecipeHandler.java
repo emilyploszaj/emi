@@ -113,7 +113,7 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 	private static Map<EmiIngredient, Boolean> getAvailable(EmiRecipe recipe, EmiPlayerInventory inventory) {
 		Map<EmiIngredient, Boolean> availableForCrafting = new IdentityHashMap<>();
 		List<Boolean> list = inventory.getCraftAvailability(recipe);
-		List<EmiIngredient> inputs = recipe.getInputs();
+		var inputs = recipe.getInputs();
 		if (list.size() != inputs.size()) {
 			return Map.of();
 		}

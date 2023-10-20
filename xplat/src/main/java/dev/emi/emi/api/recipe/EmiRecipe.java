@@ -8,6 +8,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Unmodifiable;
 
 public interface EmiRecipe {
 
@@ -21,19 +22,19 @@ public interface EmiRecipe {
 	 * @return The unique id of the recipe, or null. If null, the recipe cannot be serialized.
 	 */
 	@Nullable Identifier getId();
-	
+
 	/**
 	 * @return A list of ingredients required for the recipe.
 	 * 	Inputs will consider this recipe a use when exploring recipes.
 	 */
-	List<EmiIngredient> getInputs();
-	
+	@Unmodifiable List<? extends EmiIngredient> getInputs();
+
 	/**
 	 * @return A list of ingredients associated with the creation of the recipe.
 	 * 	Catalysts are considered the same as workstations in the recipe, not broken down as a requirement.
 	 * 	However, catalysts will consider this recipe a use when exploring recipes.
 	 */
-	default List<EmiIngredient> getCatalysts() {
+	default @Unmodifiable List<? extends EmiIngredient> getCatalysts() {
 		return List.of();
 	}
 
@@ -41,7 +42,7 @@ public interface EmiRecipe {
 	 * @return A list of stacks that are created after a craft.
 	 * 	Outputs will consider this recipe a source when exploring recipes.
 	 */
-	List<EmiStack> getOutputs();
+    @Unmodifiable List<? extends EmiStack> getOutputs();
 
 	/**
 	 * @return The width taken up by the recipe's widgets
@@ -55,7 +56,7 @@ public interface EmiRecipe {
 	/**
 	 * @return The maximum height taken up by the recipe's widgets.
 	 * 	Vertical screen space is capped, however, and EMI may opt to provide less vertical space.
-	 * 
+	 *
 	 * @see {@link WidgetHolder#getHeight()} when adding widgets for the EMI adjusted height.
 	 */
 	int getDisplayHeight();

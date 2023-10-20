@@ -61,12 +61,12 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		return this;
 	}
 
-	public EmiRecipe getRecipe() {
+	public @Nullable EmiRecipe getRecipe() {
 		return recipe;
 	}
 
 	@Override
-	public List<EmiStack> getEmiStacks() {
+	public List<? extends EmiStack> getEmiStacks() {
 		return stack.getEmiStacks();
 	}
 
@@ -93,8 +93,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	public boolean strictEquals(EmiIngredient other) {
-		List<EmiStack> as = this.getEmiStacks();
-		List<EmiStack> bs = other.getEmiStacks();
+		var as = this.getEmiStacks();
+		var bs = other.getEmiStacks();
 		if (as.size() != bs.size()) {
 			return false;
 		}

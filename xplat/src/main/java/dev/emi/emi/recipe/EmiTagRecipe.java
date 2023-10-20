@@ -15,7 +15,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class EmiTagRecipe extends EmiIngredientRecipe {
-	private final List<EmiStack> stacks;
+	private final List<? extends EmiStack> stacks;
 	private final EmiIngredient ingredient;
 	public final TagKey<?> key;
 
@@ -31,7 +31,7 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 	}
 
 	@Override
-	protected List<EmiStack> getStacks() {
+	protected List<? extends EmiStack> getStacks() {
 		return stacks;
 	}
 

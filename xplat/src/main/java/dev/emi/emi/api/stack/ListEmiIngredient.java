@@ -15,7 +15,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 @ApiStatus.Internal
 public class ListEmiIngredient implements EmiIngredient {
 	private final List<? extends EmiIngredient> ingredients;
-	private final List<EmiStack> fullList;
+	private final List<? extends EmiStack> fullList;
 	private long amount;
 	private float chance = 1;
 
@@ -55,7 +55,7 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public List<EmiStack> getEmiStacks() {
+	public List<? extends EmiStack> getEmiStacks() {
 		return fullList;
 	}
 
@@ -86,7 +86,7 @@ public class ListEmiIngredient implements EmiIngredient {
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
 		EmiIngredient current = ingredients.get(item);
 		if ((flags & RENDER_ICON) != 0) {
-			current.render(draw, x, y, delta, -1 ^ RENDER_AMOUNT);
+			current.render(draw, x, y, delta, ~RENDER_AMOUNT);
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			current.copy().setAmount(amount).render(draw, x, y, delta, RENDER_AMOUNT);
@@ -97,7 +97,7 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<? extends TooltipComponent> getTooltip() {
 		List<TooltipComponent> tooltip = Lists.newArrayList();
 		tooltip.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.accepts"))));
 		tooltip.add(new IngredientTooltipComponent(ingredients));

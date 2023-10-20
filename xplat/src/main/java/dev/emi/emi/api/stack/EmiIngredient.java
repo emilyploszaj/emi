@@ -11,18 +11,19 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.tag.TagKey;
+import org.jetbrains.annotations.Unmodifiable;
 
 public interface EmiIngredient extends EmiRenderable {
-	public static final int RENDER_ICON = 1;
-	public static final int RENDER_AMOUNT = 2;
-	public static final int RENDER_INGREDIENT = 4;
-	public static final int RENDER_REMAINDER = 8;
+	int RENDER_ICON = 1;
+	int RENDER_AMOUNT = 2;
+	int RENDER_INGREDIENT = 4;
+	int RENDER_REMAINDER = 8;
 	
 	/**
 	 * @return The {@link EmiStack}s represented by this ingredient.
 	 * 	List is never empty. For an empty ingredient, us {@link EmiStack#EMPTY}
 	 */
-	List<EmiStack> getEmiStacks();
+	@Unmodifiable List<? extends EmiStack> getEmiStacks();
 
 	default boolean isEmpty() {
 		for (EmiStack stack : getEmiStacks()) {
@@ -50,11 +51,11 @@ public interface EmiIngredient extends EmiRenderable {
 
 	void render(DrawContext draw, int x, int y, float delta, int flags);
 
-	List<TooltipComponent> getTooltip();
+	@Unmodifiable List<? extends TooltipComponent> getTooltip();
 
-	public static boolean areEqual(EmiIngredient a, EmiIngredient b) {
-		List<EmiStack> as = a.getEmiStacks();
-		List<EmiStack> bs = b.getEmiStacks();
+	static boolean areEqual(EmiIngredient a, EmiIngredient b) {
+		var as = a.getEmiStacks();
+		var bs = b.getEmiStacks();
 		if (as.size() != bs.size()) {
 			return false;
 		}
@@ -66,30 +67,30 @@ public interface EmiIngredient extends EmiRenderable {
 		return true;
 	}
 
-	public static <T> EmiIngredient of(TagKey<T> key) {
+	static <T> EmiIngredient of(TagKey<T> key) {
 		return of(key, 1);
 	}
 
-	public static <T> EmiIngredient of(TagKey<T> key, long amount) {
+	static <T> EmiIngredient of(TagKey<T> key, long amount) {
 		return EmiIngredient.of(EmiTags.getRawValues(key), amount);
 	}
 
-	public static EmiIngredient of(Ingredient ingredient) {
+	static EmiIngredient of(Ingredient ingredient) {
 		return of(ingredient, 1);
 	}
 
-	public static EmiIngredient of(Ingredient ingredient, long amount) {
+	static EmiIngredient of(Ingredient ingredient, long amount) {
 		if (ingredient == null) {
 			return EmiStack.EMPTY;
 		}
 		return EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList(), amount);
 	}
 
-	public static EmiIngredient of(List<? extends EmiIngredient> list) {
+	static EmiIngredient of(List<? extends EmiIngredient> list) {
 		return of(list, 1);
 	}
 
-	public static EmiIngredient of(List<? extends EmiIngredient> list, long amount) {
+	static EmiIngredient of(List<? extends EmiIngredient> list, long amount) {
 		if (list.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (list.size() == 1) {

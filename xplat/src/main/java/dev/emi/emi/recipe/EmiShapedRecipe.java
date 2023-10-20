@@ -22,7 +22,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 		setRemainders(input, recipe);
 	}
 
-	public static void setRemainders(List<EmiIngredient> input, CraftingRecipe recipe) {
+	public static void setRemainders(List<? extends EmiIngredient> input, CraftingRecipe recipe) {
 		try {
 			CraftingInventory inv = EmiUtil.getCraftingInventory();
 			for (int i = 0; i < input.size(); i++) {
@@ -37,7 +37,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 						inv.setStack(j, input.get(j).getEmiStacks().get(0).getItemStack().copy());
 					}
 				}
-				List<EmiStack> stacks = input.get(i).getEmiStacks();
+				var stacks = input.get(i).getEmiStacks();
 				for (EmiStack stack : stacks) {
 					inv.setStack(i, stack.getItemStack().copy());
 					ItemStack remainder = recipe.getRemainder(inv).get(i);

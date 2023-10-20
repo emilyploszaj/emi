@@ -24,7 +24,7 @@ public class EmiSyntheticIngredientRecipe extends EmiIngredientRecipe {
 	}
 
 	@Override
-	protected List<EmiStack> getStacks() {
+	protected List<? extends EmiStack> getStacks() {
 		return ingredient.getEmiStacks();
 	}
 

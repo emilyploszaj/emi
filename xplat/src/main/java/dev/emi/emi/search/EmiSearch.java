@@ -249,7 +249,7 @@ public class EmiSearch {
 							return;
 						}
 					}
-					List<EmiStack> ess = stack.getEmiStacks();
+					var ess = stack.getEmiStacks();
 					// TODO properly support ingredients?
 					if (ess.size() == 1) {
 						EmiStack es = ess.get(0);

@@ -180,22 +180,22 @@ public class TreeCost {
 			amount = node.amount;
 		}
 		long original = amount;
-		List<EmiStack> ingredientStacks = node.ingredient.getEmiStacks();
-		for (int i = 0; i < ingredientStacks.size(); i++) {
-			if (chance.chanced()) {
-				double desired = amount * chance.chance();
-				double given = getChancedRemainder(ingredientStacks.get(i), desired, catalyst, chance);
-				if (given > 0) {
-					double scaled = given / chance.chance();
-					amount -= (long) scaled;
-					if (amount > 0) {
-						chance = new ChanceState((float) ((amount - (scaled % 1)) * chance.chance() / amount), true);
-					}
-				}
-			} else {
-				amount -= getRemainder(ingredientStacks.get(i), amount, catalyst);
-			}
-		}
+		var ingredientStacks = node.ingredient.getEmiStacks();
+        for (EmiStack ingredientStack : ingredientStacks) {
+            if (chance.chanced()) {
+                double desired = amount * chance.chance();
+                double given = getChancedRemainder(ingredientStack, desired, catalyst, chance);
+                if (given > 0) {
+                    double scaled = given / chance.chance();
+                    amount -= (long) scaled;
+                    if (amount > 0) {
+                        chance = new ChanceState((float) ((amount - (scaled % 1)) * chance.chance() / amount), true);
+                    }
+                }
+            } else {
+                amount -= getRemainder(ingredientStack, amount, catalyst);
+            }
+        }
 		if (amount == 0) {
 			if (trackProgress) {
 				complete(node);

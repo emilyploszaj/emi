@@ -1,11 +1,9 @@
 package dev.emi.emi.registry;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +70,7 @@ public class EmiTags {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<EmiStack> stacks, long amount) {
+	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<? extends EmiStack> stacks, long amount) {
 		Registry<T> registry;
 		if (clazz == Item.class) {
 			registry = (Registry<T>) EmiPort.getItemRegistry();
@@ -122,7 +120,7 @@ public class EmiTags {
 			CACHED_TAGS.put((Set) original, (List) keys);
 		}
 
-		if (keys == null || keys.isEmpty()) {
+		if (keys.isEmpty()) {
 			return new ListEmiIngredient(stacks.stream().toList(), amount);
 		} else if (map.isEmpty()) {
 			if (keys.size() == 1) {
@@ -131,9 +129,8 @@ public class EmiTags {
 				return new ListEmiIngredient(keys.stream().map(k -> tagIngredient(k, 1)).toList(), amount);
 			}
 		} else {
-			return new ListEmiIngredient(List.of(map.values().stream().map(i -> i.copy().setAmount(1)).toList(),
-					keys.stream().map(k -> tagIngredient(k, 1)).toList())
-				.stream().flatMap(a -> a.stream()).toList(), amount);
+			return new ListEmiIngredient(Stream.of(map.values().stream().map(i -> i.copy().setAmount(1)).toList(),
+					keys.stream().map(k -> tagIngredient(k, 1)).toList()).flatMap(Collection::stream).toList(), amount);
 		}
 	}
 

@@ -403,7 +403,7 @@ public class BoMScreen extends Screen {
 	private boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
 		EmiPlayerInventory inv = EmiScreenManager.lastPlayerInventory;
 		if (inv != null) {
-			List<EmiStack> stacks = hover.stack.getEmiStacks();
+			var stacks = hover.stack.getEmiStacks();
 			if (stacks.size() > 1) {
 				for (EmiStack stack : stacks) {
 					if (inv.inventory.containsKey(stack)) {

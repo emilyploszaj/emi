@@ -19,17 +19,17 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 
 	protected abstract EmiIngredient getIngredient();
 
-	protected abstract List<EmiStack> getStacks();
+	protected abstract List<? extends EmiStack> getStacks();
 
 	protected abstract EmiRecipe getRecipeContext(EmiStack stack, int offset);
 
 	@Override
-	public List<EmiIngredient> getInputs() {
+	public List<? extends EmiIngredient> getInputs() {
 		return List.of(new ListEmiIngredient(getStacks(), 1));
 	}
 
 	@Override
-	public List<EmiStack> getOutputs() {
+	public List<? extends EmiStack> getOutputs() {
 		return List.of();
 	}
 
@@ -50,7 +50,7 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 
 	@Override
 	public void addWidgets(WidgetHolder widgets) {
-		List<EmiStack> stacks = getStacks();
+		var stacks = getStacks();
 		widgets.addSlot(getIngredient(), 63, 0);
 		int ph = (widgets.getHeight() - 42) / 18;
 		int pageSize = (ph + 1) * 8;
@@ -69,11 +69,11 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 	}
 
 	private class PageManager {
-		public final List<EmiStack> stacks;
+		public final List<? extends EmiStack> stacks;
 		public final int pageSize;
 		public int currentPage;
 
-		public PageManager(List<EmiStack> stacks, int pageSize) {
+		public PageManager(List<? extends EmiStack> stacks, int pageSize) {
 			this.stacks = stacks;
 			this.pageSize = pageSize;
 		}
