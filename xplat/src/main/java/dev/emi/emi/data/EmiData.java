@@ -1,20 +1,10 @@
 package dev.emi.emi.data;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -24,9 +14,23 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.runtime.EmiLog;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class EmiData {
 	public static Map<String, EmiRecipeCategoryProperties> categoryPriorities = Map.of();
@@ -134,46 +138,56 @@ public class EmiData {
 					}
 				}, list -> recipeFilters = list));
 		register.accept(
-			new EmiDataLoader<List<Supplier<IndexStackData>>>(
+			new EmiDataLoader<List<Map<Integer, Supplier<IndexStackData>>>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
-				(list, json, oid) -> list.add(() -> {
-					List<IndexStackData.Added> added = Lists.newArrayList();
-					List<EmiIngredient> removed = Lists.newArrayList();
-					List<IndexStackData.Filter> filters = Lists.newArrayList();
-					if (JsonHelper.hasArray(json, "added")) {
-						for (JsonElement el : json.getAsJsonArray("added")) {
-							if (el.isJsonObject()) {
-								JsonObject obj = el.getAsJsonObject();
-								EmiIngredient stack = EmiIngredientSerializer.getDeserialized(obj.get("stack"));
-								EmiIngredient after = EmiStack.EMPTY;
-								if (obj.has("after")) {
-									after = EmiIngredientSerializer.getDeserialized(obj.get("after"));
-								}
-								added.add(new IndexStackData.Added(stack, after));
-							}
-						}
-					}
-					if (JsonHelper.hasArray(json, "removed")) {
-						for (JsonElement el : json.getAsJsonArray("removed")) {
-							removed.add(EmiIngredientSerializer.getDeserialized(el));
-						}
-					}
-					if (JsonHelper.hasArray(json, "filters")) {
-						for (JsonElement el : json.getAsJsonArray("filters")) {
-							if (JsonHelper.isString(el)) {
-								String id = el.getAsString();
-								if (id.startsWith("/") && id.endsWith("/")) {
-									Pattern pat = Pattern.compile(id.substring(1, id.length() - 1));
-									filters.add(new IndexStackData.Filter(s -> pat.matcher(s).find()));
-								} else {
-									filters.add(new IndexStackData.Filter(s -> s.equals(id)));
+				(list, json, oid) -> {
+					Map<Integer, Supplier<IndexStackData>> map = Maps.newHashMap();
+					map.put(JsonHelper.getInt(json, "priority", 0), () -> {
+						List<IndexStackData.Added> added = Lists.newArrayList();
+						List<EmiIngredient> removed = Lists.newArrayList();
+						List<IndexStackData.Filter> filters = Lists.newArrayList();
+						if (JsonHelper.hasArray(json, "added")) {
+							for (JsonElement el : json.getAsJsonArray("added")) {
+								if (el.isJsonObject()) {
+									JsonObject obj = el.getAsJsonObject();
+									EmiIngredient stack = EmiIngredientSerializer.getDeserialized(obj.get("stack"));
+									EmiIngredient after = EmiStack.EMPTY;
+									if (obj.has("after")) {
+										after = EmiIngredientSerializer.getDeserialized(obj.get("after"));
+									}
+									added.add(new IndexStackData.Added(stack, after));
 								}
 							}
 						}
-					}
-					boolean disable = JsonHelper.getBoolean(json, "disable", false);
-					return new IndexStackData(disable, added, removed, filters);
-				}), list -> stackData = list));
+						if (JsonHelper.hasArray(json, "removed")) {
+							for (JsonElement el : json.getAsJsonArray("removed")) {
+								removed.add(EmiIngredientSerializer.getDeserialized(el));
+							}
+						}
+						if (JsonHelper.hasArray(json, "filters")) {
+							for (JsonElement el : json.getAsJsonArray("filters")) {
+								if (JsonHelper.isString(el)) {
+									String id = el.getAsString();
+									if (id.startsWith("/") && id.endsWith("/")) {
+										Pattern pat = Pattern.compile(id.substring(1, id.length() - 1));
+										filters.add(new IndexStackData.Filter(s -> pat.matcher(s).find()));
+									} else {
+										filters.add(new IndexStackData.Filter(s -> s.equals(id)));
+									}
+								}
+							}
+						}
+						boolean disable = JsonHelper.getBoolean(json, "disable", false);
+						return new IndexStackData(disable, added, removed, filters);
+					});
+					list.add(map);
+				},
+				supplierList -> {
+					supplierList.sort(Comparator.comparingInt((Map<Integer, Supplier<IndexStackData>> map) -> map.keySet().iterator().next()));
+					List<Supplier<IndexStackData>> result = Lists.newArrayList();
+					supplierList.forEach(map -> result.addAll(map.values()));
+					stackData = result;
+				}));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiAlias>>>(
 				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
