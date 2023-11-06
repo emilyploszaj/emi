@@ -97,7 +97,14 @@ public class EmiRecipes {
 			}
 			return true;
 		}).toList();
-		manager = new Manager(categories, workstations, filtered);
+		Map<EmiRecipeCategory, List<EmiIngredient>> filteredWorkstations = Maps.newHashMap();
+		for (Map.Entry<EmiRecipeCategory, List<EmiIngredient>> entry : workstations.entrySet()) {
+			List<EmiIngredient> w = entry.getValue().stream().filter(s -> !EmiHidden.isDisabled(s)).toList();
+			if (!w.isEmpty()) {
+				filteredWorkstations.put(entry.getKey(), w);
+			}
+		}
+		manager = new Manager(categories, filteredWorkstations, filtered);
 		EmiLog.info("Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
