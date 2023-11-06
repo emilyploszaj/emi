@@ -9,6 +9,9 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.api.stack.ItemEmiStack;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.jemi.JemiPlugin;
 import dev.emi.emi.platform.EmiAgnos;
@@ -25,6 +28,9 @@ import dev.emi.emi.registry.EmiStackProviders;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
+import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
+import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
+import dev.emi.emi.stack.serializer.TagEmiIngredientSerializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
@@ -137,7 +143,13 @@ public class EmiReloadManager {
 						EmiReloadLog.warn("Recipe Manager is null");
 						break;
 					}
-
+					{
+						// TODO temporary fix
+						EmiRegistry registry = new EmiRegistryImpl();
+						registry.addIngredientSerializer(ItemEmiStack.class, new ItemEmiStackSerializer());
+						registry.addIngredientSerializer(FluidEmiStack.class, new FluidEmiStackSerializer());
+						registry.addIngredientSerializer(TagEmiIngredient.class, new TagEmiIngredientSerializer());
+					}
 					EmiHidden.reload();
 
 					step(EmiPort.literal("Processing tags"));
