@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 public class EmiData {
 	public static Map<String, EmiRecipeCategoryProperties> categoryPriorities = Map.of();
 	public static List<Predicate<EmiRecipe>> recipeFilters = List.of();
-	public static List<Supplier<IndexStackData>> stackData = List.of();
+	public static List<PrioritySupplier<IndexStackData>> stackData = List.of();
 	public static List<Supplier<EmiAlias>> aliases = List.of();
 	public static List<Supplier<EmiRecipe>> recipes = List.of();
 	
@@ -134,56 +134,51 @@ public class EmiData {
 					}
 				}, list -> recipeFilters = list));
 		register.accept(
-			new EmiDataLoader<List<Map<Integer, Supplier<IndexStackData>>>>(
+			new EmiDataLoader<List<PrioritySupplier<IndexStackData>>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
-				(list, json, oid) -> {
-					Map<Integer, Supplier<IndexStackData>> map = Maps.newHashMap();
-					map.put(JsonHelper.getInt(json, "priority", 0), () -> {
-						List<IndexStackData.Added> added = Lists.newArrayList();
-						List<EmiIngredient> removed = Lists.newArrayList();
-						List<IndexStackData.Filter> filters = Lists.newArrayList();
-						if (JsonHelper.hasArray(json, "added")) {
-							for (JsonElement el : json.getAsJsonArray("added")) {
-								if (el.isJsonObject()) {
-									JsonObject obj = el.getAsJsonObject();
-									EmiIngredient stack = EmiIngredientSerializer.getDeserialized(obj.get("stack"));
-									EmiIngredient after = EmiStack.EMPTY;
-									if (obj.has("after")) {
-										after = EmiIngredientSerializer.getDeserialized(obj.get("after"));
-									}
-									added.add(new IndexStackData.Added(stack, after));
+				(list, json, oid) -> list.add(new PrioritySupplier<>(JsonHelper.getInt(json, "priority", 0), () -> {
+					List<IndexStackData.Added> added = Lists.newArrayList();
+					List<EmiIngredient> removed = Lists.newArrayList();
+					List<IndexStackData.Filter> filters = Lists.newArrayList();
+					if (JsonHelper.hasArray(json, "added")) {
+						for (JsonElement el : json.getAsJsonArray("added")) {
+							if (el.isJsonObject()) {
+								JsonObject obj = el.getAsJsonObject();
+								EmiIngredient stack = EmiIngredientSerializer.getDeserialized(obj.get("stack"));
+								EmiIngredient after = EmiStack.EMPTY;
+								if (obj.has("after")) {
+									after = EmiIngredientSerializer.getDeserialized(obj.get("after"));
+								}
+								added.add(new IndexStackData.Added(stack, after));
+							}
+						}
+					}
+					if (JsonHelper.hasArray(json, "removed")) {
+						for (JsonElement el : json.getAsJsonArray("removed")) {
+							removed.add(EmiIngredientSerializer.getDeserialized(el));
+						}
+					}
+					if (JsonHelper.hasArray(json, "filters")) {
+						for (JsonElement el : json.getAsJsonArray("filters")) {
+							if (JsonHelper.isString(el)) {
+								String id = el.getAsString();
+								if (id.startsWith("/") && id.endsWith("/")) {
+									Pattern pat = Pattern.compile(id.substring(1, id.length() - 1));
+									filters.add(new IndexStackData.Filter(s -> pat.matcher(s).find()));
+								} else {
+									filters.add(new IndexStackData.Filter(s -> s.equals(id)));
 								}
 							}
 						}
-						if (JsonHelper.hasArray(json, "removed")) {
-							for (JsonElement el : json.getAsJsonArray("removed")) {
-								removed.add(EmiIngredientSerializer.getDeserialized(el));
-							}
-						}
-						if (JsonHelper.hasArray(json, "filters")) {
-							for (JsonElement el : json.getAsJsonArray("filters")) {
-								if (JsonHelper.isString(el)) {
-									String id = el.getAsString();
-									if (id.startsWith("/") && id.endsWith("/")) {
-										Pattern pat = Pattern.compile(id.substring(1, id.length() - 1));
-										filters.add(new IndexStackData.Filter(s -> pat.matcher(s).find()));
-									} else {
-										filters.add(new IndexStackData.Filter(s -> s.equals(id)));
-									}
-								}
-							}
-						}
-						boolean disable = JsonHelper.getBoolean(json, "disable", false);
-						return new IndexStackData(disable, added, removed, filters);
-					});
-					list.add(map);
-				},
-				supplierList -> {
-					supplierList.sort(Comparator.comparingInt((Map<Integer, Supplier<IndexStackData>> map) -> map.keySet().iterator().next()));
-					List<Supplier<IndexStackData>> result = Lists.newArrayList();
-					supplierList.forEach(map -> result.addAll(map.values()));
-					stackData = result;
-				}));
+					}
+					boolean disable = JsonHelper.getBoolean(json, "disable", false);
+					return new IndexStackData(disable, added, removed, filters);
+				})),
+				list -> {
+					list.sort(Comparator.comparingInt(PrioritySupplier::getPriority));
+					stackData = list;
+				}
+				));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiAlias>>>(
 				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
@@ -232,4 +227,31 @@ public class EmiData {
 		}
 		return Stream.of(json.get(key));
 	}
+
+	public static class PrioritySupplier<T> implements Supplier<T> {
+		private final int priority;
+		private final Supplier<T> supplier;
+
+		public PrioritySupplier(int priority, Supplier<T> supplier) {
+			this.priority = priority;
+			this.supplier = supplier;
+		}
+
+		/**
+		 * Gets a result.
+		 * @return a result
+		 */
+		@Override
+		public T get() {
+			return this.supplier.get();
+		}
+
+		/**
+		 * Gets a priority if this Supplier.
+		 * @return integer priority of this Supplier.
+		 */
+		public int getPriority() {
+			return this.priority;
+		}
+	};
 }
