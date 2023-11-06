@@ -1,4 +1,6 @@
+### Tweaks
+* Disabled stacks no longer appear as workstations #323
+
 ### Fixes
-* Fixed JEMI tooltips #330
-* Fixed slot highlight misalignment #328
-* Fixed slot highlight for mod search
+* Fixed "exception deserializing stack" and related resource oddities with a temporary workaround #257
+* Fixed typo in log #341
