@@ -1,20 +1,10 @@
 package dev.emi.emi.data;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -28,10 +18,20 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public class EmiData {
 	public static Map<String, EmiRecipeCategoryProperties> categoryPriorities = Map.of();
 	public static List<Predicate<EmiRecipe>> recipeFilters = List.of();
-	public static List<Supplier<IndexStackData>> stackData = List.of();
+	public static List<PrioritySupplier<IndexStackData>> stackData = List.of();
 	public static List<Supplier<EmiAlias>> aliases = List.of();
 	public static List<Supplier<EmiRecipe>> recipes = List.of();
 	
@@ -134,9 +134,9 @@ public class EmiData {
 					}
 				}, list -> recipeFilters = list));
 		register.accept(
-			new EmiDataLoader<List<Supplier<IndexStackData>>>(
+			new EmiDataLoader<List<PrioritySupplier<IndexStackData>>>(
 				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
-				(list, json, oid) -> list.add(() -> {
+				(list, json, oid) -> list.add(new PrioritySupplier<>(JsonHelper.getInt(json, "priority", 0), () -> {
 					List<IndexStackData.Added> added = Lists.newArrayList();
 					List<EmiIngredient> removed = Lists.newArrayList();
 					List<IndexStackData.Filter> filters = Lists.newArrayList();
@@ -173,7 +173,12 @@ public class EmiData {
 					}
 					boolean disable = JsonHelper.getBoolean(json, "disable", false);
 					return new IndexStackData(disable, added, removed, filters);
-				}), list -> stackData = list));
+				})),
+				list -> {
+					list.sort(Comparator.comparingInt(PrioritySupplier::getPriority));
+					stackData = list;
+				}
+				));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiAlias>>>(
 				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
@@ -222,4 +227,31 @@ public class EmiData {
 		}
 		return Stream.of(json.get(key));
 	}
+
+	public static class PrioritySupplier<T> implements Supplier<T> {
+		private final int priority;
+		private final Supplier<T> supplier;
+
+		public PrioritySupplier(int priority, Supplier<T> supplier) {
+			this.priority = priority;
+			this.supplier = supplier;
+		}
+
+		/**
+		 * Gets a result.
+		 * @return a result
+		 */
+		@Override
+		public T get() {
+			return this.supplier.get();
+		}
+
+		/**
+		 * Gets a priority if this Supplier.
+		 * @return integer priority of this Supplier.
+		 */
+		public int getPriority() {
+			return this.priority;
+		}
+	};
 }
