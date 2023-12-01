@@ -200,18 +200,20 @@ public class EmiData {
 							getArrayOrSingleton(json, "text").map(t -> (Text) EmiPort.translatable(t.getAsString())).toList(),
 							id));
 					} else if (s.equals("emi:world_interaction")) {
-						EmiWorldInteractionRecipe.Builder builder = EmiWorldInteractionRecipe.builder();
-						getArrayOrSingleton(json, "left").map(EmiIngredientSerializer::getDeserialized).forEach(
-							i -> builder.leftInput(i)
-						);
-						getArrayOrSingleton(json, "right").map(EmiIngredientSerializer::getDeserialized).forEach(
-							i -> builder.rightInput(i, false)
-						);
-						getArrayOrSingleton(json, "output").map(EmiIngredientSerializer::getDeserialized).forEach(
-							i -> builder.output(i.getEmiStacks().get(0))
-						);
-						builder.id(id);
-						list.add(() -> builder.build());
+						list.add(() -> {
+							EmiWorldInteractionRecipe.Builder builder = EmiWorldInteractionRecipe.builder();
+							getArrayOrSingleton(json, "left").map(EmiIngredientSerializer::getDeserialized).forEach(
+								i -> builder.leftInput(i)
+							);
+							getArrayOrSingleton(json, "right").map(EmiIngredientSerializer::getDeserialized).forEach(
+								i -> builder.rightInput(i, false)
+							);
+							getArrayOrSingleton(json, "output").map(EmiIngredientSerializer::getDeserialized).forEach(
+								i -> builder.output(i.getEmiStacks().get(0))
+							);
+							builder.id(id);
+							return builder.build();
+						});
 					}
 				}, list -> recipes = list));
 	}

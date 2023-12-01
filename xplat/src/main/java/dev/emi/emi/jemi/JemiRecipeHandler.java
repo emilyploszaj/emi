@@ -3,6 +3,7 @@ package dev.emi.emi.jemi;
 import java.util.List;
 import java.util.Optional;
 
+import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -12,11 +13,13 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.RecipeFillButtonWidget;
+import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotsView;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -91,11 +94,25 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 					}
 				}
 			}
-			/*R rawRecipe = getRawRecipe(recipe);
-			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe);
+			R rawRecipe = getRawRecipe(recipe);
+			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, widgets);
 			if (view != null) {
+				view.getSlotViews().forEach(v -> {
+					if (v instanceof JemiRecipeSlot jrs) {
+						jrs.highlight = 0;
+					}
+				});
+				draw.push();
+				draw.matrices().translate(-100000, -100000, -100000);
+				draw.matrices().scale(0, 0, 0);
 				err.showError(raw, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
-			}*/
+				draw.pop();
+				view.getSlotViews().forEach(v -> {
+					if (v instanceof JemiRecipeSlot jrs && jrs.highlight != 0 && !jrs.isEmpty()) {
+						draw.fill(jrs.x, jrs.y, 18, 18, jrs.highlight);
+					}
+				});
+			}
 		}
 	}
 
@@ -105,7 +122,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 			MinecraftClient client = MinecraftClient.getInstance();
 			R rawRecipe = getRawRecipe(recipe);
 			
-			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe);
+			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, List.of());
 
 			if (view == null) {
 				return () -> IRecipeTransferError.Type.INTERNAL;
@@ -118,7 +135,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		return () -> IRecipeTransferError.Type.INTERNAL;
 	}
 
-	private JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe) {
+	private JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, List<Widget> widgets) {
 		JemiRecipeLayoutBuilder builder = null;
 		if (rawRecipe != null) {
 			/*
@@ -131,15 +148,51 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		}
 
 		if (builder == null) {
+			List<SlotWidget> slotWidgets = widgets.stream().filter(w -> w instanceof SlotWidget).map(w -> (SlotWidget) w).toList();
 			builder = new JemiRecipeLayoutBuilder();
-			addIngredients(builder, recipe.getOutputs(), RecipeIngredientRole.OUTPUT);
-			addIngredients(builder, recipe.getInputs(), RecipeIngredientRole.INPUT);
+			addIngredients(builder, slotWidgets, recipe.getOutputs(), RecipeIngredientRole.OUTPUT);
+			int blankedSlots = 0;
+			// People assume very specific slot layouts from JEI. Oblige them.
+			if (recipe instanceof EmiCraftingRecipe ecr) {
+				if (ecr.shapeless) {
+					int inputSize = recipe.getInputs().size();
+					if (inputSize == 1) {
+						addBlankIngredients(builder, slotWidgets, 4, RecipeIngredientRole.INPUT);
+						blankedSlots += 4;
+						addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
+					} else if (inputSize < 5) {
+						int wrap = 0;
+						for (EmiIngredient i : recipe.getInputs()) {
+							addIngredients(builder, slotWidgets, List.of(i), RecipeIngredientRole.INPUT);
+							wrap++;
+							if (wrap >= 2) {
+								wrap = 0;
+								addBlankIngredients(builder, slotWidgets, 1, RecipeIngredientRole.INPUT);
+								blankedSlots += 1;
+							}
+						}
+					} else {
+						addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
+					}
+				} else {
+					if (ecr.canFit(1, 3)) {
+						addBlankIngredients(builder, slotWidgets, 1, RecipeIngredientRole.INPUT);
+						blankedSlots += 1;
+					} else if (ecr.canFit(3, 1) || (ecr.canFit(3, 2) && !ecr.canFit(2, 2))) {
+						addBlankIngredients(builder, slotWidgets, 3, RecipeIngredientRole.INPUT);
+						blankedSlots += 3;
+					}
+					addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
+				}
+			} else {
+				addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
+			}
 			if (recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING) {
-				for (int i = recipe.getInputs().size(); i < 9; i++) {
-					addIngredients(builder, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
+				for (int i = recipe.getInputs().size() + blankedSlots; i < 9; i++) {
+					addIngredients(builder, slotWidgets, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
 				}
 			}
-			addIngredients(builder, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
+			addIngredients(builder, slotWidgets, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
 		}
 
 		return new JemiRecipeSlotsView(builder.slots.stream().map(JemiRecipeSlot::new).toList());
@@ -177,10 +230,23 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		return null;
 	}
 
+	private void addBlankIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, int amount, RecipeIngredientRole role) {
+		for (int i = 0; i < amount; i++) {
+			addIngredients(builder, widgets, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
+		}
+	}
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private void addIngredients(JemiRecipeLayoutBuilder builder, List<? extends EmiIngredient> stacks, RecipeIngredientRole role) {
+	private void addIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, List<? extends EmiIngredient> stacks, RecipeIngredientRole role) {
 		for (EmiIngredient ing : stacks) {
-			IIngredientAcceptor acceptor = builder.addSlot(role, 0, 0);
+			int x = 0, y = 0;
+			for (SlotWidget w : widgets) {
+				if (w.getStack() == ing) {
+					x = w.getBounds().x();
+					y = w.getBounds().y();
+				}
+			}
+			IIngredientAcceptor acceptor = builder.addSlot(role, x, y);
 			for (EmiStack stack : ing.getEmiStacks()) {
 				Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(stack);
 				if (opt.isPresent()) {

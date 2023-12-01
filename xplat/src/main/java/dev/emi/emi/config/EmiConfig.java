@@ -55,6 +55,10 @@ public class EmiConfig {
 	@ConfigValue("general.help-level")
 	public static HelpLevel helpLevel = HelpLevel.NORMAL;
 
+	@Comment("Where EMI should pull stacks from to populate the index.")
+	@ConfigValue("general.index-source")
+	public static IndexSource indexSource = IndexSource.CREATIVE;
+
 	@ConfigGroup("general.search")
 	@Comment("Whether normal search queries should include the tooltip.")
 	@ConfigValue("general.search-tooltip-by-default")
