@@ -28,6 +28,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	public final TankInfo tankInfo;
 	public final EmiIngredient stack;
 	public SlotWidget widget;
+	public int highlight = 0;
 
 	public JemiRecipeSlot(JemiRecipeSlotBuilder builder) {
 		this.role = builder.acceptor.role;
@@ -96,6 +97,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 
 	@Override
 	public void drawHighlight(MatrixStack raw, int color) {
+		this.highlight = color;
 	}
 
 	public static record OffsetDrawable(IDrawable drawable, int xOff, int yOff){

@@ -1,6 +1,8 @@
-### Tweaks
-* Disabled stacks no longer appear as workstations #323
+### Additions
+* Added option to use all registered items instead of creative tabs to source the index.
+* Added tab scrolling on hover #308
+* Added better support for JEI slot highlighting
 
 ### Fixes
-* Fixed "exception deserializing stack" and related resource oddities with a temporary workaround #257
-* Fixed typo in log #341
+* Fixed ingredient serializer errors #354
+* Fixed #346

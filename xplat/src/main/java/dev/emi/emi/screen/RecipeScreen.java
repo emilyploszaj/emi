@@ -501,7 +501,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 			scrollAcc += amount;
 			int sa = (int) scrollAcc;
 			scrollAcc %= 1;
-			if (EmiInput.isShiftDown()) {
+			if (EmiInput.isShiftDown() || mouseY < this.y) {
 				setPage(tabPage, tab - sa, 0);
 			} else {
 				setPage(tabPage, tab, page - sa);

@@ -14,6 +14,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.config.IndexSource;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.runtime.EmiHidden;
@@ -68,16 +70,20 @@ public class EmiStackList {
 				creativeGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
 			}
 		}
-		for (String namespace : namespaceGroups.keySet()) {
-			if (creativeGroups.containsKey(namespace)) {
-				IndexGroup ng = namespaceGroups.get(namespace);
-				IndexGroup cg = creativeGroups.get(namespace);
-				if (cg.stacks.size() * 3 >= ng.stacks.size()) {
-					ng.suppressedBy.add(cg);
+		if (EmiConfig.indexSource == IndexSource.CREATIVE) {
+			for (String namespace : namespaceGroups.keySet()) {
+				if (creativeGroups.containsKey(namespace)) {
+					IndexGroup ng = namespaceGroups.get(namespace);
+					IndexGroup cg = creativeGroups.get(namespace);
+					if (cg.stacks.size() * 3 >= ng.stacks.size()) {
+						ng.suppressedBy.add(cg);
+					}
 				}
 			}
 		}
-		groups.addAll(creativeGroups.values());
+		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
+			groups.addAll(creativeGroups.values());
+		}
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();
 		for (Fluid fluid : EmiPort.getFluidRegistry()) {
