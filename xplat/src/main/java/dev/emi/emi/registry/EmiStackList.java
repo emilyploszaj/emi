@@ -15,6 +15,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
+import dev.emi.emi.config.IndexSource;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.runtime.EmiHidden;
@@ -68,25 +70,29 @@ public class EmiStackList {
 			EmiStack stack = EmiStack.of(item);
 			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
 		}
-		for (ItemGroup group : ItemGroups.getGroups()) {
-			Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
-			IndexGroup ig = new IndexGroup();
-			Collection<ItemStack> searchStacks = group.getSearchTabStacks();
-			for (ItemStack stack : searchStacks) {
-				EmiStack es = EmiStack.of(stack);
-				String namespace = es.getId().getNamespace();
-				usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
-				ig.stacks.add(es);
-			}
-			for (String namespace : usedNamespaces.keySet()) {
-				if (namespaceGroups.containsKey(namespace)) {
-					IndexGroup ng = namespaceGroups.get(namespace);
-					if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
-						ng.suppressedBy.add(ig);
+		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
+			for (ItemGroup group : ItemGroups.getGroups()) {
+				Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
+				IndexGroup ig = new IndexGroup();
+				Collection<ItemStack> searchStacks = group.getSearchTabStacks();
+				for (ItemStack stack : searchStacks) {
+					EmiStack es = EmiStack.of(stack);
+					String namespace = es.getId().getNamespace();
+					usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
+					ig.stacks.add(es);
+				}
+				if (EmiConfig.indexSource == IndexSource.CREATIVE) {
+					for (String namespace : usedNamespaces.keySet()) {
+						if (namespaceGroups.containsKey(namespace)) {
+							IndexGroup ng = namespaceGroups.get(namespace);
+							if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
+								ng.suppressedBy.add(ig);
+							}
+						}
 					}
 				}
+				groups.add(ig);
 			}
-			groups.add(ig);
 		}
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();
