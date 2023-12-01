@@ -29,6 +29,9 @@
   "key.emi.hide_stack": "Hide Stack",
   "key.emi.hide_stack_by_id": "Hide Stack by ID",
 
+  "emi.index_source.creative": "Creative",
+  "emi.index_source.registered": "Registered",
+  "emi.index_source.creative_plus_registered": "Creative + Registered",
   "emi.help_level.verbose": "Verbose",
   "emi.help_level.normal": "Normal",
   "emi.help_level.none": "None",
@@ -89,6 +92,7 @@
   "config.emi.general.enabled": "Enabled",
   "config.emi.general.cheat_mode": "Cheat Mode",
   "config.emi.general.help_level": "Help Level",
+  "config.emi.general.index_source": "Index Source",
   "config.emi.general.search_tooltip_by_default": "Search Tooltip by Default",
   "config.emi.general.search_mod_name_by_default": "Search Mod Name by Default",
   "config.emi.general.search_tags_by_default": "Search Tags by Default",
