@@ -26,8 +26,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Build
-        run: ./gradlew build
+      - name: Build Fabric
+        run: ./gradlew :fabric:build
+
+      - name: Build Forge
+        run: ./gradlew :forge:build
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
