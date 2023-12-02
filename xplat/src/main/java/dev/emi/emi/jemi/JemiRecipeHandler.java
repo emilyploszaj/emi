@@ -68,13 +68,13 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 
 	@Override
 	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<T> context) {
-		IRecipeTransferError err = jeiCraft(recipe, context, false);
+		IRecipeTransferError err = jeiCraft(recipe, context, false, null);
 		return err == null || err.getType().allowsTransfer;
 	}
 
 	@Override
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
-		IRecipeTransferError err = jeiCraft(recipe, context, true);
+		IRecipeTransferError err = jeiCraft(recipe, context, true, null);
 		if (err == null || err.getType().allowsTransfer) {
 			MinecraftClient.getInstance().setScreen(context.getScreen());
 		}
@@ -84,7 +84,9 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, MatrixStack raw) {
 		EmiDrawContext draw = EmiDrawContext.wrap(raw);
-		IRecipeTransferError err = jeiCraft(recipe, context, false);
+		R rawRecipe = getRawRecipe(recipe);
+		JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, widgets);
+		IRecipeTransferError err = jeiCraft(recipe, context, false, view);
 		if (err != null) {
 			if (err.getType() == IRecipeTransferError.Type.COSMETIC) {
 				for (Widget widget : widgets) {
@@ -94,8 +96,6 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 					}
 				}
 			}
-			R rawRecipe = getRawRecipe(recipe);
-			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, widgets);
 			if (view != null) {
 				view.getSlotViews().forEach(v -> {
 					if (v instanceof JemiRecipeSlot jrs) {
@@ -117,12 +117,14 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 	}
 
 	@SuppressWarnings("unchecked")
-	private IRecipeTransferError jeiCraft(EmiRecipe recipe, EmiCraftContext<T> context, boolean craft) {
+	private IRecipeTransferError jeiCraft(EmiRecipe recipe, EmiCraftContext<T> context, boolean craft, JemiRecipeSlotsView view) {
 		try {
 			MinecraftClient client = MinecraftClient.getInstance();
 			R rawRecipe = getRawRecipe(recipe);
 			
-			JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, List.of());
+			if (view == null) {
+				view = createSlotsView(recipe, rawRecipe, List.of());
+			}
 
 			if (view == null) {
 				return () -> IRecipeTransferError.Type.INTERNAL;

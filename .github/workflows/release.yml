@@ -39,12 +39,22 @@ jobs:
         id: composite_version
         run: echo "composite_version=${{ steps.mod_version.outputs.mod_version }}+${{ steps.minecraft_version.outputs.minecraft_version }}" >> $GITHUB_OUTPUT
 
+      - name: Build Fabric
+        env:
+          RELEASE: true
+        run: ./gradlew :fabric:build
+
+      - name: Build Forge
+        env:
+          RELEASE: true
+        run: ./gradlew :forge:build
+
       - name: Publish
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           RELEASE: true
-        run: ./gradlew build publish modrinth curseforge -PmavenUrl="${{ secrets.MAVEN_URL }}" -PmavenUsername="${{ secrets.MAVEN_USERNAME }}" -PmavenPassword="${{ secrets.MAVEN_PASSWORD }}"
+        run: ./gradlew publish modrinth curseforge -PmavenUrl="${{ secrets.MAVEN_URL }}" -PmavenUsername="${{ secrets.MAVEN_USERNAME }}" -PmavenPassword="${{ secrets.MAVEN_PASSWORD }}"
 
       - name: Create Release
         id: create_release
