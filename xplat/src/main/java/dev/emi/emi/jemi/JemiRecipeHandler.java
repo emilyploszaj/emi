@@ -184,7 +184,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 						addBlankIngredients(builder, slotWidgets, 3, RecipeIngredientRole.INPUT);
 						blankedSlots += 3;
 					}
-					addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
+					addIngredients(builder, slotWidgets, recipe.getInputs().subList(0, Math.max(9, recipe.getInputs().size()) - blankedSlots), RecipeIngredientRole.INPUT);
 				}
 			} else {
 				addIngredients(builder, slotWidgets, recipe.getInputs(), RecipeIngredientRole.INPUT);
