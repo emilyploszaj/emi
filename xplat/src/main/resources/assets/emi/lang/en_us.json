@@ -1,392 +1,46 @@
 {
-  "modmenu.summaryTranslation.emi": "Multifunctional and accessible item and recipe viewer",
-  "modmenu.descriptionTranslation.emi": "Allows you to add items and recipes to favorites, view recipe trees, customize sidebars to your preference and more.",
-
-
-
-  "config.emi.group.general": "General",
-
-  "config.emi.general.enabled": "Enabled",
-  "config.emi.tooltip.general.enabled": "Whether EMI is enabled and visible?",
-
-  "config.emi.general.cheat_mode": "Cheat Mode",
-  "config.emi.tooltip.general.cheat_mode": "Whether cheating in items is enabled?",
-
-  "config.emi.general.help_level": "Help Level",
-  "config.emi.tooltip.general.help_level": "How much EMI should use tooltips and popups to show controls and information?",
-  "emi.help_level.verbose": "Verbose",
-  "emi.help_level.normal": "Normal",
-  "emi.help_level.none": "None",
-
-  "config.emi.general.index_source": "Index Source",
-  "config.emi.tooltip.general.index_source": "Where EMI should pull stacks from to populate the index? (Some items may not be added to the creative tabs! If you want to see all existing items in the game - choose 'Registered' or 'Combined Mode')",
-  "emi.index_source.creative": "Creative tabs",
-  "emi.index_source.registered": "Registered",
-  "emi.index_source.creative_plus_registered": "Combined Mode",
-
-
-  "config.emi.group.general.search": "Search",
-
-  "config.emi.general.search_tooltip_by_default": "Search Tooltip by Default",
-  "config.emi.tooltip.general.search_tooltip_by_default": "Whether normal search queries should include the tooltip?",
-
-  "config.emi.general.search_mod_name_by_default": "Search Mod Name by Default",
-  "config.emi.tooltip.general.search_mod_name_by_default": "Whether normal search queries should include the mod name?",
-
-  "config.emi.general.search_tags_by_default": "Search Tags by Default",
-  "config.emi.tooltip.general.search_tags_by_default": "Whether normal search queries should include the stack's tags?",
-
-
-
-  "config.emi.group.ui": "UI",
-
-  "config.emi.ui.recipe_book_action": "Recipe Book Action",
-  "config.emi.tooltip.ui.recipe_book_action" : "Which action should be performed when clicking the recipe book in the workbench?",
-  "emi.recipe_book_action.default": "Default",
-  "emi.recipe_book_action.toggle_craftables": "Toggle Craftables",
-  "emi.recipe_book_action.toggle_visibility": "Toggle Visibility",
-
-  "config.emi.ui.effect_location": "Effect Location",
-  "config.emi.tooltip.ui.effect_location" : "Where to display status effects in the inventory?",
-  "emi.effect_location.top": "Top",
-  "emi.effect_location.left_compressed": "Left (Compressed)",
-  "emi.effect_location.right_compressed": "Right (Compressed)",
-  "emi.effect_location.left": "Left",
-  "emi.effect_location.right": "Right",
-
-  "config.emi.ui.show_hover_overlay": "Show Hover Overlay",
-  "config.emi.tooltip.ui.show_hover_overlay" : "Whether to display a gray overlay when hovering over a stack?",
-
-
-  "config.emi.group.ui.mod_id": "Mod ID",
-
-  "config.emi.ui.append_mod_id": "Append Mod ID",
-  "config.emi.tooltip.ui.append_mod_id" : "Whether to add mod name to tooltips?",
-
-  "config.emi.ui.append_item_mod_id": "Append Item Mod ID",
-  "config.emi.tooltip.ui.append_item_mod_id" : "Whether to add mod name to item tooltips, in case another mod provides behavior? (Causes duplication of the mod name in some situations)",
-
-  "config.emi.ui.miscraft_prevention": "Miscraft Prevention",
-  "config.emi.tooltip.ui.miscraft_prevention" : "Prevents recipes being quick crafted from shifting around under the cursor.",
-
-  "config.emi.ui.fluid_unit": "Fluid Unit",
-  "config.emi.tooltip.ui.fluid_unit" : "The unit to display fluids as (L/mB/d).",
-  "emi.unit.liters": "Liters",
-  "emi.unit.millibuckets": "MilliBuckets",
-  "emi.unit.droplets": "Droplets",
-  "emi.fluid.amount.liters": "%s L",
-  "emi.fluid.amount.millibuckets": "%s mB",
-  "emi.fluid.amount.droplets": "%s d",
-
-  "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
-  "config.emi.tooltip.ui.use_batched_renderer" : "Whether to use the batched render system? (Batching is faster, but may have incompatibilities with shaders or other mods)",
-
-  "config.emi.ui.center_search_bar": "Center Search Bar",
-  "config.emi.tooltip.ui.center_search_bar" : "Whether to have the search bar in the center of the screen, instead of to the side?",
-
-  "config.emi.ui.search_sidebar_focus": "Search Sidebar Focus",
-  "config.emi.tooltip.ui.search_sidebar_focus" : "Which sidebar type to switch to when searching?",
-
-  "config.emi.ui.empty_search_sidebar_focus": "Empty Search Sidebar Focus",
-  "config.emi.tooltip.ui.empty_search_sidebar_focus" : "Which sidebar type to focus when the search is empty?",
-
-
-  "config.emi.group.ui.recipe_screen": "Recipe Screen",
-
-  "config.emi.ui.vertical_margin": "Vertical Margin",
-  "config.emi.tooltip.ui.vertical_margin" : "The amount of vertical margin to give in the recipe screen.",
-
-  "config.emi.ui.minimum_recipe_screen_width": "Minimum Recipe Screen Width",
-  "config.emi.tooltip.ui.minimum_recipe_screen_width" : "The minimum width of the recipe screen in pixels. Controls how many tabs there can be, and where the page switching buttons go (The default is 176, the width of most screens)",
-
-  "config.emi.ui.workstation_location": "Workstation Location",
-  "config.emi.tooltip.ui.workstation_location" : "Where to show workstations in the recipe screen?",
-
-  "config.emi.ui.show_cost_per_batch": "Show Cost Per Batch",
-  "config.emi.tooltip.ui.show_cost_per_batch" : "Display cost per batch when hovering the recipe output?",
-
-
-  "config.emi.group.ui.recipe_buttons": "Recipe Buttons",
-
-  "config.emi.ui.recipe_default_button": "Recipe Default Button",
-  "config.emi.tooltip.ui.recipe_default_button" : "Whether recipes should have a button to set as default.",
-
-  "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
-  "config.emi.tooltip.ui.recipe_tree_button" : "Whether recipes should have a button to show the recipe tree?",
-
-  "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
-  "config.emi.tooltip.ui.recipe_fill_button" : "Whether recipes should have a button to fill the ingredients in a handler?",
-
-  "config.emi.ui.recipe_screenshot_button": "Recipe Screenshot Button",
-  "config.emi.tooltip.ui.recipe_screenshot_button" : "Whether recipes should have a button to take a screenshot of the recipe?",
-
-  "config.emi.ui.recipe_screenshot_scale": "Recipe Screenshot Scale",
-  "config.emi.tooltip.ui.recipe_screenshot_scale" : "The GUI scale at which recipe screenshots are saved (Use 0 to use the current GUI scale)",
-
-
-
-  "config.emi.group.ui.left_sidebar": "Left Sidebar",
-
-  "config.emi.ui.left_sidebar_pages": "Pages",
-  "config.emi.tooltip.ui.left_sidebar_pages" : "The pages in the sidebar.",
-
-  "config.emi.ui.left_sidebar_subpanels": "Subpanels",
-  "config.emi.tooltip.ui.left_sidebar_subpanels" : "The subpanels in the sidebar.",
-
-  "config.emi.ui.left_sidebar_size": "Size",
-  "config.emi.tooltip.ui.left_sidebar_size" : "How many columns and rows of ingredients to limit the sidebar to?",
-
-  "config.emi.ui.left_sidebar_margins": "Margins",
-  "config.emi.tooltip.ui.left_sidebar_margins" : "How much space to maintain between the sidebar and obstructions? (In pixels)",
-
-  "config.emi.ui.left_sidebar_align": "Align",
-  "config.emi.tooltip.ui.left_sidebar_align" : "Where to position the sidebar?",
-
-  "config.emi.ui.left_sidebar_header": "Header",
-  "config.emi.tooltip.ui.left_sidebar_header" : "Whether to render the header buttons and page count for the sidebar?",
-
-  "config.emi.ui.left_sidebar_theme": "Theme",
-  "config.emi.tooltip.ui.left_sidebar_theme" : "Which theme to use for the sidebar?",
-
-
-  "config.emi.group.ui.right_sidebar": "Right Sidebar",
-
-  "config.emi.ui.right_sidebar_pages": "Pages",
-  "config.emi.tooltip.ui.right_sidebar_pages" : "The pages in the sidebar.",
-
-  "config.emi.ui.right_sidebar_subpanels": "Subpanels",
-  "config.emi.tooltip.ui.right_sidebar_subpanels" : "The subpanels in the sidebar.",
-
-  "config.emi.ui.right_sidebar_size": "Size",
-  "config.emi.tooltip.ui.right_sidebar_size" : "How many columns and rows of ingredients to limit the sidebar to?",
-
-  "config.emi.ui.right_sidebar_margins": "Margins",
-  "config.emi.tooltip.ui.right_sidebar_margins" : "How much space to maintain between the sidebar and obstructions? (In pixels)",
-
-  "config.emi.ui.right_sidebar_align": "Align",
-  "config.emi.tooltip.ui.right_sidebar_align" : "Where to position the sidebar?",
-
-  "config.emi.ui.right_sidebar_header": "Header",
-  "config.emi.tooltip.ui.right_sidebar_header" : "Whether to render the header buttons and page count for the sidebar?",
-
-  "config.emi.ui.right_sidebar_theme": "Theme",
-  "config.emi.tooltip.ui.right_sidebar_theme" : "Which theme to use for the sidebar?",
-
-
-  "config.emi.group.ui.top_sidebar": "Top Sidebar",
-
-  "config.emi.ui.top_sidebar_pages": "Pages",
-  "config.emi.tooltip.ui.top_sidebar_pages" : "The pages in the sidebar.",
-
-  "config.emi.ui.top_sidebar_subpanels": "Subpanels",
-  "config.emi.tooltip.ui.top_sidebar_subpanels" : "The subpanels in the sidebar.",
-
-  "config.emi.ui.top_sidebar_size": "Size",
-  "config.emi.tooltip.ui.top_sidebar_size" : "How many columns and rows of ingredients to limit the sidebar to?",
-
-  "config.emi.ui.top_sidebar_margins": "Margins",
-  "config.emi.tooltip.ui.top_sidebar_margins" : "How much space to maintain between the sidebar and obstructions? (In pixels)",
-
-  "config.emi.ui.top_sidebar_align": "Align",
-  "config.emi.tooltip.ui.top_sidebar_align" : "Where to position the sidebar?",
-
-  "config.emi.ui.top_sidebar_header": "Header",
-  "config.emi.tooltip.ui.top_sidebar_header" : "Whether to render the header buttons and page count for the sidebar?",
-
-  "config.emi.ui.top_sidebar_theme": "Theme",
-  "config.emi.tooltip.ui.top_sidebar_theme" : "Which theme to use for the sidebar?",
-
-
-  "config.emi.group.ui.bottom_sidebar": "Bottom Sidebar",
-
-  "config.emi.ui.bottom_sidebar_pages": "Pages",
-  "config.emi.tooltip.ui.bottom_sidebar_pages" : "The pages in the sidebar.",
-
-  "config.emi.ui.bottom_sidebar_subpanels": "Subpanels",
-  "config.emi.tooltip.ui.bottom_sidebar_subpanels" : "The subpanels in the sidebar.",
-
-  "config.emi.ui.bottom_sidebar_size": "Size",
-  "config.emi.tooltip.ui.bottom_sidebar_size" : "How many columns and rows of ingredients to limit the sidebar to?",
-
-  "config.emi.ui.bottom_sidebar_margins": "Margins",
-  "config.emi.tooltip.ui.bottom_sidebar_margins" : "How much space to maintain between the sidebar and obstructions? (In pixels)",
-
-  "config.emi.ui.bottom_sidebar_align": "Align",
-  "config.emi.tooltip.ui.bottom_sidebar_align" : "Where to position the sidebar?",
-
-  "config.emi.ui.bottom_sidebar_header": "Header",
-  "config.emi.tooltip.ui.bottom_sidebar_header" : "Whether to render the header buttons and page count for the sidebar?",
-
-  "config.emi.ui.bottom_sidebar_theme": "Theme",
-  "config.emi.tooltip.ui.bottom_sidebar_theme" : "Which theme to use for the sidebar?",
-
-
-
-  "config.emi.group.binds": "Binds",
-
-  "key.emi.toggle_visibility": "Toggle Visibility",
-  "config.emi.tooltip.binds.toggle_visibility": "Toggle the visibility of EMI.",
-
-  "key.emi.focus_search": "Focus Search",
-  "config.emi.tooltip.binds.focus_search": "Focus the search bar.",
-
-  "key.emi.clear_search": "Clear Search",
-  "config.emi.tooltip.binds.clear_search": "Clears the search bar.",
-
-  "key.emi.view_recipes": "View Recipes",
-  "config.emi.tooltip.binds.view_recipes": "Displays recipes for the hovered stack.",
-
-  "key.emi.view_uses": "View Uses",
-  "config.emi.tooltip.binds.view_uses": "Displays recipes that can be created with the hovered stack.",
-
-  "key.emi.favorite": "Favorite",
-  "config.emi.tooltip.binds.favorite": "Add the hovered stack (or recipe) to favorite for quick access.",
-
-  "key.emi.set_default": "???",
-  "config.emi.tooltip.binds.set_default": "???",
-
-  "key.emi.default_stack": "Default Stack",
-  "config.emi.tooltip.binds.default_stack": "Set the default recipe for this stack (you need to click on the recipe output)",
-
-  "key.emi.view_stack_tree": "View Stack Tree",
-  "config.emi.tooltip.binds.view_stack_tree": "Display the recipe tree for a given stack.",
-
-  "key.emi.view_tree": "View Tree",
-  "config.emi.tooltip.binds.view_tree": "Displays the last saved recipe tree.",
-
-  "key.emi.back": "Back",
-  "config.emi.tooltip.binds.back": "Return to the previous page in EMI.",
-
-  "key.emi.forward": "Forward",
-  "config.emi.tooltip.binds.forward": "Return to the next page in EMI after going back.",
-
-
-  "config.emi.group.binds.crafts": "Crafts",
-
-  "key.emi.craft_one": "Craft One",
-  "config.emi.tooltip.binds.craft_one": "When on a stack with an associated recipe:\nMove ingredients for a single result.",
-
-  "key.emi.craft_all": "Craft All",
-  "config.emi.tooltip.binds.craft_all": "When on a stack with an associated recipe:\nMove ingredients for as many results as possible.",
-
-  "key.emi.craft_one_to_inventory": "Craft One to Inventory",
-  "config.emi.tooltip.binds.craft_one_to_inventory": "When on a stack with an associated recipe:\nMove ingredients for a single result and put in inventory if possible.",
-
-  "key.emi.craft_all_to_inventory": "Craft All to Inventory",
-  "config.emi.tooltip.binds.craft_all_to_inventory": "When on a stack with an associated recipe:\nMove ingredients for as many results as possible and put in inventory if possible.",
-
-  "key.emi.craft_one_to_cursor": "Craft One to Cursor",
-  "config.emi.tooltip.binds.craft_one_to_cursor": "When on a stack with an associated recipe:\nMove ingredients for a single result and put in cursor if possible.",
-
-  "key.emi.show_craft": "Show Craft",
-  "config.emi.tooltip.binds.show_craft": "Display the recipe that will be used to craft a stack when hotkeys are used.",
-
-
-  "config.emi.group.binds.cheats": "Cheats",
-
-  "key.emi.cheat_one_to_inventory": "Cheat One to Inventory",
-  "config.emi.tooltip.binds.cheat_one_to_inventory": "Cheat in one of an item into the inventory.",
-
-  "key.emi.cheat_stack_to_inventory": "Cheat Stack to Inventory",
-  "config.emi.tooltip.binds.cheat_stack_to_inventory": "Cheat in a stack of an item into the inventory.",
-
-  "key.emi.cheat_one_to_cursor": "Cheat One to Cursor",
-  "config.emi.tooltip.binds.cheat_one_to_cursor": "Cheat in one of an item into the cursor.",
-
-  "key.emi.cheat_stack_to_cursor": "Cheat Stack to Cursor",
-  "config.emi.tooltip.binds.cheat_stack_to_cursor": "Cheat in a stack of an item into the cursor.",
-
-  "key.emi.delete_cursor_stack": "Delete Cursor Stack",
-  "config.emi.tooltip.binds.delete_cursor_stack": "Delete the stack in the cursor when hovering the index.",
-
-  "key.emi.hide_stack": "Hide Stack",
-  "config.emi.tooltip.binds.hide_stack": "In edit mode, hide the hovered stack.",
-
-  "key.emi.hide_stack_by_id": "Hide Stack by ID",
-  "config.emi.tooltip.binds.hide_stack_by_id": "In edit mode, hide stacks with the hovered stack's id.",
-
   "key.keyboard.control": "Ctrl",
   "key.keyboard.alt": "Alt",
   "key.keyboard.shift": "Shift",
 
+  "key.emi.toggle_visibility": "Toggle Visibility",
+  "key.emi.focus_search": "Focus Search",
+  "key.emi.clear_search": "Clear Search",
+  "key.emi.view_recipes": "View Recipes",
+  "key.emi.view_uses": "View Uses",
+  "key.emi.favorite": "Favorite",
+  "key.emi.set_default": "Set Default",
+  "key.emi.default_stack": "Default Stack",
+  "key.emi.view_stack_tree": "View Stack Tree",
+  "key.emi.view_tree": "View Tree",
+  "key.emi.back": "Back",
+  "key.emi.forward": "Forward",
+  "key.emi.craft_one": "Craft One",
+  "key.emi.craft_all": "Craft All",
+  "key.emi.craft_one_to_inventory": "Craft One to Inventory",
+  "key.emi.craft_all_to_inventory": "Craft All to Inventory",
+  "key.emi.craft_one_to_cursor": "Craft One to Cursor",
+  "key.emi.show_craft": "Show Craft",
+  "key.emi.cheat_one_to_inventory": "Cheat One to Inventory",
+  "key.emi.cheat_stack_to_inventory": "Cheat Stack to Inventory",
+  "key.emi.cheat_one_to_cursor": "Cheat One to Cursor",
+  "key.emi.cheat_stack_to_cursor": "Cheat Stack to Cursor",
+  "key.emi.delete_cursor_stack": "Delete Cursor Stack",
+  "key.emi.hide_stack": "Hide Stack",
+  "key.emi.hide_stack_by_id": "Hide Stack by ID",
 
-
-  "config.emi.group.dev": "Dev",
-
-  "config.emi.dev.dev_mode": "Dev Mode",
-  "config.emi.tooltip.dev.dev_mode": "Whether development functions should be enabled? (Not recommended for general play)",
-
-  "config.emi.dev.edit_mode": "Edit Mode",
-  "config.emi.tooltip.dev.edit_mode": "Whether editing the index is enabled?",
-
-  "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",
-  "config.emi.tooltip.dev.log_untranslated_tags": "Whether to log untranslated tags as warnings?",
-
-  "config.emi.dev.log_non_tag_ingredients": "Log Non-Tag Ingredients",
-  "config.emi.tooltip.dev.log_non_tag_ingredients": "Whether to log ingredients that don't have a representative tag as warnings?",
-
-  "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
-  "config.emi.tooltip.dev.show_recipe_ids": "Whether hovering the output of a recipe should show the recipe's EMI ID?",
-
-  "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
-  "config.emi.tooltip.dev.highlight_defaulted": "Whether stacks in the index should display a highlight if they have a recipe default?",
-
-  "config.emi.dev.highlight_exclusion_areas": "Highlight Exclusion Areas",
-  "config.emi.tooltip.dev.highlight_exclusion_areas": "Whether to display exclusion areas?",
-
-
-
-  "screen.emi.presets": "Config Presets",
-
-  "config.emi.presets.sidebars": "Sidebars",
-
-  "config.emi.presets.productive": "Productive",
-  "config.emi.tooltip.presets.productive" : "Index on the right, a smaller set of craftables on the left, and favorites in the top left. Ideal for getting the most out of EMI's features",
-
-  "config.emi.presets.recipe_book_plus": "Recipe Book Plus",
-  "config.emi.tooltip.presets.recipe_book_plus" : "Use a smaller, recipe book styled panel on the left for craftables and favorites, and use a classic index on the right.",
-
-  "config.emi.presets.empty_search_craftable": "Empty Search Craftable",
-  "config.emi.tooltip.presets.empty_search_craftable" : "Use index and craftables on the right panel, craftable by default, and index when searching",
-
-
-  "config.emi.presets.binds": "Binds",
-
-  "config.emi.presets.author_binds": "Author Binds",
-  "config.emi.tooltip.presets.author_binds" : "Use some of the binds EMI's author uses, do they know best?",
-
-
-  "config.emi.presets.restore": "Restore",
-
-  "config.emi.presets.backup": "Restore Backup",
-  "config.emi.tooltip.presets.backup" : "Restore all settings to backup from most recently launch.",
-
-  "config.emi.presets.defaults": "Restore Defaults",
-  "config.emi.tooltip.presets.defaults" : "Restore all default settings.",
-
-
-  "tooltip.emi.config.global": "Toggle using a global EMI config between all game instances instead of a separate config per game instance.\n§8(Only §8useful §8when §8using §8a §8launcher §8that §8creates §8multiple §8.minecraft §8folders)",
-
-
-  "screen.emi.recipe": "Recipe",
-  "screen.emi.config": "Config",
-
-  "screen.emi.config.reset": "Revert %s change(s)",
-
-  "emi.error.recipe.initialize": "Error Initializing",
-  "emi.error.recipe.render": "Error Rendering",
-
+  "emi.index_source.creative": "Creative",
+  "emi.index_source.registered": "Registered",
+  "emi.index_source.creative_plus_registered": "Creative + Registered",
+  "emi.help_level.verbose": "Verbose",
+  "emi.help_level.normal": "Normal",
+  "emi.help_level.none": "None",
   "emi.align.horizontal.left": "Left",
   "emi.align.horizontal.center": "Center",
   "emi.align.horizontal.right": "Right",
-
   "emi.align.vertical.top": "Top",
   "emi.align.vertical.center": "Center",
   "emi.align.vertical.bottom": "Bottom",
-
-  "emi.header.visible": "Visible",
-  "emi.header.invisible": "Invisible",
-
   "emi.sidebar.type.none": "None",
   "emi.sidebar.type.index": "Index",
   "emi.sidebar.type.craftables": "Craftables",
@@ -394,26 +48,136 @@
   "emi.sidebar.type.lookup_history": "Lookup History",
   "emi.sidebar.type.craft_history": "Crafting History",
   "emi.sidebar.type.chess": "Chess",
-
   "emi.sidebar.theme.transparent": "Transparent",
   "emi.sidebar.theme.vanilla": "Vanilla",
   "emi.sidebar.theme.modern": "Modern",
-
+  "emi.header.visible": "Visible",
+  "emi.header.invisible": "Invisible",
   "emi.sidebar.size.columns": "Columns",
   "emi.sidebar.size.rows": "Rows",
-
   "emi.sidebar.margins.top": "Top",
   "emi.sidebar.margins.right": "Right",
   "emi.sidebar.margins.bottom": "Bottom",
   "emi.sidebar.margins.left": "Left",
-
   "emi.sidebar.none": "None",
   "emi.sidebar.left": "Left",
   "emi.sidebar.right": "Right",
   "emi.sidebar.top": "Top",
   "emi.sidebar.bottom": "Bottom",
+  "emi.effect_location.top": "Top",
+  "emi.effect_location.left_compressed": "Left (Compressed)",
+  "emi.effect_location.right_compressed": "Right (Compressed)",
+  "emi.effect_location.left": "Left",
+  "emi.effect_location.right": "Right",
+  "emi.recipe_book_action.default": "Default",
+  "emi.recipe_book_action.toggle_craftables": "Toggle Craftables",
+  "emi.recipe_book_action.toggle_visibility": "Toggle Visibility",
 
+  "config.emi.group.general": "General",
+  "config.emi.group.general.search": "Search",
+  "config.emi.group.ui": "UI",
+  "config.emi.group.ui.mod_id": "Mod ID",
+  "config.emi.group.ui.recipe_screen": "Recipe Screen",
+  "config.emi.group.ui.recipe_buttons": "Recipe Buttons",
+  "config.emi.group.ui.left_sidebar": "Left Sidebar",
+  "config.emi.group.ui.right_sidebar": "Right Sidebar",
+  "config.emi.group.ui.top_sidebar": "Top Sidebar",
+  "config.emi.group.ui.bottom_sidebar": "Bottom Sidebar",
+  "config.emi.group.binds": "Binds",
+  "config.emi.group.dev": "Dev",
 
+  "config.emi.group.binds.crafts": "Crafts",
+  "config.emi.group.binds.cheats": "Cheats",
+
+  "config.emi.general.enabled": "Enabled",
+  "config.emi.general.cheat_mode": "Cheat Mode",
+  "config.emi.general.help_level": "Help Level",
+  "config.emi.general.index_source": "Index Source",
+  "config.emi.general.search_tooltip_by_default": "Search Tooltip by Default",
+  "config.emi.general.search_mod_name_by_default": "Search Mod Name by Default",
+  "config.emi.general.search_tags_by_default": "Search Tags by Default",
+
+  "config.emi.ui.effect_location": "Effect Location",
+  "config.emi.ui.center_search_bar": "Center Search Bar",
+  "config.emi.ui.show_hover_overlay": "Show Hover Overlay",
+  "config.emi.ui.append_mod_id": "Append Mod ID",
+  "config.emi.ui.append_item_mod_id": "Append Item Mod ID",
+  "config.emi.ui.recipe_book_action": "Recipe Book Action",
+  "config.emi.ui.search_sidebar_focus": "Search Sidebar Focus",
+  "config.emi.ui.empty_search_sidebar_focus": "Empty Search Sidebar Focus",
+
+  "config.emi.ui.left_sidebar_pages": "Pages",
+  "config.emi.ui.left_sidebar_subpanels": "Subpanels",
+  "config.emi.ui.left_sidebar_size": "Size",
+  "config.emi.ui.left_sidebar_margins": "Margins",
+  "config.emi.ui.left_sidebar_align": "Align",
+  "config.emi.ui.left_sidebar_header": "Header",
+  "config.emi.ui.left_sidebar_theme": "Theme",
+
+  "config.emi.ui.right_sidebar_pages": "Pages",
+  "config.emi.ui.right_sidebar_subpanels": "Subpanels",
+  "config.emi.ui.right_sidebar_size": "Size",
+  "config.emi.ui.right_sidebar_margins": "Margins",
+  "config.emi.ui.right_sidebar_align": "Align",
+  "config.emi.ui.right_sidebar_header": "Header",
+  "config.emi.ui.right_sidebar_theme": "Theme",
+
+  "config.emi.ui.top_sidebar_pages": "Pages",
+  "config.emi.ui.top_sidebar_subpanels": "Subpanels",
+  "config.emi.ui.top_sidebar_size": "Size",
+  "config.emi.ui.top_sidebar_margins": "Margins",
+  "config.emi.ui.top_sidebar_align": "Align",
+  "config.emi.ui.top_sidebar_header": "Header",
+  "config.emi.ui.top_sidebar_theme": "Theme",
+
+  "config.emi.ui.bottom_sidebar_pages": "Pages",
+  "config.emi.ui.bottom_sidebar_subpanels": "Subpanels",
+  "config.emi.ui.bottom_sidebar_size": "Size",
+  "config.emi.ui.bottom_sidebar_margins": "Margins",
+  "config.emi.ui.bottom_sidebar_align": "Align",
+  "config.emi.ui.bottom_sidebar_header": "Header",
+  "config.emi.ui.bottom_sidebar_theme": "Theme",
+
+  "config.emi.ui.vertical_margin": "Vertical Margin",
+  "config.emi.ui.minimum_recipe_screen_width": "Minimum Recipe Screen Width",
+  "config.emi.ui.workstation_location": "Workstation Location",
+  "config.emi.ui.miscraft_prevention": "Miscraft Prevention",
+  "config.emi.ui.fluid_unit": "Fluid Unit",
+  "config.emi.ui.show_cost_per_batch": "Show Cost Per Batch",
+  "config.emi.ui.recipe_default_button": "Recipe Default Button",
+  "config.emi.ui.recipe_tree_button": "Recipe Tree Button",
+  "config.emi.ui.recipe_fill_button": "Recipe Fill Button",
+  "config.emi.ui.recipe_screenshot_button": "Recipe Screenshot Button",
+  "config.emi.ui.recipe_screenshot_scale": "Recipe Screenshot Scale",
+  "config.emi.ui.use_batched_renderer": "Use Batched Renderer",
+
+  "config.emi.dev.dev_mode": "Dev Mode",
+  "config.emi.dev.edit_mode": "Edit Mode",
+  "config.emi.dev.log_untranslated_tags": "Log Untranslated Tags",
+  "config.emi.dev.log_non_tag_ingredients": "Log Non-Tag Ingredients",
+  "config.emi.dev.show_recipe_ids": "Show Recipe IDs",
+  "config.emi.dev.highlight_defaulted": "Highlight Defaulted",
+  "config.emi.dev.highlight_exclusion_areas": "Highlight Exclusion Areas",
+
+  "config.emi.presets.sidebars": "Sidebars",
+  "config.emi.presets.binds": "Binds",
+  "config.emi.presets.restore": "Restore",
+
+  "config.emi.presets.productive": "Productive",
+  "config.emi.presets.recipe_book_plus": "Recipe Book Plus",
+  "config.emi.presets.empty_search_craftable": "Empty Search Craftable",
+
+  "config.emi.presets.author_binds": "Author Binds",
+
+  "config.emi.presets.backup": "Restore Backup",
+  "config.emi.presets.defaults": "Restore Defaults",
+
+  "emi.unit.liters": "Liters",
+  "emi.unit.millibuckets": "Millibuckets",
+  "emi.unit.droplets": "Droplets",
+  "emi.fluid.amount.liters": "%s L",
+  "emi.fluid.amount.millibuckets": "%smB",
+  "emi.fluid.amount.droplets": "%s d",
 
   "emi.disabled": "EMI disabled! Toggle with",
   "emi.reloading": "EMI Reloading...",
@@ -460,6 +224,8 @@
   "tooltip.emi.config": "%s Config",
   "tooltip.emi.recipe_tree": "Recipe Tree",
 
+  "tooltip.emi.config.global": "Toggle using a global EMI config between all game instances instead of a separate config per game instance",
+
   "tooltip.emi.synfav.uncraftable": "Unable to craft §cany§r batches",
   "tooltip.emi.synfav.partially_craftable": "Able to craft §dsome§r batches",
   "tooltip.emi.synfav.fully_craftable": "Able to craft §aall %s§r batches",
@@ -471,10 +237,18 @@
   "tooltip.emi.bom.mode.view": "§6Viewing§r recipe tree",
   "tooltip.emi.bom.mode.craft": "§6Crafting§r recipe tree\nProgress will be shown in recipe tree\n§bSynthetic favorites§r added to sidebar",
   "tooltip.emi.bom.help": "The recipe tree shows the process and base cost of a recipe\nThe display can be panned and zoomed\n\nLeft click a node to choose a recipe to assign to it\nHold §6[shift]§r to automatically pick based on your inventory\n\nRight click a recipe node to fold it temporarily\nHold §6[shift]§r to clear the recipe\n\nThe initial tree state is controlled by default recipes\nA button next to recipes can set default recipe preferences\n\nThe toggle by total cost can be used to help craft a recipe tree\nWhile crafting, materials that need to be collected will be displayed\n§bSynthetic favorites§r will be added to the favorites sidebar that\nwill show incomplete steps and can be used to craft",
-
-
+  
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Below lava",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Adjacent to lava",
+
+  "screen.emi.recipe": "Recipe",
+  "screen.emi.config": "Config",
+  "screen.emi.presets": "Config Presets",
+
+  "screen.emi.config.reset": "Revert %s change(s)",
+
+  "emi.error.recipe.initialize": "Error Initializing",
+  "emi.error.recipe.render": "Error Rendering",
 
   "emi.chess.piece.white_pawn": "White Pawn",
   "emi.chess.piece.white_rook": "White Rook",
@@ -516,7 +290,7 @@
   "emi.category.emi.fuel": "Fuel",
   "emi.category.emi.composting": "Composting",
   "emi.category.emi.info": "Info",
-
+  
   "emi.category.emi.tag": "Tags",
   "emi.category.emi.ingredient": "Ingredients",
 
@@ -666,7 +440,7 @@
   "tag.item.c.ores_in_ground.stone": "Stone Ores",
   "tag.item.c.ores_in_ground.deepslate": "Deepslate Ores",
   "tag.item.c.ores_in_ground.netherrack": "Netherrack Ores",
-
+  
   "tag.item.c.chest": "Chests",
   "tag.item.c.coal": "Coals",
   "tag.item.c.sand": "Sands",
