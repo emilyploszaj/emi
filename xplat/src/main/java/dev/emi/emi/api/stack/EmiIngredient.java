@@ -9,6 +9,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.tag.TagKey;
 
@@ -75,7 +76,21 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {
-		return of(ingredient, 1);
+		if (ingredient == null) {
+			return EmiStack.EMPTY;
+		}
+		ItemStack[] stacks = ingredient.getMatchingStacks();
+		int amount = 1;
+		if (stacks.length != 0) {
+			amount = stacks[0].getCount();
+			for (int i = 1; i < stacks.length; i++) {
+				if (stacks[i].getCount() != amount) {
+					amount = 1;
+					break;
+				}
+			}
+		}
+		return of(ingredient, amount);
 	}
 
 	public static EmiIngredient of(Ingredient ingredient, long amount) {

@@ -79,7 +79,7 @@ shadowJar {
 	exclude "architectury.common.json"
 
 	configurations = [project.configurations.shadowCommon]
-	classifier "dev-shadow"
+	archiveClassifier = "dev-shadow"
 }
 
 remapJar {
@@ -95,14 +95,14 @@ sourcesJar {
 }
 
 task filteredSourcesJar(type: Jar) {
-	classifier = 'filtered-sources'
+	archiveClassifier = 'filtered-sources'
 	dependsOn remapSourcesJar
 	from zipTree(remapSourcesJar.archivePath)
 	exclude 'dev/emi/emi/jemi/**'
 }
 
 task apiJar(type: Jar) {
-	classifier = 'api'
+	archiveClassifier = 'api'
 	dependsOn remapJar
 	from zipTree(remapJar.archivePath)
 	include 'fabric.mod.json'

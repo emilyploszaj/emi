@@ -22,7 +22,7 @@ task mojmapSourcesJar(type: net.fabricmc.loom.task.RemapSourcesJarTask) {
 	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
 	dependsOn project(':xplat').filteredSourcesJar
 	
-	classifier 'sources'
+	archiveClassifier = 'sources'
 	
 	inputFile = project(':xplat').filteredSourcesJar.archiveFile
 	sourceNamespace = 'intermediary'
@@ -35,7 +35,7 @@ task mojmapApiJar(type: net.fabricmc.loom.task.RemapJarTask) {
 	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
 	dependsOn project(':xplat').apiJar
 	
-	classifier 'api'
+	archiveClassifier = 'api'
 	
 	inputFile = project(':xplat').apiJar.archiveFile
 	sourceNamespace = 'intermediary'
@@ -55,15 +55,15 @@ publishing {
 			version = project.ext.mavenVersion
 			artifact(mojmapJar) {
 				builtBy mojmapJar
-				classifier ''
+				classifier = ''
 			}
 			artifact(mojmapSourcesJar) {
 				builtBy mojmapSourcesJar
-				classifier 'sources'
+				classifier = 'sources'
 			}
 			artifact(mojmapApiJar) {
 				builtBy mojmapApiJar
-				classifier 'api'
+				classifier = 'api'
 			}
 		}
 	}
