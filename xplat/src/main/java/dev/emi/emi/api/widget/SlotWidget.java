@@ -159,6 +159,7 @@ public class SlotWidget extends Widget {
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		drawBackground(matrices, mouseX, mouseY, delta);
 		drawStack(matrices, mouseX, mouseY, delta);
+		RenderSystem.disableDepthTest();
 		drawOverlay(matrices, mouseX, mouseY, delta);
 	}
 
@@ -208,7 +209,6 @@ public class SlotWidget extends Widget {
 	}
 
 	public void drawSlotHighlight(MatrixStack matrices, Bounds bounds) {
-		RenderSystem.disableDepthTest();
 		EmiRenderHelper.drawSlotHightlight(EmiDrawContext.wrap(matrices), bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
 	}
 	
@@ -278,19 +278,20 @@ public class SlotWidget extends Widget {
 	}
 
 	private boolean slotInteraction(Function<EmiBind, Boolean> function) {
+		EmiRecipe recipe = getRecipe();
 		if (canResolve()) {
 			if (function.apply(EmiConfig.defaultStack)) {
-				BoM.addRecipe(RecipeScreen.resolve, getRecipe());
+				BoM.addRecipe(RecipeScreen.resolve, recipe);
 				EmiHistory.pop();
 				return true;
 			} else if (function.apply(EmiConfig.viewRecipes)) {
-				BoM.addResolution(RecipeScreen.resolve, getRecipe());
+				BoM.addResolution(RecipeScreen.resolve, recipe);
 				EmiHistory.pop();
 				return true;
 			}
-		} else {
+		} else if (recipe != null && recipe.supportsRecipeTree()) {
 			if (function.apply(EmiConfig.defaultStack)) {
-				BoM.addRecipe(getStack(), getRecipe());
+				BoM.addRecipe(getStack(), recipe);
 				return true;
 			}
 		}

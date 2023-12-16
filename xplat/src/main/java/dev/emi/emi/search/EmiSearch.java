@@ -68,6 +68,8 @@ public class EmiSearch {
 				Identifier id = stack.getId();
 				if (id != null) {
 					mods.add(searchStack, EmiUtil.getModName(id.getNamespace()).toLowerCase());
+					mods.add(searchStack, id.getNamespace().toLowerCase());
+					names.add(searchStack, id.getPath().toLowerCase());
 				}
 				if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
 					for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {

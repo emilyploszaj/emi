@@ -221,7 +221,7 @@ public class EmiStackList {
 	public static int getIndex(EmiIngredient ingredient) {
 		EmiStack stack = ingredient.getEmiStacks().get(0);
 		int ret = strictIndices.getOrDefault(stack, Integer.MAX_VALUE);
-		if (ret != Integer.MAX_VALUE) {
+		if (ret == Integer.MAX_VALUE) {
 			ret = keyIndices.getOrDefault(stack, ret);
 		}
 		return ret;

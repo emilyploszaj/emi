@@ -303,7 +303,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<CraftingRecipe> category) {
 		Set<Identifier> replaced = Sets.newHashSet();
 		Set<EmiRecipe> replacements = Sets.newHashSet();
-		for (CraftingRecipe recipe : registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING)) {
+		for (CraftingRecipe recipe : runtime.getRecipeManager().createRecipeLookup(category.getRecipeType()).includeHidden().get().toList()) {
 			try {
 				if (category.isHandled(recipe)) {
 					JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
