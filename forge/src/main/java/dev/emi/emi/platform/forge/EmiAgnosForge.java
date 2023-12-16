@@ -139,11 +139,11 @@ public class EmiAgnosForge extends EmiAgnos {
 						if (recipe.ingredient.getMatchingStacks().length > 0) {
 							Identifier id = new Identifier("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.f_43532_.get()))
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.f_43534_.get())));
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input.get()))
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output.get())));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.f_43532_.get())), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.f_43534_.get())), id));
+								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input.get())), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output.get())), id));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -156,8 +156,8 @@ public class EmiAgnosForge extends EmiAgnos {
 			try {
 				if (recipe.ingredient.getMatchingStacks().length > 0) {
 					String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
-					String iid = EmiUtil.subId(recipe.f_43532_.get());
-					String oid = EmiUtil.subId(recipe.f_43534_.get());
+					String iid = EmiUtil.subId(recipe.input.get());
+					String oid = EmiUtil.subId(recipe.output.get());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						Potion potion = entry.value();
 						if (potion == Potions.EMPTY) {
@@ -167,11 +167,11 @@ public class EmiAgnosForge extends EmiAgnos {
 							Identifier id = new Identifier("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.f_43532_.get()), potion)), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.f_43534_.get()), potion)), id));
+								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.input.get()), potion)), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.output.get()), potion)), id));
 						}
 					};
-					if ((recipe.f_43532_.get() instanceof PotionItem)) {
+					if ((recipe.input.get() instanceof PotionItem)) {
 						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
 					} else {
 						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));

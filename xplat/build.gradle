@@ -32,14 +32,14 @@ afterEvaluate {
 }
 
 task filteredSourcesJar(type: Jar) {
-	classifier = 'filtered-sources'
+	archiveClassifier = 'filtered-sources'
 	dependsOn remapSourcesJar
 	from zipTree(remapSourcesJar.archivePath)
 	exclude 'dev/emi/emi/jemi/**'
 }
 
 task apiJar(type: Jar) {
-	classifier = "api"
+	archiveClassifier = "api"
 	dependsOn remapJar
 	from zipTree(remapJar.archivePath)
 	include 'fabric.mod.json'
@@ -64,15 +64,15 @@ publishing {
 			version = project.ext.mavenVersion
 			artifact(remapJar) {
 				builtBy remapJar
-				classifier ''
+				classifier = null
 			}
 			artifact(filteredSourcesJar) {
 				builtBy filteredSourcesJar
-				classifier 'sources'
+				classifier = 'sources'
 			}
 			artifact(apiJar) {
 				builtBy apiJar
-				classifier 'api'
+				classifier = 'api'
 			}
 		}
 	}

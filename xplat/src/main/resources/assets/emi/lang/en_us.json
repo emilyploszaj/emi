@@ -26,6 +26,7 @@
   "key.emi.cheat_one_to_cursor": "Cheat One to Cursor",
   "key.emi.cheat_stack_to_cursor": "Cheat Stack to Cursor",
   "key.emi.delete_cursor_stack": "Delete Cursor Stack",
+  "key.emi.copy_recipe_id": "Copy Recipe ID",
   "key.emi.hide_stack": "Hide Stack",
   "key.emi.hide_stack_by_id": "Hide Stack by ID",
 
