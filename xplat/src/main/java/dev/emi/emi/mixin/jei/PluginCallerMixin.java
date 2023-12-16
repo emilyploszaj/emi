@@ -32,6 +32,7 @@ public class PluginCallerMixin {
 			switch (title) {
 				case "Registering categories" -> {}
 				case "Registering ingredients" -> {}
+				case "Registering vanilla category extensions" -> {}
 				case "Sending Runtime" -> {}
 				case "Sending Runtime Unavailable" -> {}
 				default -> { return; }

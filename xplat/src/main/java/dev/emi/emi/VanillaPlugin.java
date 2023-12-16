@@ -649,7 +649,7 @@ public class VanillaPlugin implements EmiPlugin {
 			.output(EmiStack.of(Fluids.WATER, FluidUnit.BUCKET))
 			.build());
 		addRecipeSafe(registry, () -> EmiWorldInteractionRecipe.builder()
-			.id(synthetic("world/fluid_interaction", "minecraft/coblestone"))
+			.id(synthetic("world/fluid_interaction", "minecraft/cobblestone"))
 			.leftInput(waterCatalyst)
 			.rightInput(lavaCatalyst, false)
 			.output(EmiStack.of(Items.COBBLESTONE))

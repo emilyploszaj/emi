@@ -140,7 +140,7 @@ public class BoM {
 	public static DefaultStatus getRecipeStatus(EmiRecipe recipe) {
 		int found = 0;
 		for (EmiStack stack : recipe.getOutputs()) {
-			if (getRecipe(stack) == recipe) {
+			if (recipe.equals(getRecipe(stack))) {
 				found++;
 			}
 		}
@@ -183,6 +183,9 @@ public class BoM {
 	}
 
 	public static void addRecipe(EmiIngredient stack, EmiRecipe recipe) {
+		if (recipe instanceof EmiResolutionRecipe err) {
+			stack = err.ingredient;
+		}
 		addedRecipes.put(stack, recipe);
 		EmiPersistentData.save();
 		recalculate();

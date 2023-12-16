@@ -99,6 +99,7 @@ public class EmiScreenManager {
 			new SidebarPanel(SidebarSide.BOTTOM, EmiConfig.bottomSidebarPages));
 	// The last stack that was used to draw a tooltip, cleared each frame
 	public static ItemStack lastStackTooltipRendered;
+	private static long lastPlayerInventorySync = 0;
 	public static EmiPlayerInventory lastPlayerInventory;
 	public static int lastMouseX, lastMouseY;
 	// The stack that was clicked on, for determining when a drag properly starts
@@ -127,19 +128,9 @@ public class EmiScreenManager {
 	}
 
 	public static void recalculate() {
-		EmiPlayerInventory inv = EmiPlayerInventory.of(client.player);
+		updateCraftables();
 		SidebarPanel searchPanel = getSearchPanel();
-		if (searchPanel.space != null) {
-			if (!inv.isEqual(lastPlayerInventory)) {
-				lastPlayerInventory = inv;
-				EmiSidebars.craftables = lastPlayerInventory.getCraftables();
-				searchPanel.space.batcher.repopulate();
-				if (searchPanel.getType() == SidebarType.CRAFTABLES) {
-					EmiSearch.update();
-				}
-				EmiFavorites.updateSynthetic(inv);
-				repopulatePanels(SidebarType.CRAFTABLES);
-			}
+		if (searchPanel != null && searchPanel.space != null) {
 			if (searchedStacks != EmiSearch.stacks) {
 				searchPanel.space.batcher.repopulate();
 				searchedStacks = EmiSearch.stacks;
@@ -226,6 +217,30 @@ public class EmiScreenManager {
 					SidebarSettings.BOTTOM);
 
 			updateSidebarButtons();
+		}
+	}
+
+	private static void updateCraftables() {
+		int minDelay = 400;
+		if (hasSidebarVisible(SidebarType.CRAFTABLES)) {
+			minDelay = 50;
+		}
+		if (lastPlayerInventory == null || Math.abs(System.currentTimeMillis() - lastPlayerInventorySync) >= minDelay) {
+			lastPlayerInventorySync = System.currentTimeMillis();
+			EmiPlayerInventory inv = EmiPlayerInventory.of(client.player);
+			SidebarPanel searchPanel = getSearchPanel();
+			if (!inv.isEqual(lastPlayerInventory)) {
+				lastPlayerInventory = inv;
+				EmiSidebars.craftables = lastPlayerInventory.getCraftables();
+				if (searchPanel != null && searchPanel.space != null) {
+					searchPanel.space.batcher.repopulate();
+					if (searchPanel.getType() == SidebarType.CRAFTABLES) {
+						EmiSearch.update();
+					}
+				}
+				EmiFavorites.updateSynthetic(inv);
+				repopulatePanels(SidebarType.CRAFTABLES);
+			}
 		}
 	}
 
@@ -427,6 +442,17 @@ public class EmiScreenManager {
 			return panel.getHoveredSpace(mouseX, mouseY);
 		}
 		return null;
+	}
+
+	public static boolean hasSidebarVisible(SidebarType type) {
+		for (SidebarPanel panel : panels) {
+			for (ScreenSpace space : panel.getSpaces()) {
+				if (type == space.getType()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public static boolean hasSidebarAvailable(SidebarType type) {
@@ -1132,6 +1158,9 @@ public class EmiScreenManager {
 				return true;
 			}
 		}
+		if (recipeInteraction(context, function)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -1188,6 +1217,22 @@ public class EmiScreenManager {
 					return true;
 				}
 			}
+		}
+		return false;
+	}
+
+	public static boolean recipeInteraction(EmiRecipe recipe, Function<EmiBind, Boolean> function) {
+		if (recipe == null) {
+			return false;
+		}
+		if (function.apply(EmiConfig.favorite) && recipe.getOutputs().size() > 0) {
+			EmiFavorites.addFavorite(recipe.getOutputs().get(0), recipe);
+			repopulatePanels(SidebarType.FAVORITES);
+			return true;
+		} else if (function.apply(EmiConfig.copyId)) {
+			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			client.keyboard.setClipboard("" + recipe.getId());
+			return true;
 		}
 		return false;
 	}

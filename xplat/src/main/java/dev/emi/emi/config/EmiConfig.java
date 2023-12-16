@@ -443,6 +443,10 @@ public class EmiConfig {
 	public static EmiBind deleteCursorStack = new EmiBind("key.emi.delete_cursor_stack",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
+	@Comment("Copies the hovered recipe's ID to the clipboard")
+	@ConfigValue("binds.copy-recipe-id")
+	public static EmiBind copyId = new EmiBind("key.emi.copy_recipe_id", InputUtil.UNKNOWN_KEY.getCode());
+
 	@Comment("In edit mode, hide the hovered stack")
 	@ConfigValue("binds.hide-stack")
 	public static EmiBind hideStack = new EmiBind("key.emi.hide_stack",
