@@ -94,16 +94,7 @@ public class EmiPlayerInventory {
 
 	private void addStack(EmiStack stack) {
 		if (!stack.isEmpty()) {
-			if (inventory.containsKey(stack)) {
-				for (EmiStack other : inventory.keySet()) {
-					if (other.isEqual(stack, nbt)) {
-						other.setAmount(other.getAmount() + stack.getAmount());
-						break;
-					}
-				}
-			} else {
-				inventory.put(stack, stack);
-			}
+			inventory.merge(stack, stack, (a, b) -> a.setAmount(a.getAmount() + b.getAmount()));
 		}
 	}
 

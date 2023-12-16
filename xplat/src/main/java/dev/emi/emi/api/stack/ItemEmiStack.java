@@ -86,7 +86,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
 			DiffuseLighting.enableGuiDepthLighting();
-			draw.drawItem(stack, x, y);
+			draw.drawItemWithoutEntity(stack, x, y);
 			draw.drawItemInSlot(client.textRenderer, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
