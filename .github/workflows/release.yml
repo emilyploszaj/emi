@@ -44,10 +44,10 @@ jobs:
           RELEASE: true
         run: ./gradlew :fabric:build
 
-      - name: Build Forge
-        env:
-          RELEASE: true
-        run: ./gradlew :forge:build
+#      - name: Build Forge
+#        env:
+#          RELEASE: true
+#        run: ./gradlew :forge:build
 
       - name: Publish
         env:

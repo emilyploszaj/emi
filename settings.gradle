@@ -10,6 +10,6 @@ pluginManagement {
 include("xplat")
 include("xplat:mojmap")
 include("fabric")
-include("forge")
+//include("forge")
 
 rootProject.name = "emi"
