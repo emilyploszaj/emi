@@ -28,6 +28,10 @@ public abstract class EmiAgnos {
 			Class.forName("dev.emi.emi.platform.forge.EmiAgnosForge");
 		} catch (Throwable t) {
 		}
+		try {
+			Class.forName("dev.emi.emi.platform.neoforge.EmiAgnosNeoForge");
+		} catch (Throwable t) {
+		}
 	}
 
 	public static boolean isForge() {
