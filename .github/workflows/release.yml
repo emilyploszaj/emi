@@ -49,6 +49,11 @@ jobs:
 #          RELEASE: true
 #        run: ./gradlew :forge:build
 
+      - name: Build NeoForge
+        env:
+          RELEASE: true
+        run: ./gradlew :neoforge:build
+
       - name: Publish
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

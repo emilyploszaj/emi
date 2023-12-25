@@ -1,0 +1,20 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mixins]]
+config="emi.mixins.json"
+
+[[mixins]]
+config="emi-neoforge.mixins.json"
+
+[[mods]]
+modId = "emi"
+version = "${version}"
+displayName = "EMI"
+authors = "Emi"
+description = '''
+A featureful and accessible item and recipe viewer
+'''
+logoFile = "icon.png"

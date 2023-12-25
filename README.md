@@ -30,6 +30,10 @@ dependencies {
 	compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}:api")
 	runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}") 
 
+	// NeoForge
+	compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+	runtimeOnly dev.emi:emi-neoforge:${emi_version}" 
+
 	// Architectury
 	modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
 
