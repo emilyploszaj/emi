@@ -344,7 +344,7 @@ public class VanillaPlugin implements EmiPlugin {
 					Identifier sid = synthetic("crafting/shulker_box_dying", EmiUtil.subId(dyeItem));
 					addRecipeSafe(registry, () -> new EmiCraftingRecipe(
 						List.of(EmiStack.of(Items.SHULKER_BOX), EmiStack.of(dyeItem)),
-						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), sid), recipe);
+						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), sid, id), recipe);
 				}
 			} else if (recipe instanceof ShieldDecorationRecipe shield) {
 				addRecipeSafe(registry, () -> new EmiBannerShieldRecipe(id), recipe);
@@ -363,6 +363,7 @@ public class VanillaPlugin implements EmiPlugin {
 						),
 						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
 						synthetic("crafting/tipped_arrow", EmiUtil.subId(EmiPort.getPotionRegistry().getId(entry.value()))),
+						id,
 						false), recipe);
 				});
 			} else if (recipe instanceof FireworkStarRecipe star) {

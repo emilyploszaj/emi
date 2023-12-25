@@ -10,6 +10,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class EmiSmithingRecipe implements EmiRecipe {
 	protected final Identifier id;
@@ -34,6 +35,11 @@ public class EmiSmithingRecipe implements EmiRecipe {
 	@Override
 	public Identifier getId() {
 		return id;
+	}
+
+	@Override
+	public @Nullable Identifier getMinecraftRecipeId() {
+		return id; // Our EmiRecipe id matches the Vanilla id
 	}
 
 	@Override

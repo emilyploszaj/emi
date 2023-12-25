@@ -28,7 +28,7 @@ public class EmiSuspiciousStewRecipe extends EmiPatternCraftingRecipe {
 				EmiStack.of(Items.RED_MUSHROOM),
 				EmiStack.of(Items.BROWN_MUSHROOM),
 				EmiIngredient.of(FLOWERS.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList()))),
-			EmiStack.of(Items.SUSPICIOUS_STEW), id);
+			EmiStack.of(Items.SUSPICIOUS_STEW), id, id);
 	}
 
 	@Override

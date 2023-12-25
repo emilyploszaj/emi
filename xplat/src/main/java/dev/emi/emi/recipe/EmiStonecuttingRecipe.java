@@ -12,6 +12,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class EmiStonecuttingRecipe implements EmiRecipe {
 	private final Identifier id;
@@ -22,6 +23,11 @@ public class EmiStonecuttingRecipe implements EmiRecipe {
 		this.id = EmiPort.getId(recipe);
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
 		output = EmiStack.of(EmiPort.getOutput(recipe));
+	}
+
+	@Override
+	public @Nullable Identifier getMinecraftRecipeId() {
+		return this.id;
 	}
 
 	@Override

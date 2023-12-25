@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	protected final int unique = EmiUtil.RANDOM.nextInt();
@@ -16,9 +17,17 @@ public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
 		super(input, output, id);
 	}
-	
+
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, @Nullable Identifier minecraftRecipeId) {
+		super(input, output, id, minecraftRecipeId);
+	}
+
 	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
 		super(input, output, id, shapeless);
+	}
+
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, @Nullable Identifier minecraftRecipeId, boolean shapeless) {
+		super(input, output, id, minecraftRecipeId, shapeless);
 	}
 
 	public abstract SlotWidget getInputWidget(int slot, int x, int y);

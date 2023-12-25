@@ -2,6 +2,8 @@ package dev.emi.emi.api.recipe;
 
 import java.util.List;
 
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -21,6 +23,16 @@ public interface EmiRecipe {
 	 * @return The unique id of the recipe, or null. If null, the recipe cannot be serialized.
 	 */
 	@Nullable Identifier getId();
+
+	/**
+	 * @return Returns the identifier of the Minecraft recipe represented by this EMI recipe.
+	 *         Returns null for EMI recipes that don't have a  corresponding Minecraft recipe.
+	 *         The id of this recipe does not necessarily match {@link #getId()}.
+	 *         There can be multiple EMI recipes for the same Minecraft recipe.
+	 */
+	default @Nullable Identifier getMinecraftRecipeId() {
+		return null;
+	}
 	
 	/**
 	 * @return A list of ingredients required for the recipe.

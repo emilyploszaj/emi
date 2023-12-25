@@ -34,7 +34,7 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 						EmiIngredient.of(SHAPES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
 						EmiIngredient.of(EFFECTS.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
 						EmiStack.of(Items.GUNPOWDER)),
-				EmiStack.of(Items.FIREWORK_STAR), id);
+				EmiStack.of(Items.FIREWORK_STAR), id, id);
 	}
 
 	@Override

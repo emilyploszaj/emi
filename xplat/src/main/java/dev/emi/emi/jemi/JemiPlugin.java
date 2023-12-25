@@ -323,8 +323,9 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					}
 					if (inputs.stream().anyMatch(i -> !i.isEmpty()) && outputs.stream().anyMatch(o -> !o.isEmpty())) {
 						EmiRecipe replacement;
+						var id = category.getRegistryName(recipe);
 						if (outputs.size() > 1) {
-							replacement = new EmiPatternCraftingRecipe(inputs, EmiStack.EMPTY, category.getRegistryName(recipe), builder.shapeless) {
+							replacement = new EmiPatternCraftingRecipe(inputs, EmiStack.EMPTY, id, id, builder.shapeless) {
 
 								@Override
 								public List<EmiStack> getOutputs() {
@@ -347,7 +348,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 								
 							};
 						} else {
-							replacement = new EmiCraftingRecipe(inputs, outputs.get(0), category.getRegistryName(recipe), builder.shapeless);
+							replacement = new EmiCraftingRecipe(inputs, outputs.get(0), id, id, builder.shapeless);
 						}
 						if (replacement.getId() != null) {
 							replaced.add(replacement.getId());

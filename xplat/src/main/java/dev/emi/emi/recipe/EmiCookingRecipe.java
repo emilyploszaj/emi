@@ -15,6 +15,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class EmiCookingRecipe implements EmiRecipe {
 	private final Identifier id;
@@ -45,6 +46,11 @@ public class EmiCookingRecipe implements EmiRecipe {
 
 	@Override
 	public Identifier getId() {
+		return id;
+	}
+
+	@Override
+	public @Nullable Identifier getMinecraftRecipeId() {
 		return id;
 	}
 

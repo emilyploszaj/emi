@@ -18,7 +18,7 @@ import net.minecraft.recipe.ShapedRecipe;
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
 	public EmiShapedRecipe(ShapedRecipe recipe) {
-		super(padIngredients(recipe), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe), false);
+		super(padIngredients(recipe), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe), EmiPort.getId(recipe), false);
 		setRemainders(input, recipe);
 	}
 

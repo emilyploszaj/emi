@@ -27,7 +27,7 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 				EmiStack.of(Items.PAPER),
 						EmiStack.of(Items.FIREWORK_STAR),
 						EmiStack.of(Items.GUNPOWDER)),
-				EmiStack.of(Items.FIREWORK_ROCKET), id);
+				EmiStack.of(Items.FIREWORK_ROCKET), id, id);
 	}
 
 	@Override

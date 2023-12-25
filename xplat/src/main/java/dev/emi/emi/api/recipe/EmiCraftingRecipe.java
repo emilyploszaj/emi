@@ -8,9 +8,11 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class EmiCraftingRecipe implements EmiRecipe {
 	protected final Identifier id;
+	protected final Identifier minecraftRecipeId;
 	protected final List<EmiIngredient> input;
 	protected final EmiStack output;
 	public final boolean shapeless;
@@ -19,10 +21,19 @@ public class EmiCraftingRecipe implements EmiRecipe {
 		this(input, output, id, true);
 	}
 
+	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, @Nullable Identifier minecraftRecipeId) {
+		this(input, output, id, minecraftRecipeId,true);
+	}
+
 	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
+		this(input, output, id, null, shapeless);
+	}
+
+	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, @Nullable Identifier minecraftRecipeId, boolean shapeless) {
 		this.input = input;
 		this.output = output;
 		this.id = id;
+		this.minecraftRecipeId = minecraftRecipeId;
 		this.shapeless = shapeless;
 	}
 
