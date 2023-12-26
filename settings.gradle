@@ -11,6 +11,5 @@ include("xplat")
 include("xplat:mojmap")
 include("fabric")
 //include("forge")
-include("neoforge")
 
 rootProject.name = "emi"
