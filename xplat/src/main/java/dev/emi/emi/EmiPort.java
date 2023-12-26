@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -171,6 +173,14 @@ public final class EmiPort {
 	}
 
 	public static void focus(TextFieldWidget widget, boolean focused) {
+		// Also ensure a current focus-element in the screen is cleared if it changes
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client != null && client.currentScreen != null) {
+			var currentFocus = client.currentScreen.getFocused();
+			if (!focused && currentFocus == widget || focused && currentFocus != widget) {
+				client.currentScreen.focusOn(null);
+			}
+		}
 		widget.setFocused(focused);
 	}
 
