@@ -199,7 +199,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 	}
 
 	@Override
-	public void renderWidget(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.setEditable(EmiConfig.enabled);
 		String lower = getText().toLowerCase();
@@ -230,7 +230,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 
 		if (EmiConfig.enabled) {
-			super.renderWidget(context.raw(), mouseX, mouseY, delta);
+			super.render(context.raw(), mouseX, mouseY, delta);
 			if (highlight) {
 				int border = 0xffeeee00;
 				context.fill(this.x - 1, this.y - 1, this.width + 2, 1, border);

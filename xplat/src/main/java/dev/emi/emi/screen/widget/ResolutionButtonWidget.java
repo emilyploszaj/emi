@@ -29,9 +29,24 @@ public class ResolutionButtonWidget extends ButtonWidget {
 		this.stack = stack;
 		this.hoveredWidget = hoveredWidget;
 	}
+	
+	@Override
+	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		super.render(raw, mouseX, mouseY, delta);
+		if (this.isHovered()) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			raw.drawTooltip(client.textRenderer, List.of(
+				EmiPort.translatable("tooltip.emi.resolution"),
+				EmiPort.translatable("tooltip.emi.select_resolution"),
+				EmiPort.translatable("tooltip.emi.default_resolution"),
+				EmiPort.translatable("tooltip.emi.clear_resolution")
+			), mouseX, mouseY);
+		}
+		stack.render(raw, x + 1, y + 1, delta);
+	}
 
 	@Override
-	public void renderWidget(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void renderButton(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int u = 0;
 		if (this.isHovered()) {
@@ -45,15 +60,5 @@ public class ResolutionButtonWidget extends ButtonWidget {
 		}
 		EmiTexture.SLOT.render(context.raw(), x, y, delta);
 		context.drawTexture(EmiRenderHelper.WIDGETS, x, y, u, 128, width, height);
-		if (this.isHovered()) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			raw.drawTooltip(client.textRenderer, List.of(
-				EmiPort.translatable("tooltip.emi.resolution"),
-				EmiPort.translatable("tooltip.emi.select_resolution"),
-				EmiPort.translatable("tooltip.emi.default_resolution"),
-				EmiPort.translatable("tooltip.emi.clear_resolution")
-			), mouseX, mouseY);
-		}
-		stack.render(raw, x + 1, y + 1, delta);
 	}
 }
