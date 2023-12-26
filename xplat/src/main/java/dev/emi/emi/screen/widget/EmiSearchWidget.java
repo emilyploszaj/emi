@@ -153,16 +153,16 @@ public class EmiSearchWidget extends TextFieldWidget {
 	public boolean isFocused() {
 		return isFocused;
 	}
-	
+
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (!isMouseOver(mouseX, mouseY) || !EmiConfig.enabled) {
-			setFocused(false);
+			EmiPort.focus(this, false);
 			return false;
 		} else {
 			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
 			if (isMouseOver(mouseX, mouseY)) {
-				setFocused(true);
+				EmiPort.focus(this, true);
 			}
 			if (this.isFocused()) {
 				if (button == 0) {
@@ -174,7 +174,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 					}
 				} else if (button == 1) {
 					this.setText("");
-					this.setFocused(true);
+					EmiPort.focus(this, true);
 				}
 			}
 			return b;
@@ -190,8 +190,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			}
 			if ((EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
 					|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {
-				this.setFocused(false);
-				this.setFocused(false);
+				EmiPort.focus(this, false);
 				return true;
 			}
 		}
