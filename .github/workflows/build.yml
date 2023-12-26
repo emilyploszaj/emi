@@ -29,11 +29,8 @@ jobs:
       - name: Build Fabric
         run: ./gradlew :fabric:build
 
-      - name: Build NeoForge
-        run: ./gradlew :neoforge:build
-
-#      - name: Build Forge
-#        run: ./gradlew :forge:build
+      - name: Build Forge
+        run: ./gradlew :forge:build
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
@@ -41,5 +38,4 @@ jobs:
           name: Artifacts
           path: |
             fabric/build/libs/
-            neoforge/build/libs/
-#           forge/build/libs/
+            forge/build/libs/
