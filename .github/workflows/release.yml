@@ -79,13 +79,13 @@ jobs:
           asset_name: emi-${{ steps.composite_version.outputs.composite_version }}+fabric.jar
           asset_content_type: application/java-archive
 
-#      - name: Upload Forge Release Asset
-#        id: upload_forge_release_asset
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: ./forge/build/libs/emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
-#          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
-#          asset_content_type: application/java-archive
+      - name: Upload Forge Release Asset
+        id: upload_forge_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./forge/build/libs/emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
+          asset_name: emi-${{ steps.composite_version.outputs.composite_version }}+forge.jar
+          asset_content_type: application/java-archive
