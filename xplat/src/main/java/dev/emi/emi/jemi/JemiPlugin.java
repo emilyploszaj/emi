@@ -306,7 +306,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		Set<EmiRecipe> replacements = Sets.newHashSet();
 		List<CraftingRecipe> recipes = Stream.concat(
 			runtime.getRecipeManager().createRecipeLookup(category.getRecipeType()).includeHidden().get(),
-			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream().map(e -> e.value())
+			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream()
 		).distinct().toList();
 		for (CraftingRecipe recipe : recipes) {
 			try {
