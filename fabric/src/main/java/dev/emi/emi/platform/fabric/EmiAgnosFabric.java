@@ -65,6 +65,10 @@ public class EmiAgnosFabric extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getMetadata().getName();
 		}
+		container = FabricLoader.getInstance().getModContainer(namespace.replace('_', '-'));
+		if (container.isPresent()) {
+			return container.get().getMetadata().getName();
+		}
 		return namespace;
 	}
 

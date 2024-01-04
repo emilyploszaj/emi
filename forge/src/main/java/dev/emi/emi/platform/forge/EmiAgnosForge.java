@@ -79,6 +79,10 @@ public class EmiAgnosForge extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getModInfo().getDisplayName();
 		}
+		container = ModList.get().getModContainerById(namespace.replace('_', '-'));
+		if (container.isPresent()) {
+			return container.get().getModInfo().getDisplayName();
+		}
 		return namespace;
 	}
 
