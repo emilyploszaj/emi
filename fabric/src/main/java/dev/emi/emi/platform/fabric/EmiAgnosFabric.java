@@ -45,6 +45,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -69,7 +70,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getMetadata().getName();
 		}
-		return namespace;
+		return WordUtils.capitalizeFully(namespace.replace('_', ' '));
 	}
 
 	@Override

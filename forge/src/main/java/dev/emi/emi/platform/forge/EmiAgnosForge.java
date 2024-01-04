@@ -83,7 +83,7 @@ public class EmiAgnosForge extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getModInfo().getDisplayName();
 		}
-		return namespace;
+		return WordUtils.capitalizeFully(namespace.replace('_', ' '));
 	}
 
 	@Override
