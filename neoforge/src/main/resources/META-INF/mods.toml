@@ -18,3 +18,10 @@ description = '''
 A featureful and accessible item and recipe viewer
 '''
 logoFile = "icon.png"
+
+[[dependencies.emi]]
+modId="neoforge"
+type="REQUIRED"
+versionRange="[20.4.72-beta,)" # network refactor
+ordering="NONE"
+side="BOTH"

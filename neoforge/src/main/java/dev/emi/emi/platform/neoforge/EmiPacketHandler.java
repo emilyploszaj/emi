@@ -1,62 +1,76 @@
 package dev.emi.emi.platform.neoforge;
 
-import java.util.function.BiConsumer;
-
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiChessPacket;
+import dev.emi.emi.network.EmiNetwork;
+import dev.emi.emi.network.EmiPacket;
 import dev.emi.emi.network.FillRecipeC2SPacket;
 import dev.emi.emi.network.PingS2CPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.PlayNetworkDirection;
-import net.neoforged.neoforge.network.simple.MessageFunctions;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+
+import java.util.function.Function;
 
 public class EmiPacketHandler {
-	public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder.named(new Identifier("emi:emi"))
-		.networkProtocolVersion(() -> "1")
-		.clientAcceptedVersions((version) -> true)
-		.serverAcceptedVersions((version) -> true)
-		.simpleChannel();
+    private static final Identifier ID_CHESS_CLIENTBOUND = new Identifier("emi", "chess_s2c");
+    private static final Identifier ID_CHESS_SERVERBOUND = new Identifier("emi", "chess_c2s");
 
-	public static void init() {
-		int i = 0;
-		CHANNEL.messageBuilder(FillRecipeC2SPacket.class, i++, PlayNetworkDirection.PLAY_TO_SERVER)
-			.encoder(FillRecipeC2SPacket::write).decoder(FillRecipeC2SPacket::new)
-			.consumerMainThread(serverHandler(FillRecipeC2SPacket::apply)).add();
-		CHANNEL.messageBuilder(CreateItemC2SPacket.class, i++, PlayNetworkDirection.PLAY_TO_SERVER)
-			.encoder(CreateItemC2SPacket::write).decoder(CreateItemC2SPacket::new)
-			.consumerMainThread(serverHandler(CreateItemC2SPacket::apply)).add();
-		CHANNEL.messageBuilder(EmiChessPacket.C2S.class, i++, PlayNetworkDirection.PLAY_TO_SERVER)
-			.encoder(EmiChessPacket.C2S::write).decoder(EmiChessPacket.C2S::new)
-			.consumerMainThread(serverHandler(EmiChessPacket.C2S::apply)).add();
+    public static void init(RegisterPayloadHandlerEvent event) {
+        var registrar = event.registrar("emi");
 
-		CHANNEL.messageBuilder(PingS2CPacket.class, i++, PlayNetworkDirection.PLAY_TO_CLIENT)
-			.encoder(PingS2CPacket::write).decoder(PingS2CPacket::new)
-			.consumerMainThread(clientHandler(PingS2CPacket::apply)).add();
-		CHANNEL.messageBuilder(CommandS2CPacket.class, i++, PlayNetworkDirection.PLAY_TO_CLIENT)
-			.encoder(CommandS2CPacket::write).decoder(CommandS2CPacket::new)
-			.consumerMainThread(clientHandler(CommandS2CPacket::apply)).add();
-		CHANNEL.messageBuilder(EmiChessPacket.S2C.class, i++, PlayNetworkDirection.PLAY_TO_CLIENT)
-			.encoder(EmiChessPacket.S2C::write).decoder(EmiChessPacket.S2C::new)
-			.consumerMainThread(clientHandler(EmiChessPacket.S2C::apply)).add();
-	}
+        registrar.play(EmiNetwork.FILL_RECIPE, makeReader(EmiNetwork.FILL_RECIPE, FillRecipeC2SPacket::new), EmiPacketHandler::handleServerbound);
+        registrar.play(EmiNetwork.CREATE_ITEM, makeReader(EmiNetwork.CREATE_ITEM, CreateItemC2SPacket::new), EmiPacketHandler::handleServerbound);
+        registrar.play(EmiNetwork.PING, makeReader(EmiNetwork.PING, PingS2CPacket::new), EmiPacketHandler::handleClientbound);
+        registrar.play(EmiNetwork.COMMAND, makeReader(EmiNetwork.COMMAND, CommandS2CPacket::new), EmiPacketHandler::handleClientbound);
+        registrar.play(ID_CHESS_SERVERBOUND, makeReader(ID_CHESS_SERVERBOUND, EmiChessPacket.C2S::new), EmiPacketHandler::handleServerbound);
+        registrar.play(ID_CHESS_CLIENTBOUND, makeReader(ID_CHESS_CLIENTBOUND, EmiChessPacket.S2C::new), EmiPacketHandler::handleClientbound);
+    }
 
-	private static <T> MessageFunctions.MessageConsumer<T> serverHandler(BiConsumer<T, PlayerEntity> handler) {
-		return (t, context) -> {
-			handler.accept(t, context.getSender());
-			context.setPacketHandled(true);
-		};
-	}
+    public static CustomPayload wrap(EmiPacket packet) {
+        // Special casing for chess since it's reusing the same ID in EMI for both
+        if (packet instanceof EmiChessPacket.S2C) {
+            return new PayloadWrapper<>(ID_CHESS_CLIENTBOUND, packet);
+        } else if (packet instanceof EmiChessPacket.C2S) {
+            return new PayloadWrapper<>(ID_CHESS_SERVERBOUND, packet);
+        } else {
+            return new PayloadWrapper<>(packet.getId(), packet);
+        }
+    }
 
-	private static <T> MessageFunctions.MessageConsumer<T> clientHandler(BiConsumer<T, PlayerEntity> handler) {
-		return (t, context) -> {
-			MinecraftClient client = MinecraftClient.getInstance();
-			handler.accept(t, client.player);
-			context.setPacketHandled(true);
-		};
-	}
+    // Neoforge requires us to implement this interface, we use a wrapper-record to do this on top of EmiPacket
+    private record PayloadWrapper<T extends EmiPacket>(Identifier id, T packet) implements CustomPayload {
+        @Override
+        public void write(PacketByteBuf buf) {
+            packet.write(buf);
+        }
+    }
+
+    private static <T extends EmiPacket> PacketByteBuf.PacketReader<PayloadWrapper<T>> makeReader(Identifier id, Function<PacketByteBuf, T> reader) {
+        return buffer -> {
+            // Read EMI packet and wrap
+            return new PayloadWrapper<>(id, reader.apply(buffer));
+        };
+    }
+
+    private static void handleServerbound(PayloadWrapper<?> wrapper, PlayPayloadContext context) {
+        var packet = wrapper.packet();
+        if (!context.flow().isServerbound()) {
+            throw new IllegalArgumentException("Trying to handle serverbound packet on client: " + packet);
+        }
+        var player = context.player().orElse(null);
+        context.workHandler().execute(() -> packet.apply(player));
+    }
+
+    private static void handleClientbound(PayloadWrapper<?> wrapper, PlayPayloadContext context) {
+        var packet = wrapper.packet();
+        if (!context.flow().isClientbound()) {
+            throw new IllegalArgumentException("Trying to handle clientbound packet on server: " + packet);
+        }
+        var player = context.player().orElse(null);
+        context.workHandler().execute(() -> packet.apply(player));
+    }
 }

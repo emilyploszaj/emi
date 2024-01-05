@@ -37,7 +37,7 @@ public class EmiClientNeoForge {
 	public static void clientInit(FMLClientSetupEvent event) {
 		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(NeoForgeRenderTypes.values()).map(f -> f.get()).toList());
 		EmiClient.init();
-		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.send(PacketDistributor.SERVER.noArg(), packet));
+		EmiNetwork.initClient(packet -> PacketDistributor.SERVER.noArg().send(EmiPacketHandler.wrap(packet)));
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::recipesReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::tagsReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::renderScreenForeground);
