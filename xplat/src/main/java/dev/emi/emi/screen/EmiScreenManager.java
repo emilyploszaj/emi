@@ -50,6 +50,7 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiDragDropHandlers;
 import dev.emi.emi.registry.EmiExclusionAreas;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackProviders;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
@@ -612,6 +613,10 @@ public class EmiScreenManager {
 			client.getProfiler().pop();
 			lastHoveredCraftable = null;
 			return;
+		} else if (EmiRecipes.activeWorker != null) {
+			context.drawTextWithShadow(EmiPort.translatable("emi.reloading.still_baking_recipes"), 48, screen.height - 16);
+		} else {
+			renderDevMode(context, mouseX, mouseY, delta, screen);
 		}
 		renderWidgets(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().push("sidebars");
@@ -626,7 +631,6 @@ public class EmiScreenManager {
 			client.getProfiler().pop();
 		}
 
-		renderDevMode(context, mouseX, mouseY, delta, screen);
 		client.getProfiler().pop();
 
 		renderExclusionAreas(context, mouseX, mouseY, delta, screen);
