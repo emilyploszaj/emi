@@ -220,8 +220,8 @@ public class EmiReloadManager {
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 					status = 2;
 				} catch (Throwable e) {
-					EmiLog.error("Critical error occured during reload:");
-					e.printStackTrace();
+					EmiReloadLog.warn("Critical error occured during reload:");
+					EmiReloadLog.error(e);
 					status = -1;
 					if (retries-- > 0) {
 						restart = true;
