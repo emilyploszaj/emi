@@ -1,6 +1,5 @@
-### Platforms
-* EMI now has releases on NeoForge
+### Tweaks
+* EMI reloading now defers certain non-essential tasks, like recipe baking, speeding up reloads and making EMI usable up to 10 times faster in extreme cases
 
-### Fixes
-* Certain JEMI forwarded recipes not appearing #381
-* Search field not causing others to defocus properly #388
+### Platforms
+* NeoForge networking updated #396 #401
