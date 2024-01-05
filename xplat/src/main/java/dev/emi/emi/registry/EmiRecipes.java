@@ -42,6 +42,7 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
+	public static volatile Worker activeWorker = null;
 	public static EmiRecipeManager manager = Manager.EMPTY;
 	public static List<Consumer<Consumer<EmiRecipe>>> lateRecipes = Lists.newArrayList();
 	public static List<Predicate<EmiRecipe>> invalidators = Lists.newArrayList();
@@ -55,6 +56,7 @@ public class EmiRecipes {
 	public static Map<Recipe<?>, Identifier> recipeIds = Map.of();
 	
 	public static void clear() {
+		setWorker(null);
 		lateRecipes.clear();
 		invalidators.clear();
 		categories.clear();
@@ -104,7 +106,8 @@ public class EmiRecipes {
 				filteredWorkstations.put(entry.getKey(), w);
 			}
 		}
-		manager = new Manager(categories, filteredWorkstations, filtered);
+		manager = new Manager(categories, filteredWorkstations, filtered, false);
+		setWorker(new Worker(categories, filteredWorkstations, filtered));
 		EmiLog.info("Baked " + recipes.size() + " recipes in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
@@ -118,6 +121,13 @@ public class EmiRecipes {
 
 	public static void addRecipe(EmiRecipe recipe) {
 		recipes.add(recipe);
+	}
+
+	private static synchronized void setWorker(Worker worker) {
+		activeWorker = worker;
+		if (worker != null) {
+			new Thread(activeWorker).start();
+		}
 	}
 
 	private static class Manager implements EmiRecipeManager {
@@ -136,7 +146,7 @@ public class EmiRecipes {
 			this.recipes = List.of();
 		}
 
-		public Manager(List<EmiRecipeCategory> categories, Map<EmiRecipeCategory, List<EmiIngredient>> workstations, List<EmiRecipe> recipes) {
+		public Manager(List<EmiRecipeCategory> categories, Map<EmiRecipeCategory, List<EmiIngredient>> workstations, List<EmiRecipe> recipes, boolean doSort) {
 			this.categories = categories.stream().distinct().toList();
 			this.workstations = workstations;
 			this.recipes = List.copyOf(recipes);
@@ -183,7 +193,7 @@ public class EmiRecipes {
 				}
 				List<EmiRecipe> cRecipes = byCategory.get(category);
 				Comparator<EmiRecipe> sort = EmiRecipeCategoryProperties.getSort(category);
-				if (sort != EmiRecipeSorting.none()) {
+				if (doSort && sort != EmiRecipeSorting.none()) {
 					cRecipes = cRecipes.stream().sorted(sort).collect(Collectors.toList());
 					EmiRecipeSorter.clear();
 				}
@@ -251,6 +261,34 @@ public class EmiRecipes {
 		@Override
 		public List<EmiRecipe> getRecipesByOutput(EmiStack stack) {
 			return byOutput.getOrDefault(stack, List.of());
+		}
+	}
+
+	private static class Worker implements Runnable {
+		private List<EmiRecipeCategory> categories;
+		private Map<EmiRecipeCategory, List<EmiIngredient>> workstations;
+		private List<EmiRecipe> recipes;
+
+		public Worker(List<EmiRecipeCategory> categories, Map<EmiRecipeCategory, List<EmiIngredient>> workstations, List<EmiRecipe> recipes) {
+			this.categories = categories;
+			this.workstations = workstations;
+			this.recipes = recipes;
+		}
+
+		@Override
+		public void run() {
+			long startTime = System.currentTimeMillis();
+			Manager manager = new Manager(categories, workstations, recipes, true);
+			try {
+				Thread.sleep(3000);
+			} catch (Exception e) {
+			}
+			if (activeWorker == this) {
+				long endTime = System.currentTimeMillis();
+				EmiLog.info("Baked recipes after reload in " + (endTime - startTime) + "ms");
+				EmiRecipes.manager = manager;
+			}
+			setWorker(null);
 		}
 	}
 }
