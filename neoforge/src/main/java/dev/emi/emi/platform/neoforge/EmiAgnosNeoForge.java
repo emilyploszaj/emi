@@ -11,6 +11,7 @@ import net.minecraft.item.PotionItem;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.common.CommonHooks;
+import org.apache.commons.lang3.text.WordUtils;
 import org.objectweb.asm.Type;
 
 import com.google.common.collect.Lists;
@@ -70,6 +71,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected String getModNameAgnos(String namespace) {
 		if (namespace.equals("c")) {
@@ -79,7 +81,11 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getModInfo().getDisplayName();
 		}
-		return namespace;
+		container = ModList.get().getModContainerById(namespace.replace('_', '-'));
+		if (container.isPresent()) {
+			return container.get().getModInfo().getDisplayName();
+		}
+		return WordUtils.capitalizeFully(namespace.replace('_', ' '));
 	}
 
 	@Override
