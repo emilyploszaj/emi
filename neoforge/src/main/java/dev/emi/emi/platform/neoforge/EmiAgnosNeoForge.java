@@ -71,6 +71,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected String getModNameAgnos(String namespace) {
 		if (namespace.equals("c")) {
