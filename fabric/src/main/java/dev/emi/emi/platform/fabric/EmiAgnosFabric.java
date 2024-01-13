@@ -57,6 +57,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected String getModNameAgnos(String namespace) {
 		if (namespace.equals("c")) {
