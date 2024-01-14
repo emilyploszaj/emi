@@ -1,6 +1,7 @@
 package dev.emi.emi.runtime;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 
@@ -41,6 +42,17 @@ public class EmiHistory {
 		} else if (screen != null) {
 			client.setScreen(screen);
 		}
+	}
+
+	public static void popUntil(Predicate<Screen> predicate, Screen otherwise) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		while (!EmiHistory.isEmpty()) {
+			EmiHistory.pop();
+			if (predicate.test(client.currentScreen)) {
+				return;
+			}
+		}
+		client.setScreen(otherwise);
 	}
 
 	public static void forward() {
