@@ -59,6 +59,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.ModFileScanData;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class EmiAgnosForge extends EmiAgnos {
 	static {
