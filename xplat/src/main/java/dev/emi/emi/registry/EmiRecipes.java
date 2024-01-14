@@ -279,10 +279,6 @@ public class EmiRecipes {
 		public void run() {
 			long startTime = System.currentTimeMillis();
 			Manager manager = new Manager(categories, workstations, recipes, true);
-			try {
-				Thread.sleep(3000);
-			} catch (Exception e) {
-			}
 			if (activeWorker == this) {
 				long endTime = System.currentTimeMillis();
 				EmiLog.info("Baked recipes after reload in " + (endTime - startTime) + "ms");
