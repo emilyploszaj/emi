@@ -29,6 +29,7 @@ import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
+import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -41,7 +42,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class RecipeScreen extends Screen implements EmiScreen {
+public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
 	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
@@ -575,7 +576,7 @@ public class RecipeScreen extends Screen implements EmiScreen {
 
 	@Override
 	public void close() {
-		this.client.setScreen(old);
+		EmiHistory.popUntil(s -> !(s instanceof RecipeScreen), old);
 	}
 
 	@Override
@@ -583,29 +584,16 @@ public class RecipeScreen extends Screen implements EmiScreen {
 		return false;
 	}
 
-	@Override
-	public int emi$getLeft() {
+	public Bounds getBounds() {
+		int top = y - 26;
+		int bottom = y + backgroundHeight;
+		int left = x;
+		int right = x + backgroundWidth;
 		if (EmiConfig.workstationLocation == SidebarSide.LEFT) {
-			return x - 22;
+			left -= 22;
+		} else if (EmiConfig.workstationLocation == SidebarSide.RIGHT) {
+			right += 22;
 		}
-		return x;
-	}
-
-	@Override
-	public int emi$getRight() {
-		if (EmiConfig.workstationLocation == SidebarSide.RIGHT) {
-			return x + backgroundWidth + 22;
-		}
-		return x + backgroundWidth;
-	}
-
-	@Override
-	public int emi$getTop() {
-		return y - 26;
-	}
-
-	@Override
-	public int emi$getBottom() {
-		return y + backgroundHeight;
+		return new Bounds(left, top, right - left, bottom - top);
 	}
 }
