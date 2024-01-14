@@ -12,16 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
-import dev.emi.emi.screen.EmiScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(HandledScreen.class)
-public abstract class HandledScreenMixin extends Screen implements EmiScreen {
+public abstract class HandledScreenMixin extends Screen {
 	@Shadow
 	protected int backgroundWidth, backgroundHeight, x, y;
 
@@ -57,30 +55,5 @@ public abstract class HandledScreenMixin extends Screen implements EmiScreen {
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
 		context.pop();
-	}
-
-	@Override
-	public int emi$getLeft() {
-		if (this instanceof RecipeBookProvider provider) {
-			if (provider.getRecipeBookWidget().isOpen()) {
-				return x - 177;
-			}
-		}
-		return x;
-	}
-
-	@Override
-	public int emi$getRight() {
-		return x + backgroundWidth;
-	}
-
-	@Override
-	public int emi$getTop() {
-		return y;
-	}
-
-	@Override
-	public int emi$getBottom() {
-		return y + backgroundHeight;
 	}
 }
