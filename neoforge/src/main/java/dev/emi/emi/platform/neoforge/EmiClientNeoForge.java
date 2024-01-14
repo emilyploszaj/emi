@@ -10,7 +10,7 @@ import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.screen.ConfigScreen;
-import dev.emi.emi.screen.EmiScreen;
+import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
@@ -67,10 +67,11 @@ public class EmiClientNeoForge {
 	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
 		HandledScreen<?> screen = event.getContainerScreen();
-		if (screen instanceof EmiScreen emi) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
-			context.matrices().translate(-emi.emi$getLeft(), -emi.emi$getTop(), 0.0);
+			context.matrices().translate(-base.bounds().left(), -base.bounds().top(), 0.0);
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
