@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -24,13 +25,21 @@ public class EmiHidden {
 	public static Set<EmiIngredient> disabledStacks = Sets.newHashSet();
 	public static List<IndexStackData.Filter> disabledFilters = Lists.newArrayList();
 	public static Map<String, Boolean> disabledFilterLookup = Maps.newHashMap();
+	// Plugin defined
+	public static Set<EmiIngredient> pluginDisabledStacks = Sets.newHashSet();
+	public static List<Predicate<EmiStack>> pluginDisabledFilters = Lists.newArrayList();
 	// User edited
 	public static Set<EmiIngredient> hiddenStacks = new LinkedHashSet<>();
 
-	public static void reload() {
+	public static void clear() {
 		disabledStacks.clear();
 		disabledFilters.clear();
 		disabledFilterLookup.clear();
+		pluginDisabledStacks.clear();
+		pluginDisabledFilters.clear();
+	}
+
+	public static void reload() {
 		List<IndexStackData> isds = EmiData.stackData.stream().map(i -> i.get()).filter(i -> i.disable() && (!i.filters().isEmpty() || !i.removed().isEmpty())).toList();
 		for (IndexStackData data : isds) {
 			for (EmiIngredient stack : data.removed()) {
@@ -71,9 +80,15 @@ public class EmiHidden {
 	}
 
 	public static boolean isDisabled(EmiIngredient stack) {
+		outer:
 		for (EmiStack s : stack.getEmiStacks()) {
-			if (disabledStacks.contains(s)) {
+			if (disabledStacks.contains(s) || pluginDisabledStacks.contains(s)) {
 				continue;
+			}
+			for (Predicate<EmiStack> predicate : pluginDisabledFilters) {
+				if (predicate.test(s)) {
+					continue outer;
+				}
 			}
 			boolean filtered = disabledFilterLookup.computeIfAbsent("" + s.getId(), id -> {
 				for (IndexStackData.Filter filter : disabledFilters) {

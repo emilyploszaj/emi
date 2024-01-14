@@ -70,6 +70,7 @@ public class EmiAgnosForge extends EmiAgnos {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected String getModNameAgnos(String namespace) {
 		if (namespace.equals("c")) {
@@ -79,7 +80,11 @@ public class EmiAgnosForge extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getModInfo().getDisplayName();
 		}
-		return namespace;
+		container = ModList.get().getModContainerById(namespace.replace('_', '-'));
+		if (container.isPresent()) {
+			return container.get().getModInfo().getDisplayName();
+		}
+		return WordUtils.capitalizeFully(namespace.replace('_', ' '));
 	}
 
 	@Override

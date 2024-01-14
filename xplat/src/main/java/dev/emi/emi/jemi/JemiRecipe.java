@@ -1,6 +1,13 @@
 package dev.emi.emi.jemi;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
+
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -24,18 +31,15 @@ import mezz.jei.library.focus.FocusGroup;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Optional;
 
 public class JemiRecipe<T> implements EmiRecipe {
 	public List<EmiIngredient> inputs = Lists.newArrayList();
 	public List<EmiIngredient> catalysts = Lists.newArrayList();
 	public List<EmiStack> outputs = Lists.newArrayList();
 	public EmiRecipeCategory recipeCategory;
-	public Identifier id;
+	public Identifier originalId, id;
 	public IRecipeCategory<T> category;
 	public T recipe;
 	public JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
@@ -45,7 +49,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.recipeCategory = recipeCategory;
 		this.category = category;
 		this.recipe = recipe;
-		Identifier id = category.getRegistryName(recipe);
+		this.originalId = category.getRegistryName(recipe);
 		if (id != null) {
 			this.id = new Identifier("jei", "/" + EmiUtil.subId(id));
 		}
@@ -71,6 +75,11 @@ public class JemiRecipe<T> implements EmiRecipe {
 	@Override
 	public EmiRecipeCategory getCategory() {
 		return recipeCategory;
+	}
+
+	@Override
+	public @Nullable Recipe<?> getBackingRecipe() {
+		return EmiPort.getRecipe(originalId);
 	}
 
 	@Override
