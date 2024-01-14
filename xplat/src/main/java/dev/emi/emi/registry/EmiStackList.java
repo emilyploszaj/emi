@@ -205,7 +205,7 @@ public class EmiStackList {
 	}
 
 	public static void bakeFiltered() {
-		filteredStacks = stacks.stream().filter(s -> !EmiHidden.isHidden(s)).toList();
+		filteredStacks = stacks.stream().filter(s -> !EmiHidden.isDisabled(s) && !EmiHidden.isHidden(s)).toList();
 	}
 
 	public static int getIndex(EmiIngredient ingredient) {

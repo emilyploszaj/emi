@@ -89,9 +89,9 @@ public interface EmiRegistry {
 	}
 
 	/**
-	 * Adds a serializer for a given type of ingredient.
-	 * This will allow it to be favorited, among other things.
+	 * @deprecated Use {@link EmiPlugin#initialize()} and {@link EmiInitRegistry#addIngredientSerializer()}
 	 */
+	@Deprecated
 	<T extends EmiIngredient> void addIngredientSerializer(Class<T> clazz, EmiIngredientSerializer<T> serializer);
 
 	/**

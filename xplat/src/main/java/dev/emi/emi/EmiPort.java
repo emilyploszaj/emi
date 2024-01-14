@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
@@ -28,6 +29,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeManager;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.MutableText;
@@ -175,5 +177,16 @@ public final class EmiPort {
 
 	public static Identifier getId(Recipe<?> recipe) {
 		return recipe.getId();
+	}
+
+	public static @Nullable Recipe<?> getRecipe(Identifier id) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world != null && id != null) {
+			RecipeManager manager = client.world.getRecipeManager();
+			if (manager != null) {
+				return manager.get(id).orElse(null);
+			}
+		}
+		return null;
 	}
 }

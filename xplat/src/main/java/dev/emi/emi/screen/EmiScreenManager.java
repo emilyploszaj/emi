@@ -138,11 +138,12 @@ public class EmiScreenManager {
 			}
 		}
 
-		Screen screen = client.currentScreen;
-		if (screen == null) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
 			return;
 		}
-		List<Bounds> exclusion = EmiExclusionAreas.getExclusion(screen);
+		Screen screen = base.screen();
+		List<Bounds> exclusion = EmiExclusionAreas.getExclusion(base);
 		if (lastWidth == screen.width && lastHeight == screen.height && exclusion.size() == lastExclusion.size()) {
 			boolean same = true;
 			for (int i = 0; i < exclusion.size(); i++) {
@@ -165,60 +166,60 @@ public class EmiScreenManager {
 		lastWidth = screen.width;
 		lastHeight = screen.height;
 		lastExclusion = exclusion;
-		if (screen instanceof EmiScreen emi) {
-			int left = Math.max(ENTRY_SIZE * 2, emi.emi$getLeft());
-			int right = Math.min(screen.width - ENTRY_SIZE * 2, emi.emi$getRight());
-			int top = emi.emi$getTop();
-			int bottom = emi.emi$getBottom();
 
-			batchers.unclaimAll();
+		Bounds bounds = base.bounds();
+		int left = Math.max(ENTRY_SIZE * 2, bounds.left());
+		int right = Math.min(screen.width - ENTRY_SIZE * 2, bounds.right());
+		int top = bounds.left();
+		int bottom = bounds.bottom();
 
-			List<Bounds> spaceExclusion = Lists.newArrayList();
-			spaceExclusion.addAll(exclusion);
+		batchers.unclaimAll();
 
-			createScreenSpace(panels.get(0), screen, spaceExclusion, false,
-					new Bounds(0, 0, left, screen.height),
-					SidebarSettings.LEFT);
+		List<Bounds> spaceExclusion = Lists.newArrayList();
+		spaceExclusion.addAll(exclusion);
 
-			createScreenSpace(panels.get(1), screen, spaceExclusion, true,
-					new Bounds(right, 0, screen.width - right, screen.height),
-					SidebarSettings.RIGHT);
+		createScreenSpace(panels.get(0), screen, spaceExclusion, false,
+				new Bounds(0, 0, left, screen.height),
+				SidebarSettings.LEFT);
 
-			spaceExclusion = Lists.newArrayList();
-			if (panels.get(0).isVisible()) {
-				spaceExclusion.add(panels.get(0).getBounds());
-			}
-			if (panels.get(1).isVisible()) {
-				spaceExclusion.add(panels.get(1).getBounds());
-			}
-			spaceExclusion.addAll(exclusion);
+		createScreenSpace(panels.get(1), screen, spaceExclusion, true,
+				new Bounds(right, 0, screen.width - right, screen.height),
+				SidebarSettings.RIGHT);
 
-			int topCenter = EmiConfig.topSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.topSidebarTheme.horizontalPadding;
-			int topSpaceBottom = switch (EmiConfig.topSidebarAlign.horizontal) {
-				case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.topSidebarMargins.left() + topCenter, top, screen.height, true);
-				case CENTER -> top;
-				case RIGHT -> getVerticalConstraint(panels.get(1), right - EmiConfig.topSidebarMargins.right() + topCenter, top, screen.height, true);
-			};
-			boolean topRtl = EmiConfig.topSidebarAlign.horizontal == Horizontal.RIGHT;
-
-			createScreenSpace(panels.get(2), screen, spaceExclusion, topRtl,
-					new Bounds(0, 0, screen.width, topSpaceBottom),
-					SidebarSettings.TOP);
-
-			int bottomCenter = EmiConfig.bottomSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.bottomSidebarTheme.horizontalPadding;
-			int bottomSpaceTop = switch (EmiConfig.bottomSidebarAlign.horizontal) {
-				case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.bottomSidebarMargins.left() + bottomCenter, bottom, 0, false);
-				case CENTER -> bottom;
-				case RIGHT -> getVerticalConstraint(panels.get(1), EmiConfig.bottomSidebarMargins.right() + bottomCenter, bottom, 0, false);
-			};
-			boolean bottomRtl = EmiConfig.bottomSidebarAlign.horizontal == Horizontal.RIGHT;
-
-			createScreenSpace(panels.get(3), screen, spaceExclusion, bottomRtl,
-					new Bounds(0, bottomSpaceTop, screen.width, screen.height - bottomSpaceTop),
-					SidebarSettings.BOTTOM);
-
-			updateSidebarButtons();
+		spaceExclusion = Lists.newArrayList();
+		if (panels.get(0).isVisible()) {
+			spaceExclusion.add(panels.get(0).getBounds());
 		}
+		if (panels.get(1).isVisible()) {
+			spaceExclusion.add(panels.get(1).getBounds());
+		}
+		spaceExclusion.addAll(exclusion);
+
+		int topCenter = EmiConfig.topSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.topSidebarTheme.horizontalPadding;
+		int topSpaceBottom = switch (EmiConfig.topSidebarAlign.horizontal) {
+			case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.topSidebarMargins.left() + topCenter, top, screen.height, true);
+			case CENTER -> top;
+			case RIGHT -> getVerticalConstraint(panels.get(1), right - EmiConfig.topSidebarMargins.right() + topCenter, top, screen.height, true);
+		};
+		boolean topRtl = EmiConfig.topSidebarAlign.horizontal == Horizontal.RIGHT;
+
+		createScreenSpace(panels.get(2), screen, spaceExclusion, topRtl,
+				new Bounds(0, 0, screen.width, topSpaceBottom),
+				SidebarSettings.TOP);
+
+		int bottomCenter = EmiConfig.bottomSidebarSize.values.getInt(0) * ENTRY_SIZE / 2 + EmiConfig.bottomSidebarTheme.horizontalPadding;
+		int bottomSpaceTop = switch (EmiConfig.bottomSidebarAlign.horizontal) {
+			case LEFT -> getVerticalConstraint(panels.get(0), EmiConfig.bottomSidebarMargins.left() + bottomCenter, bottom, 0, false);
+			case CENTER -> bottom;
+			case RIGHT -> getVerticalConstraint(panels.get(1), EmiConfig.bottomSidebarMargins.right() + bottomCenter, bottom, 0, false);
+		};
+		boolean bottomRtl = EmiConfig.bottomSidebarAlign.horizontal == Horizontal.RIGHT;
+
+		createScreenSpace(panels.get(3), screen, spaceExclusion, bottomRtl,
+				new Bounds(0, bottomSpaceTop, screen.width, screen.height - bottomSpaceTop),
+				SidebarSettings.BOTTOM);
+
+		updateSidebarButtons();
 	}
 
 	private static void updateCraftables() {
@@ -570,11 +571,8 @@ public class EmiScreenManager {
 	public static void drawBackground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 		updateMouse(mouseX, mouseY);
 		recalculate();
-		Screen screen = client.currentScreen;
-		if (screen == null) {
-			return;
-		}
-		if (screen instanceof EmiScreen emi) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base != null) {
 			client.getProfiler().push("sidebar");
 			for (SidebarPanel panel : panels) {
 				panel.drawBackground(context, mouseX, mouseY, delta);
@@ -586,8 +584,8 @@ public class EmiScreenManager {
 		client.getProfiler().push("emi");
 		updateMouse(mouseX, mouseY);
 		recalculate();
-		Screen screen = client.currentScreen;
-		if (screen == null) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
 			return;
 		}
 		boolean visible = !isDisabled();
@@ -597,16 +595,17 @@ public class EmiScreenManager {
 			panel.updateWidgetVisibility();
 		}
 		if (isDisabled()) {
+			int screenHeight = base.screen().height;
 			if (!EmiReloadManager.isLoaded()) {
 				if (EmiReloadManager.getStatus() == -1) {
-					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.error"), 4, screen.height - 16);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.error"), 4, screenHeight - 16);
 				} else if (EmiReloadManager.getStatus() == 0) {
-					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.waiting"), 4, screen.height - 16);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading.waiting"), 4, screenHeight - 16);
 				} else {
-					context.drawTextWithShadow(EmiPort.translatable("emi.reloading"), 4, screen.height - 16);
-					context.drawTextWithShadow(EmiReloadManager.reloadStep, 4, screen.height - 26);
+					context.drawTextWithShadow(EmiPort.translatable("emi.reloading"), 4, screenHeight - 16);
+					context.drawTextWithShadow(EmiReloadManager.reloadStep, 4, screenHeight - 26);
 					if (System.currentTimeMillis() > EmiReloadManager.reloadWorry) {
-						context.drawTextWithShadow(EmiPort.translatable("emi.reloading.worry"), 4, screen.height - 36);
+						context.drawTextWithShadow(EmiPort.translatable("emi.reloading.worry"), 4, screenHeight - 36);
 					}
 				}
 			}
@@ -614,43 +613,38 @@ public class EmiScreenManager {
 			lastHoveredCraftable = null;
 			return;
 		} else if (EmiRecipes.activeWorker != null) {
-			context.drawTextWithShadow(EmiPort.translatable("emi.reloading.still_baking_recipes"), 48, screen.height - 16);
+			context.drawTextWithShadow(EmiPort.translatable("emi.reloading.still_baking_recipes"), 48, base.screen().height - 16);
 		} else {
-			renderDevMode(context, mouseX, mouseY, delta, screen);
+			renderDevMode(context, mouseX, mouseY, delta, base);
 		}
-		renderWidgets(context, mouseX, mouseY, delta, screen);
+		renderWidgets(context, mouseX, mouseY, delta, base);
 		client.getProfiler().push("sidebars");
-		if (screen instanceof EmiScreen emi) {
-			client.getProfiler().push("sidebar");
-			for (SidebarPanel panel : panels) {
-				panel.render(context, mouseX, mouseY, delta);
-			}
-
-			renderLastHoveredCraftable(context, mouseX, mouseY, delta, screen);
-
-			client.getProfiler().pop();
+		for (SidebarPanel panel : panels) {
+			panel.render(context, mouseX, mouseY, delta);
 		}
+
+		renderLastHoveredCraftable(context, mouseX, mouseY, delta, base);
 
 		client.getProfiler().pop();
 
-		renderExclusionAreas(context, mouseX, mouseY, delta, screen);
+		renderExclusionAreas(context, mouseX, mouseY, delta, base);
 
 		client.getProfiler().swap("slots");
-		renderSlotOverlays(context, mouseX, mouseY, delta, screen);
+		renderSlotOverlays(context, mouseX, mouseY, delta, base);
 		client.getProfiler().pop();
 
 		RenderSystem.disableDepthTest();
 	}
 
 	public static void drawForeground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
-		Screen screen = client.currentScreen;
-		if (screen instanceof EmiScreen && !isDisabled()) {
-			renderDraggedStack(context, mouseX, mouseY, delta, screen);
-			renderCurrentTooltip(context, mouseX, mouseY, delta, screen);
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base != null && !isDisabled()) {
+			renderDraggedStack(context, mouseX, mouseY, delta, base);
+			renderCurrentTooltip(context, mouseX, mouseY, delta, base);
 		}
 	}
 
-	private static void renderWidgets(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderWidgets(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		context.push();
 		context.matrices().translate(0, 0, 100);
 		emi.render(context.raw(), mouseX, mouseY, delta);
@@ -659,8 +653,7 @@ public class EmiScreenManager {
 		context.pop();
 	}
 
-	private static void renderLastHoveredCraftable(EmiDrawContext context, int mouseX, int mouseY, float delta,
-			Screen screen) {
+	private static void renderLastHoveredCraftable(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		if (lastHoveredCraftable != null && lastHoveredCraftableOffset != -1) {
 			EmiStackInteraction cur = getHoveredStack(mouseX, mouseY, false, true);
 			if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
@@ -682,7 +675,7 @@ public class EmiScreenManager {
 		}
 	}
 
-	private static void renderDraggedStack(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderDraggedStack(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		if (!draggedStack.isEmpty()) {
 			SidebarPanel panel = getHoveredPanel(mouseX, mouseY);
 			if (panel != null) {
@@ -707,7 +700,7 @@ public class EmiScreenManager {
 					}
 				}
 			}
-			EmiDragDropHandlers.render(screen, draggedStack, context.raw(), mouseX, mouseY, delta);
+			EmiDragDropHandlers.render(base.screen(), draggedStack, context.raw(), mouseX, mouseY, delta);
 			MatrixStack view = RenderSystem.getModelViewStack();
 			view.push();
 			view.translate(0, 0, 400);
@@ -718,7 +711,7 @@ public class EmiScreenManager {
 		}
 	}
 
-	private static void renderCurrentTooltip(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderCurrentTooltip(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		ItemStack cursor = ItemStack.EMPTY;
 		if (client.currentScreen instanceof HandledScreen<?> handled) {
 			cursor = handled.getScreenHandler().getCursorStack();
@@ -730,9 +723,9 @@ public class EmiScreenManager {
 				TooltipComponent.of(EmiPort.ordered(EmiConfig.deleteCursorStack.getBindText()))
 			);
 			if (space.rtl) {
-				EmiRenderHelper.drawLeftTooltip(screen, context, list, mouseX, mouseY);
+				EmiRenderHelper.drawLeftTooltip(base.screen(), context, list, mouseX, mouseY);
 			} else {
-				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(base.screen(), context, list, mouseX, mouseY);
 			}
 		}
 		if (cursor.isEmpty() && draggedStack.isEmpty()) {
@@ -756,17 +749,18 @@ public class EmiScreenManager {
 				list.add(TooltipComponent.of(EmiPort.translatable("emi.edit_mode.hide_all", EmiConfig.hideStackById.getBindText()).asOrderedText()));
 			}
 			if (space != null && space.rtl) {
-				EmiRenderHelper.drawLeftTooltip(screen, context, list, mouseX, mouseY);
+				EmiRenderHelper.drawLeftTooltip(base.screen(), context, list, mouseX, mouseY);
 			} else {
-				EmiRenderHelper.drawTooltip(screen, context, list, mouseX, mouseY);
+				EmiRenderHelper.drawTooltip(base.screen(), context, list, mouseX, mouseY);
 			}
 			client.getProfiler().pop();
 		}
 		lastStackTooltipRendered = null;
 	}
 
-	private static void renderDevMode(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderDevMode(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		if (EmiConfig.devMode) {
+			Screen screen = base.screen();
 			client.getProfiler().swap("dev");
 			int color = 0xFFFFFF;
 			Text title = EmiPort.literal("EMI Dev Mode");
@@ -793,29 +787,27 @@ public class EmiScreenManager {
 		}
 	}
 
-	private static void renderExclusionAreas(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderExclusionAreas(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		if (EmiConfig.highlightExclusionAreas) {
-			if (screen instanceof EmiScreen emi) {
-				for (SidebarPanel panel : panels) {
-					if (panel.isVisible()) {
-						Bounds bounds = panel.getBounds();
-						context.fill(bounds.left(), bounds.top(), bounds.width(), bounds.height(), 0x440000ff);
-					}
+			for (SidebarPanel panel : panels) {
+				if (panel.isVisible()) {
+					Bounds bounds = panel.getBounds();
+					context.fill(bounds.left(), bounds.top(), bounds.width(), bounds.height(), 0x440000ff);
 				}
-				List<Bounds> exclusions = EmiExclusionAreas.getExclusion(screen);
-				if (exclusions.size() == 0) {
-					return;
-				}
-				for (int i = 0; i < exclusions.size(); i++) {
-					Bounds b = exclusions.get(i);
-					context.fill(b.x(), b.y(), b.width(), b.height(), i == 0 ? 0x4400ff00 : 0x44ff0000);
-				}
+			}
+			List<Bounds> exclusions = EmiExclusionAreas.getExclusion(base);
+			if (exclusions.size() == 0) {
+				return;
+			}
+			for (int i = 0; i < exclusions.size(); i++) {
+				Bounds b = exclusions.get(i);
+				context.fill(b.x(), b.y(), b.width(), b.height(), i == 0 ? 0x4400ff00 : 0x44ff0000);
 			}
 		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private static void renderSlotOverlays(EmiDrawContext context, int mouseX, int mouseY, float delta, Screen screen) {
+	private static void renderSlotOverlays(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		CompiledQuery query = null;
 		if (EmiScreenManager.search.highlight) {
 			query = EmiSearch.compiledQuery;
@@ -835,7 +827,7 @@ public class EmiScreenManager {
 				}
 			}
 		}
-		if (screen instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
+		if (base.screen() instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
 			context.push();
 			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
 			for (Slot slot : hs.getScreenHandler().slots) {
@@ -1768,7 +1760,7 @@ public class EmiScreenManager {
 
 		public boolean containsNotExcluded(int x, int y) {
 			if (this.contains(lastMouseX, lastMouseY)) {
-				for (Bounds bounds : EmiExclusionAreas.getExclusion(client.currentScreen)) {
+				for (Bounds bounds : EmiExclusionAreas.getExclusion(EmiScreenBase.getCurrent())) {
 					if (bounds.contains(x, y)) {
 						return false;
 					}

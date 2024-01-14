@@ -45,6 +45,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryEntry;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -56,6 +57,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected String getModNameAgnos(String namespace) {
 		if (namespace.equals("c")) {
@@ -65,7 +67,11 @@ public class EmiAgnosFabric extends EmiAgnos {
 		if (container.isPresent()) {
 			return container.get().getMetadata().getName();
 		}
-		return namespace;
+		container = FabricLoader.getInstance().getModContainer(namespace.replace('_', '-'));
+		if (container.isPresent()) {
+			return container.get().getMetadata().getName();
+		}
+		return WordUtils.capitalizeFully(namespace.replace('_', ' '));
 	}
 
 	@Override
