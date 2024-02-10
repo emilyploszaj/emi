@@ -14,20 +14,22 @@ import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.ConfigScreenHandler;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = "emi", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -41,6 +43,7 @@ public class EmiClientNeoForge {
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::recipesReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::tagsReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::renderScreenForeground);
+		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::postRenderScreen);
 		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
 	}
@@ -67,13 +70,28 @@ public class EmiClientNeoForge {
 	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
 		HandledScreen<?> screen = event.getContainerScreen();
-		EmiScreenBase base = EmiScreenBase.getCurrent();
+		EmiScreenBase base = EmiScreenBase.of(screen);
 		if (base != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
-			context.matrices().translate(-base.bounds().left(), -base.bounds().top(), 0.0);
+			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
+			context.pop();
+		}
+	}
+
+	public static void postRenderScreen(ScreenEvent.Render.Post event) {
+		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
+		Screen screen = event.getScreen();
+		if (!(screen instanceof HandledScreen<?>)) {
+			return;
+		}
+		EmiScreenBase base = EmiScreenBase.of(screen);
+		if (base != null) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			context.push();
+			EmiPort.setPositionTexShader();
 			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			context.pop();
 		}
