@@ -1,12 +1,5 @@
-### Tweaks
-* EMI now does not display in screens without slots
-
 ### Fixes
-* EMI rendering in incorrect screens without slots #205, #334, #412
-* Wrong recipe handler is used for inventory crafting when JEI is present #408
-* EMI doesn't back out of the recipe screen to the original source #366
-
-### API
-* `EmiRecipe.getBackingRecipe` has been added for returning the vanilla recipe the `EmiRecipe` represents.
-* `EmiPlugin.initialize` has been added for registering content required to load EMI and plugins, like serializers.
-* Mods can now completely disable stacks in EMI, similar to the resource pack format.
+* Fixed fill recipe not working in the inventory grid with JEI present #426
+* Fixed 1.20.4 effects displaying with the wrong time #435
+* Fixed Forge/NeoForge recipe book causing offset in EMI #425
+* Fixed input behaving as if EMI is present even if it's not in certain screens
