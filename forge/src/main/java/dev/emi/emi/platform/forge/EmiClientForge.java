@@ -16,6 +16,7 @@ import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,6 +26,7 @@ import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,6 +45,7 @@ public class EmiClientForge {
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::recipesReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::tagsReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::renderScreenForeground);
+		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::postRenderScreen);
 		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
 			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
 	}
@@ -69,15 +72,30 @@ public class EmiClientForge {
 	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		HandledScreen<?> screen = event.getContainerScreen();
-		EmiScreenBase base = EmiScreenBase.getCurrent();
+		EmiScreenBase base = EmiScreenBase.of(screen);
 		if (base != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			MatrixStack viewStack = RenderSystem.getModelViewStack();
 			viewStack.push();
-			viewStack.translate(-base.bounds().left(), -base.bounds().top(), 0.0);
+			viewStack.translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
 			RenderSystem.applyModelViewMatrix();
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
+			context.pop();
+		}
+	}
+
+	public static void postRenderScreen(ScreenEvent.Render.Post event) {
+		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
+		Screen screen = event.getScreen();
+		if (!(screen instanceof HandledScreen<?>)) {
+			return;
+		}
+		EmiScreenBase base = EmiScreenBase.of(screen);
+		if (base != null) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			context.push();
+			EmiPort.setPositionTexShader();
 			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			viewStack.pop();
 			RenderSystem.applyModelViewMatrix();
