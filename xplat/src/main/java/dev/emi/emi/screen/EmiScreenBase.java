@@ -27,7 +27,10 @@ public class EmiScreenBase {
 	
 	public static EmiScreenBase getCurrent() {
 		MinecraftClient client = MinecraftClient.getInstance();
-		Screen screen = client.currentScreen;
+		return of(client.currentScreen);
+	}
+
+	public static EmiScreenBase of(Screen screen) {
 		if (screen instanceof HandledScreen hs) {
 			HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
 			ScreenHandler sh = hs.getScreenHandler();
