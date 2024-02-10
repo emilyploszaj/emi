@@ -76,8 +76,7 @@ public class EmiClientForge {
 			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
-			viewStack.pop();
-			RenderSystem.applyModelViewMatrix();
+			context.pop();
 		}
 	}
 
