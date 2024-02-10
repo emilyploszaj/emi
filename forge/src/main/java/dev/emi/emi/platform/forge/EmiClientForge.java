@@ -81,12 +81,13 @@ public class EmiClientForge {
 			RenderSystem.applyModelViewMatrix();
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
-			context.pop();
+			viewStack.pop();
+			RenderSystem.applyModelViewMatrix();
 		}
 	}
 
 	public static void postRenderScreen(ScreenEvent.Render.Post event) {
-		EmiDrawContext context = EmiDrawContext.wrap(event.getGuiGraphics());
+		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		Screen screen = event.getScreen();
 		if (!(screen instanceof HandledScreen<?>)) {
 			return;
@@ -97,8 +98,7 @@ public class EmiClientForge {
 			context.push();
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
-			viewStack.pop();
-			RenderSystem.applyModelViewMatrix();
+			context.pop();
 		}
 	}
 }
