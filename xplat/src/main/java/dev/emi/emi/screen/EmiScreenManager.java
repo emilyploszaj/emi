@@ -57,6 +57,7 @@ import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.runtime.EmiSidebars;
@@ -820,11 +821,17 @@ public class EmiScreenManager {
 				synfavs.addAll(fav.getEmiStacks());
 			}
 			
-			for (EmiRecipeHandler handler : EmiRecipeFiller.getAllHandlers(EmiApi.getHandledScreen())) {
-				if (handler instanceof StandardRecipeHandler standard) {
-					ignoredSlots.addAll(standard.getInputSources(EmiApi.getHandledScreen().getScreenHandler()));
-					ignoredSlots.addAll(standard.getCraftingSlots(EmiApi.getHandledScreen().getScreenHandler()));
+			try {
+				HandledScreen<?> hs = EmiApi.getHandledScreen();
+				for (EmiRecipeHandler handler : EmiRecipeFiller.getAllHandlers(hs)) {
+					if (handler instanceof StandardRecipeHandler standard) {
+						ignoredSlots.addAll(standard.getInputSources(hs.getScreenHandler()));
+						ignoredSlots.addAll(standard.getCraftingSlots(hs.getScreenHandler()));
+					}
 				}
+			} catch (Throwable t) {
+				EmiLog.error("Recipe handler is throwing in renderSlotOverlays:");
+				EmiLog.error(t);
 			}
 		}
 		if (base.screen() instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
@@ -895,6 +902,10 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
+			return false;
+		}
 		if (search.mouseClicked(mouseX, mouseY, button)) {
 			return true;
 		} else if (emi.mouseClicked(mouseX, mouseY, button)) {
@@ -932,6 +943,10 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
+			return false;
+		}
 		try {
 			if (isDisabled()) {
 				return false;
@@ -992,6 +1007,10 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
+			return false;
+		}
 		if (isDisabled()) {
 			return false;
 		}
@@ -1011,6 +1030,10 @@ public class EmiScreenManager {
 	}
 
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
+			return false;
+		}
 		if (isDisabled()) {
 			if (EmiConfig.toggleVisibility.matchesKey(keyCode, scanCode)) {
 				toggleVisibility(true);

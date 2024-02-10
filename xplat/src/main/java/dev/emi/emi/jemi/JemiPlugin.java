@@ -69,6 +69,7 @@ import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;
@@ -307,6 +308,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		List<CraftingRecipe> recipes = Stream.concat(
 			runtime.getRecipeManager().createRecipeLookup(category.getRecipeType()).includeHidden().get(),
 			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream()
+				.filter(r -> r instanceof SpecialCraftingRecipe)
 		).distinct().toList();
 		for (CraftingRecipe recipe : recipes) {
 			try {
