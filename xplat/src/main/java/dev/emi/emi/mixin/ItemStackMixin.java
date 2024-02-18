@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-@Mixin(value = ItemStack.class, priority = 2000)
+@Mixin(value = ItemStack.class, priority = 500)
 public class ItemStackMixin {
 	
 	@Inject(at = @At("RETURN"), method = "getTooltip")
