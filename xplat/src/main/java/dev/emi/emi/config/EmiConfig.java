@@ -478,6 +478,10 @@ public class EmiConfig {
 	@ConfigValue("dev.show-recipe-ids")
 	public static boolean showRecipeIds = false;
 
+	@Comment("Whether to display additional widgets added to recipes from other mods.\nThese are typically developer facing and compatibility related, and not useful for players.")
+	@ConfigValue("dev.show-recipe-decorators")
+	public static boolean showRecipeDecorators = EmiAgnos.isDevelopmentEnvironment();
+
 	@Comment("Whether stacks in the index should display a highlight if they have a recipe default.")
 	@ConfigValue("dev.highlight-defaulted")
 	public static boolean highlightDefaulted = false;
