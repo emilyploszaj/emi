@@ -4,8 +4,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeDecorator;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -169,4 +172,24 @@ public interface EmiRegistry {
 	 * Recipe handlers are responsible for filling recipes automatically.
 	 */
 	<T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, dev.emi.emi.api.recipe.handler.EmiRecipeHandler<T> handler);
+
+	/**
+	 * Adds a recipe decorator for all recipe categories.
+	 * Recipe decorators can display additional widgets in recipes to indicate information from external mods.
+	 */
+	@ApiStatus.Experimental
+	void addRecipeDecorator(EmiRecipeDecorator decorator);
+
+	/**
+	 * Adds a recipe decorator for a specific recipe category.
+	 * Recipe decorators can display additional widgets in recipes to indicate information from external mods.
+	 */
+	@ApiStatus.Experimental
+	default void addRecipeDecorator(EmiRecipeCategory category, EmiRecipeDecorator decorator) {
+		addRecipeDecorator((recipe, widgets) -> {
+			if (recipe.getCategory() == category) {
+				decorator.decorateRecipe(recipe, widgets);
+			}
+		});
+	}
 }
