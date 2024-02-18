@@ -62,44 +62,65 @@ public class EmiStackList {
 			ItemGroups.updateDisplayParameters(client.player.networkHandler.getEnabledFeatures(), false);
 		} catch (Throwable t) {
 			EmiLog.error("Failed to update creative tabs. Using fallback index.");
-			t.printStackTrace();
+			EmiLog.error(t);
 		}
 		List<IndexGroup> groups = Lists.newArrayList();
 		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
-			EmiStack stack = EmiStack.of(item);
-			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+			String itemName = "null";
+			try {
+				itemName = item.toString();
+				EmiStack stack = EmiStack.of(item);
+				namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+			} catch (Exception e) {
+				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.");
+				EmiLog.error(e);
+			}
 		}
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
 			for (ItemGroup group : ItemGroups.getGroups()) {
-				Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
-				IndexGroup ig = new IndexGroup();
-				Collection<ItemStack> searchStacks = group.getSearchTabStacks();
-				for (ItemStack stack : searchStacks) {
-					EmiStack es = EmiStack.of(stack);
-					String namespace = es.getId().getNamespace();
-					usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
-					ig.stacks.add(es);
-				}
-				if (EmiConfig.indexSource == IndexSource.CREATIVE) {
-					for (String namespace : usedNamespaces.keySet()) {
-						if (namespaceGroups.containsKey(namespace)) {
-							IndexGroup ng = namespaceGroups.get(namespace);
-							if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
-								ng.suppressedBy.add(ig);
+				String groupName = "null";
+				try {
+					groupName = group.getDisplayName().getString();
+					Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
+					IndexGroup ig = new IndexGroup();
+					Collection<ItemStack> searchStacks = group.getSearchTabStacks();
+					for (ItemStack stack : searchStacks) {
+						EmiStack es = EmiStack.of(stack);
+						String namespace = es.getId().getNamespace();
+						usedNamespaces.put(namespace, usedNamespaces.getOrDefault(namespace, 0) + 1);
+						ig.stacks.add(es);
+					}
+					if (EmiConfig.indexSource == IndexSource.CREATIVE) {
+						for (String namespace : usedNamespaces.keySet()) {
+							if (namespaceGroups.containsKey(namespace)) {
+								IndexGroup ng = namespaceGroups.get(namespace);
+								if (usedNamespaces.getInt(namespace) * 3 >= searchStacks.size() || usedNamespaces.getInt(namespace) * 3 >= ng.stacks.size()) {
+									ng.suppressedBy.add(ig);
+								}
 							}
 						}
 					}
+					groups.add(ig);
+				} catch (Exception e) {
+					EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.");
+					EmiLog.error(e);
 				}
-				groups.add(ig);
 			}
 		}
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();
 		for (Fluid fluid : EmiPort.getFluidRegistry()) {
-			if (fluid.isStill(fluid.getDefaultState()) || (fluid instanceof FlowableFluid ff && ff.getStill() == Fluids.EMPTY)) {
-				EmiStack fs = EmiStack.of(fluid);
-				fluidGroup.stacks.add(fs);
+			String fluidName = null;
+			try {
+				fluidName = fluid.toString();
+				if (fluid.isStill(fluid.getDefaultState()) || (fluid instanceof FlowableFluid ff && ff.getStill() == Fluids.EMPTY)) {
+					EmiStack fs = EmiStack.of(fluid);
+					fluidGroup.stacks.add(fs);
+				}
+			} catch (Exception e) {
+				EmiLog.error("Fluid  " + fluidName + " threw while EMI was attempting to construct the index, stack may be missing.");
+				EmiLog.error(e);
 			}
 		}
 		groups.add(fluidGroup);

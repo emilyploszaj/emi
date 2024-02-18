@@ -28,6 +28,8 @@ import net.minecraft.util.math.RotationAxis;
 
 public class EmiSearchWidget extends TextFieldWidget {
 	private static final Pattern ESCAPE = Pattern.compile("\\\\.");
+	private List<String> searchHistory = Lists.newArrayList();
+	private int searchHistoryIndex = 0;
 	private List<Pair<Integer, Style>> styles;
 	private long lastClick = 0;
 	private String last = "";
@@ -144,6 +146,18 @@ public class EmiSearchWidget extends TextFieldWidget {
 
 	@Override
 	public void setFocused(boolean focused) {
+		if (!focused) {
+			searchHistoryIndex = 0;
+			String currentSearch = getText();
+			if (!currentSearch.isBlank() && !currentSearch.isEmpty()) {
+				searchHistory.removeIf(String::isBlank);
+				searchHistory.remove(currentSearch);
+				searchHistory.add(0, currentSearch);
+				if (searchHistory.size() > 36) {
+					searchHistory.remove(searchHistory.size() - 1);
+				}
+			}
+		}
 		isFocused = focused;
 	}
 
@@ -188,6 +202,16 @@ public class EmiSearchWidget extends TextFieldWidget {
 				this.setFocused(false);
 				this.setFocused(false);
 				return true;
+			}
+			if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_DOWN) {
+				int offset = keyCode == GLFW.GLFW_KEY_UP ? 1 : -1;
+				if (searchHistoryIndex + offset >= 0 && searchHistoryIndex + offset < searchHistory.size()) {
+					if (searchHistoryIndex >= 0 && searchHistoryIndex < searchHistory.size()) {
+						searchHistory.set(searchHistoryIndex, getText());
+					}
+					searchHistoryIndex += offset;
+					setText(searchHistory.get(searchHistoryIndex));
+				}
 			}
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
