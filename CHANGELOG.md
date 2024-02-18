@@ -1,5 +1,7 @@
-### Fixes
-* Fixed fill recipe not working in the inventory grid with JEI present #426
-* Fixed 1.20.4 effects displaying with the wrong time #435
-* Fixed Forge/NeoForge recipe book causing offset in EMI #425
-* Fixed input behaving as if EMI is present even if it's not in certain screens
+### Tweaks
+* Search now has a history of previous queries #147
+* Made mod name tooltip more likely to apply if other mods are making changes
+* EMI's index construction is now slightly safer when other mods cause issues
+
+### API
+* Added an experimental "recipe decorator" API

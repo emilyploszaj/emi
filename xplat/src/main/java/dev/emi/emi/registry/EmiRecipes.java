@@ -19,6 +19,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeDecorator;
 import dev.emi.emi.api.recipe.EmiRecipeManager;
 import dev.emi.emi.api.recipe.EmiRecipeSorting;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -48,6 +49,7 @@ public class EmiRecipes {
 	private static List<EmiRecipe> recipes = Lists.newArrayList();
 
 	public static Map<EmiStack, List<EmiRecipe>> byWorkstation = Maps.newHashMap();
+	public static List<EmiRecipeDecorator> decorators = Lists.newArrayList();
 	
 	public static void clear() {
 		setWorker(null);
@@ -57,6 +59,7 @@ public class EmiRecipes {
 		workstations.clear();
 		recipes.clear();
 		byWorkstation.clear();
+		decorators.clear();
 		manager = Manager.EMPTY;
 	}
 
