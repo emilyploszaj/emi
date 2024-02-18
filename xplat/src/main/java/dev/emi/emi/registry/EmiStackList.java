@@ -59,15 +59,29 @@ public class EmiStackList {
 		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
 		Map<String, IndexGroup> creativeGroups = new LinkedHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
-			EmiStack stack = EmiStack.of(item);
-			namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+			String itemName = "null";
+			try {
+				itemName = item.toString();
+				EmiStack stack = EmiStack.of(item);
+				namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
+			} catch (Exception e) {
+				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.");
+				EmiLog.error(e);
+			}
 		}
 		for (Item item : EmiPort.getItemRegistry()) {
-			DefaultedList<ItemStack> itemStacks = DefaultedList.of();
-			item.appendStacks(ItemGroup.SEARCH, itemStacks);
-			List<EmiStack> stacks = itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).toList();
-			if (!stacks.isEmpty()) {
-				creativeGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
+			String itemName = "null";
+			try {
+				itemName = item.toString();
+				DefaultedList<ItemStack> itemStacks = DefaultedList.of();
+				item.appendStacks(ItemGroup.SEARCH, itemStacks);
+				List<EmiStack> stacks = itemStacks.stream().filter(s -> !s.isEmpty()).map(EmiStack::of).toList();
+				if (!stacks.isEmpty()) {
+					creativeGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
+				}
+			} catch (Exception e) {
+				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.");
+				EmiLog.error(e);
 			}
 		}
 		if (EmiConfig.indexSource == IndexSource.CREATIVE) {
@@ -87,9 +101,16 @@ public class EmiStackList {
 		groups.addAll(namespaceGroups.values());
 		IndexGroup fluidGroup = new IndexGroup();
 		for (Fluid fluid : EmiPort.getFluidRegistry()) {
-			if (fluid.isStill(fluid.getDefaultState()) || (fluid instanceof FlowableFluid ff && ff.getStill() == Fluids.EMPTY)) {
-				EmiStack fs = EmiStack.of(fluid);
-				fluidGroup.stacks.add(fs);
+			String fluidName = null;
+			try {
+				fluidName = fluid.toString();
+				if (fluid.isStill(fluid.getDefaultState()) || (fluid instanceof FlowableFluid ff && ff.getStill() == Fluids.EMPTY)) {
+					EmiStack fs = EmiStack.of(fluid);
+					fluidGroup.stacks.add(fs);
+				}
+			} catch (Exception e) {
+				EmiLog.error("Fluid  " + fluidName + " threw while EMI was attempting to construct the index, stack may be missing.");
+				EmiLog.error(e);
 			}
 		}
 		groups.add(fluidGroup);

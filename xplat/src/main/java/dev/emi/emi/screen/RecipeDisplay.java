@@ -7,11 +7,13 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.EmiRecipeDecorator;
 import dev.emi.emi.api.widget.RecipeFillButtonWidget;
 import dev.emi.emi.api.widget.TextWidget;
 import dev.emi.emi.api.widget.TextWidget.Alignment;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
@@ -69,6 +71,11 @@ public class RecipeDisplay {
 		if (recipe != null) {
 			try {
 				recipe.addWidgets(widgets);
+				if (EmiConfig.showRecipeDecorators) {
+					for (EmiRecipeDecorator decorator : EmiRecipes.decorators) {
+						decorator.decorateRecipe(recipe, widgets);
+					}
+				}
 				addButtons(widgets, leftButtons, 0 - 4 - 13, -14);
 				addButtons(widgets, rightButtons, width + 5, 14);
 			} catch (Throwable t) {
