@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiRecipeDecorator;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -127,5 +128,10 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void setDefaultComparison(Object key, Function<Comparison, Comparison> comparison) {
 		EmiComparisonDefaults.comparisons.put(key, comparison.apply(EmiComparisonDefaults.get(key)));
+	}
+
+	@Override
+	public void addRecipeDecorator(EmiRecipeDecorator decorator) {
+		EmiRecipes.decorators.add(decorator);
 	}
 }
