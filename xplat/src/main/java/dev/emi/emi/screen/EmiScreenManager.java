@@ -863,9 +863,14 @@ public class EmiScreenManager {
 			search.y = screen.height - 21;
 			search.setWidth(160);
 		} else {
-			search.x = panels.get(1).space.tx;
+			SidebarPanel panel = panels.get(1);
+			if (panel.space == null) {
+				EmiLog.warn("panel.space is null, stop addWidgets.");
+				return;
+			}
+			search.x = panel.space.tx;
 			search.y = screen.height - 21;
-			search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
+			search.setWidth(panel.space.tw * ENTRY_SIZE);
 		}
 		EmiPort.focus(search, false);
 
