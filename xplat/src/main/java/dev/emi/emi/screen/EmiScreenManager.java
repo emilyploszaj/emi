@@ -857,6 +857,10 @@ public class EmiScreenManager {
 	}
 
 	public static void addWidgets(Screen screen) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base == null) {
+			return;
+		}
 		forceRecalculate();
 		if (EmiConfig.centerSearchBar) {
 			search.x = (screen.width - 160) / 2;
