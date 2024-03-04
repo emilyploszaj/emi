@@ -20,7 +20,7 @@ public class EmiPacketHandler {
     private static final Identifier ID_CHESS_SERVERBOUND = new Identifier("emi", "chess_c2s");
 
     public static void init(RegisterPayloadHandlerEvent event) {
-        var registrar = event.registrar("emi");
+        var registrar = event.registrar("emi").optional();
 
         registrar.play(EmiNetwork.FILL_RECIPE, makeReader(EmiNetwork.FILL_RECIPE, FillRecipeC2SPacket::new), EmiPacketHandler::handleServerbound);
         registrar.play(EmiNetwork.CREATE_ITEM, makeReader(EmiNetwork.CREATE_ITEM, CreateItemC2SPacket::new), EmiPacketHandler::handleServerbound);
