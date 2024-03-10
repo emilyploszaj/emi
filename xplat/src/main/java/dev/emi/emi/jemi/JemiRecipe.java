@@ -50,7 +50,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.category = category;
 		this.recipe = recipe;
 		this.originalId = category.getRegistryName(recipe);
-		if (id != null) {
+		if (this.originalId != null) {
 			this.id = new Identifier("jei", "/" + EmiUtil.subId(id));
 		}
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());

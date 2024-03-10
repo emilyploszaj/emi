@@ -1,7 +1,8 @@
 ### Tweaks
-* Search now has a history of previous queries #147
-* Made mod name tooltip more likely to apply if other mods are making changes
-* EMI's index construction is now slightly safer when other mods cause issues
+* Added nullability annotation on EmiStackInteraction #455
+* Allow identifier to be used for category property sorting #418
+* Made EMI serverside optional on Neo
 
-### API
-* Added an experimental "recipe decorator" API
+### Fixes
+* Recipes from JEI not always getting assigned proper IDs #459
+* NPE from certain mods instantiating screens in peculiar times and locations #449

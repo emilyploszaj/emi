@@ -84,6 +84,9 @@ public class EmiPlayerInventory {
 				return handlers.get(0).getInventory((HandledScreen) screen);
 			}
 		}
+		if (entity == null) {
+			return new EmiPlayerInventory(List.of());
+		}
 		return new EmiPlayerInventory(entity);
 	}
 
