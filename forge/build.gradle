@@ -1,3 +1,6 @@
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -83,27 +86,29 @@ shadowJar {
 }
 
 remapJar {
-	input.set shadowJar.archiveFile
+	inputFile.set shadowJar.archiveFile
 	dependsOn shadowJar
 }
 
-sourcesJar {
-	def commonSources = project(":xplat").sourcesJar
+tasks.named('sourcesJar', Jar).configure { Jar jar ->
+	def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
 	dependsOn commonSources
-	from commonSources.archiveFile.map { zipTree(it) }
+	jar.from zipTree(commonSources.flatMap { it.archiveFile })
 }
 
-task filteredSourcesJar(type: Jar) {
+def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
+	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
 	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.archivePath)
+	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
 	exclude 'dev/emi/emi/jemi/**'
-}
+})
 
-task apiJar(type: Jar) {
+def apiJar = tasks.register('apiJar', Jar, {
 	archiveClassifier = 'api'
+	def remapJar = tasks.named('remapJar', RemapJarTask)
 	dependsOn remapJar
-	from zipTree(remapJar.archivePath)
+	from zipTree(remapJar.flatMap { it.archiveFile })
 	include 'emi.mixins.json'
 	include 'emi-forge.mixins.json'
 	include 'emi.accesswidener'
@@ -114,10 +119,11 @@ task apiJar(type: Jar) {
 	exclude 'dev/emi/emi/api/stack/EmptyEmiStack**'
 	exclude 'dev/emi/emi/api/stack/TagEmiIngredient**'
 	exclude 'dev/emi/emi/api/stack/ListEmiIngredient**'
-}
+})
 
-build.dependsOn filteredSourcesJar
-build.dependsOn apiJar
+tasks.named("build").configure {
+	dependsOn(filteredSourcesJar, apiJar)
+}
 
 components.java {
 	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
@@ -127,7 +133,7 @@ components.java {
 
 publishing {
 	publications {
-		maven(MavenPublication) {
+		register('maven', MavenPublication) {
 			artifactId = "${rootProject.name}-${project.name}"
 			version = project.ext.mavenVersion
 			artifact(remapJar) {
