@@ -81,7 +81,7 @@ processResources {
 
 def shadowJar = tasks.named('shadowJar', ShadowJar)
 
-shadowJar.configure { ShadowJar jar ->\
+shadowJar.configure { ShadowJar jar ->
 	jar.exclude "architectury.common.json"
 
 	jar.configurations = [project.configurations.shadowCommon]
