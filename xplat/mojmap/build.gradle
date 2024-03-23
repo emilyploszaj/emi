@@ -1,3 +1,7 @@
+import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
+
 apply plugin: "dev.architectury.loom"
 
 evaluationDependsOn ':xplat'
@@ -7,50 +11,53 @@ dependencies {
 	mappings loom.officialMojangMappings()
 }
 
-task mojmapJar(type: net.fabricmc.loom.task.RemapJarTask) {
-	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
-	dependsOn project(':xplat').remapJar
-	
-	inputFile = project(':xplat').remapJar.archiveFile
+def mojmapJar = tasks.register('mojmapJar', RemapJarTask, {
+	classpath.from loom.getMinecraftJarsCollection(MappingsNamespace.INTERMEDIARY)
+	def remapJar = project(':xplat').tasks.named('remapJar', RemapJarTask)
+	dependsOn remapJar
+
+	inputFile.convention(remapJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
 	remapperIsolation = true
-}
+})
 
-task mojmapSourcesJar(type: net.fabricmc.loom.task.RemapSourcesJarTask) {
-	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
-	dependsOn project(':xplat').filteredSourcesJar
+def mojmapSourcesJar = tasks.register('mojmapSourcesJar', RemapSourcesJarTask, {
+	classpath.from loom.getMinecraftJarsCollection(MappingsNamespace.INTERMEDIARY)
+	def filteredSourcesJar = project(':xplat').tasks.named('filteredSourcesJar', Jar)
+	dependsOn filteredSourcesJar
 	
 	archiveClassifier = 'sources'
-	
-	inputFile = project(':xplat').filteredSourcesJar.archiveFile
+
+	inputFile.convention(filteredSourcesJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
 	remapperIsolation = true
-}
+})
 
-task mojmapApiJar(type: net.fabricmc.loom.task.RemapJarTask) {
-	classpath.from loom.getMinecraftJarsCollection(net.fabricmc.loom.api.mappings.layered.MappingsNamespace.INTERMEDIARY)
-	dependsOn project(':xplat').apiJar
+def mojmapApiJar = tasks.register('mojmapApiJar', RemapJarTask, {
+	classpath.from loom.getMinecraftJarsCollection(MappingsNamespace.INTERMEDIARY)
+	def apiJar = project(':xplat').tasks.named('apiJar', Jar)
+	dependsOn apiJar
 	
 	archiveClassifier = 'api'
-	
-	inputFile = project(':xplat').apiJar.archiveFile
+
+	inputFile.convention(apiJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
 	remapperIsolation = true
-}
+})
 
-build.dependsOn mojmapJar
-build.dependsOn mojmapSourcesJar
-build.dependsOn mojmapApiJar
+tasks.named("build").configure {
+	dependsOn(mojmapJar, mojmapSourcesJar, mojmapApiJar)
+}
 
 publishing {
 	publications {
-		maven(MavenPublication) {
+		register('maven', MavenPublication) {
 			artifactId = "${rootProject.name}-xplat-mojmap"
 			version = project.ext.mavenVersion
 			artifact(mojmapJar) {
