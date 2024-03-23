@@ -701,14 +701,11 @@ public class EmiScreenManager {
 					}
 				}
 			}
+			context.push();
+			context.matrices().translate(0, 0, 400);
 			EmiDragDropHandlers.render(base.screen(), draggedStack, context.raw(), mouseX, mouseY, delta);
-			MatrixStack view = RenderSystem.getModelViewStack();
-			view.push();
-			view.translate(0, 0, 400);
-			RenderSystem.applyModelViewMatrix();
 			draggedStack.render(context.raw(), mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
-			view.pop();
-			RenderSystem.applyModelViewMatrix();
+			context.pop();
 		}
 	}
 
