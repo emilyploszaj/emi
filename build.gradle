@@ -16,7 +16,7 @@ allprojects {
 		compileOnly()
 	}
 
-	archivesBaseName = rootProject.archives_base_name
+	base.archivesName = rootProject.archives_base_name
 	ext.mavenVersion = "${rootProject.mod_version}"
 	if (System.getenv("RELEASE") == null) {
 		ext.mavenVersion += "-SNAPSHOT"
@@ -31,10 +31,10 @@ allprojects {
 		}
 	}
 
-	tasks.withType(JavaCompile) {
+	tasks.withType(JavaCompile).configureEach({
 		options.encoding = "UTF-8"
 		options.release = 17
-	}
+	})
 
 	java {
 		withSourcesJar()

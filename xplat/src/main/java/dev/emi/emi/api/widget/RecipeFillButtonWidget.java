@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -70,7 +69,7 @@ public class RecipeFillButtonWidget extends RecipeButtonWidget {
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
 		if (canFill) {
 			HandledScreen<?> hs = EmiApi.getHandledScreen();
-			if (hs != null && EmiRecipeFiller.performFill(recipe, hs, EmiFillAction.FILL, EmiInput.isShiftDown() ? Integer.MAX_VALUE : 1)) {
+			if (hs != null && EmiRecipeFiller.performFill(recipe, hs, EmiCraftContext.Type.FILL_BUTTON, EmiCraftContext.Destination.NONE, EmiInput.isShiftDown() ? Integer.MAX_VALUE : 1)) {
 				this.playButtonSound();
 				return true;
 			}

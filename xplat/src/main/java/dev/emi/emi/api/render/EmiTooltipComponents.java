@@ -2,9 +2,12 @@ package dev.emi.emi.api.render;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
 import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
@@ -55,5 +58,17 @@ public class EmiTooltipComponents {
 	 */
 	public static TooltipComponent of(Text text) {
 		return TooltipComponent.of(text.asOrderedText());
+	}
+
+	/**
+	 * Appends a mod name to a list of components based on a namespace.
+	 * Takes into consideration config options and formatting.
+	 * EMI's config allows users to disable displaying mod names, so it is possible for the list of components to be unchanged.
+	 */
+	public static void appendModName(List<TooltipComponent> components, String namespace) {
+		if (EmiConfig.appendModId) {
+			String mod = EmiUtil.getModName(namespace);
+			components.add(of(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC)));
+		}
 	}
 }
