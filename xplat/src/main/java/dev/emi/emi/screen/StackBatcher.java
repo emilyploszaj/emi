@@ -42,7 +42,8 @@ import net.minecraft.util.math.Matrix4f;
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
-	
+	private static boolean isIncompatibleSodiumLoaded;
+
 	static {
 		try {
 			Class<?> clazz = null;
@@ -58,6 +59,24 @@ public class StackBatcher {
 				.findStatic(clazz, "markSpriteActive", MethodType.methodType(void.class, Sprite.class));
 			if (sodiumSpriteHandle != null) {
 				EmiLog.info("Discovered Sodium");
+			}
+
+			if(EmiAgnos.isModLoaded("sodium") || EmiAgnos.isModLoaded("rubidium")) {
+				// Check for the modern VertexBufferWriter API. If so, we are likely on Sodium 0.5+ (or a derivative),
+				// which can generally handle a custom VertexConsumer properly.
+				try {
+					Class.forName("net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter");
+				} catch(Throwable t) {
+					// Check for the legacy VBW API which *cannot* handle this
+					try {
+						Class.forName("me.jellysquid.mods.sodium.client.render.vertex.VertexBufferWriter");
+						// Success means the class exists
+						isIncompatibleSodiumLoaded = true;
+						EmiLog.info("Batching stack renderer disabled for compatibility with legacy Sodium");
+					} catch(Throwable t2) {
+						// Old enough Sodiums shouldn't have an issue
+					}
+				}
 			}
 		} catch (Throwable e) {
 		}
@@ -83,7 +102,7 @@ public class StackBatcher {
 	public static final List<RenderLayer> EXTRA_RENDER_LAYERS = Lists.newArrayList();
 
 	private static boolean isEnabled() {
-		return EmiConfig.useBatchedRenderer;
+		return EmiConfig.useBatchedRenderer && !isIncompatibleSodiumLoaded;
 	}
 
 	public StackBatcher() {

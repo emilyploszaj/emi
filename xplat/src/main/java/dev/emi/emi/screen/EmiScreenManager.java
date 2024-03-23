@@ -18,9 +18,9 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -1192,22 +1192,22 @@ public class EmiScreenManager {
 		if (!(stack instanceof SidebarEmiStackInteraction)) {
 			return false;
 		}
-		EmiFillAction action = null;
+		EmiCraftContext.Destination destination = null;
 		boolean all = false;
 		if (function.apply(EmiConfig.craftAllToInventory)) {
-			action = EmiFillAction.QUICK_MOVE;
+			destination = EmiCraftContext.Destination.INVENTORY;
 			all = true;
 		} else if (function.apply(EmiConfig.craftOneToInventory)) {
-			action = EmiFillAction.QUICK_MOVE;
+			destination = EmiCraftContext.Destination.INVENTORY;
 		} else if (function.apply(EmiConfig.craftOneToCursor)) {
-			action = EmiFillAction.CURSOR;
+			destination = EmiCraftContext.Destination.CURSOR;
 		} else if (function.apply(EmiConfig.craftAll)) {
-			action = EmiFillAction.FILL;
+			destination = EmiCraftContext.Destination.NONE;
 			all = true;
 		} else if (function.apply(EmiConfig.craftOne)) {
-			action = EmiFillAction.FILL;
+			destination = EmiCraftContext.Destination.NONE;
 		}
-		if (action != null) {
+		if (destination != null) {
 			EmiRecipe context = contextSupplier.get();
 			if (context != null) {
 				if (EmiConfig.miscraftPrevention) {
@@ -1234,7 +1234,7 @@ public class EmiScreenManager {
 					}
 					amount = Math.min(amount, batches);
 				}
-				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), action, amount)) {
+				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), EmiCraftContext.Type.CRAFTABLE, destination, amount)) {
 					MinecraftClient.getInstance().getSoundManager()
 							.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 					return true;

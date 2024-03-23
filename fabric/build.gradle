@@ -1,3 +1,7 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -75,36 +79,41 @@ processResources {
 	}
 }
 
-shadowJar {
-	exclude "architectury.common.json"
+def shadowJar = tasks.named('shadowJar', ShadowJar)
 
-	configurations = [project.configurations.shadowCommon]
-	archiveClassifier = "dev-shadow"
+shadowJar.configure { ShadowJar jar ->
+	jar.exclude "architectury.common.json"
+
+	jar.configurations = [project.configurations.shadowCommon]
+	jar.archiveClassifier = "dev-shadow"
 }
 
-remapJar {
-	injectAccessWidener = true
-	input.set shadowJar.archiveFile
+def remapJar = tasks.named('remapJar', RemapJarTask)
+
+remapJar.configure { RemapJarTask jar ->
 	dependsOn shadowJar
+	jar.inputFile.convention(shadowJar.flatMap {it.archiveFile })
+	jar.injectAccessWidener = true
 }
 
-sourcesJar {
-	def commonSources = project(":xplat").sourcesJar
+tasks.named('sourcesJar', Jar).configure { Jar jar ->
+	def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
 	dependsOn commonSources
-	from commonSources.archiveFile.map { zipTree(it) }
+	jar.from zipTree(commonSources.flatMap { it.archiveFile })
 }
 
-task filteredSourcesJar(type: Jar) {
+def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
+	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
 	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.archivePath)
+	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
 	exclude 'dev/emi/emi/jemi/**'
-}
+})
 
-task apiJar(type: Jar) {
+def apiJar = tasks.register('apiJar', Jar, {
 	archiveClassifier = 'api'
 	dependsOn remapJar
-	from zipTree(remapJar.archivePath)
+	from zipTree(remapJar.flatMap { it.archiveFile })
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
 	include 'emi-fabric.mixins.json'
@@ -116,10 +125,11 @@ task apiJar(type: Jar) {
 	exclude 'dev/emi/emi/api/stack/EmptyEmiStack**'
 	exclude 'dev/emi/emi/api/stack/TagEmiIngredient**'
 	exclude 'dev/emi/emi/api/stack/ListEmiIngredient**'
-}
+})
 
-build.dependsOn filteredSourcesJar
-build.dependsOn apiJar
+tasks.named("build").configure {
+	dependsOn(filteredSourcesJar, apiJar)
+}
 
 components.java {
 	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
@@ -129,7 +139,7 @@ components.java {
 
 publishing {
 	publications {
-		maven(MavenPublication) {
+		register('maven', MavenPublication) {
 			artifactId = "${rootProject.name}-${project.name}"
 			version = project.ext.mavenVersion
 			artifact(remapJar) {

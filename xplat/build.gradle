@@ -1,3 +1,6 @@
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
+
 apply plugin: "dev.architectury.loom"
 
 architectury {
@@ -31,17 +34,19 @@ afterEvaluate {
 	configurations.default.extendsFrom = [configurations.namedElements]
 }
 
-task filteredSourcesJar(type: Jar) {
+def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
+	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
 	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.archivePath)
+	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
 	exclude 'dev/emi/emi/jemi/**'
-}
+})
 
-task apiJar(type: Jar) {
+def apiJar = tasks.register('apiJar', Jar, {
 	archiveClassifier = "api"
+	def remapJar = tasks.named('remapJar', RemapJarTask)
 	dependsOn remapJar
-	from zipTree(remapJar.archivePath)
+	from zipTree(remapJar.flatMap { it.archiveFile })
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
 	include 'emi.accesswidener'
@@ -52,14 +57,15 @@ task apiJar(type: Jar) {
 	exclude 'dev/emi/emi/api/stack/EmptyEmiStack**'
 	exclude 'dev/emi/emi/api/stack/TagEmiIngredient**'
 	exclude 'dev/emi/emi/api/stack/ListEmiIngredient**'
-}
+})
 
-build.dependsOn filteredSourcesJar
-build.dependsOn apiJar
+tasks.named("build").configure {
+	dependsOn(filteredSourcesJar, apiJar)
+}
 
 publishing {
 	publications {
-		maven(MavenPublication) {
+		register('maven', MavenPublication) {
 			artifactId = "${rootProject.name}-xplat-intermediary"
 			version = project.ext.mavenVersion
 			artifact(remapJar) {
