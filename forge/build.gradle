@@ -192,7 +192,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			addGameVersion rootProject.minecraft_version
 			addGameVersion 'Forge'
 
-			mainArtifact(remapJar) {
+			mainArtifact(remapJar.get().archiveFile) {
 				displayName = 'emi-' + project.version
 			}
 		}
