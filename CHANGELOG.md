@@ -1,8 +1,11 @@
 ### Tweaks
-* Added nullability annotation on EmiStackInteraction #455
-* Allow identifier to be used for category property sorting #418
-* Made EMI serverside optional on Neo
+* Updated Japanese translation
+* Enable batched rendering if a new enough Sodium is installed
 
 ### Fixes
-* Recipes from JEI not always getting assigned proper IDs #459
-* NPE from certain mods instantiating screens in peculiar times and locations #449
+* Neo artifact sources inconsistently missing sources #469
+* Recipe handler context type is not correct for craftables #467
+* JEMI recipe handler not handling RecipeEntry correctly #468
+
+### API (Experimental)
+* Expose a method to get mod name tooltips #470

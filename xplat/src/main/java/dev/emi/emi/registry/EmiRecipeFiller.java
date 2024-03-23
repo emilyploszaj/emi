@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.EmiApi;
-import dev.emi.emi.api.EmiFillAction;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -113,15 +112,12 @@ public class EmiRecipeFiller {
 		return ret;
 	}
 
-	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen, EmiFillAction action, int amount) {
+	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen,
+			EmiCraftContext.Type type, EmiCraftContext.Destination destination, int amount) {
 		EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 		if (handler != null && handler.supportsRecipe(recipe)) {
 			EmiPlayerInventory inv = handler.getInventory(screen);
-			EmiCraftContext<T> context = new EmiCraftContext<T>(screen, inv, EmiCraftContext.Type.FILL_BUTTON, switch (action) {
-				case FILL -> EmiCraftContext.Destination.NONE;
-				case QUICK_MOVE -> EmiCraftContext.Destination.INVENTORY;
-				case CURSOR -> EmiCraftContext.Destination.CURSOR;
-			}, amount);
+			EmiCraftContext<T> context = new EmiCraftContext<T>(screen, inv, type, destination, amount);
 			if (handler.canCraft(recipe, context)) {
 				EmiSidebars.craft(recipe);
 				return handler.craft(recipe, context);
