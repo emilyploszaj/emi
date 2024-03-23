@@ -198,7 +198,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			addGameVersion rootProject.minecraft_version
 			addGameVersion 'NeoForge'
 
-			mainArtifact(remapJar) {
+			mainArtifact(remapJar.archiveFile) {
 				displayName = 'emi-' + project.version
 			}
 		}
