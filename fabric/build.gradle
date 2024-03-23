@@ -199,7 +199,7 @@ if (System.getenv("CURSEFORGE_TOKEN")) {
 			addGameVersion 'Fabric'
 			addGameVersion 'Quilt'
 
-			mainArtifact(remapJar) {
+			mainArtifact(remapJar.get().archiveFile) {
 				displayName = 'emi-' + project.version
 			}
 		}
