@@ -2,6 +2,8 @@ package dev.emi.emi.search;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -32,13 +34,20 @@ import net.minecraft.util.Identifier;
 
 public class EmiSearch {
 	public static final Pattern TOKENS = Pattern.compile("(-?[@#]?\\/(\\\\.|[^\\\\\\/])+\\/|[^\\s]+)");
-	private static volatile SearchWorker currentWorker = null;
-	public static volatile Thread searchThread = null;
-	public static volatile List<? extends EmiIngredient> stacks = EmiStackList.stacks;
-	public static volatile CompiledQuery compiledQuery;
+	private static Thread searchThread;
+	public static final Executor executor = Executors.newSingleThreadExecutor(task -> {
+		Thread t = new Thread(task, "EMI Search Thread");
+		t.setDaemon(true);
+		searchThread = t;
+		return t;
+	});
 	public static Set<EmiStack> bakedStacks;
 	public static SuffixArray<SearchStack> names, tooltips, mods;
 	public static SuffixArray<EmiStack> aliases;
+
+	public static boolean isSearchThread() {
+		return searchThread == Thread.currentThread();
+	}
 
 	public static void bake() {
 		SuffixArray<SearchStack> names = new SuffixArray<>();
@@ -108,31 +117,6 @@ public class EmiSearch {
 		EmiSearch.mods = mods;
 		EmiSearch.aliases = aliases;
 		EmiSearch.bakedStacks = bakedStacks;
-	}
-
-	public static void update() {
-		search(EmiScreenManager.search.getText());
-	}
-
-	public static void search(String query) {
-		synchronized (EmiSearch.class) {
-			SearchWorker worker = new SearchWorker(query, EmiScreenManager.getSearchSource());
-			currentWorker = worker;
-			
-			searchThread = new Thread(worker);
-			searchThread.setDaemon(true);
-			searchThread.start();
-		}
-	}
-
-	public static void apply(SearchWorker worker, List<? extends EmiIngredient> stacks) {
-		synchronized (EmiSearch.class) {
-			if (worker == currentWorker) {
-				EmiSearch.stacks = stacks;
-				currentWorker = null;
-				searchThread = null;
-			}
-		}
 	}
 
 	public static class CompiledQuery {
@@ -221,50 +205,6 @@ public class EmiSearch {
 			}
 			q.negated = negated;
 			queries.add(q);
-		}
-	}
-
-	private static class SearchWorker implements Runnable {
-		private final String query;
-		private final List<? extends EmiIngredient> source;
-
-		public SearchWorker(String query, List<? extends EmiIngredient> source) {
-			this.query = query;
-			this.source = source;
-		}
-
-		@Override
-		public void run() {
-			try {
-				CompiledQuery compiled = new CompiledQuery(query);
-				compiledQuery = compiled;
-				if (compiled.isEmpty()) {
-					apply(this, source);
-					return;
-				}
-				List<EmiIngredient> stacks = Lists.newArrayList();
-				int processed = 0;
-				for (EmiIngredient stack : source) {
-					if (processed++ >= 1024) {
-						processed = 0;
-						if (this != currentWorker) {
-							return;
-						}
-					}
-					List<EmiStack> ess = stack.getEmiStacks();
-					// TODO properly support ingredients?
-					if (ess.size() == 1) {
-						EmiStack es = ess.get(0);
-						if (compiled.test(es)) {
-							stacks.add(stack);
-						}
-					}
-				}
-				apply(this, List.copyOf(stacks));
-			} catch (Exception e) {
-				EmiLog.error("Error when attempting to search:");
-				e.printStackTrace();
-			}
 		}
 	}
 }

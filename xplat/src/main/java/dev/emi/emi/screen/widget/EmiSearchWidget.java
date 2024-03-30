@@ -131,7 +131,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 				styles.add(new Pair<Integer, Style>(string.length(), Style.EMPTY.withFormatting(Formatting.WHITE)));
 			}
 			this.styles = styles;
-			EmiSearch.search(string);
+			EmiScreenManager.searchManager.search(string);
 		});
 	}
 
