@@ -1,5 +1,15 @@
 package dev.emi.emi;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -12,6 +22,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiRecipeFiller;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -29,15 +40,6 @@ import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Stream;
 
 public class EmiUtil {
 	public static final Random RANDOM = new Random();

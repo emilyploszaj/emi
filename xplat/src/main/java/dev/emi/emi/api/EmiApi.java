@@ -1,7 +1,15 @@
 package dev.emi.emi.api;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -19,16 +27,11 @@ import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class EmiApi {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -66,8 +69,9 @@ public class EmiApi {
 	/**
 	 * Gets the currently hovered EmiIngredient at the provided screen coordinates,
 	 * or {@link EmiStack#EMPTY} if none.
+	 *
 	 * @param includeStandard Whether to include the EmiIngredient representation of
-	 * 	standard stacks in slots or otherwise provided to EMI.
+	 *                        standard stacks in slots or otherwise provided to EMI.
 	 */
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean includeStandard) {
 		return EmiScreenManager.getHoveredStack(mouseX, mouseY, includeStandard);
@@ -75,8 +79,9 @@ public class EmiApi {
 
 	/**
 	 * Gets the currently hovered EmiIngredient at the mouse or {@link EmiStack#EMPTY} if none.
+	 *
 	 * @param includeStandard Whether to include the EmiIngredient representation of
-	 * 	standard stacks in slots or otherwise provided to EMI.
+	 *                        standard stacks in slots or otherwise provided to EMI.
 	 */
 	public static EmiStackInteraction getHoveredStack(boolean includeStandard) {
 		return EmiScreenManager.getHoveredStack(EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, includeStandard);
@@ -84,7 +89,7 @@ public class EmiApi {
 
 	/**
 	 * @return Recipe context associated with specific ingredient implementations.
-	 *  This could be favorites, craftables, or something else.
+	 * This could be favorites, craftables, or something else.
 	 */
 	public static @Nullable EmiRecipe getRecipeContext(EmiIngredient stack) {
 		if (stack instanceof EmiFavorite fav) {
@@ -117,7 +122,7 @@ public class EmiApi {
 	public static void displayRecipe(EmiRecipe recipe) {
 		setPages(Map.of(recipe.getCategory(), List.of(recipe)), EmiStack.EMPTY);
 	}
-	
+
 	public static void displayRecipes(EmiIngredient stack) {
 		if (stack instanceof EmiFavorite fav) {
 			stack = fav.getStack();
@@ -142,9 +147,9 @@ public class EmiApi {
 		if (!stack.isEmpty()) {
 			EmiStack zero = stack.getEmiStacks().get(0);
 			Map<EmiRecipeCategory, List<EmiRecipe>> map
-				= mapRecipes(Stream.concat(
-						pruneUses(getRecipeManager().getRecipesByInput(zero), stack).stream(),
-						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
+			  = mapRecipes(Stream.concat(
+			  pruneUses(getRecipeManager().getRecipesByInput(zero), stack).stream(),
+			  EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
 			setPages(map, stack);
 		}
 	}
@@ -189,7 +194,7 @@ public class EmiApi {
 	private static List<EmiRecipe> pruneUses(List<EmiRecipe> list, EmiIngredient context) {
 		return list.stream().filter(r -> {
 			return r.getInputs().stream().anyMatch(i -> containsAll(i, context))
-				|| r.getCatalysts().stream().anyMatch(i -> containsAll(i, context));
+			  || r.getCatalysts().stream().anyMatch(i -> containsAll(i, context));
 		}).sorted((a, b) -> getSmallestPresence(a, context) - getSmallestPresence(b, context)).toList();
 	}
 
@@ -230,7 +235,7 @@ public class EmiApi {
 
 	private static void setPages(Map<EmiRecipeCategory, List<EmiRecipe>> recipes, EmiIngredient stack) {
 		recipes = recipes.entrySet().stream().filter(e -> !e.getValue().isEmpty())
-			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+		  .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
 			EmiSidebars.lookup(stack);
 			if (client.currentScreen instanceof BoMScreen bs) {
