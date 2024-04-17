@@ -4,40 +4,33 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.api.search.EmiSearchManager;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiLog;
-import dev.emi.emi.screen.EmiScreenManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 public class EmiSearchManagerImpl implements EmiSearchManager {
-    private EmiSearch.CompiledQuery compiledQuery;
-    private List<? extends EmiIngredient> stacks = EmiStackList.stacks;
-    private volatile SearchWorker currentWorker;
-
-    public CompletableFuture<List<? extends EmiIngredient>> search(String query) {
+    public SearchWorker search(String query, List<? extends EmiIngredient> ingredients) {
         synchronized (this) {
-            SearchWorker worker = new SearchWorker(query, EmiScreenManager.getSearchSource());
-            currentWorker = worker;
+            SearchWorker worker = new SearchWorker(query, ingredients);
 
             EmiSearch.executor.execute(worker);
-            return worker.getCompletionFuture();
+            return worker;
         }
     }
 
-    public List<? extends EmiIngredient> getStacks() {
-        return this.stacks;
-    }
-
-    public EmiSearch.CompiledQuery getCompiledQuery() {
-        return this.compiledQuery;
-    }
-
-    class SearchWorker implements Runnable {
+    public class SearchWorker implements Runnable, SearchFuture {
         private final String query;
+        private EmiSearch.CompiledQuery compiledQuery;
         private final List<? extends EmiIngredient> source;
         private final CompletableFuture<List<? extends EmiIngredient>> completion;
+        private boolean interrupted;
 
         SearchWorker(String query, List<? extends EmiIngredient> source) {
             this.query = query;
@@ -45,18 +38,12 @@ public class EmiSearchManagerImpl implements EmiSearchManager {
             this.completion = new CompletableFuture<>();
         }
 
-        public CompletableFuture<List<? extends EmiIngredient>> getCompletionFuture() {
-            return completion;
+        private void apply(List<? extends EmiIngredient> stacks) {
+            completion.complete(stacks);
         }
 
-        private void apply(List<? extends EmiIngredient> stacks) {
-            synchronized (EmiSearchManagerImpl.this) {
-                if(this == currentWorker) {
-                    EmiSearchManagerImpl.this.stacks = stacks;
-                    EmiSearchManagerImpl.this.currentWorker = null;
-                }
-            }
-            completion.complete(stacks);
+        public EmiSearch.CompiledQuery getCompiledQuery() {
+            return this.compiledQuery;
         }
 
         @Override
@@ -73,7 +60,7 @@ public class EmiSearchManagerImpl implements EmiSearchManager {
                 for (EmiIngredient stack : source) {
                     if (processed++ >= 1024) {
                         processed = 0;
-                        if (this != currentWorker) {
+                        if (interrupted) {
                             apply(source);
                             return;
                         }
@@ -93,6 +80,47 @@ public class EmiSearchManagerImpl implements EmiSearchManager {
                 e.printStackTrace();
                 apply(source);
             }
+        }
+
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            this.interrupted = true;
+            return true;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return this.interrupted;
+        }
+
+        @Override
+        public boolean isDone() {
+            return this.completion.isDone();
+        }
+
+        @Override
+        public List<? extends EmiIngredient> get() throws InterruptedException, ExecutionException {
+            return this.completion.get();
+        }
+
+        @Override
+        public List<? extends EmiIngredient> get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            return this.completion.get(timeout, unit);
+        }
+
+        @Override
+        public List<? extends EmiIngredient> getNow() {
+            return this.completion.getNow(this.source);
+        }
+
+        @Override
+        public SearchWorker whenCompleted(Consumer<List<? extends EmiIngredient>> consumer) {
+            this.completion.whenComplete((c, ex) -> {
+                if(c != null) {
+                    consumer.accept(c);
+                }
+            });
+            return this;
         }
     }
 }

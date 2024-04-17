@@ -2,11 +2,14 @@ package dev.emi.emi.screen;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import dev.emi.emi.api.search.EmiSearchManager;
+import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.search.EmiSearchManagerImpl;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -126,22 +129,26 @@ public class EmiScreenManager {
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 
 	public static EmiSearchManagerImpl searchManager = new EmiSearchManagerImpl();
+	public static EmiSearchManager.SearchFuture lastSearch = EmiSearchManager.SearchFuture.completedFuture(EmiScreenManager.getSearchSource());
+	public static boolean searchChanged = true;
+
 
 	public static boolean isDisabled() {
 		return !EmiReloadManager.isLoaded() || !EmiConfig.enabled;
 	}
 
 	public static void updateSearch() {
-		searchManager.search(search.getText());
+		lastSearch = searchManager.search(search.getText(), EmiScreenManager.getSearchSource()).whenCompleted(l -> searchChanged = true);
 	}
 
 	public static void recalculate() {
 		updateCraftables();
 		SidebarPanel searchPanel = getSearchPanel();
 		if (searchPanel != null && searchPanel.space != null) {
-			if (searchedStacks != searchManager.getStacks()) {
+			if (searchChanged) {
 				searchPanel.space.batcher.repopulate();
-				searchedStacks = searchManager.getStacks();
+				searchedStacks = lastSearch.getNow();
+				searchChanged = false;
 			}
 		}
 
@@ -813,8 +820,8 @@ public class EmiScreenManager {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static void renderSlotOverlays(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		CompiledQuery query = null;
-		if (EmiScreenManager.search.highlight) {
-			query = searchManager.getCompiledQuery();
+		if (EmiScreenManager.search.highlight && lastSearch instanceof EmiSearchManagerImpl.SearchWorker worker) {
+			query = worker.getCompiledQuery();
 		}
 		Set<Slot> ignoredSlots = Sets.newHashSet();
 		Set<EmiStack> synfavs = Sets.newHashSet();
@@ -1386,7 +1393,7 @@ public class EmiScreenManager {
 				}
 			}
 			if (isSearch()) {
-				searchManager.search(search.getText());
+				searchManager.search(search.getText(), EmiScreenManager.getSearchSource());
 			}
 			if (space != null) {
 				space.batcher.repopulate();
