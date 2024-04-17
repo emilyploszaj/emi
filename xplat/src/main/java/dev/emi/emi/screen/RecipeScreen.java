@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
-
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.EmiApi;
@@ -40,7 +41,6 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
