@@ -138,6 +138,9 @@ public class EmiScreenManager {
 	}
 
 	public static void updateSearch() {
+		if(lastSearch != null) {
+			lastSearch.cancel(true);
+		}
 		lastSearch = searchManager.search(search.getText(), EmiScreenManager.getSearchSource()).whenCompleted(l -> searchChanged = true);
 	}
 
