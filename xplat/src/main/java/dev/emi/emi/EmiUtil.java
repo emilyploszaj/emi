@@ -22,7 +22,6 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiRecipeFiller;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
