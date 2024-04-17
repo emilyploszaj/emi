@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dev.emi.emi.search.EmiSearchManager;
+import dev.emi.emi.search.EmiSearchManagerImpl;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -66,7 +66,6 @@ import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.EmiSearch.CompiledQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -126,7 +125,7 @@ public class EmiScreenManager {
 			() -> true, (w) -> EmiApi.viewRecipeTree(),
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 
-	public static EmiSearchManager searchManager = new EmiSearchManager();
+	public static EmiSearchManagerImpl searchManager = new EmiSearchManagerImpl();
 
 	public static boolean isDisabled() {
 		return !EmiReloadManager.isLoaded() || !EmiConfig.enabled;

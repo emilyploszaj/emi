@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dev.emi.emi.api.search.EmiSearchManagerApi;
-import dev.emi.emi.search.EmiSearchManager;
+import dev.emi.emi.api.search.EmiSearchManager;
+import dev.emi.emi.search.EmiSearchManagerImpl;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -67,8 +67,8 @@ public class EmiApi {
 		EmiScreenManager.search.setText(text);
 	}
 
-	public static EmiSearchManagerApi createSearchManager() {
-		return new EmiSearchManager();
+	public static EmiSearchManager createSearchManager() {
+		return new EmiSearchManagerImpl();
 	}
 
 	public static boolean isSearchFocused() {

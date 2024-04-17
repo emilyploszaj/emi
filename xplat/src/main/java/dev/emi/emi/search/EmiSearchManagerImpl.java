@@ -1,7 +1,7 @@
 package dev.emi.emi.search;
 
 import com.google.common.collect.Lists;
-import dev.emi.emi.api.search.EmiSearchManagerApi;
+import dev.emi.emi.api.search.EmiSearchManager;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.registry.EmiStackList;
@@ -11,7 +11,7 @@ import dev.emi.emi.screen.EmiScreenManager;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class EmiSearchManager implements EmiSearchManagerApi {
+public class EmiSearchManagerImpl implements EmiSearchManager {
     private EmiSearch.CompiledQuery compiledQuery;
     private List<? extends EmiIngredient> stacks = EmiStackList.stacks;
     private volatile SearchWorker currentWorker;
@@ -50,10 +50,10 @@ public class EmiSearchManager implements EmiSearchManagerApi {
         }
 
         private void apply(List<? extends EmiIngredient> stacks) {
-            synchronized (EmiSearchManager.this) {
+            synchronized (EmiSearchManagerImpl.this) {
                 if(this == currentWorker) {
-                    EmiSearchManager.this.stacks = stacks;
-                    EmiSearchManager.this.currentWorker = null;
+                    EmiSearchManagerImpl.this.stacks = stacks;
+                    EmiSearchManagerImpl.this.currentWorker = null;
                 }
             }
             completion.complete(stacks);
