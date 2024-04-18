@@ -171,7 +171,7 @@ public class StackBatcher {
 		if (stack instanceof Batchable b && !b.isUnbatchable() && isEnabled() && (flags & EmiIngredient.RENDER_ICON) != 0) {
 			if (!populated) {
 				try {
-					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, draw, x-this.x, -y-this.y, z, delta);
+					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, draw, x-this.x, y + this.y, z, delta);
 					if (sodiumSpriteHandle != null && !stack.isEmpty()) {
 						ItemStack is = stack.getEmiStacks().get(0).getItemStack();
 						MinecraftClient client = MinecraftClient.getInstance();
@@ -218,9 +218,7 @@ public class StackBatcher {
 		RenderSystem.enableDepthTest();
 		DiffuseLighting.enableGuiDepthLighting();
 		Matrix4f mat = new Matrix4f(RenderSystem.getModelViewMatrix());
-		mat.mul(new Matrix4f().scale(1, -1, 1));
-		// Flipped Y creates an offset
-		mat.mul(new Matrix4f().translation(x, -y - 16, 0));
+		mat.mul(new Matrix4f().translation(x, y, 0));
 		for (Map.Entry<RenderLayer, VertexBuffer> en : buffers.entrySet()) {
 			en.getKey().startDrawing();
 			EmiPort.setShader(en.getValue(), mat);
