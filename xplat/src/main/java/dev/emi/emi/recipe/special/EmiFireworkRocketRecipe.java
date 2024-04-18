@@ -1,5 +1,6 @@
 package dev.emi.emi.recipe.special;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -10,6 +11,12 @@ import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworkExplosionComponent;
+import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -53,27 +60,19 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 
 	private EmiStack getFireworkRocket(Random random) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
-		NbtCompound tag = new NbtCompound();
-		NbtCompound fireworks = new NbtCompound();
-		NbtList explosions = new NbtList();
+		List<FireworkExplosionComponent> explosions = new ArrayList<>();
 
 		List<EmiStack> items = getItems(random);
 		int gunpowder = 0;
 		for (EmiStack item : items) {
 			if (item.getId() == EmiStack.of(Items.FIREWORK_STAR).getId()){
-				explosions.add(item.getNbt().get("Explosion"));
+				explosions.add(item.getOrDefault(DataComponentTypes.FIREWORK_EXPLOSION, FireworkExplosionComponent.DEFAULT));
 			} else if (item.isEqual(EmiStack.of(Items.GUNPOWDER))) {
 				gunpowder++;
 			}
 		}
-		if (gunpowder > 1) {
-			fireworks.putByte("Flight", (byte) gunpowder);
-		}
-		if (!(items.isEmpty())) {
-			fireworks.put("Explosions", explosions);
-		}
-		tag.put("Fireworks", fireworks);
-		stack.setNbt(tag);
+
+		stack.set(DataComponentTypes.FIREWORKS, new FireworksComponent(gunpowder, explosions));
 		return EmiStack.of(stack, 3);
 	}
 
@@ -102,12 +101,11 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 
 	private EmiStack getFireworkStar(Random random) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_STAR);
-		NbtCompound tag = new NbtCompound();
-		NbtCompound explosion = new NbtCompound();
 		int items = 0;
 
 		int amount = random.nextInt(5);
-		explosion.putByte("Type", (byte) amount);
+
+		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.values()[random.nextInt(FireworkExplosionComponent.Type.values().length)];
 
 		if (!(amount == 0)) {
 			items++;
@@ -115,38 +113,43 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 
 		amount = random.nextInt(4);
 
+		boolean flicker = false, trail = false;
+
 		if (amount == 0) {
-			explosion.putByte("Flicker", (byte) 1);
+			flicker = true;
 			items++;
 		} else if (amount == 1) {
-			explosion.putByte("Trail", (byte) 1);
+			trail = true;
 			items++;
 		} else if (amount == 2){
-			explosion.putByte("Trail", (byte) 1);
-			explosion.putByte("Flicker", (byte) 1);
+			flicker = true;
+			trail = true;
 			items = items + 2;
 		}
 
 		List<DyeItem> dyeItems = getDyes(random, 8 - items);
-		List<Integer> colors = Lists.newArrayList();
+		IntList colors = new IntArrayList();
 		for (DyeItem dyeItem : dyeItems) {
 			colors.add(dyeItem.getColor().getFireworkColor());
 		}
-		explosion.putIntArray("Colors", colors);
 
 		amount = random.nextInt(2);
 
+		IntList fadedColors;
+
 		if (amount == 1) {
 			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
-			List<Integer> fadedColors = Lists.newArrayList();
+			fadedColors = new IntArrayList();
 			for (DyeItem dyeItem : dyeItemsFaded) {
 				fadedColors.add(dyeItem.getColor().getFireworkColor());
 			}
-			explosion.putIntArray("FadeColors", fadedColors);
+		} else {
+			fadedColors = IntLists.emptyList();
 		}
 
-		tag.put("Explosion", explosion);
-		stack.setNbt(tag);
+		FireworkExplosionComponent component = new FireworkExplosionComponent(type, colors, fadedColors, trail, flicker);
+
+		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, component);
 		return EmiStack.of(stack);
 	}
 }

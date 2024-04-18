@@ -7,6 +7,12 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BannerPatternsComponent;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -32,7 +38,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
@@ -103,9 +108,10 @@ public final class EmiPort {
 		}
 	}
 
-	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
-		return patterns.add(Registries.BANNER_PATTERN.getEntry(random.nextInt(Registries.BANNER_PATTERN.size())).get(),
-			DyeColor.values()[random.nextInt(DyeColor.values().length)]);
+	public static BannerPatternsComponent addRandomBanner(BannerPatternsComponent patterns, Random random) {
+		var bannerRegistry = getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
+		return new BannerPatternsComponent.Builder().addAll(patterns).add(bannerRegistry.getEntry(random.nextInt(bannerRegistry.size())).get(),
+			DyeColor.values()[random.nextInt(DyeColor.values().length)]).build();
 	}
 
 	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
@@ -181,7 +187,7 @@ public final class EmiPort {
 		if (client != null && client.currentScreen != null) {
 			var currentFocus = client.currentScreen.getFocused();
 			if (!focused && currentFocus == widget || focused && currentFocus != widget) {
-				client.currentScreen.focusOn(null);
+				client.currentScreen.setFocused(null);
 			}
 		}
 		widget.setFocused(focused);
@@ -212,7 +218,20 @@ public final class EmiPort {
 		return Comparison.compareNbt();
 	}
 
+	public static ItemStack setPotion(ItemStack stack, RegistryEntry<Potion> potion) {
+		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, potion, PotionContentsComponent::with);
+		return stack;
+	}
+
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
-		return PotionUtil.setPotion(stack, potion);
+		return setPotion(stack, getPotionRegistry().getEntry(potion));
+	}
+
+	public static @Nullable DynamicRegistryManager getRegistryManager() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world != null) {
+			return client.world.getRegistryManager();
+		}
+		return null;
 	}
 }

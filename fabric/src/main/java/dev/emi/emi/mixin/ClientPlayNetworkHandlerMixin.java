@@ -29,7 +29,7 @@ public class ClientPlayNetworkHandlerMixin {
 		EmiReloadManager.reloadRecipes();
 	}
 
-	@Inject(at = @At("RETURN"), method = "refreshTagBasedData")
+	@Inject(at = @At("RETURN"), method = "onSynchronizeTags")
 	private void refreshTagBasedData(CallbackInfo info) {
 		EmiReloadManager.reloadTags();
 	}

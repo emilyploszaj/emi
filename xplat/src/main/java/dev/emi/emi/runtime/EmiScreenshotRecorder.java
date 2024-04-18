@@ -19,6 +19,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import org.joml.Matrix4fStack;
 
 public class EmiScreenshotRecorder {
 	private static final String SCREENSHOTS_DIRNAME = "screenshots";
@@ -64,12 +65,12 @@ public class EmiScreenshotRecorder {
 
 		framebuffer.beginWrite(true);
 
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
-		view.loadIdentity();
-		view.translate(-1.0, 1.0, 0.0);
+		Matrix4fStack view = RenderSystem.getModelViewStack();
+		view.pushMatrix();
+		view.identity();
+		view.translate(-1.0f, 1.0f, 0.0f);
 		view.scale(2f / width, -2f / height, -1f / 1000f);
-		view.translate(0.0, 0.0, 10.0);
+		view.translate(0.0f, 0.0f, 10.0f);
 		RenderSystem.applyModelViewMatrix();
 
 		Matrix4f backupProj = RenderSystem.getProjectionMatrix();
@@ -78,7 +79,7 @@ public class EmiScreenshotRecorder {
 		renderer.run();
 
 		RenderSystem.setProjectionMatrix(backupProj, VertexSorter.BY_Z);
-		view.pop();
+		view.popMatrix();
 		RenderSystem.applyModelViewMatrix();
 
 		framebuffer.endWrite();

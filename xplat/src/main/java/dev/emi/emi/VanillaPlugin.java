@@ -107,6 +107,9 @@ import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.FlowableFluid;
@@ -116,7 +119,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeItem;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.HoneycombItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -124,7 +126,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolItem;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.ArmorDyeRecipe;
 import net.minecraft.recipe.BannerDuplicateRecipe;
@@ -318,7 +319,7 @@ public class VanillaPlugin implements EmiPlugin {
 			}
 		});
 
-		Comparison potionComparison = Comparison.compareData(stack -> PotionUtil.getPotion(stack.getNbt()));
+		Comparison potionComparison = Comparison.compareData(stack -> stack.get(DataComponentTypes.POTION_CONTENTS));
 
 		registry.setDefaultComparison(Items.POTION, potionComparison);
 		registry.setDefaultComparison(Items.SPLASH_POTION, potionComparison);
@@ -330,6 +331,8 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiUtil.values(TagKey.of(EmiPort.getItemRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value),
 			EmiPort.getDisabledItems()
 		).collect(Collectors.toSet());
+
+		List<Item> dyeableItems = EmiUtil.values(ItemTags.DYEABLE).map(RegistryEntry::value).collect(Collectors.toList());
 
 		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
 			Identifier id = EmiPort.getId(recipe);
@@ -347,7 +350,7 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
 			} else if (recipe instanceof ArmorDyeRecipe dye) {
-				for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+				for (Item i : dyeableItems) {
 					if (!hiddenItems.contains(i)) {
 						addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
 					}
@@ -368,9 +371,6 @@ public class VanillaPlugin implements EmiPlugin {
 				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(id), recipe);
 			} else if (recipe instanceof TippedArrowRecipe tipped) {
 				EmiPort.getPotionRegistry().streamEntries().forEach(entry -> {
-					if (entry.value() == Potions.EMPTY) {
-						return;
-					}
 					EmiStack arrow = EmiStack.of(Items.ARROW);
 					addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
 							arrow, arrow, arrow, arrow,
@@ -488,18 +488,19 @@ public class VanillaPlugin implements EmiPlugin {
 				continue;
 			}
 			try {
-				if (i.getMaxDamage() > 0) {
-					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().getRepairIngredient() != null
-							&& !ai.getMaterial().getRepairIngredient().isEmpty()) {
-						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ai.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().getRepairIngredient()), id));
+				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
+					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().value().repairIngredient().get() != null
+							&& !ai.getMaterial().value().repairIngredient().get().isEmpty()) {
+						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ai.getMaterial().value().repairIngredient().get().getMatchingStacks()[0].getItem()));
+						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().value().repairIngredient().get()), id));
 					} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
 							&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
 						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ti.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
 						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient()), id));
 					}
 				}
-				if (i.isDamageable()) {
+				// TODO used to be isDamageable, the 20.1 impl of that method appears to just be maxDamage > 0 though
+				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
 					addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i, synthetic("anvil/repairing/tool", EmiUtil.subId(i))));
 					addRecipeSafe(registry, () -> new EmiGrindstoneRecipe(i, synthetic("grindstone/repairing", EmiUtil.subId(i))));
 				}
@@ -643,7 +644,7 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
 		}
 
-		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+		for (Item i : EmiUtil.values(ItemTags.DYEABLE).map(RegistryEntry::value).collect(Collectors.toList())) {
 			if (hiddenItems.contains(i)) {
 				continue;
 			}
@@ -654,7 +655,7 @@ public class VanillaPlugin implements EmiPlugin {
 				.id(synthetic("world/cauldron_washing", EmiUtil.subId(i)))
 				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
 					ItemStack stack = i.getDefaultStack();
-					((DyeableItem) i).setColor(stack, r.nextInt(0xFFFFFF + 1));
+					stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(r.nextInt(0xFFFFFF + 1), true));
 					return EmiStack.of(stack);
 				}, uniq, s.getBounds().x(), s.getBounds().y()))
 				.rightInput(cauldron, true)

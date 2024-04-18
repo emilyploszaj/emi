@@ -2,6 +2,8 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.EmiPort;
@@ -51,8 +53,13 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public NbtCompound getNbt() {
-		return null;
+	public ComponentMap getComponents() {
+		return ComponentMap.EMPTY;
+	}
+
+	@Override
+	public ComponentChanges getComponentChanges() {
+		return ComponentChanges.EMPTY;
 	}
 
 	@Override

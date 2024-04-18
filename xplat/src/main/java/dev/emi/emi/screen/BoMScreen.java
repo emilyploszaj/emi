@@ -7,6 +7,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
@@ -193,7 +195,7 @@ public class BoMScreen extends Screen {
 	@Override
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		this.renderBackgroundTexture(context.raw());
+		this.renderDarkening(context.raw());
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		float scale = getScale();
@@ -211,11 +213,11 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
+		Matrix4fStack view = RenderSystem.getModelViewStack();
+		view.pushMatrix();
 		view.translate(width / 2, height / 2, 0);
 		view.scale(scale, scale, 1);
-		view.translate(offX, offY, 0);
+		view.translate((float)offX, (float)offY, 0);
 		RenderSystem.applyModelViewMatrix();
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
@@ -250,7 +252,7 @@ public class BoMScreen extends Screen {
 			context.drawCenteredText(EmiPort.translatable("emi.random_tree_input"), 0, 0);
 		}
 
-		view.pop();
+		view.popMatrix();
 		RenderSystem.applyModelViewMatrix();
 
 		if (help.contains(mouseX, mouseY)) {

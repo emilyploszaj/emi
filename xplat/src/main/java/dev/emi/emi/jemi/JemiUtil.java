@@ -58,7 +58,8 @@ public class JemiUtil {
 		if (stack.isEmpty()) {
 			return Optional.empty();
 		} else if (stack.getKey() instanceof Fluid f) {
-			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f, stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getNbt()));
+			throw new UnsupportedOperationException("TODO port to components");
+			//return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f, stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getComponents()));
 		} else if (stack instanceof JemiStack js) {
 			return JemiPlugin.runtime.getIngredientManager().getIngredientTypeChecked(js.ingredient)
 				.map(t -> (Optional) JemiPlugin.runtime.getIngredientManager().createTypedIngredient(t, js.ingredient))
@@ -69,7 +70,8 @@ public class JemiUtil {
 
 	public static EmiStack getFluidFromJei(Object object) {
 		if (object instanceof IJeiFluidIngredient fluid) {
-			return EmiStack.of(fluid.getFluid(), fluid.getTag().orElseGet(() -> null), fluid.getAmount());
+			throw new UnsupportedOperationException("TODO port to components");
+			//return EmiStack.of(fluid.getFluid(), fluid.getTag().orElseGet(() -> null), fluid.getAmount());
 		}
 		return EmiStack.EMPTY;
 	}

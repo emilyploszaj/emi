@@ -2,6 +2,11 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import dev.emi.emi.mixin.accessor.ItemStackAccessor;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import org.jetbrains.annotations.ApiStatus;
@@ -17,7 +22,6 @@ import dev.emi.emi.screen.StackBatcher.Batchable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
@@ -26,7 +30,6 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -35,7 +38,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 
 	private final Item item;
-	private final NbtCompound nbt;
+	private final ComponentMapImpl components;
 
 	private boolean unbatchable;
 
@@ -44,27 +47,23 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(ItemStack stack, long amount) {
-		this(stack.getItem(), stack.getNbt(), amount);
+		this(stack.getItem(), ((ItemStackAccessor)(Object)stack).getBackingComponentMap(), amount);
 	}
 
-	public ItemEmiStack(Item item, NbtCompound nbt, long amount) {
+	public ItemEmiStack(Item item, ComponentMapImpl components, long amount) {
 		this.item = item;
-		this.nbt = nbt != null ? nbt.copy() : null;
+		this.components = components.copy();
 		this.amount = amount;
 	}
 
 	@Override
 	public ItemStack getItemStack() {
-		ItemStack stack = new ItemStack(this.item, (int) this.amount);
-		if (this.nbt != null) {
-			stack.setNbt(this.nbt);
-		}
-		return stack;
+		return ItemStackAccessor.withExistingComponentMap(this.item, (int) this.amount, this.components);
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(item, nbt, amount);
+		EmiStack e = new ItemEmiStack(item, components, amount);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
@@ -77,8 +76,13 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public NbtCompound getNbt() {
-		return nbt;
+	public ComponentMap getComponents() {
+		return this.components;
+	}
+
+	@Override
+	public ComponentChanges getComponentChanges() {
+		return this.components.getChanges();
 	}
 
 	@Override
@@ -148,7 +152,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return getItemStack().getTooltip(client.player, TooltipContext.BASIC);
+		return getItemStack().getTooltip(Item.TooltipContext.DEFAULT, client.player, TooltipType.BASIC);
 	}
 
 	@Override

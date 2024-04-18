@@ -7,22 +7,19 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.DyeItem;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
-	public static final List<Item> DYEABLE_ITEMS = EmiPort.getItemRegistry().stream()
-		.filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
 	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(c -> DyeItem.byColor(c)).collect(Collectors.toList());
 	private final Item armor;
 
@@ -52,7 +49,7 @@ public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
 	@Override
 	public SlotWidget getOutputWidget(int x, int y) {
 		return new GeneratedSlotWidget(r -> {
-			return EmiStack.of(DyeableItem.blendAndSetColor(new ItemStack(armor), getDyes(r)));
+			return EmiStack.of(DyedColorComponent.setColor(new ItemStack(armor), getDyes(r)));
 		}, unique, x, y);
 	}
 	

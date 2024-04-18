@@ -35,7 +35,7 @@ public class TankWidget extends SlotWidget {
 		EmiIngredient ingredient = getStack();
 		for (EmiStack stack : ingredient.getEmiStacks()) {
 			if (stack.getKey() instanceof Fluid fluid) {
-				FluidEmiStack fes = new FluidEmiStack(fluid, stack.getNbt(), ingredient.getAmount());
+				FluidEmiStack fes = new FluidEmiStack(fluid, stack.getComponentChanges(), ingredient.getAmount());
 				boolean floaty = EmiAgnos.isFloatyFluid(fes);
 				Bounds bounds = getBounds();
 				int x = bounds.x() + 1;

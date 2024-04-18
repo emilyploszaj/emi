@@ -10,6 +10,8 @@ import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -94,17 +96,17 @@ public abstract class EmiAgnos {
 
 	protected abstract List<TooltipComponent> getItemTooltipAgnos(ItemStack stack);
 
-	public static Text getFluidName(Fluid fluid, NbtCompound nbt) {
+	public static Text getFluidName(Fluid fluid, ComponentChanges nbt) {
 		return delegate.getFluidNameAgnos(fluid, nbt);
 	}
 
-	protected abstract Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt);
+	protected abstract Text getFluidNameAgnos(Fluid fluid, ComponentChanges nbt);
 
-	public static List<Text> getFluidTooltip(Fluid fluid, NbtCompound nbt) {
+	public static List<Text> getFluidTooltip(Fluid fluid, ComponentChanges nbt) {
 		return delegate.getFluidTooltipAgnos(fluid, nbt);
 	}
 
-	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt);
+	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges nbt);
 
 	public static boolean isFloatyFluid(FluidEmiStack stack) {
 		return delegate.isFloatyFluidAgnos(stack);

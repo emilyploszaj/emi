@@ -17,7 +17,9 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -68,8 +70,13 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public NbtCompound getNbt() {
-		return null;
+	public ComponentMap getComponents() {
+		return ComponentMap.EMPTY;
+	}
+
+	@Override
+	public ComponentChanges getComponentChanges() {
+		return ComponentChanges.EMPTY;
 	}
 
 	@Override
@@ -84,14 +91,14 @@ public class JemiStack<T> extends EmiStack {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return renderer.getTooltip(ingredient, TooltipContext.BASIC);
+		return renderer.getTooltip(ingredient, TooltipType.BASIC);
 	}
 
 	@Override
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
 		MinecraftClient client = MinecraftClient.getInstance();
-		list.addAll(renderer.getTooltip(ingredient, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC)
+		list.addAll(renderer.getTooltip(ingredient, client.options.advancedItemTooltips ? TooltipType.ADVANCED : TooltipType.BASIC)
 			.stream().map(EmiPort::ordered).map(TooltipComponent::of).toList());
 
 		Identifier id = getId();

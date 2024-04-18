@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
@@ -236,11 +237,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 		lastRender = System.currentTimeMillis();
 		long deg = accumulatedSpin * -180 / 500;
-		MatrixStack view = RenderSystem.getModelViewStack();
-		view.push();
+		Matrix4fStack view = RenderSystem.getModelViewStack();
+		view.pushMatrix();
 		if (deg != 0) {
 			view.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
-			view.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
+			view.rotate(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
 			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
 			RenderSystem.applyModelViewMatrix();
 		}
@@ -263,7 +264,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			}
 		}
 		context.resetColor();
-		view.pop();
+		view.popMatrix();
 		RenderSystem.applyModelViewMatrix();
 	}
 }

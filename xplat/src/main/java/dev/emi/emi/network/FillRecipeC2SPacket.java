@@ -3,6 +3,8 @@ package dev.emi.emi.network;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -32,7 +34,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		this.stacks = stacks;
 	}
 
-	public FillRecipeC2SPacket(PacketByteBuf buf) {
+	public FillRecipeC2SPacket(RegistryByteBuf buf) {
 		syncId = buf.readInt();
 		action = buf.readByte();
 		slots = parseCompressedSlots(buf);
@@ -50,12 +52,12 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		int size = buf.readVarInt();
 		stacks = Lists.newArrayList();
 		for (int i = 0; i < size; i++) {
-			stacks.add(buf.readItemStack());
+			stacks.add(ItemStack.PACKET_CODEC.decode(buf));
 		}
 	}
 
 	@Override
-	public void write(PacketByteBuf buf) {
+	public void write(RegistryByteBuf buf) {
 		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(slots, buf);
@@ -71,7 +73,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		}
 		buf.writeVarInt(stacks.size());
 		for (ItemStack stack : stacks) {
-			buf.writeItemStack(stack);
+			ItemStack.PACKET_CODEC.encode(buf, stack);
 		}
 	}
 
@@ -201,7 +203,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 				return grabbed;
 			}
 			ItemStack r = rubble.get(i);
-			if (ItemStack.canCombine(stack, r)) {
+			if (ItemStack.areItemsAndComponentsEqual(stack, r)) {
 				int wanted = amount - grabbed;
 				if (r.getCount() <= wanted) {
 					grabbed += r.getCount();
@@ -221,7 +223,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 				continue;
 			}
 			ItemStack st = s.getStack();
-			if (ItemStack.canCombine(stack, st)) {
+			if (ItemStack.areItemsAndComponentsEqual(stack, st)) {
 				int wanted = amount - grabbed;
 				if (st.getCount() <= wanted) {
 					grabbed += st.getCount();
@@ -236,7 +238,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 	}
 
 	@Override
-	public Identifier getId() {
+	public Id<FillRecipeC2SPacket> getId() {
 		return EmiNetwork.FILL_RECIPE;
 	}
 }

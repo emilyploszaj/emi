@@ -3,6 +3,9 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 import java.util.function.Function;
 
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentHolder;
+import net.minecraft.component.ComponentMap;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -23,7 +26,7 @@ import net.minecraft.util.Identifier;
  * An abstract representation of a resource in EMI.
  * Can be an item, a fluid, or something else.
  */
-public abstract class EmiStack implements EmiIngredient {
+public abstract class EmiStack implements EmiIngredient, ComponentHolder {
 	public static final EmiStack EMPTY = new EmptyEmiStack();
 	private EmiStack remainder = EMPTY;
 	protected Comparison comparison = Comparison.DEFAULT_COMPARISON;
@@ -79,11 +82,9 @@ public abstract class EmiStack implements EmiIngredient {
 		return this;
 	}
 
-	public abstract NbtCompound getNbt();
+	public abstract ComponentMap getComponents();
 
-	public boolean hasNbt() {
-		return getNbt() != null;
-	}
+	public abstract ComponentChanges getComponentChanges();
 
 	public abstract Object getKey();
 
@@ -149,9 +150,9 @@ public abstract class EmiStack implements EmiIngredient {
 	@Override
 	public String toString() {
 		String s = "" + getKey();
-		NbtCompound nbt = getNbt();
-		if (nbt != null) {
-			s += nbt;
+		ComponentMap componentMap = getComponents();
+		if (componentMap != ComponentMap.EMPTY) {
+			s += componentMap;
 		}
 		return s + " x" + getAmount();
 	}
@@ -187,18 +188,18 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(Fluid fluid) {
-		return of(fluid, null);
+		return of(fluid, ComponentChanges.EMPTY);
 	}
 
 	public static EmiStack of(Fluid fluid, long amount) {
-		return of(fluid, null, amount);
+		return of(fluid, ComponentChanges.EMPTY, amount);
 	}
 
-	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
+	public static EmiStack of(Fluid fluid, ComponentChanges nbt) {
 		return of(fluid, nbt, 0);
 	}
 
-	public static EmiStack of(Fluid fluid, NbtCompound nbt, long amount) {
+	public static EmiStack of(Fluid fluid, ComponentChanges nbt, long amount) {
 		if (fluid instanceof FlowableFluid ff && ff.getStill() != Fluids.EMPTY) {
 			fluid = ff.getStill();
 		}

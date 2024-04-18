@@ -15,13 +15,5 @@ import net.minecraft.util.Identifier;
 
 @Mixin(SynchronizeRecipesS2CPacket.class)
 public class SynchronizeRecipesS2CPacketMixin {
-	
-	@Inject(at = @At("RETURN"), method = "readRecipe", locals = LocalCapture.CAPTURE_FAILHARD)
-	private static void readRecipe(PacketByteBuf buf, CallbackInfoReturnable<RecipeEntry<Recipe<?>>> info, Identifier serializer, Identifier id) {
-		RecipeEntry<Recipe<?>> recipe = info.getReturnValue();
-		if (recipe == null) {
-			EmiLog.error("Recipe " + id + " was deserialized as null using recipe serializer " + serializer
-				+ ", this is breaking vanilla recipe sync, and will prevent EMI from loading recipes");
-		}
-	}
+
 }

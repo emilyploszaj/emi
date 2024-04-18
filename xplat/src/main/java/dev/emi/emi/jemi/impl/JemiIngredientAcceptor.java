@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.minecraft.client.item.TooltipType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -20,7 +21,6 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -44,7 +44,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 			if (typed != null && (stack instanceof JemiStack || stack.getKey() instanceof Fluid)) {
 				List<Text> base = Lists.newArrayList();
 				if (renderers != null && renderers.containsKey(typed.getType())) {
-					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipContext.Default.BASIC));
+					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipType.BASIC));
 				}
 				if (base == null || base.isEmpty()) {
 					if (tooltipCallback == null) {
@@ -113,7 +113,8 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 
 	@Override
 	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, NbtCompound tag) {
-		addStack(EmiStack.of(fluid, tag, amount));
+		if(true) throw new UnsupportedOperationException("TODO port to components");
+		//addStack(EmiStack.of(fluid, tag, amount));
 		return this;
 	}
 }

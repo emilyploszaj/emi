@@ -83,7 +83,7 @@ public class EmiAnvilRepairItemRecipe implements EmiRecipe {
 
 	private ItemStack getMergeItems(List<ItemStack> items) {
 		ItemStack item = tool.getDefaultStack();
-		int maxDamage = tool.getMaxDamage();
+		int maxDamage = item.getMaxDamage();
 		int damage = items.get(0).getDamage() - (21 * maxDamage)/20 + items.get(1).getDamage();
 		if (damage > 0) {
 			item.setDamage(damage);

@@ -74,7 +74,7 @@ public class ConfigPresetScreen extends Screen {
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderBackgroundTexture(context.raw());
+		this.renderDarkening(context.raw());
 		list.render(context.raw(), mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {
