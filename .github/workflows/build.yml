@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        java: [ 17 ]
+        java: [ 21 ]
     runs-on: ubuntu-latest
     steps:
 
