@@ -12,6 +12,7 @@ import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
@@ -31,6 +32,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
@@ -204,5 +206,13 @@ public final class EmiPort {
 			}
 		}
 		return null;
+	}
+
+	public static Comparison compareStrict() {
+		return Comparison.compareNbt();
+	}
+
+	public static ItemStack setPotion(ItemStack stack, Potion potion) {
+		return PotionUtil.setPotion(stack, potion);
 	}
 }

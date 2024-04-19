@@ -120,8 +120,8 @@ public class EmiAgnosFabric extends EmiAgnos {
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput())), EmiIngredient.of(recipeIngredient),
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())), id));
+								EmiStack.of(EmiPort.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput())), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(EmiPort.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())), id));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -146,8 +146,8 @@ public class EmiAgnosFabric extends EmiAgnos {
 							Identifier id = new Identifier("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()), potion)), EmiIngredient.of(recipeIngredient),
-								EmiStack.of(PotionUtil.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput()), potion)), id));
+								EmiStack.of(EmiPort.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()), potion)), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(EmiPort.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput()), potion)), id));
 						}
 					};
 					if ((((BrewingRecipeRegistryRecipeAccessor) recipe).getInput() instanceof PotionItem)) {

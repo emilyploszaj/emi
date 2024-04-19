@@ -148,8 +148,8 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output)));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(stack.copy(), recipe.output)), id));
+								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.input)), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.output)), id));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -173,8 +173,8 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 							Identifier id = new Identifier("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.input), potion)), EmiIngredient.of(recipe.ingredient),
-								EmiStack.of(PotionUtil.setPotion(new ItemStack(recipe.output), potion)), id));
+								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.input), potion)), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.output), potion)), id));
 						}
 					};
 					if ((recipe.input instanceof PotionItem)) {
