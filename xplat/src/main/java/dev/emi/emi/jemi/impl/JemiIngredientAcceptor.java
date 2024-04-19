@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.client.item.TooltipType;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,7 +114,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 
 	@Override
 	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, NbtCompound tag) {
-		if(true) throw new UnsupportedOperationException("TODO port to components");
+		EmiLog.error("TODO update JEMI ingredient acceptor to use components");
 		//addStack(EmiStack.of(fluid, tag, amount));
 		return this;
 	}
