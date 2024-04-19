@@ -6,7 +6,6 @@
   "plugin": "dev.emi.emi.mixinsupport.EmiMixinPlugin",
   "mixins": [],
   "client": [
-    "accessor.BrewingRecipeRegistryAccessor",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",

@@ -7,6 +7,7 @@
   "client": [
     "accessor.AxeItemAccessor",
     "accessor.BakedModelManagerAccessor",
+    "accessor.BrewingRecipeRegistryAccessor",
     "accessor.CraftingResultSlotAccessor",
     "accessor.DrawContextAccessor",
     "accessor.HandledScreenAccessor",

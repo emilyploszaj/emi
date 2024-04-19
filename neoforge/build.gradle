@@ -48,6 +48,15 @@ repositories {
 			includeGroupAndSubgroups "cpw.mods"
 		}
 	}
+	// TODO: Remove when 1.20.5 is released
+	maven {
+		name 'Maven for PR #794' // https://github.com/neoforged/NeoForge/pull/794
+		url 'https://prmaven.neoforged.net/NeoForge/pr794'
+		content {
+			includeModule('net.neoforged', 'testframework')
+			includeModule('net.neoforged', 'neoforge')
+		}
+	}
 }
 
 configurations {
@@ -60,7 +69,11 @@ configurations {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-	mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+	mappings loom.layered {
+		it.mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+		// Needed to fix "Unfixable conflicts" in 1.20.5
+		it.mappings(project.projectDir.toPath().resolve("mappings/fix.tiny").toFile())
+	}
 
 	neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
@@ -71,7 +84,7 @@ dependencies {
 processResources {
 	inputs.property "version", project.version
 
-	filesMatching("META-INF/mods.toml") {
+	filesMatching("META-INF/neoforge.mods.toml") {
 		expand "version": project.version
 	}
 }

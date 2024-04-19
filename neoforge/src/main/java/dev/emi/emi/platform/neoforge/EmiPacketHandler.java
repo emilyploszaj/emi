@@ -8,6 +8,9 @@ import dev.emi.emi.network.EmiPacket;
 import dev.emi.emi.network.FillRecipeC2SPacket;
 import dev.emi.emi.network.PingS2CPacket;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketDecoder;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
@@ -16,8 +19,8 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import java.util.function.Function;
 
 public class EmiPacketHandler {
-    private static final Identifier ID_CHESS_CLIENTBOUND = new Identifier("emi", "chess_s2c");
-    private static final Identifier ID_CHESS_SERVERBOUND = new Identifier("emi", "chess_c2s");
+    private static final CustomPayload.Id<EmiChessPacket.S2C> ID_CHESS_CLIENTBOUND = CustomPayload.id("emi:chess_s2c");
+    private static final CustomPayload.Id<EmiChessPacket.C2S> ID_CHESS_SERVERBOUND = CustomPayload.id("emi:chess_c2s");
 
     public static void init(RegisterPayloadHandlerEvent event) {
         var registrar = event.registrar("emi").optional();
@@ -30,34 +33,15 @@ public class EmiPacketHandler {
         registrar.play(ID_CHESS_CLIENTBOUND, makeReader(ID_CHESS_CLIENTBOUND, EmiChessPacket.S2C::new), EmiPacketHandler::handleClientbound);
     }
 
-    public static CustomPayload wrap(EmiPacket packet) {
-        // Special casing for chess since it's reusing the same ID in EMI for both
-        if (packet instanceof EmiChessPacket.S2C) {
-            return new PayloadWrapper<>(ID_CHESS_CLIENTBOUND, packet);
-        } else if (packet instanceof EmiChessPacket.C2S) {
-            return new PayloadWrapper<>(ID_CHESS_SERVERBOUND, packet);
-        } else {
-            return new PayloadWrapper<>(packet.getId(), packet);
-        }
+    public static EmiPacket wrap(EmiPacket packet) {
+        return packet;
     }
 
-    // Neoforge requires us to implement this interface, we use a wrapper-record to do this on top of EmiPacket
-    private record PayloadWrapper<T extends EmiPacket>(Identifier id, T packet) implements CustomPayload {
-        @Override
-        public void write(PacketByteBuf buf) {
-            packet.write(buf);
-        }
+    private static <T extends EmiPacket> PacketCodec<RegistryByteBuf, T> makeReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> reader) {
+        return PacketCodec.of(EmiPacket::write, reader);
     }
 
-    private static <T extends EmiPacket> PacketByteBuf.PacketReader<PayloadWrapper<T>> makeReader(Identifier id, Function<PacketByteBuf, T> reader) {
-        return buffer -> {
-            // Read EMI packet and wrap
-            return new PayloadWrapper<>(id, reader.apply(buffer));
-        };
-    }
-
-    private static void handleServerbound(PayloadWrapper<?> wrapper, PlayPayloadContext context) {
-        var packet = wrapper.packet();
+    private static void handleServerbound(EmiPacket packet, PlayPayloadContext context) {
         if (!context.flow().isServerbound()) {
             throw new IllegalArgumentException("Trying to handle serverbound packet on client: " + packet);
         }
@@ -65,8 +49,7 @@ public class EmiPacketHandler {
         context.workHandler().execute(() -> packet.apply(player));
     }
 
-    private static void handleClientbound(PayloadWrapper<?> wrapper, PlayPayloadContext context) {
-        var packet = wrapper.packet();
+    private static void handleClientbound(EmiPacket packet, PlayPayloadContext context) {
         if (!context.flow().isClientbound()) {
             throw new IllegalArgumentException("Trying to handle clientbound packet on server: " + packet);
         }
