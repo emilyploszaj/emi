@@ -366,7 +366,7 @@ public class StackBatcher {
 
 			@Override
 			public VertexConsumer normal(float x, float y, float z) {
-				delegate.normal(0, 1, 0); // this is the change
+				delegate.normal(0, -1, 0); // this is the change
 				return this;
 			}
 			
