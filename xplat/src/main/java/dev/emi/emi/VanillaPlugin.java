@@ -43,6 +43,7 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiRegistryAdapater;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
@@ -210,6 +211,9 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addIngredientSerializer(ItemEmiStack.class, new ItemEmiStackSerializer());
 		registry.addIngredientSerializer(FluidEmiStack.class, new FluidEmiStackSerializer());
 		registry.addIngredientSerializer(TagEmiIngredient.class, new TagEmiIngredientSerializer());
+
+		registry.addRegistryAdapter(EmiRegistryAdapater.simple(Item.class, EmiPort.getItemRegistry(), EmiStack::of));
+		registry.addRegistryAdapter(EmiRegistryAdapater.simple(Fluid.class, EmiPort.getFluidRegistry(), EmiStack::of));
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiRegistryAdapater;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
@@ -23,11 +24,11 @@ import dev.emi.emi.data.TagExclusions;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.util.InheritanceMap;
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -37,50 +38,49 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmiTags {
+	public static final InheritanceMap<EmiRegistryAdapater<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
+	public static final Map<Registry<?>, EmiRegistryAdapater<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
 	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_CONTENTS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
 	private static final Map<Identifier, List<TagKey<?>>> SORTED_TAGS = Maps.newHashMap();
-	public static final List<Registry<?>> REGISTRIES = List.of(EmiPort.getItemRegistry(), EmiPort.getFluidRegistry());
 	public static final List<TagKey<?>> TAGS = Lists.newArrayList();
 	public static TagExclusions exclusions = new TagExclusions();
 
-	@SuppressWarnings("unchecked")
+	public static <T> Registry<T> getRegistry(TagKey<T> key) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		return client.world.getRegistryManager().getOptional(key.registry()).orElse(null);
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> List<EmiStack> getValues(TagKey<T> key) {
 		if (TAG_VALUES.containsKey(key)) {
-			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
-			if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
-				return values.stream().map(t -> EmiStack.of((Item) t)).toList();
-			} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
-				return values.stream().map(t -> EmiStack.of((Fluid) t)).toList();
+			EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+			if (adapter != null) {
+				List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
+				return values.stream().map(t -> adapter.of(t)).toList();
 			}
 		}
 		return List.of();
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> List<EmiStack> getRawValues(TagKey<T> key) {
-		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
-			return EmiUtil.values(key).map(e -> EmiStack.of((Item) e.value())).toList();
-		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
-			return EmiUtil.values(key).map(e -> EmiStack.of((Fluid) e.value())).toList();
-		} else if (key.registry().equals(EmiPort.getBlockRegistry().getKey())) {
+		if (key.registry().equals(EmiPort.getBlockRegistry().getKey())) {
 			return EmiUtil.values(key).map(e -> EmiStack.of((Block) e.value())).toList();
+		}
+		EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+		if (adapter != null) {
+			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
+			return values.stream().map(t -> adapter.of(t)).toList();
 		}
 		return List.of();
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> EmiIngredient getIngredient(Class<T> clazz, List<EmiStack> stacks, long amount) {
-		Registry<T> registry;
-		if (clazz == Item.class) {
-			registry = (Registry<T>) EmiPort.getItemRegistry();
-		} else if (clazz == Fluid.class) {
-			registry = (Registry<T>) EmiPort.getFluidRegistry();
-		} else {
-			return EmiStack.EMPTY;
-		}
 		Map<T, EmiStack> map = Maps.newHashMap();
 		for (EmiStack stack : stacks) {
 			if (!stack.isEmpty()) {
@@ -96,6 +96,11 @@ public class EmiTags {
 		} else if (map.size() == 1) {
 			return map.values().stream().toList().get(0).copy().setAmount(amount);
 		}
+		EmiRegistryAdapater<T> adapter = (EmiRegistryAdapater<T>) ADAPTERS_BY_CLASS.get(clazz);
+		if (adapter == null) {
+			return new ListEmiIngredient(stacks, amount);
+		}
+		Registry<T> registry = adapter.getRegistry();
 		List<TagKey<T>> keys = (List<TagKey<T>>) (List) CACHED_TAGS.get(map.keySet());
 
 		if (keys != null) {
@@ -150,7 +155,7 @@ public class EmiTags {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> List<TagKey<T>> getTags(Registry<T> registry) {
-		return (List<TagKey<T>>) (List) SORTED_TAGS.get(registry.getKey().getValue());
+		return (List<TagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.getKey().getValue(), List.of());
 	}
 
 	public static Text getTagName(TagKey<?> key) {
@@ -234,7 +239,7 @@ public class EmiTags {
 		TAG_CONTENTS.clear();
 		TAG_VALUES.clear();
 		CACHED_TAGS.clear();
-		for (Registry<?> registry : REGISTRIES) {
+		for (Registry<?> registry : ADAPTERS_BY_REGISTRY.keySet()) {
 			reloadTags(registry);
 		}
 	}
@@ -265,11 +270,11 @@ public class EmiTags {
 		EmiTags.SORTED_TAGS.put(registry.getKey().getValue(), (List) tags);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T> EmiStack stackFromKey(TagKey<T> key, T t) {
-		if (key.registry().equals(EmiPort.getItemRegistry().getKey())) {
-			return EmiStack.of((Item) t);
-		} else if (key.registry().equals(EmiPort.getFluidRegistry().getKey())) {
-			return EmiStack.of((Fluid) t);
+		EmiRegistryAdapater<T> adapter = (EmiRegistryAdapater<T>) ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+		if (adapter != null) {
+			return adapter.of(t);
 		}
 		throw new UnsupportedOperationException("Unsupported tag registry " + key);
 	}

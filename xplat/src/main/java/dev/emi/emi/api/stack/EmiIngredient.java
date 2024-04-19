@@ -7,7 +7,6 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -124,16 +123,12 @@ public interface EmiIngredient extends EmiRenderable {
 			for (EmiIngredient i : list) {
 				for (EmiStack s : i.getEmiStacks()) {
 					if (!s.isEmpty()) {
-						Class<?> tt = null;
-						if (s.getKey() instanceof Item) {
-							tt = Item.class;
-						} else if (s.getKey() instanceof Fluid) {
-							tt = Fluid.class;
+						if (tagType == null) {
+							tagType = EmiTags.ADAPTERS_BY_CLASS.getKey(s.getKey().getClass());
 						}
-						if (tt == null || (tagType != null && tt != tagType)) {
+						if (tagType == null || !tagType.isAssignableFrom(s.getKey().getClass())) {
 							return new ListEmiIngredient(list, amount);
 						}
-						tagType = tt;
 					}
 				}
 			}

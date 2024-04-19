@@ -1641,10 +1641,9 @@ public class EmiScreenManager {
 				if (hovered != -1 && EmiConfig.showHoverOverlay && startIndex + hovered < stacks.size()) {
 					hx = this.getRawX(hovered);
 					hy = this.getRawY(hovered);
-					EmiRenderHelper.drawSlotHightlight(context, hx, hy, ENTRY_SIZE, ENTRY_SIZE);
+					EmiRenderHelper.drawSlotHightlight(context, hx, hy, ENTRY_SIZE, ENTRY_SIZE, 0);
 				}
 				context.push();
-				context.matrices().translate(0, 0, 100);
 				outer: for (int yo = 0; yo < this.th; yo++) {
 					for (int xo = 0; xo < this.getWidth(yo); xo++) {
 						if (i >= stacks.size()) {
