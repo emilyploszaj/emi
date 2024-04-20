@@ -44,10 +44,10 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(ItemStack stack, long amount) {
-		this(stack.getItem(), amount, stack.getNbt());
+		this(stack.getItem(), stack.getNbt(), amount);
 	}
 
-	public ItemEmiStack(Item item, long amount, NbtCompound nbt) {
+	public ItemEmiStack(Item item, NbtCompound nbt, long amount) {
 		this.item = item;
 		this.nbt = nbt != null ? nbt.copy() : null;
 		this.amount = amount;
@@ -55,7 +55,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public ItemStack getItemStack() {
-		ItemStack stack = new ItemStack(this.item, (int)this.amount);
+		ItemStack stack = new ItemStack(this.item, (int) this.amount);
 		if (this.nbt != null) {
 			stack.setNbt(this.nbt);
 		}
@@ -64,7 +64,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(item, amount, nbt);
+		EmiStack e = new ItemEmiStack(item, nbt, amount);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
