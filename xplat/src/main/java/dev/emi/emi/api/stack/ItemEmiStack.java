@@ -2,6 +2,8 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
@@ -31,7 +33,10 @@ import net.minecraft.util.Identifier;
 @ApiStatus.Internal
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
-	private final ItemStack stack;
+
+	private final Item item;
+	private final NbtCompound nbt;
+
 	private boolean unbatchable;
 
 	public ItemEmiStack(ItemStack stack) {
@@ -39,21 +44,27 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(ItemStack stack, long amount) {
-		stack = stack.copy();
-		stack.setCount((int) amount);
-		this.stack = stack;
+		this(stack.getItem(), amount, stack.getNbt());
+	}
+
+	public ItemEmiStack(Item item, long amount, NbtCompound nbt) {
+		this.item = item;
+		this.nbt = nbt != null ? nbt.copy() : null;
 		this.amount = amount;
 	}
 
 	@Override
 	public ItemStack getItemStack() {
-		stack.setCount((int) amount);
+		ItemStack stack = new ItemStack(this.item, (int)this.amount);
+		if (this.nbt != null) {
+			stack.setNbt(this.nbt);
+		}
 		return stack;
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(stack.copy(), amount);
+		EmiStack e = new ItemEmiStack(item, amount, nbt);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
@@ -62,22 +73,22 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public boolean isEmpty() {
-		return amount == 0 || stack.isEmpty();
+		return amount == 0 || item == Items.AIR;
 	}
 
 	@Override
 	public NbtCompound getNbt() {
-		return stack.getNbt();
+		return nbt;
 	}
 
 	@Override
 	public Object getKey() {
-		return stack.getItem();
+		return item;
 	}
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.getItemRegistry().getId(stack.getItem());
+		return EmiPort.getItemRegistry().getId(item);
 	}
 
 	@Override
