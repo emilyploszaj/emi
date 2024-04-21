@@ -60,7 +60,7 @@ public class EmiTags {
 			EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 			if (adapter != null) {
 				List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
-				return values.stream().map(t -> adapter.of(t)).toList();
+				return values.stream().map(t -> adapter.of(t, null, 0)).toList();
 			}
 		}
 		return List.of();
@@ -74,7 +74,7 @@ public class EmiTags {
 		EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 		if (adapter != null) {
 			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
-			return values.stream().map(t -> adapter.of(t)).toList();
+			return values.stream().map(t -> adapter.of(t, null, 0)).toList();
 		}
 		return List.of();
 	}
@@ -274,7 +274,7 @@ public class EmiTags {
 	private static <T> EmiStack stackFromKey(TagKey<T> key, T t) {
 		EmiRegistryAdapater<T> adapter = (EmiRegistryAdapater<T>) ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 		if (adapter != null) {
-			return adapter.of(t);
+			return adapter.of(t, null, 0);
 		}
 		throw new UnsupportedOperationException("Unsupported tag registry " + key);
 	}

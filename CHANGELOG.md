@@ -1,4 +1,5 @@
 ### Tweaks
+* Significantly reduce EMI's RAM consumption at the minor cost of niche ItemStack identity dependency scenarios (halved total RAM consumption in smaller pack testing with other optimization mods).
 * Fluid hovering highlight no longer covers the fluid in the sidebar.
 
 ### Fixes
