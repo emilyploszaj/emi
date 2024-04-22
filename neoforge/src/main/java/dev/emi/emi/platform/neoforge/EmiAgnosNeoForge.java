@@ -235,13 +235,13 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	}
 
 	@Override
-	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges nbt) {
-		return new FluidStack(fluid.getRegistryEntry(), 1000, nbt).getHoverName();
+	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return new FluidStack(fluid.getRegistryEntry(), 1000, componentChanges).getHoverName();
 	}
 
 	@Override
-	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges nbt) {
-		return List.of(getFluidName(fluid, nbt));
+	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return List.of(getFluidName(fluid, componentChanges));
 	}
 
 	@Override

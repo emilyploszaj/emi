@@ -168,13 +168,13 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges nbt) {
-		return FluidVariantAttributes.getName(FluidVariant.of(fluid, nbt));
+	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return FluidVariantAttributes.getName(FluidVariant.of(fluid, componentChanges));
 	}
 
 	@Override
-	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges nbt) {
-		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, nbt));
+	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, componentChanges));
 	}
 
 	@Override

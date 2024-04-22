@@ -96,17 +96,17 @@ public abstract class EmiAgnos {
 
 	protected abstract List<TooltipComponent> getItemTooltipAgnos(ItemStack stack);
 
-	public static Text getFluidName(Fluid fluid, ComponentChanges nbt) {
-		return delegate.getFluidNameAgnos(fluid, nbt);
+	public static Text getFluidName(Fluid fluid, ComponentChanges componentChanges) {
+		return delegate.getFluidNameAgnos(fluid, componentChanges);
 	}
 
-	protected abstract Text getFluidNameAgnos(Fluid fluid, ComponentChanges nbt);
+	protected abstract Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges);
 
-	public static List<Text> getFluidTooltip(Fluid fluid, ComponentChanges nbt) {
-		return delegate.getFluidTooltipAgnos(fluid, nbt);
+	public static List<Text> getFluidTooltip(Fluid fluid, ComponentChanges componentChanges) {
+		return delegate.getFluidTooltipAgnos(fluid, componentChanges);
 	}
 
-	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges nbt);
+	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges);
 
 	public static boolean isFloatyFluid(FluidEmiStack stack) {
 		return delegate.isFloatyFluidAgnos(stack);
