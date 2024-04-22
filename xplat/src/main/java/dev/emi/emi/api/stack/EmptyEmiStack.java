@@ -53,11 +53,6 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ComponentMap getComponents() {
-		return ComponentMap.EMPTY;
-	}
-
-	@Override
 	public ComponentChanges getComponentChanges() {
 		return ComponentChanges.EMPTY;
 	}

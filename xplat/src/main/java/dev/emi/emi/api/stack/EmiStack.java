@@ -1,12 +1,14 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentMapImpl;
+import net.minecraft.component.DataComponentType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -27,7 +29,7 @@ import net.minecraft.util.Identifier;
  * An abstract representation of a resource in EMI.
  * Can be an item, a fluid, or something else.
  */
-public abstract class EmiStack implements EmiIngredient, ComponentHolder {
+public abstract class EmiStack implements EmiIngredient {
 	public static final EmiStack EMPTY = new EmptyEmiStack();
 	private EmiStack remainder = EMPTY;
 	protected Comparison comparison = Comparison.DEFAULT_COMPARISON;
@@ -83,9 +85,18 @@ public abstract class EmiStack implements EmiIngredient, ComponentHolder {
 		return this;
 	}
 
-	public abstract ComponentMap getComponents();
-
 	public abstract ComponentChanges getComponentChanges();
+
+	public <T> @Nullable T get(DataComponentType<? extends T> type) {
+		var opt = getComponentChanges().get(type);
+		//noinspection OptionalAssignedToNull
+		return opt != null ? opt.orElse(null) : null;
+	}
+
+	public <T> T getOrDefault(DataComponentType<? extends T> type, T fallback) {
+		var componentValue = this.get(type);
+		return componentValue != null ? componentValue : fallback;
+	}
 
 	public abstract Object getKey();
 
@@ -151,9 +162,9 @@ public abstract class EmiStack implements EmiIngredient, ComponentHolder {
 	@Override
 	public String toString() {
 		String s = "" + getKey();
-		ComponentMap componentMap = getComponents();
-		if (componentMap != ComponentMap.EMPTY) {
-			s += componentMap;
+		ComponentChanges changes = getComponentChanges();
+		if (changes != ComponentChanges.EMPTY) {
+			s += changes;
 		}
 		return s + " x" + getAmount();
 	}

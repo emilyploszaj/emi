@@ -7,8 +7,10 @@ import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentMapImpl;
+import net.minecraft.component.DataComponentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
@@ -32,13 +34,14 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.Internal
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 
-	private final Item item;
-	private final ComponentMapImpl components;
+	private final RegistryEntry<Item> item;
+	private final ComponentChanges componentChanges;
 
 	private boolean unbatchable;
 
@@ -47,27 +50,27 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(ItemStack stack, long amount) {
-		this(stack.getItem(), ((ItemStackAccessor)(Object)stack).getBackingComponentMap(), amount);
+		this(stack.getItem(), stack.getComponentChanges(), amount);
 	}
 
 	public ItemEmiStack(Item item, ComponentChanges components, long amount) {
-		this(item, ComponentMapImpl.create(item.getComponents(), components), amount);
+		this(EmiPort.getItemRegistry().getEntry(item), components, amount);
 	}
 
-	private ItemEmiStack(Item item, ComponentMapImpl components, long amount) {
+	public ItemEmiStack(RegistryEntry<Item> item, ComponentChanges components, long amount) {
 		this.item = item;
-		this.components = components.copy();
+		this.componentChanges = components;
 		this.amount = amount;
 	}
 
 	@Override
 	public ItemStack getItemStack() {
-		return ItemStackAccessor.withExistingComponentMap(this.item, (int) this.amount, this.components);
+		return new ItemStack(this.item, (int) this.amount, componentChanges);
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new ItemEmiStack(item, components, amount);
+		EmiStack e = new ItemEmiStack(item, componentChanges, amount);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
@@ -80,13 +83,20 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public ComponentMap getComponents() {
-		return this.components;
+	public ComponentChanges getComponentChanges() {
+		return this.componentChanges;
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
-		return this.components.getChanges();
+	public <T> @Nullable T get(DataComponentType<? extends T> type) {
+		// Check the changes first
+		var changedOpt = this.componentChanges.get(type);
+		//noinspection OptionalAssignedToNull
+		if(changedOpt != null) {
+			return changedOpt.orElse(null);
+		}
+		// Check the item's default components
+		return this.item.value().getComponents().get(type);
 	}
 
 	@Override
@@ -96,7 +106,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.getItemRegistry().getId(item);
+		return EmiPort.getItemRegistry().getId(item.value());
 	}
 
 	@Override

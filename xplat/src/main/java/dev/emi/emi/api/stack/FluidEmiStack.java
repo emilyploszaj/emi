@@ -25,7 +25,6 @@ import net.minecraft.util.Identifier;
 public class FluidEmiStack extends EmiStack {
 	private final Fluid fluid;
 	private final ComponentChanges componentChanges;
-	private final ComponentMap components;
 
 	public FluidEmiStack(Fluid fluid) {
 		this(fluid, ComponentChanges.EMPTY);
@@ -38,7 +37,6 @@ public class FluidEmiStack extends EmiStack {
 	public FluidEmiStack(Fluid fluid, ComponentChanges componentChanges, long amount) {
 		this.fluid = fluid;
 		this.componentChanges = componentChanges;
-		this.components = componentChanges == ComponentChanges.EMPTY ? ComponentMap.EMPTY : ComponentMapImpl.create(ComponentMap.EMPTY, componentChanges);
 		this.amount = amount;
 	}
 
@@ -54,11 +52,6 @@ public class FluidEmiStack extends EmiStack {
 	@Override
 	public boolean isEmpty() {
 		return false;
-	}
-
-	@Override
-	public ComponentMap getComponents() {
-		return components;
 	}
 
 	@Override
