@@ -2,7 +2,6 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
-import dev.emi.emi.mixin.accessor.ItemStackAccessor;
 import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentMap;
