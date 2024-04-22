@@ -6,6 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registry;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides EMI context for a {@link Registry} to construct stacks from the objects in the registry.
@@ -27,7 +28,7 @@ public interface EmiRegistryAdapater<T> {
 	/**
 	 * Constructs an {@link EmiStack} from a given object from the registry, or {@link EmiStack#EMPTY} if somehow invalid.
 	 */
-	EmiStack of(T t, ComponentChanges componentChanges, long amount);
+	EmiStack of(T t, @Nullable ComponentChanges componentChanges, long amount);
 
 	/**
 	 * Convenience method for creating an {@link EmiRegistryAdapter}.
@@ -46,7 +47,12 @@ public interface EmiRegistryAdapater<T> {
 			}
 
 			@Override
-			public EmiStack of(T t, ComponentChanges componentChanges, long amount) {
+			public EmiStack of(T t, @Nullable ComponentChanges componentChanges, long amount) {
+				// We allow null values unlike Mojang to reduce the diff size when backporting. They need to be cleaned
+				// up before construction, however.
+				if(componentChanges == null) {
+					componentChanges = ComponentChanges.EMPTY;
+				}
 				return constructor.of(t, componentChanges, amount);
 			}
 		};

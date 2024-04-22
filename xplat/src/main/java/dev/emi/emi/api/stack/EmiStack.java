@@ -196,18 +196,18 @@ public abstract class EmiStack implements EmiIngredient, ComponentHolder {
 		return of(fluid, ComponentChanges.EMPTY, amount);
 	}
 
-	public static EmiStack of(Fluid fluid, ComponentChanges nbt) {
-		return of(fluid, nbt, 0);
+	public static EmiStack of(Fluid fluid, ComponentChanges componentChanges) {
+		return of(fluid, componentChanges, 0);
 	}
 
-	public static EmiStack of(Fluid fluid, ComponentChanges nbt, long amount) {
+	public static EmiStack of(Fluid fluid, ComponentChanges componentChanges, long amount) {
 		if (fluid instanceof FlowableFluid ff && ff.getStill() != Fluids.EMPTY) {
 			fluid = ff.getStill();
 		}
 		if (fluid == Fluids.EMPTY) {
 			return EmiStack.EMPTY;
 		}
-		return new FluidEmiStack(fluid, nbt, amount);
+		return new FluidEmiStack(fluid, componentChanges, amount);
 	}
 
 	static abstract class Entry<T> {
