@@ -10,8 +10,7 @@
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
     "ClientConfigurationNetworkHandlerMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "SynchronizeRecipesS2CPacketMixin"
+    "ClientPlayNetworkHandlerMixin"
   ],
   "server": [],
   "injectors": {
