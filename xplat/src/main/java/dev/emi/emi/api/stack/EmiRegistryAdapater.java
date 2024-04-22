@@ -1,5 +1,7 @@
 package dev.emi.emi.api.stack;
 
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMapImpl;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.nbt.NbtCompound;
@@ -25,7 +27,7 @@ public interface EmiRegistryAdapater<T> {
 	/**
 	 * Constructs an {@link EmiStack} from a given object from the registry, or {@link EmiStack#EMPTY} if somehow invalid.
 	 */
-	EmiStack of(T t, NbtCompound nbt, long amount);
+	EmiStack of(T t, ComponentChanges componentChanges, long amount);
 
 	/**
 	 * Convenience method for creating an {@link EmiRegistryAdapter}.
@@ -44,13 +46,13 @@ public interface EmiRegistryAdapater<T> {
 			}
 
 			@Override
-			public EmiStack of(T t, NbtCompound nbt, long amount) {
-				return constructor.of(t, nbt, amount);
+			public EmiStack of(T t, ComponentChanges componentChanges, long amount) {
+				return constructor.of(t, componentChanges, amount);
 			}
 		};
 	}
 
 	public static interface StackConstructor<T> {
-		EmiStack of(T t, NbtCompound nbt, long amount);
+		EmiStack of(T t, ComponentChanges componentChanges, long amount);
 	}
 }

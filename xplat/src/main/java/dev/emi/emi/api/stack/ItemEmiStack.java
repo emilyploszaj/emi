@@ -50,7 +50,11 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		this(stack.getItem(), ((ItemStackAccessor)(Object)stack).getBackingComponentMap(), amount);
 	}
 
-	public ItemEmiStack(Item item, ComponentMapImpl components, long amount) {
+	public ItemEmiStack(Item item, ComponentChanges components, long amount) {
+		this(item, ComponentMapImpl.create(item.getComponents(), components), amount);
+	}
+
+	private ItemEmiStack(Item item, ComponentMapImpl components, long amount) {
 		this.item = item;
 		this.components = components.copy();
 		this.amount = amount;

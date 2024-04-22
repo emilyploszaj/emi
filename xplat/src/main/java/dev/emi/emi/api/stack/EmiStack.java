@@ -6,6 +6,7 @@ import java.util.function.Function;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentMapImpl;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -179,12 +180,12 @@ public abstract class EmiStack implements EmiIngredient, ComponentHolder {
 		return of(item.asItem().getDefaultStack(), amount);
 	}
 
-	public static EmiStack of(ItemConvertible item, NbtCompound nbt) {
-		return of(item, null, 1);
+	public static EmiStack of(ItemConvertible item, ComponentChanges componentChanges) {
+		return of(item, componentChanges, 1);
 	}
 
-	public static EmiStack of(ItemConvertible item, NbtCompound nbt, long amount) {
-		return new ItemEmiStack(item.asItem(), nbt, amount);
+	public static EmiStack of(ItemConvertible item, ComponentChanges componentChanges, long amount) {
+		return new ItemEmiStack(item.asItem(), componentChanges, amount);
 	}
 
 	public static EmiStack of(Fluid fluid) {
