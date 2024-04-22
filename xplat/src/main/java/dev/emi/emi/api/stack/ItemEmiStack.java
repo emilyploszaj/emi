@@ -4,12 +4,9 @@ import java.util.List;
 
 import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.DataComponentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
@@ -39,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 public class ItemEmiStack extends EmiStack implements Batchable {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 
-	private final RegistryEntry<Item> item;
+	private final Item item;
 	private final ComponentChanges componentChanges;
 
 	private boolean unbatchable;
@@ -53,10 +50,6 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	public ItemEmiStack(Item item, ComponentChanges components, long amount) {
-		this(EmiPort.getItemRegistry().getEntry(item), components, amount);
-	}
-
-	public ItemEmiStack(RegistryEntry<Item> item, ComponentChanges components, long amount) {
 		this.item = item;
 		this.componentChanges = components;
 		this.amount = amount;
@@ -64,7 +57,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public ItemStack getItemStack() {
-		return new ItemStack(this.item, (int) this.amount, componentChanges);
+		return new ItemStack(EmiPort.getItemRegistry().getEntry(this.item), (int) this.amount, componentChanges);
 	}
 
 	@Override
@@ -95,7 +88,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 			return changedOpt.orElse(null);
 		}
 		// Check the item's default components
-		return this.item.value().getComponents().get(type);
+		return this.item.getComponents().get(type);
 	}
 
 	@Override
@@ -105,7 +98,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.getItemRegistry().getId(item.value());
+		return EmiPort.getItemRegistry().getId(item);
 	}
 
 	@Override
