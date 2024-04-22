@@ -20,7 +20,7 @@ import net.minecraft.util.JsonHelper;
 public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSerializer<T> {
 	static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	
-	EmiStack create(Identifier id, ComponentChanges componentPatch, long amount);
+	EmiStack create(Identifier id, ComponentChanges componentChanges, long amount);
 
 	@Override
 	default EmiIngredient deserialize(JsonElement element) {

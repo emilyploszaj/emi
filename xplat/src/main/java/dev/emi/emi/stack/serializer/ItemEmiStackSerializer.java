@@ -17,8 +17,8 @@ public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> 
 	}
 
 	@Override
-	public EmiStack create(Identifier id, ComponentChanges nbt, long amount) {
-		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().getEntry(id).orElseThrow(), 1, nbt);
+	public EmiStack create(Identifier id, ComponentChanges componentChanges, long amount) {
+		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().getEntry(id).orElseThrow(), 1, componentChanges);
 		return EmiStack.of(stack, amount);
 	}
 }
