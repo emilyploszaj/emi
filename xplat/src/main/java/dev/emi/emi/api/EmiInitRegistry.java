@@ -3,7 +3,7 @@ package dev.emi.emi.api;
 import java.util.function.Predicate;
 
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiRegistryAdapater;
+import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 
@@ -36,5 +36,5 @@ public interface EmiInitRegistry {
 	/**
 	* Adds an adapter for a given registry to allow EMI to construct stacks and create tags from objects of the registry.
 	*/
-	void addRegistryAdapter(EmiRegistryAdapater<?> adapter);
+	void addRegistryAdapter(EmiRegistryAdapter<?> adapter);
 }

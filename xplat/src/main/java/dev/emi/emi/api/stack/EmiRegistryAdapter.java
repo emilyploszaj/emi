@@ -10,7 +10,7 @@ import net.minecraft.registry.Registry;
  * This allows EMI to construct tag ingredients from stacks from the given registry.
  */
 @ApiStatus.Experimental
-public interface EmiRegistryAdapater<T> {
+public interface EmiRegistryAdapter<T> {
 
 	/**
 	 * @return The base class for objects in the registry.
@@ -30,8 +30,8 @@ public interface EmiRegistryAdapater<T> {
 	/**
 	 * Convenience method for creating an {@link EmiRegistryAdapter}.
 	 */
-	public static <T> EmiRegistryAdapater<T> simple(Class<T> clazz, Registry<T> registry, StackConstructor<T> constructor) {
-		return new EmiRegistryAdapater<T>() {
+	public static <T> EmiRegistryAdapter<T> simple(Class<T> clazz, Registry<T> registry, StackConstructor<T> constructor) {
+		return new EmiRegistryAdapter<T>() {
 
 			@Override
 			public Class<T> getBaseClass() {
