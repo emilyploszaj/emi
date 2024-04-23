@@ -331,6 +331,8 @@ public class VanillaPlugin implements EmiPlugin {
 			EmiPort.getDisabledItems()
 		).collect(Collectors.toSet());
 
+		List<Item> dyeableItems = EmiPort.getItemRegistry().stream().filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
+
 		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
 			Identifier id = EmiPort.getId(recipe);
 			if (recipe instanceof MapExtendingRecipe map) {
@@ -347,7 +349,7 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
 			} else if (recipe instanceof ArmorDyeRecipe dye) {
-				for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+				for (Item i : dyeableItems) {
 					if (!hiddenItems.contains(i)) {
 						addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
 					}
@@ -459,7 +461,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		safely("repair", () -> addRepair(registry, hiddenItems));
 		safely("brewing", () -> EmiAgnos.addBrewingRecipes(registry));
-		safely("world interaction", () -> addWorldInteraction(registry, hiddenItems));
+		safely("world interaction", () -> addWorldInteraction(registry, hiddenItems, dyeableItems));
 		safely("fuel", () -> addFuel(registry, hiddenItems));
 		safely("composting", () -> addComposting(registry, hiddenItems));
 
@@ -558,7 +560,7 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 	}
 
-	private static void addWorldInteraction(EmiRegistry registry, Set<Item> hiddenItems) {
+	private static void addWorldInteraction(EmiRegistry registry, Set<Item> hiddenItems, List<Item> dyeableItems) {
 		EmiStack concreteWater = EmiStack.of(Fluids.WATER);
 		concreteWater.setRemainder(concreteWater);
 		addConcreteRecipe(registry, Blocks.WHITE_CONCRETE_POWDER, concreteWater, Blocks.WHITE_CONCRETE);
@@ -643,7 +645,7 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
 		}
 
-		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+		for (Item i : dyeableItems) {
 			if (hiddenItems.contains(i)) {
 				continue;
 			}

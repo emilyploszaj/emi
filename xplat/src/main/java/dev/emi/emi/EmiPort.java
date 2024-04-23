@@ -31,6 +31,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
@@ -214,5 +215,9 @@ public final class EmiPort {
 
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
 		return PotionUtil.setPotion(stack, potion);
+	}
+
+	public static NbtCompound emptyNbt() {
+		return null;
 	}
 }
