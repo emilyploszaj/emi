@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -233,5 +234,9 @@ public final class EmiPort {
 			return client.world.getRegistryManager();
 		}
 		return null;
+	}
+
+	public static ComponentChanges emptyExtraData() {
+		return ComponentChanges.EMPTY;
 	}
 }
