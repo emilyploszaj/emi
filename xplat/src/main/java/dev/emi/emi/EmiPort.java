@@ -11,9 +11,7 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -110,7 +108,7 @@ public final class EmiPort {
 	}
 
 	public static BannerPatternsComponent addRandomBanner(BannerPatternsComponent patterns, Random random) {
-		var bannerRegistry = getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
+		var bannerRegistry = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
 		return new BannerPatternsComponent.Builder().addAll(patterns).add(bannerRegistry.getEntry(random.nextInt(bannerRegistry.size())).get(),
 			DyeColor.values()[random.nextInt(DyeColor.values().length)]).build();
 	}
@@ -222,14 +220,6 @@ public final class EmiPort {
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
 		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, getPotionRegistry().getEntry(potion), PotionContentsComponent::with);
 		return stack;
-	}
-
-	public static @Nullable DynamicRegistryManager getRegistryManager() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world != null) {
-			return client.world.getRegistryManager();
-		}
-		return null;
 	}
 
 	public static ComponentChanges emptyExtraData() {
