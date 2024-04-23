@@ -219,13 +219,9 @@ public final class EmiPort {
 		return Comparison.compareNbt();
 	}
 
-	public static ItemStack setPotion(ItemStack stack, RegistryEntry<Potion> potion) {
-		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, potion, PotionContentsComponent::with);
-		return stack;
-	}
-
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
-		return setPotion(stack, getPotionRegistry().getEntry(potion));
+		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, getPotionRegistry().getEntry(potion), PotionContentsComponent::with);
+		return stack;
 	}
 
 	public static @Nullable DynamicRegistryManager getRegistryManager() {
