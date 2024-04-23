@@ -217,7 +217,7 @@ public final class EmiPort {
 		return PotionUtil.setPotion(stack, potion);
 	}
 
-	public static NbtCompound emptyNbt() {
+	public static NbtCompound emptyExtraData() {
 		return null;
 	}
 }

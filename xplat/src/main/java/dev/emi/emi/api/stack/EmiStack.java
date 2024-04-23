@@ -188,11 +188,11 @@ public abstract class EmiStack implements EmiIngredient {
 	}
 
 	public static EmiStack of(Fluid fluid) {
-		return of(fluid, EmiPort.emptyNbt());
+		return of(fluid, EmiPort.emptyExtraData());
 	}
 
 	public static EmiStack of(Fluid fluid, long amount) {
-		return of(fluid, EmiPort.emptyNbt(), amount);
+		return of(fluid, EmiPort.emptyExtraData(), amount);
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
