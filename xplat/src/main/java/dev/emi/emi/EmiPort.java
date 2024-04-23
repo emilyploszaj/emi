@@ -216,7 +216,7 @@ public final class EmiPort {
 	}
 
 	public static Comparison compareStrict() {
-		return Comparison.compareNbt();
+		return Comparison.compareComponents();
 	}
 
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
