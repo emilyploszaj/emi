@@ -15,7 +15,7 @@ import com.google.common.collect.Maps;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiRegistryAdapater;
+import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
@@ -38,8 +38,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EmiTags {
-	public static final InheritanceMap<EmiRegistryAdapater<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
-	public static final Map<Registry<?>, EmiRegistryAdapater<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
+	public static final InheritanceMap<EmiRegistryAdapter<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
+	public static final Map<Registry<?>, EmiRegistryAdapter<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
 	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
@@ -57,7 +57,7 @@ public class EmiTags {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> List<EmiStack> getValues(TagKey<T> key) {
 		if (TAG_VALUES.containsKey(key)) {
-			EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+			EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 			if (adapter != null) {
 				List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
 				return values.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
@@ -71,7 +71,7 @@ public class EmiTags {
 		if (key.registry().equals(EmiPort.getBlockRegistry().getKey())) {
 			return EmiUtil.values(key).map(e -> EmiStack.of((Block) e.value())).toList();
 		}
-		EmiRegistryAdapater adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+		EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 		if (adapter != null) {
 			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
 			return values.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
@@ -96,7 +96,7 @@ public class EmiTags {
 		} else if (map.size() == 1) {
 			return map.values().stream().toList().get(0).copy().setAmount(amount);
 		}
-		EmiRegistryAdapater<T> adapter = (EmiRegistryAdapater<T>) ADAPTERS_BY_CLASS.get(clazz);
+		EmiRegistryAdapter<T> adapter = (EmiRegistryAdapter<T>) ADAPTERS_BY_CLASS.get(clazz);
 		if (adapter == null) {
 			return new ListEmiIngredient(stacks, amount);
 		}
@@ -272,7 +272,7 @@ public class EmiTags {
 
 	@SuppressWarnings("unchecked")
 	private static <T> EmiStack stackFromKey(TagKey<T> key, T t) {
-		EmiRegistryAdapater<T> adapter = (EmiRegistryAdapater<T>) ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+		EmiRegistryAdapter<T> adapter = (EmiRegistryAdapter<T>) ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 		if (adapter != null) {
 			return adapter.of(t, EmiPort.emptyExtraData(), 1);
 		}
