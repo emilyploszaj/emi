@@ -48,15 +48,6 @@ repositories {
 			includeGroupAndSubgroups "cpw.mods"
 		}
 	}
-	// TODO: Remove when 1.20.5 is released
-	maven {
-		name 'Maven for PR #794' // https://github.com/neoforged/NeoForge/pull/794
-		url 'https://prmaven.neoforged.net/NeoForge/pr794'
-		content {
-			includeModule('net.neoforged', 'testframework')
-			includeModule('net.neoforged', 'neoforge')
-		}
-	}
 }
 
 configurations {
