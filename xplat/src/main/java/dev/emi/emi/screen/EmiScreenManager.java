@@ -7,7 +7,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.component.ComponentChanges;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
@@ -660,8 +662,8 @@ public class EmiScreenManager {
 			if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
 				ScreenSpace space = getHoveredSpace(mouseX, mouseY);
 				if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
-					MatrixStack view = RenderSystem.getModelViewStack();
-					view.push();
+					Matrix4fStack view = RenderSystem.getModelViewStack();
+					view.pushMatrix();
 					view.translate(0, 0, 200);
 					RenderSystem.applyModelViewMatrix();
 					int lhx = space.getRawX(lastHoveredCraftableOffset);
@@ -669,7 +671,7 @@ public class EmiScreenManager {
 					context.fill(lhx, lhy, 18, 18, 0x44AA00FF);
 					lastHoveredCraftable.getStack().render(context.raw(), lhx + 1, lhy + 1, delta,
 							EmiIngredient.RENDER_ICON);
-					view.pop();
+					view.popMatrix();
 					RenderSystem.applyModelViewMatrix();
 				}
 			}
@@ -1282,8 +1284,8 @@ public class EmiScreenManager {
 			if (!is.isEmpty()) {
 				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
 				String command = "give @s " + id;
-				if (is.hasNbt()) {
-					command += is.getNbt().toString();
+				if (is.getComponentChanges() != ComponentChanges.EMPTY) {
+					command += is.getComponentChanges().toString();
 				}
 				command += " " + amount;
 				if (command.length() < 256) {

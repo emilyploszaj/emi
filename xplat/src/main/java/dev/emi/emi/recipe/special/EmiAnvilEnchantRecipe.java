@@ -10,13 +10,12 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
 public class EmiAnvilEnchantRecipe implements EmiRecipe {
@@ -85,16 +84,9 @@ public class EmiAnvilEnchantRecipe implements EmiRecipe {
 
 	private EmiStack getBook() {
 		ItemStack item = new ItemStack(Items.ENCHANTED_BOOK);
-		NbtCompound tag = new NbtCompound();
-		NbtList StoredEnchantments = new NbtList();
-		NbtCompound enchant = new NbtCompound();
-		String id = getTool().getNbt().getList("Enchantments", NbtElement.COMPOUND_TYPE).getCompound(0).getString("id");
-
-		enchant.putString("id", id);
-		enchant.putShort("lvl", (short) level);
-		StoredEnchantments.add(enchant);
-		tag.put("StoredEnchantments", StoredEnchantments);
-		item.setNbt(tag);
+		var enchBuilder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
+		enchBuilder.add(enchantment, level);
+		item.set(DataComponentTypes.STORED_ENCHANTMENTS, enchBuilder.build());
 		return EmiStack.of(item);
 	}
 }

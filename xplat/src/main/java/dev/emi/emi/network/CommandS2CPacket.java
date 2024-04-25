@@ -7,6 +7,7 @@ import dev.emi.emi.bom.BoM;
 import dev.emi.emi.registry.EmiCommands;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.util.Identifier;
 
 public class CommandS2CPacket implements EmiPacket {
@@ -28,7 +29,7 @@ public class CommandS2CPacket implements EmiPacket {
 	}
 
 	@Override
-	public void write(PacketByteBuf buf) {
+	public void write(RegistryByteBuf buf) {
 		buf.writeByte(type);
 		if (type == EmiCommands.VIEW_RECIPE || type == EmiCommands.TREE_GOAL || type == EmiCommands.TREE_RESOLUTION) {
 			buf.writeIdentifier(id);
@@ -60,7 +61,7 @@ public class CommandS2CPacket implements EmiPacket {
 	}
 
 	@Override
-	public Identifier getId() {
+	public Id<CommandS2CPacket> getId() {
 		return EmiNetwork.COMMAND;
 	}
 }

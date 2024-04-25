@@ -6,12 +6,11 @@
   "plugin": "dev.emi.emi.mixinsupport.EmiMixinPlugin",
   "mixins": [],
   "client": [
-    "accessor.BrewingRecipeRegistryRecipeAccessor",
     "conversion.FluidMixin",
     "conversion.ItemConvertibleMixin",
     "conversion.ItemStackMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "SynchronizeRecipesS2CPacketMixin"
+    "ClientConfigurationNetworkHandlerMixin",
+    "ClientPlayNetworkHandlerMixin"
   ],
   "server": [],
   "injectors": {

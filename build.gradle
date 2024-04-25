@@ -1,6 +1,6 @@
 plugins {
 	id "architectury-plugin" version "3.4-SNAPSHOT"
-	id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
+	id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
 }
 
 architectury {
@@ -33,7 +33,7 @@ allprojects {
 
 	tasks.withType(JavaCompile).configureEach({
 		options.encoding = "UTF-8"
-		options.release = 17
+		options.release = 21
 	})
 
 	java {

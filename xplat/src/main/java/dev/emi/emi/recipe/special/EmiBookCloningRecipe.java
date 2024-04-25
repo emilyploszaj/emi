@@ -10,11 +10,14 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.platform.EmiAgnos;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.text.RawFilteredPair;
 import net.minecraft.util.Identifier;
 
 public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
@@ -78,17 +81,15 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 		if (title.length() > 0) {
 			title = Character.toUpperCase(title.charAt(0)) + title.substring(1, title.length());
 		}
-		tag.putString(WrittenBookItem.TITLE_KEY, title);
 		String author;
 		if (random.nextInt(20) < 5) {
 			author = MOD_AUTHORS.get(random.nextInt(MOD_AUTHORS.size()));
 		} else {
 			author = AUTHORS.get(random.nextInt(AUTHORS.size()));
 		}
-		tag.putString(WrittenBookItem.AUTHOR_KEY, author);
-		tag.putInt(WrittenBookItem.GENERATION_KEY, (copy ? 1 : 0) + random.nextInt(2));
-		tag.put("pages", new NbtList());
-		stack.setNbt(tag);
+		int generationKey = (copy ? 1 : 0) + random.nextInt(2);
+		stack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(RawFilteredPair.of(title), author, generationKey, List.of(), false));
+
 		return EmiStack.of(stack);
 	}
 

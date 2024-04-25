@@ -1,5 +1,6 @@
 package dev.emi.emi.platform.fabric;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import dev.emi.emi.network.CreateItemC2SPacket;
@@ -13,9 +14,15 @@ import dev.emi.emi.registry.EmiCommands;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketDecoder;
+import net.minecraft.network.codec.PacketEncoder;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
 public class EmiMainFabric implements ModInitializer {
@@ -25,11 +32,7 @@ public class EmiMainFabric implements ModInitializer {
 		EmiMain.init();
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> EmiCommands.registerCommands(dispatcher));
 
-		EmiNetwork.initServer((player, packet) -> {
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			packet.write(buf);
-			ServerPlayNetworking.send(player, packet.getId(), buf);
-		});
+		EmiNetwork.initServer(ServerPlayNetworking::send);
 
 		registerPacketReader(EmiNetwork.FILL_RECIPE, FillRecipeC2SPacket::new);
 		registerPacketReader(EmiNetwork.CREATE_ITEM, CreateItemC2SPacket::new);
@@ -40,11 +43,11 @@ public class EmiMainFabric implements ModInitializer {
 		});
 	}
 
-	private void registerPacketReader(Identifier id, Function<PacketByteBuf, EmiPacket> create) {
-		ServerPlayNetworking.registerGlobalReceiver(id, (server, player, networkHandler, buf, sender) -> {
-			EmiPacket packet = create.apply(buf);
-			server.execute(() -> {
-				packet.apply(player);
+	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
+		PayloadTypeRegistry.playC2S().register(id, PacketCodec.ofStatic((buf, v) -> v.write(buf), decode));
+		ServerPlayNetworking.registerGlobalReceiver(id, (payload, context) -> {
+			context.player().getServer().execute(() -> {
+				((EmiPacket)payload).apply(context.player());
 			});
 		});
 	}

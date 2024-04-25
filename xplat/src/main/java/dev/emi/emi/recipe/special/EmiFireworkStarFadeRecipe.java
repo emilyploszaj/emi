@@ -12,6 +12,11 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -60,12 +65,11 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 
 	private EmiStack getFireworkStar(Random random, Boolean faded) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_STAR);
-		NbtCompound tag = new NbtCompound();
-		NbtCompound explosion = new NbtCompound();
 		int items = 0;
 
 		int amount = random.nextInt(5);
-		explosion.putByte("Type", (byte) amount);
+
+		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.values()[random.nextInt(FireworkExplosionComponent.Type.values().length)];
 
 		if (!(amount == 0)) {
 			items++;
@@ -73,36 +77,41 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 
 		amount = random.nextInt(4);
 
+		boolean flicker = false, trail = false;
+
 		if (amount == 0) {
-			explosion.putByte("Flicker", (byte) 1);
+			flicker = true;
 			items++;
 		} else if (amount == 1) {
-			explosion.putByte("Trail", (byte) 1);
+			trail = true;
 			items++;
 		} else if (amount == 2){
-			explosion.putByte("Trail", (byte) 1);
-			explosion.putByte("Flicker", (byte) 1);
+			flicker = true;
+			trail = true;
 			items = items + 2;
 		}
 
 		List<DyeItem> dyeItems = getDyes(random, 8 - items);
-		List<Integer> colors = Lists.newArrayList();
+		IntList colors = new IntArrayList();
 		for (DyeItem dyeItem : dyeItems) {
 			colors.add(dyeItem.getColor().getFireworkColor());
 		}
-		explosion.putIntArray("Colors", colors);
+
+		IntList fadedColors;
 
 		if (faded) {
 			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
-			List<Integer> fadedColors = Lists.newArrayList();
+			fadedColors = new IntArrayList();
 			for (DyeItem dyeItem : dyeItemsFaded) {
 				fadedColors.add(dyeItem.getColor().getFireworkColor());
 			}
-			explosion.putIntArray("FadeColors", fadedColors);
+		} else {
+			fadedColors = IntLists.emptyList();
 		}
 
-		tag.put("Explosion", explosion);
-		stack.setNbt(tag);
+		FireworkExplosionComponent component = new FireworkExplosionComponent(type, colors, fadedColors, trail, flicker);
+
+		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, component);
 		return EmiStack.of(stack);
 	}
 }

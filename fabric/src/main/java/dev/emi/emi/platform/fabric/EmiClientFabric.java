@@ -19,9 +19,14 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketDecoder;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -64,9 +69,7 @@ public class EmiClientFabric implements ClientModInitializer {
 		});
 
 		EmiNetwork.initClient(packet -> {
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			packet.write(buf);
-			ClientPlayNetworking.send(packet.getId(), buf);
+			ClientPlayNetworking.send(packet);
 		});
 
 		registerPacketReader(EmiNetwork.PING, PingS2CPacket::new);
@@ -74,11 +77,11 @@ public class EmiClientFabric implements ClientModInitializer {
 		registerPacketReader(EmiNetwork.CHESS, EmiChessPacket.S2C::new);
 	}
 
-	private void registerPacketReader(Identifier id, Function<PacketByteBuf, EmiPacket> create) {
-		ClientPlayNetworking.registerGlobalReceiver(id, (client, handler, buf, sender) -> {
-			EmiPacket packet = create.apply(buf);
-			client.execute(() -> {
-				packet.apply(client.player);
+	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
+		PayloadTypeRegistry.playS2C().register(id, PacketCodec.ofStatic((buf, v) -> v.write(buf), decode));
+		ClientPlayNetworking.registerGlobalReceiver(id, (payload, context) -> {
+			context.client().execute(() -> {
+				payload.apply(context.client().player);
 			});
 		});
 	}

@@ -18,34 +18,34 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.ConfigScreenHandler;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-@Mod.EventBusSubscriber(modid = "emi", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = "emi", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class EmiClientNeoForge {
 	
 	@SubscribeEvent
 	public static void clientInit(FMLClientSetupEvent event) {
 		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(NeoForgeRenderTypes.values()).map(f -> f.get()).toList());
 		EmiClient.init();
-		EmiNetwork.initClient(packet -> PacketDistributor.SERVER.noArg().send(EmiPacketHandler.wrap(packet)));
+		EmiNetwork.initClient(packet -> PacketDistributor.sendToServer(EmiPacketHandler.wrap(packet)));
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::recipesReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::tagsReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::renderScreenForeground);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::postRenderScreen);
-		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
+		ModList.get().getModContainerById("emi").orElseThrow().registerExtensionPoint(IConfigScreenFactory.class,
+				(client, last) -> new ConfigScreen(last));
 	}
 
 	@SubscribeEvent

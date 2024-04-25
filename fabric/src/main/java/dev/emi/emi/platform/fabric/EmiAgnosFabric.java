@@ -15,7 +15,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.jemi.JemiUtil;
-import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
+import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
@@ -29,16 +29,18 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
@@ -108,20 +110,22 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected void addBrewingRecipesAgnos(EmiRegistry registry) {
-		for (Ingredient ingredient : BrewingRecipeRegistry.POTION_TYPES) {
+		BrewingRecipeRegistry brewingRegistry = MinecraftClient.getInstance().world != null ? MinecraftClient.getInstance().world.getBrewingRecipeRegistry() : BrewingRecipeRegistry.EMPTY;
+		BrewingRecipeRegistryAccessor brewingRegistryAccess = (BrewingRecipeRegistryAccessor)brewingRegistry;
+		for (Ingredient ingredient : brewingRegistryAccess.getPotionTypes()) {
 			for (ItemStack stack : ingredient.getMatchingStacks()) {
 				String pid = EmiUtil.subId(stack.getItem());
-				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
+				for (BrewingRecipeRegistry.Recipe<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
-						Ingredient recipeIngredient = ((BrewingRecipeRegistryRecipeAccessor) recipe).getIngredient();
+						Ingredient recipeIngredient = recipe.ingredient();
 						if (recipeIngredient.getMatchingStacks().length > 0) {
 							Identifier id = new Identifier("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()))
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())));
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(EmiPort.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput())), EmiIngredient.of(recipeIngredient),
-								EmiStack.of(EmiPort.setPotion(stack.copy(), (Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())), id));
+								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.from().value())), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.to().value())), id));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -130,30 +134,26 @@ public class EmiAgnosFabric extends EmiAgnos {
 			}
 		}
 
-		for (BrewingRecipeRegistry.Recipe<Item> recipe : BrewingRecipeRegistry.ITEM_RECIPES) {
+		for (BrewingRecipeRegistry.Recipe<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
 			try {
-				Ingredient recipeIngredient = ((BrewingRecipeRegistryRecipeAccessor) recipe).getIngredient();
+				Ingredient recipeIngredient = recipe.ingredient();
 				if (recipeIngredient.getMatchingStacks().length > 0) {
 					String gid = EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem());
-					String iid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput());
-					String oid = EmiUtil.subId((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput());
+					String iid = EmiUtil.subId(recipe.from().value());
+					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
-						Potion potion = entry.value();
-						if (potion == Potions.EMPTY) {
-							return;
-						}
-						if (BrewingRecipeRegistry.isBrewable(potion)) {
+						if (brewingRegistry.isBrewable(entry)) {
 							Identifier id = new Identifier("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(EmiPort.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()), potion)), EmiIngredient.of(recipeIngredient),
-								EmiStack.of(EmiPort.setPotion(new ItemStack((Item) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput()), potion)), id));
+								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), entry.value())), EmiIngredient.of(recipeIngredient),
+								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.to().value()), entry.value())), id));
 						}
 					};
-					if ((((BrewingRecipeRegistryRecipeAccessor) recipe).getInput() instanceof PotionItem)) {
+					if (recipe.from().value() instanceof PotionItem) {
 						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
 					} else {
-						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(Potions.AWKWARD));
+						potionRecipeGen.accept(Potions.AWKWARD);
 					}
 				}
 			} catch (Exception e) {
@@ -168,24 +168,24 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected Text getFluidNameAgnos(Fluid fluid, NbtCompound nbt) {
-		return FluidVariantAttributes.getName(FluidVariant.of(fluid, nbt));
+	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return FluidVariantAttributes.getName(FluidVariant.of(fluid, componentChanges));
 	}
 
 	@Override
-	protected List<Text> getFluidTooltipAgnos(Fluid fluid, NbtCompound nbt) {
-		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, nbt));
+	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges) {
+		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, componentChanges));
 	}
 
 	@Override
 	protected boolean isFloatyFluidAgnos(FluidEmiStack stack) {
-		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getNbt());
+		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
 		return FluidVariantAttributes.isLighterThanAir(fluid);
 	}
 
 	@Override
 	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
-		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getNbt());
+		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
 		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
 		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
 			return;

@@ -28,6 +28,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -279,9 +281,9 @@ public class EmiStackList {
 		@Override
 		public int hashCode(EmiStack stack) {
 			if (stack != null) {
-				NbtCompound nbtCompound = stack.getNbt();
+				ComponentChanges changes = stack.getComponentChanges();
 				int i = 31 + stack.getKey().hashCode();
-				return 31 * i + (nbtCompound == null ? 0 : nbtCompound.hashCode());
+				return 31 * i + changes.hashCode();
 			}
 			return 0;
 		}
