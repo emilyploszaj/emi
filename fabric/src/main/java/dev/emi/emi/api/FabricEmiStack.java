@@ -15,10 +15,10 @@ public final class FabricEmiStack {
 	}
 	
 	public static EmiStack of(FluidVariant variant) {
-		return EmiStack.of(variant.getFluid(), variant.getComponents());
+		return EmiStack.of(variant.getFluid(), variant.getNbt());
 	}
 	
 	public static EmiStack of(FluidVariant variant, long amount) {
-		return EmiStack.of(variant.getFluid(), variant.getComponents(), amount);
+		return EmiStack.of(variant.getFluid(), variant.getNbt(), amount);
 	}
 }

@@ -10,9 +10,7 @@ import com.google.gson.JsonPrimitive;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.component.ComponentChanges;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -20,7 +18,7 @@ import net.minecraft.util.JsonHelper;
 public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSerializer<T> {
 	static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	
-	EmiStack create(Identifier id, ComponentChanges componentChanges, long amount);
+	EmiStack create(Identifier id, NbtCompound nbt, long amount);
 
 	@Override
 	default EmiIngredient deserialize(JsonElement element) {
@@ -51,11 +49,11 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 		}
 		if (id != null) {
 			try {
-				ComponentChanges changes = ComponentChanges.EMPTY;
+				NbtCompound nbtComp = null;
 				if (nbt != null) {
-					changes = ComponentChanges.CODEC.decode(NbtOps.INSTANCE, StringNbtReader.parse(nbt)).getOrThrow().getFirst();
+					nbtComp = StringNbtReader.parse(nbt);
 				}
-				EmiStack stack = create(id, changes, amount);
+				EmiStack stack = create(id, nbtComp, amount);
 				if (chance != 1) {
 					stack.setChance(chance);
 				}
@@ -76,9 +74,8 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 	default JsonElement serialize(T stack) {
 		if (stack.getAmount() == 1 && stack.getChance() == 1 && stack.getRemainder().isEmpty()) {
 			String s = getType() + ":" + stack.getId();
-			var componentChanges = stack.getComponentChanges();
-			if (componentChanges != ComponentChanges.EMPTY) {
-				s += ComponentChanges.CODEC.encodeStart(NbtOps.INSTANCE, componentChanges).getOrThrow().asString();
+			if (stack.hasNbt()) {
+				s += stack.getNbt().asString();
 			}
 			return new JsonPrimitive(s);
 		} else {

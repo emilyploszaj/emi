@@ -12,8 +12,8 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
-import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.DyeItem;
+import net.minecraft.item.DyeableItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
@@ -49,7 +49,7 @@ public class EmiArmorDyeRecipe extends EmiPatternCraftingRecipe {
 	@Override
 	public SlotWidget getOutputWidget(int x, int y) {
 		return new GeneratedSlotWidget(r -> {
-			return EmiStack.of(DyedColorComponent.setColor(new ItemStack(armor), getDyes(r)));
+			return EmiStack.of(DyeableItem.blendAndSetColor(new ItemStack(armor), getDyes(r)));
 		}, unique, x, y);
 	}
 	

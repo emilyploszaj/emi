@@ -1,14 +1,8 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentHolder;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
-import net.minecraft.component.DataComponentType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -86,17 +80,10 @@ public abstract class EmiStack implements EmiIngredient {
 		return this;
 	}
 
-	public abstract ComponentChanges getComponentChanges();
+	public abstract NbtCompound getNbt();
 
-	public <T> @Nullable T get(DataComponentType<? extends T> type) {
-		var opt = getComponentChanges().get(type);
-		//noinspection OptionalAssignedToNull
-		return opt != null ? opt.orElse(null) : null;
-	}
-
-	public <T> T getOrDefault(DataComponentType<? extends T> type, T fallback) {
-		var componentValue = this.get(type);
-		return componentValue != null ? componentValue : fallback;
+	public boolean hasNbt() {
+		return getNbt() != null;
 	}
 
 	public abstract Object getKey();
@@ -163,9 +150,9 @@ public abstract class EmiStack implements EmiIngredient {
 	@Override
 	public String toString() {
 		String s = "" + getKey();
-		ComponentChanges changes = getComponentChanges();
-		if (changes != ComponentChanges.EMPTY) {
-			s += changes;
+		NbtCompound nbt = getNbt();
+		if (nbt != null) {
+			s += nbt;
 		}
 		return s + " x" + getAmount();
 	}
@@ -192,12 +179,12 @@ public abstract class EmiStack implements EmiIngredient {
 		return of(item.asItem().getDefaultStack(), amount);
 	}
 
-	public static EmiStack of(ItemConvertible item, ComponentChanges componentChanges) {
-		return of(item, componentChanges, 1);
+	public static EmiStack of(ItemConvertible item, NbtCompound nbt) {
+		return of(item, nbt, 1);
 	}
 
-	public static EmiStack of(ItemConvertible item, ComponentChanges componentChanges, long amount) {
-		return new ItemEmiStack(item.asItem(), componentChanges, amount);
+	public static EmiStack of(ItemConvertible item, NbtCompound nbt, long amount) {
+		return new ItemEmiStack(item.asItem(), nbt, amount);
 	}
 
 	public static EmiStack of(Fluid fluid) {
@@ -208,18 +195,18 @@ public abstract class EmiStack implements EmiIngredient {
 		return of(fluid, EmiPort.emptyExtraData(), amount);
 	}
 
-	public static EmiStack of(Fluid fluid, ComponentChanges componentChanges) {
-		return of(fluid, componentChanges, 0);
+	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
+		return of(fluid, nbt, 0);
 	}
 
-	public static EmiStack of(Fluid fluid, ComponentChanges componentChanges, long amount) {
+	public static EmiStack of(Fluid fluid, NbtCompound nbt, long amount) {
 		if (fluid instanceof FlowableFluid ff && ff.getStill() != Fluids.EMPTY) {
 			fluid = ff.getStill();
 		}
 		if (fluid == Fluids.EMPTY) {
 			return EmiStack.EMPTY;
 		}
-		return new FluidEmiStack(fluid, componentChanges, amount);
+		return new FluidEmiStack(fluid, nbt, amount);
 	}
 
 	static abstract class Entry<T> {

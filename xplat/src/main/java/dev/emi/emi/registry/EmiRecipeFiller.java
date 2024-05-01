@@ -150,7 +150,7 @@ public class EmiRecipeFiller {
 							ItemStack ss = s.getStack();
 							if (EmiStack.of(s.getStack()).isEqual(stack)) {
 								for (DiscoveredItem di : d) {
-									if (ItemStack.areItemsAndComponentsEqual(ss, di.stack)) {
+									if (ItemStack.canCombine(ss, di.stack)) {
 										di.amount += ss.getCount();
 										continue slotLoop;
 									}
@@ -193,7 +193,7 @@ public class EmiRecipeFiller {
 						continue;
 					}
 					for (DiscoveredItem ui : unique) {
-						if (ItemStack.areItemsAndComponentsEqual(di.stack, ui.stack)) {
+						if (ItemStack.canCombine(di.stack, ui.stack)) {
 							ui.consumed += di.consumed;
 							continue outer;
 						}
@@ -313,7 +313,7 @@ public class EmiRecipeFiller {
 						continue;
 					}
 					ItemStack is = input.getStack().copy();
-					if (ItemStack.areItemsAndComponentsEqual(is, stack)) {
+					if (ItemStack.canCombine(is, stack)) {
 						manager.clickSlot(screenHandler.syncId, input.id, 0, SlotActionType.PICKUP, player);
 						if (is.getCount() <= needed) {
 							needed -= is.getCount();

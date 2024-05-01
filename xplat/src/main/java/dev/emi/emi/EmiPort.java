@@ -7,11 +7,6 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BannerPatternsComponent;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.registry.RegistryKeys;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -36,7 +31,9 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
@@ -107,10 +104,9 @@ public final class EmiPort {
 		}
 	}
 
-	public static BannerPatternsComponent addRandomBanner(BannerPatternsComponent patterns, Random random) {
-		var bannerRegistry = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
-		return new BannerPatternsComponent.Builder().addAll(patterns).add(bannerRegistry.getEntry(random.nextInt(bannerRegistry.size())).get(),
-			DyeColor.values()[random.nextInt(DyeColor.values().length)]).build();
+	public static BannerPattern.Patterns addRandomBanner(BannerPattern.Patterns patterns, Random random) {
+		return patterns.add(Registries.BANNER_PATTERN.getEntry(random.nextInt(Registries.BANNER_PATTERN.size())).get(),
+			DyeColor.values()[random.nextInt(DyeColor.values().length)]);
 	}
 
 	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
@@ -186,7 +182,7 @@ public final class EmiPort {
 		if (client != null && client.currentScreen != null) {
 			var currentFocus = client.currentScreen.getFocused();
 			if (!focused && currentFocus == widget || focused && currentFocus != widget) {
-				client.currentScreen.setFocused(null);
+				client.currentScreen.focusOn(null);
 			}
 		}
 		widget.setFocused(focused);
@@ -214,15 +210,14 @@ public final class EmiPort {
 	}
 
 	public static Comparison compareStrict() {
-		return Comparison.compareComponents();
+		return Comparison.compareNbt();
 	}
 
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
-		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, getPotionRegistry().getEntry(potion), PotionContentsComponent::with);
-		return stack;
+		return PotionUtil.setPotion(stack, potion);
 	}
 
-	public static ComponentChanges emptyExtraData() {
-		return ComponentChanges.EMPTY;
+	public static NbtCompound emptyExtraData() {
+		return null;
 	}
 }

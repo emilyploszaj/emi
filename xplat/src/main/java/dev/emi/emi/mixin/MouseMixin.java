@@ -23,10 +23,6 @@ public class MouseMixin {
 	@Shadow
 	private int activeButton = -1;
 
-	@Shadow private double cursorDeltaX;
-
-	@Shadow private double cursorDeltaY;
-
 	@Inject(at = @At(value = "INVOKE", ordinal = 0, target =
 			"net/minecraft/client/gui/screen/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
 		method = "onMouseButton(JIII)V", cancellable = true)
@@ -67,15 +63,15 @@ public class MouseMixin {
 
 	@Inject(at = @At(value = "INVOKE", ordinal = 1, target =
 			"net/minecraft/client/gui/screen/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
-		method = "tick", cancellable = true)
-	private void onMouseDragged(CallbackInfo info) {
+		method = "onCursorPos(JDD)V", cancellable = true)
+	private void onMouseDragged(long window, double x, double y, CallbackInfo info) {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?> hs) {
 				double mx = this.x * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
 				double my = this.y * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
-				double dx = this.cursorDeltaX * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
-				double dy = this.cursorDeltaY * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
+				double dx = (x - this.x) * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
+				double dy = (y - this.y) * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
 				EmiScreenManager.mouseDragged(mx, my, activeButton, dx, dy);
 			}
 		} catch (Exception e) {

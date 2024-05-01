@@ -4,7 +4,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.api.stack.serializer.EmiStackSerializer;
-import net.minecraft.component.ComponentChanges;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
@@ -17,8 +16,9 @@ public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> 
 	}
 
 	@Override
-	public EmiStack create(Identifier id, ComponentChanges componentChanges, long amount) {
-		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().getEntry(id).orElseThrow(), 1, componentChanges);
+	public EmiStack create(Identifier id, NbtCompound nbt, long amount) {
+		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().get(id));
+		stack.setNbt(nbt);
 		return EmiStack.of(stack, amount);
 	}
 }

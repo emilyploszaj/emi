@@ -11,14 +11,13 @@ import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class EmiRepairItemRecipe extends EmiPatternCraftingRecipe {
 	public static final List<Item> TOOLS = EmiPort.getItemRegistry().stream()
-			.filter(i -> i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0).collect(Collectors.toList());
+			.filter(Item::isDamageable).collect(Collectors.toList());
 	private final Item tool;
 
 	public EmiRepairItemRecipe(Item tool, Identifier id) {
@@ -55,7 +54,7 @@ public class EmiRepairItemRecipe extends EmiPatternCraftingRecipe {
 	private ItemStack getMergeItems(Random random) {
 		List<ItemStack> items = getItems(random);
 		ItemStack item = tool.getDefaultStack();
-		int maxDamage = item.getMaxDamage();
+		int maxDamage = tool.getMaxDamage();
 		int damage = items.get(0).getDamage() - (21 * maxDamage)/20 + items.get(1).getDamage();
 		if (damage > 0) {
 			item.setDamage(damage);

@@ -11,8 +11,6 @@ import dev.emi.emi.api.widget.SlotWidget;
 
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,13 +55,16 @@ public class EmiBannerDuplicateRecipe extends EmiPatternCraftingRecipe {
 	public EmiStack getPattern(Random random, boolean reminder) {
 		ItemStack stack = new ItemStack(banner);
 		int patterns = 1 + Math.max(random.nextInt(5), random.nextInt(3));
-		BannerPatternsComponent pattern = BannerPatternsComponent.DEFAULT;
+		BannerPattern.Patterns pattern = new BannerPattern.Patterns();
 		for (int i = 0; i < patterns; i++) {
 			pattern = EmiPort.addRandomBanner(pattern, random);
 		}
 
-		stack.set(DataComponentTypes.BANNER_PATTERNS, pattern);
+		NbtCompound tag = new NbtCompound();
+		tag.put("Patterns", pattern.toNbt());
 
+		BlockItem.setBlockEntityNbt(stack, BlockEntityType.BANNER, tag);
+		//stack.setNbt(tag);
 		EmiStack emiStack = EmiStack.of(stack);
 		if (reminder) {
 			emiStack.setRemainder(EmiStack.of(stack));

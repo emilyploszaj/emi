@@ -13,8 +13,6 @@ import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.item.BannerItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -60,13 +58,17 @@ public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
 		}
 		ItemStack stack = new ItemStack(item);
 		int patterns = 1 + Math.max(random.nextInt(5), random.nextInt(3));
-		BannerPatternsComponent pattern = BannerPatternsComponent.DEFAULT;
+		BannerPattern.Patterns pattern = new BannerPattern.Patterns();
 		for (int i = 0; i < patterns; i++) {
 			pattern = EmiPort.addRandomBanner(pattern, random);
 		}
-
-		stack.set(DataComponentTypes.BANNER_PATTERNS, pattern);
-
+		NbtCompound tag = new NbtCompound();
+		tag.put("Patterns", pattern.toNbt());
+		if (item == Items.SHIELD) {
+			tag.putInt("Base", ((BannerItem) BANNERS.get(base)).getColor().getId());
+		}
+		BlockItem.setBlockEntityNbt(stack, BlockEntityType.BANNER, tag);
+		//stack.setNbt(tag);
 		return EmiStack.of(stack);
 	}
 }

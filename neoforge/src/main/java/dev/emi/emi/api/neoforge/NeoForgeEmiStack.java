@@ -6,6 +6,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 public final class NeoForgeEmiStack {
 	
 	public static EmiStack of(FluidStack stack) {
-		return EmiStack.of(stack.getFluid(), stack.getComponentsPatch(), stack.getAmount());
+		return EmiStack.of(stack.getFluid(), stack.getTag(), stack.getAmount());
 	}
 }

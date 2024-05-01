@@ -3,9 +3,6 @@ package dev.emi.emi.api.stack;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,25 +21,25 @@ import net.minecraft.util.Identifier;
 @ApiStatus.Internal
 public class FluidEmiStack extends EmiStack {
 	private final Fluid fluid;
-	private final ComponentChanges componentChanges;
+	private final NbtCompound nbt;
 
 	public FluidEmiStack(Fluid fluid) {
-		this(fluid, ComponentChanges.EMPTY);
+		this(fluid, null);
 	}
 
-	public FluidEmiStack(Fluid fluid, ComponentChanges componentChanges) {
-		this(fluid, componentChanges, 0);
+	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt) {
+		this(fluid, nbt, 0);
 	}
 
-	public FluidEmiStack(Fluid fluid, ComponentChanges componentChanges, long amount) {
+	public FluidEmiStack(Fluid fluid, @Nullable NbtCompound nbt, long amount) {
 		this.fluid = fluid;
-		this.componentChanges = componentChanges;
+		this.nbt = nbt;
 		this.amount = amount;
 	}
 
 	@Override
 	public EmiStack copy() {
-		EmiStack e = new FluidEmiStack(fluid, componentChanges, amount);
+		EmiStack e = new FluidEmiStack(fluid, nbt, amount);
 		e.setChance(chance);
 		e.setRemainder(getRemainder().copy());
 		e.comparison = comparison;
@@ -55,8 +52,8 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
-		return ComponentChanges.EMPTY;
+	public NbtCompound getNbt() {
+		return nbt;
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return EmiAgnos.getFluidTooltip(fluid, componentChanges);
+		return EmiAgnos.getFluidTooltip(fluid, nbt);
 	}
 
 	@Override
@@ -102,7 +99,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public Text getName() {
-		return EmiAgnos.getFluidName(fluid, componentChanges);
+		return EmiAgnos.getFluidName(fluid, nbt);
 	}
 
 	static class FluidEntry {

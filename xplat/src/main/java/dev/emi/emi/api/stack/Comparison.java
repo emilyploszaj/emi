@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import dev.emi.emi.runtime.EmiLog;
 
 public class Comparison {
-	private static final Comparison COMPARE_COMPONENTS = Comparison.compareData(stack -> stack.getComponentChanges());
+	private static final Comparison COMPARE_NBT = Comparison.compareData(stack -> stack.getNbt()); 
 	public static final Comparison DEFAULT_COMPARISON = Comparison.of((a, b) -> true);
 	private Predicate predicate;
 	private HashFunction hash;
@@ -38,8 +38,8 @@ public class Comparison {
 	/**
 	 * Creates a comparison method where stacks are distinct based on NBT
 	 */
-	public static Comparison compareComponents() {
-		return COMPARE_COMPONENTS;
+	public static Comparison compareNbt() {
+		return COMPARE_NBT;
 	}
 
 	public boolean compare(EmiStack a, EmiStack b) {

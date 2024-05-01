@@ -5,7 +5,6 @@ import java.util.UUID;
 import dev.emi.emi.chess.EmiChess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -25,7 +24,7 @@ public abstract class EmiChessPacket implements EmiPacket {
 	}
 
 	@Override
-	public void write(RegistryByteBuf buf) {
+	public void write(PacketByteBuf buf) {
 		buf.writeUuid(uuid);
 		buf.writeByte(type);
 		buf.writeByte(start);
@@ -33,7 +32,7 @@ public abstract class EmiChessPacket implements EmiPacket {
 	}
 
 	@Override
-	public Id<EmiChessPacket> getId() {
+	public Identifier getId() {
 		return EmiNetwork.CHESS;
 	}
 

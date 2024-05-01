@@ -24,12 +24,9 @@ import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SuffixArray;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Items;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -75,8 +72,8 @@ public class EmiSearch {
 					names.add(searchStack, id.getPath().toLowerCase());
 				}
 				if (stack.getItemStack().getItem() == Items.ENCHANTED_BOOK) {
-					for (RegistryEntry<Enchantment> e : stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT).getEnchantments()) {
-						Identifier eid = EmiPort.getEnchantmentRegistry().getId(e.value());
+					for (Enchantment e : EnchantmentHelper.get(stack.getItemStack()).keySet()) {
+						Identifier eid = EmiPort.getEnchantmentRegistry().getId(e);
 						if (eid != null && !eid.getNamespace().equals("minecraft")) {
 							mods.add(searchStack, EmiUtil.getModName(eid.getNamespace()).toLowerCase());
 						}

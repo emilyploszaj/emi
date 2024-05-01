@@ -4,7 +4,6 @@ import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.util.Identifier;
 
 public class CreateItemC2SPacket implements EmiPacket {
@@ -16,14 +15,14 @@ public class CreateItemC2SPacket implements EmiPacket {
 		this.stack = stack;
 	}
 
-	public CreateItemC2SPacket(RegistryByteBuf buf) {
-		this(buf.readByte(), ItemStack.PACKET_CODEC.decode(buf));
+	public CreateItemC2SPacket(PacketByteBuf buf) {
+		this(buf.readByte(), buf.readItemStack());
 	}
 
 	@Override
-	public void write(RegistryByteBuf buf) {
+	public void write(PacketByteBuf buf) {
 		buf.writeByte(mode);
-		ItemStack.PACKET_CODEC.encode(buf, stack);
+		buf.writeItemStack(stack);
 	}
 
 	@Override
@@ -46,7 +45,7 @@ public class CreateItemC2SPacket implements EmiPacket {
 	}
 
 	@Override
-	public Id<CreateItemC2SPacket> getId() {
+	public Identifier getId() {
 		return EmiNetwork.CREATE_ITEM;
 	}
 }

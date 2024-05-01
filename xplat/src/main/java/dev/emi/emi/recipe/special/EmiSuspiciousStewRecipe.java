@@ -11,8 +11,6 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import net.minecraft.block.FlowerBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.SuspiciousStewEffectsComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -52,7 +50,7 @@ public class EmiSuspiciousStewRecipe extends EmiPatternCraftingRecipe {
 		return new GeneratedSlotWidget(r -> {
 			FlowerBlock block = (FlowerBlock) ((BlockItem) getFlower(r)).getBlock();
 			ItemStack stack = new ItemStack(Items.SUSPICIOUS_STEW);
-			stack.set(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS, block.getStewEffects());
+			SuspiciousStewItem.addEffectsToStew(stack, block.getStewEffects());
 			return EmiStack.of(stack);
 		}, unique, x, y);
 	}

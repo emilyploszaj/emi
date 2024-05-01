@@ -25,7 +25,7 @@ public abstract class HandledScreenMixin extends Screen {
 
 	@Dynamic
 	@Inject(at = @At(value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V",
+			target = "net/minecraft/client/gui/screen/Screen.renderBackground(Lnet/minecraft/client/gui/DrawContext;IIF)V",
 			shift = Shift.AFTER),
 		method = "renderBackground(Lnet/minecraft/client/gui/DrawContext;IIF)V")
 	private void renderBackground(DrawContext raw, int mouseX, int mouseY, float delta, CallbackInfo info) {

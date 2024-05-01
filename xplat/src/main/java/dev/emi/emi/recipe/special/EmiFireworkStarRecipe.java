@@ -12,10 +12,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -91,32 +87,47 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 
 	private EmiStack getFireworkStar(Random random) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_STAR);
-		List<Item> items = getItems(random);
-		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.SMALL_BALL;
-		IntList colors = new IntArrayList();
+		NbtCompound tag = new NbtCompound();
+		NbtCompound explosion = new NbtCompound();
+		boolean hasShape = false;
 
-		boolean flicker = false, trail = false;
+		List<Item> items = getItems(random);
+		byte smallBall = 0;
+		byte largeBall = 1;
+		byte star = 2;
+		byte creeper = 3;
+		byte burst = 4;
+		List<Integer> colors = Lists.newArrayList();
 
 		for (Item item : items) {
 			if (Items.GLOWSTONE_DUST.equals(item)) {
-				flicker = true;
+				explosion.putByte("Flicker", largeBall);
 			} else if (Items.DIAMOND.equals(item)) {
-				trail = true;
+				explosion.putByte("Trail", largeBall);
 			} else if (Items.FIRE_CHARGE.equals(item)) {
-				type = FireworkExplosionComponent.Type.LARGE_BALL;
+				explosion.putByte("Type", largeBall);
+				hasShape = true;
 			} else if (Items.GOLD_NUGGET.equals(item)) {
-				type = FireworkExplosionComponent.Type.STAR;
+				explosion.putByte("Type", star);
+				hasShape = true;
 			} else if (Items.FEATHER.equals(item)) {
-				type = FireworkExplosionComponent.Type.BURST;
+				explosion.putByte("Type", burst);
+				hasShape = true;
 			} else if (SHAPES.contains(item)) {
-				type = FireworkExplosionComponent.Type.CREEPER;
+				explosion.putByte("Type", creeper);
+				hasShape = true;
 			} else {
 				DyeItem dyeItem = (DyeItem) item;
 				colors.add(dyeItem.getColor().getFireworkColor());
 			}
 		}
+		if (!hasShape) {
+			explosion.putByte("Type", smallBall);
+		}
 
-		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(type, colors, IntList.of(), trail, flicker));
+		explosion.putIntArray("Colors", colors);
+		tag.put("Explosion", explosion);
+		stack.setNbt(tag);
 		return EmiStack.of(stack);
 	}
 }

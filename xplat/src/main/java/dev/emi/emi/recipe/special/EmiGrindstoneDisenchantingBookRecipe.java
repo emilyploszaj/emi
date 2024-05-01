@@ -8,11 +8,12 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.api.widget.TextWidget.Alignment;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.OrderedText;
 import net.minecraft.util.Identifier;
 
@@ -75,11 +76,20 @@ public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 	}
 
 	private EmiStack getBook() {
-		ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+		ItemStack enchantedTool = new ItemStack(Items.ENCHANTED_BOOK);;
+		enchantedTool.addEnchantment(enchantment, level);
 
-		var enchBuilder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
-		enchBuilder.add(enchantment, level);
-		book.set(DataComponentTypes.STORED_ENCHANTMENTS, enchBuilder.build());
+		ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+		NbtCompound tag = new NbtCompound();
+		NbtList StoredEnchantments = new NbtList();
+		NbtCompound enchant = new NbtCompound();
+		String id = enchantedTool.getNbt().getList("Enchantments", NbtElement.COMPOUND_TYPE).getCompound(0).getString("id");
+
+		enchant.putString("id", id);
+		enchant.putShort("lvl", (short) level);
+		StoredEnchantments.add(enchant);
+		tag.put("StoredEnchantments", StoredEnchantments);
+		book.setNbt(tag);
 
 		return EmiStack.of(book);
 	}
