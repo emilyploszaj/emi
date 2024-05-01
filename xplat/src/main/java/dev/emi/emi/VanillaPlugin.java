@@ -43,6 +43,7 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
@@ -207,6 +208,9 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addIngredientSerializer(ItemEmiStack.class, new ItemEmiStackSerializer());
 		registry.addIngredientSerializer(FluidEmiStack.class, new FluidEmiStackSerializer());
 		registry.addIngredientSerializer(TagEmiIngredient.class, new TagEmiIngredientSerializer());
+
+		registry.addRegistryAdapter(EmiRegistryAdapter.simple(Item.class, EmiPort.getItemRegistry(), EmiStack::of));
+		registry.addRegistryAdapter(EmiRegistryAdapter.simple(Fluid.class, EmiPort.getFluidRegistry(), EmiStack::of));
 	}
 
 	@Override
@@ -317,12 +321,14 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.setDefaultComparison(Items.SPLASH_POTION, potionComparison);
 		registry.setDefaultComparison(Items.LINGERING_POTION, potionComparison);
 		registry.setDefaultComparison(Items.TIPPED_ARROW, potionComparison);
-		registry.setDefaultComparison(Items.ENCHANTED_BOOK, Comparison.compareNbt());
+		registry.setDefaultComparison(Items.ENCHANTED_BOOK, EmiPort.compareStrict());
 
 		Set<Item> hiddenItems = Stream.concat(
 			EmiUtil.values(TagKey.of(EmiPort.getItemRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value),
 			EmiPort.getDisabledItems()
 		).collect(Collectors.toSet());
+
+		List<Item> dyeableItems = EmiPort.getItemRegistry().stream().filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
 
 		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
 			Identifier id = EmiPort.getId(recipe);
@@ -340,7 +346,7 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
 			} else if (recipe instanceof ArmorDyeRecipe dye) {
-				for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+				for (Item i : dyeableItems) {
 					if (!hiddenItems.contains(i)) {
 						addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
 					}
@@ -367,10 +373,10 @@ public class VanillaPlugin implements EmiPlugin {
 					EmiStack arrow = EmiStack.of(Items.ARROW);
 					addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
 							arrow, arrow, arrow, arrow,
-							EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.LINGERING_POTION), entry.value())),
+							EmiStack.of(EmiPort.setPotion(new ItemStack(Items.LINGERING_POTION), entry.value())),
 							arrow, arrow, arrow, arrow
 						),
-						EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
+						EmiStack.of(EmiPort.setPotion(new ItemStack(Items.TIPPED_ARROW, 8), entry.value())),
 						synthetic("crafting/tipped_arrow", EmiUtil.subId(EmiPort.getPotionRegistry().getId(entry.value()))),
 						false), recipe);
 				});
@@ -444,7 +450,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 		safely("repair", () -> addRepair(registry, hiddenItems));
 		safely("brewing", () -> EmiAgnos.addBrewingRecipes(registry));
-		safely("world interaction", () -> addWorldInteraction(registry, hiddenItems));
+		safely("world interaction", () -> addWorldInteraction(registry, hiddenItems, dyeableItems));
 		safely("fuel", () -> addFuel(registry, hiddenItems));
 		safely("composting", () -> addComposting(registry, hiddenItems));
 
@@ -543,7 +549,7 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 	}
 
-	private static void addWorldInteraction(EmiRegistry registry, Set<Item> hiddenItems) {
+	private static void addWorldInteraction(EmiRegistry registry, Set<Item> hiddenItems, List<Item> dyeableItems) {
 		EmiStack concreteWater = EmiStack.of(Fluids.WATER);
 		concreteWater.setRemainder(concreteWater);
 		addConcreteRecipe(registry, Blocks.WHITE_CONCRETE_POWDER, concreteWater, Blocks.WHITE_CONCRETE);
@@ -628,7 +634,7 @@ public class VanillaPlugin implements EmiPlugin {
 			addRecipeSafe(registry, () -> basicWorld(EmiStack.of(entry.getKey()), honeycomb, EmiStack.of(entry.getValue()), id, false));
 		}
 
-		for (Item i : EmiArmorDyeRecipe.DYEABLE_ITEMS) {
+		for (Item i : dyeableItems) {
 			if (hiddenItems.contains(i)) {
 				continue;
 			}
@@ -704,10 +710,10 @@ public class VanillaPlugin implements EmiPlugin {
 		});
 
 		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.GLASS_BOTTLE), water,
-			EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
+			EmiStack.of(EmiPort.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			synthetic("world/unique", "minecraft/water_bottle")));
 
-		EmiStack waterBottle = EmiStack.of(PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER))
+		EmiStack waterBottle = EmiStack.of(EmiPort.setPotion(new ItemStack(Items.POTION), Potions.WATER))
 			.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
 		EmiStack mud = EmiStack.of(Items.MUD);
 		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud, synthetic("world/unique", "minecraft/mud"), false));

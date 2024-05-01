@@ -30,6 +30,11 @@
       "dev.emi.emi.jemi.JemiPlugin"
     ]
   },
+  "custom": {
+    "polymer:disable_mixin": {
+      "polymer-core:client.compat.emi_ItemEmiStackMixin": "Please stop mixing into impl"
+    }
+  },
   "mixins": [
     "emi.mixins.json",
     "emi-fabric.mixins.json"
