@@ -131,6 +131,8 @@ public class EmiReloadManager {
 					EmiStackProviders.clear();
 					EmiRecipeFiller.clear();
 					EmiHidden.clear();
+					EmiTags.ADAPTERS_BY_CLASS.map().clear();
+					EmiTags.ADAPTERS_BY_REGISTRY.clear();
 					if (clear) {
 						clear = false;
 						continue;

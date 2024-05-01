@@ -204,9 +204,9 @@ public class EmiRenderHelper {
 		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner);
 	}
 
-	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h) {
+	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h, int z) {
 		context.push();
-		context.matrices().translate(0, 0, 200);
+		context.matrices().translate(0, 0, z);
 		RenderSystem.colorMask(true, true, true, false);
 		context.fill(x, y, w, h, -2130706433);
 		RenderSystem.colorMask(true, true, true, true);

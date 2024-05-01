@@ -10,6 +10,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluid;
@@ -66,12 +67,16 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if ((flags & RENDER_ICON) != 0) {
-			EmiAgnos.renderFluid(this, draw.getMatrices(), x, y, delta);
+			context.push();
+			context.matrices().translate(0, 0, 100);
+			EmiAgnos.renderFluid(this, context.matrices(), x, y, delta);
+			context.pop();
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
-			EmiRender.renderRemainderIcon(this, draw, x, y);
+			EmiRender.renderRemainderIcon(this, context.raw(), x, y);
 		}
 	}
 

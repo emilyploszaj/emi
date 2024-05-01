@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -178,12 +179,20 @@ public abstract class EmiStack implements EmiIngredient {
 		return of(item.asItem().getDefaultStack(), amount);
 	}
 
+	public static EmiStack of(ItemConvertible item, NbtCompound nbt) {
+		return of(item, nbt, 1);
+	}
+
+	public static EmiStack of(ItemConvertible item, NbtCompound nbt, long amount) {
+		return new ItemEmiStack(item.asItem(), nbt, amount);
+	}
+
 	public static EmiStack of(Fluid fluid) {
-		return of(fluid, null);
+		return of(fluid, EmiPort.emptyExtraData());
 	}
 
 	public static EmiStack of(Fluid fluid, long amount) {
-		return of(fluid, null, amount);
+		return of(fluid, EmiPort.emptyExtraData(), amount);
 	}
 
 	public static EmiStack of(Fluid fluid, NbtCompound nbt) {
