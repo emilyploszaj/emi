@@ -176,7 +176,7 @@ public class EmiStackList {
 				Set<EmiStack> removed = Sets.newHashSet();
 				for (EmiIngredient invalidator : ssd.removed()) {
 					for (EmiStack stack : invalidator.getEmiStacks()) {
-						removed.add(stack.copy().comparison(c -> Comparison.compareNbt()));
+						removed.add(stack.copy().comparison(c -> EmiPort.compareStrict()));
 					}
 				}
 				stacks.removeAll(removed);
@@ -273,7 +273,7 @@ public class EmiStackList {
 			} else if (a.isEmpty() && b.isEmpty()) {
 				return true;
 			}
-			return a.isEqual(b, Comparison.compareNbt());
+			return a.isEqual(b, EmiPort.compareStrict());
 		}
 
 		@Override
