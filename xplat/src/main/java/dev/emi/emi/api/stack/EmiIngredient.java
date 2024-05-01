@@ -124,16 +124,12 @@ public interface EmiIngredient extends EmiRenderable {
 			for (EmiIngredient i : list) {
 				for (EmiStack s : i.getEmiStacks()) {
 					if (!s.isEmpty()) {
-						Class<?> tt = null;
-						if (s.getKey() instanceof Item) {
-							tt = Item.class;
-						} else if (s.getKey() instanceof Fluid) {
-							tt = Fluid.class;
+						if (tagType == null) {
+							tagType = EmiTags.ADAPTERS_BY_CLASS.getKey(s.getKey().getClass());
 						}
-						if (tt == null || (tagType != null && tt != tagType)) {
+						if (tagType == null || !tagType.isAssignableFrom(s.getKey().getClass())) {
 							return new ListEmiIngredient(list, amount);
 						}
-						tagType = tt;
 					}
 				}
 			}

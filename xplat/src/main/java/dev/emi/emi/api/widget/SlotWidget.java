@@ -3,9 +3,6 @@ package dev.emi.emi.api.widget;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.jetbrains.annotations.ApiStatus;
-
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -54,7 +51,11 @@ public class SlotWidget extends Widget {
 		return stack;
 	}
 
-	@ApiStatus.Internal
+	/**
+	 * @return The recipe associated with a slot.
+	 *	Logical output slots will return the recipe they represent.
+	 *  Otherwise, the result will be null.
+	 */
 	public EmiRecipe getRecipe() {
 		return recipe;
 	}
@@ -209,7 +210,7 @@ public class SlotWidget extends Widget {
 	}
 
 	public void drawSlotHighlight(MatrixStack matrices, Bounds bounds) {
-		EmiRenderHelper.drawSlotHightlight(EmiDrawContext.wrap(matrices), bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2);
+		EmiRenderHelper.drawSlotHightlight(EmiDrawContext.wrap(matrices), bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2, 200);
 	}
 	
 	@Override
