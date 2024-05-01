@@ -3,7 +3,7 @@ package dev.emi.emi.api.stack;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registry;
+import net.minecraft.util.registry.Registry;
 
 /**
  * Provides EMI context for a {@link Registry} to construct stacks from the objects in the registry.
