@@ -52,7 +52,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		int size = buf.readVarInt();
 		stacks = Lists.newArrayList();
 		for (int i = 0; i < size; i++) {
-			stacks.add(ItemStack.PACKET_CODEC.decode(buf));
+			stacks.add(ItemStack.OPTIONAL_PACKET_CODEC.decode(buf));
 		}
 	}
 
@@ -73,7 +73,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		}
 		buf.writeVarInt(stacks.size());
 		for (ItemStack stack : stacks) {
-			ItemStack.PACKET_CODEC.encode(buf, stack);
+			ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, stack);
 		}
 	}
 
