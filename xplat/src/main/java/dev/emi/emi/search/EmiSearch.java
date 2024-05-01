@@ -93,7 +93,7 @@ public class EmiSearch {
 				String text = I18n.translate(key).toLowerCase();
 				for (EmiIngredient ing : alias.stacks()) {
 					for (EmiStack stack : ing.getEmiStacks()) {
-						aliases.add(stack.copy().comparison(Comparison.compareNbt()), text);
+						aliases.add(stack.copy().comparison(EmiPort.compareStrict()), text);
 					}
 				}
 			}

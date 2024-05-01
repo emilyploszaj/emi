@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
@@ -33,7 +34,7 @@ import net.minecraft.screen.slot.Slot;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class EmiPlayerInventory {
 	private final Comparison none = Comparison.DEFAULT_COMPARISON;
-	private final Comparison nbt = Comparison.compareNbt();
+	private final Comparison strict = EmiPort.compareStrict();
 	public Map<EmiStack, EmiStack> inventory = Maps.newHashMap();
 	
 	@Deprecated
@@ -197,7 +198,7 @@ public class EmiPlayerInventory {
 			return false;
 		}
 		Comparison comparison = Comparison.of((a, b) -> {
-			return nbt.compare(a, b) && a.getAmount() == b.getAmount();
+			return strict.compare(a, b) && a.getAmount() == b.getAmount();
 		});
 		if (other.inventory.size() != inventory.size()) {
 			return false;
