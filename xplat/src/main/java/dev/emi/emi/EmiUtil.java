@@ -29,9 +29,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
@@ -57,9 +55,9 @@ public class EmiUtil {
 		return subId(EmiPort.getFluidRegistry().getId(fluid));
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
-		Registry<T> registry = Registries.REGISTRIES.get((RegistryKey) key.registry());
+		MinecraftClient client = MinecraftClient.getInstance();
+		Registry<T> registry = client.world.getRegistryManager().get(key.registry());
 		Optional<Named<T>> opt = registry.getEntryList(key);
 		if (opt.isEmpty()) {
 			return Stream.of();
