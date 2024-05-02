@@ -17,13 +17,13 @@ public class CreateItemC2SPacket implements EmiPacket {
 	}
 
 	public CreateItemC2SPacket(RegistryByteBuf buf) {
-		this(buf.readByte(), ItemStack.PACKET_CODEC.decode(buf));
+		this(buf.readByte(), ItemStack.OPTIONAL_PACKET_CODEC.decode(buf));
 	}
 
 	@Override
 	public void write(RegistryByteBuf buf) {
 		buf.writeByte(mode);
-		ItemStack.PACKET_CODEC.encode(buf, stack);
+		ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, stack);
 	}
 
 	@Override
