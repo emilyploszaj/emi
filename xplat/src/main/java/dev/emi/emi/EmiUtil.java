@@ -56,7 +56,6 @@ public class EmiUtil {
 		return subId(EmiPort.getFluidRegistry().getId(fluid));
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
 		Registry<T> registry = Registry.REGISTRIES.get((RegistryKey) key.registry());
 		Optional<Named<T>> opt = registry.getEntryList(key);
