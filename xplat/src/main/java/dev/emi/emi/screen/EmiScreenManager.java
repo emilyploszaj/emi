@@ -2,11 +2,15 @@ package dev.emi.emi.screen;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import dev.emi.emi.api.search.EmiSearchManager;
+import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.search.EmiSearchManagerImpl;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -65,7 +69,6 @@ import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import dev.emi.emi.screen.widget.EmiSearchWidget;
 import dev.emi.emi.screen.widget.SidebarButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.EmiSearch.CompiledQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -125,17 +128,30 @@ public class EmiScreenManager {
 			() -> true, (w) -> EmiApi.viewRecipeTree(),
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 
+	public static EmiSearchManagerImpl searchManager = new EmiSearchManagerImpl();
+	public static EmiSearchManager.SearchFuture lastSearch = EmiSearchManager.SearchFuture.completedFuture(EmiScreenManager.getSearchSource());
+	public static boolean searchChanged = true;
+
+
 	public static boolean isDisabled() {
 		return !EmiReloadManager.isLoaded() || !EmiConfig.enabled;
+	}
+
+	public static void updateSearch() {
+		if(lastSearch != null) {
+			lastSearch.cancel(true);
+		}
+		lastSearch = searchManager.search(search.getText(), EmiScreenManager.getSearchSource()).whenCompleted(l -> searchChanged = true);
 	}
 
 	public static void recalculate() {
 		updateCraftables();
 		SidebarPanel searchPanel = getSearchPanel();
 		if (searchPanel != null && searchPanel.space != null) {
-			if (searchedStacks != EmiSearch.stacks) {
+			if (searchChanged) {
 				searchPanel.space.batcher.repopulate();
-				searchedStacks = EmiSearch.stacks;
+				searchedStacks = lastSearch.getNow();
+				searchChanged = false;
 			}
 		}
 
@@ -238,7 +254,7 @@ public class EmiScreenManager {
 				if (searchPanel != null && searchPanel.space != null) {
 					searchPanel.space.batcher.repopulate();
 					if (searchPanel.getType() == SidebarType.CRAFTABLES) {
-						EmiSearch.update();
+						EmiScreenManager.updateSearch();
 					}
 				}
 				EmiFavorites.updateSynthetic(inv);
@@ -807,8 +823,8 @@ public class EmiScreenManager {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static void renderSlotOverlays(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		CompiledQuery query = null;
-		if (EmiScreenManager.search.highlight) {
-			query = EmiSearch.compiledQuery;
+		if (EmiScreenManager.search.highlight && lastSearch instanceof EmiSearchManagerImpl.SearchWorker worker) {
+			query = worker.getCompiledQuery();
 		}
 		Set<Slot> ignoredSlots = Sets.newHashSet();
 		Set<EmiStack> synfavs = Sets.newHashSet();
@@ -1380,7 +1396,7 @@ public class EmiScreenManager {
 				}
 			}
 			if (isSearch()) {
-				EmiSearch.search(search.getText());
+				searchManager.search(search.getText(), EmiScreenManager.getSearchSource());
 			}
 			if (space != null) {
 				space.batcher.repopulate();

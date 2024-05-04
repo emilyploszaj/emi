@@ -87,7 +87,7 @@ public class ConfigScreen extends Screen {
 	@Override
 	public void close() {
 		EmiConfig.writeConfig();
-		EmiSearch.update();
+		EmiScreenManager.updateSearch();
 		MinecraftClient.getInstance().setScreen(last);
 	}
 
