@@ -157,7 +157,7 @@ public class EmiStackList {
 				if (s.getKey() instanceof Item i) {
 					if (i instanceof BlockItem bi && bi.getBlock().getDefaultState().isIn(BLOCK_HIDDEN)) {
 						return true;
-					} else if (s.getItemStack().isIn(ITEM_HIDDEN)) {
+					} else if (i.getRegistryEntry().isIn(ITEM_HIDDEN)) {
 						return true;
 					}
 				} else if (s.getKey() instanceof Fluid f) {
