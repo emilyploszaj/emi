@@ -231,9 +231,9 @@
   "emi.unit.liters": "升",
   "emi.unit.millibuckets": "毫桶",
   "emi.unit.droplets": "滴",
-  "emi.fluid.amount.liters": "%s 升",
-  "emi.fluid.amount.millibuckets": "%s 毫桶",
-  "emi.fluid.amount.droplets": "%s 滴",
+  "emi.fluid.amount.liters": "%s L",
+  "emi.fluid.amount.millibuckets": "%s mB",
+  "emi.fluid.amount.droplets": "%s d",
 
   "emi.disabled": "EMI 被禁用! 开关: ",
   "emi.reloading": "EMI重载中……",
