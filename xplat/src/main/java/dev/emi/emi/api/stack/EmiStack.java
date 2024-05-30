@@ -8,7 +8,7 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentMapImpl;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -88,13 +88,13 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract ComponentChanges getComponentChanges();
 
-	public <T> @Nullable T get(DataComponentType<? extends T> type) {
+	public <T> @Nullable T get(ComponentType<? extends T> type) {
 		var opt = getComponentChanges().get(type);
 		//noinspection OptionalAssignedToNull
 		return opt != null ? opt.orElse(null) : null;
 	}
 
-	public <T> T getOrDefault(DataComponentType<? extends T> type, T fallback) {
+	public <T> T getOrDefault(ComponentType<? extends T> type, T fallback) {
 		var componentValue = this.get(type);
 		return componentValue != null ? componentValue : fallback;
 	}

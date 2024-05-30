@@ -119,7 +119,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					try {
 						Ingredient recipeIngredient = recipe.ingredient();
 						if (recipeIngredient.getMatchingStacks().length > 0) {
-							Identifier id = new Identifier("emi", "/brewing/" + pid
+							Identifier id = Identifier.of("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
@@ -143,7 +143,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						if (brewingRegistry.isBrewable(entry)) {
-							Identifier id = new Identifier("emi", "brewing/item/"
+							Identifier id = Identifier.of("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), entry.value())), EmiIngredient.of(recipeIngredient),

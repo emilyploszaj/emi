@@ -2,11 +2,11 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
-import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
@@ -80,7 +80,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public <T> @Nullable T get(DataComponentType<? extends T> type) {
+	public <T> @Nullable T get(ComponentType<? extends T> type) {
 		// Check the changes first
 		var changedOpt = this.componentChanges.get(type);
 		//noinspection OptionalAssignedToNull

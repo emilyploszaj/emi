@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.client.item.TooltipType;
+import net.minecraft.item.tooltip.TooltipType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;

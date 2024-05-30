@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = Identifier.of("minecraft", "textures/gui/container/grindstone.png");
 	private final Enchantment enchantment;
 	private final int level;
 	private final Identifier id;
@@ -78,7 +78,7 @@ public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 		ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
 
 		var enchBuilder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
-		enchBuilder.add(enchantment, level);
+		enchBuilder.add(EmiPort.getEnchantmentRegistry().getEntry(enchantment), level);
 		book.set(DataComponentTypes.STORED_ENCHANTMENTS, enchBuilder.build());
 
 		return EmiStack.of(book);

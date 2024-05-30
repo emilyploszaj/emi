@@ -99,7 +99,7 @@ class ChessEmiStack extends EmiStack {
 
 	@Override
 	public Identifier getId() {
-		return new Identifier("emi:/chess/" + position);
+		return Identifier.of("emi:/chess/" + position);
 	}
 
 	@Override

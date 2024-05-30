@@ -40,8 +40,8 @@ import net.minecraft.util.Identifier;
 public class EmiTags {
 	public static final InheritanceMap<EmiRegistryAdapter<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
 	public static final Map<Registry<?>, EmiRegistryAdapter<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
-	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
-	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
+	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = Identifier.of("c", "hidden_from_recipe_viewers");
+	private static final Map<TagKey<?>, ModelIdentifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_CONTENTS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
@@ -188,7 +188,7 @@ public class EmiTags {
 			return s;
 		}
 		if (id.getNamespace().equals("forge")) {
-			s = EmiUtil.translateId(prefix, new Identifier("c", id.getPath()));
+			s = EmiUtil.translateId(prefix, Identifier.of("c", id.getPath()));
 			if (I18n.hasTranslation(s)) {
 				return s;
 			}
@@ -196,10 +196,10 @@ public class EmiTags {
 		return null;
 	}
 
-	public static @Nullable Identifier getCustomModel(TagKey<?> key) {
+	public static @Nullable ModelIdentifier getCustomModel(TagKey<?> key) {
 		Identifier rid = key.id();
 		if (rid.getNamespace().equals("forge") && !EmiTags.MODELED_TAGS.containsKey(key)) {
-			key = TagKey.of(key.registry(), new Identifier("c", rid.getPath()));
+			key = TagKey.of(key.registry(), Identifier.of("c", rid.getPath()));
 		}
 		return EmiTags.MODELED_TAGS.get(key);
 	}
@@ -208,15 +208,16 @@ public class EmiTags {
 		return getCustomModel(key) != null;
 	}
 
-	public static void registerTagModels(ResourceManager manager, Consumer<Identifier> consumer) {
+	public static void registerTagModels(ResourceManager manager, Consumer<ModelIdentifier> consumer) {
 		EmiTags.MODELED_TAGS.clear();
 		for (Identifier id : EmiPort.findResources(manager, "models/tag", s -> s.endsWith(".json"))) {
 			String path = id.getPath();
 			path = path.substring(11, path.length() - 5);
 			String[] parts = path.split("/");
 			if (parts.length > 1) {
-				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(new Identifier("minecraft", parts[0])), new Identifier(id.getNamespace(), path.substring(1 + parts[0].length())));
-				Identifier mid = new Identifier(id.getNamespace(), "tag/" + path);
+				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(Identifier.of("minecraft", parts[0])), Identifier.of(id.getNamespace(), path.substring(1 + parts[0].length())));
+				// TODO not sure if this is correct for 1.21
+				ModelIdentifier mid = new ModelIdentifier(Identifier.of(id.getNamespace(), "tag/" + path), "");
 				EmiTags.MODELED_TAGS.put(key, mid);
 				consumer.accept(mid);
 			}
@@ -226,8 +227,8 @@ public class EmiTags {
 			path = path.substring(0, path.length() - 5);
 			String[] parts = path.substring(17).split("/");
 			if (id.getNamespace().equals("emi") && parts.length > 1) {
-				Identifier mid = new ModelIdentifier(id.getNamespace(), path.substring(12), "inventory");
-				EmiTags.MODELED_TAGS.put(TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier(parts[0], path.substring(18 + parts[0].length()))), mid);
+				ModelIdentifier mid = new ModelIdentifier(Identifier.of(id.getNamespace(), path.substring(12)), "inventory");
+				EmiTags.MODELED_TAGS.put(TagKey.of(EmiPort.getItemRegistry().getKey(), Identifier.of(parts[0], path.substring(18 + parts[0].length()))), mid);
 				consumer.accept(mid);
 			}
 		}

@@ -17,7 +17,6 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiTags;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -58,6 +57,8 @@ public class EmiClientFabric implements ClientModInitializer {
 			});
 		});
 
+		// TODO
+		/*
 		PreparableModelLoadingPlugin.<List<Identifier>>register((manager, executor) -> {
 			return CompletableFuture.supplyAsync(() -> {
 				List<Identifier> ids = Lists.newArrayList();
@@ -67,6 +68,7 @@ public class EmiClientFabric implements ClientModInitializer {
 		}, (ids, context) -> {
 			context.addModels(ids);
 		});
+		 */
 
 		EmiNetwork.initClient(packet -> {
 			ClientPlayNetworking.send(packet);

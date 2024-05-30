@@ -8,7 +8,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
 public class RecipeBackground extends Widget {
-	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
+	private static final Identifier TEXTURE = Identifier.of("emi", "textures/gui/background.png");
 	private final int x, y, width, height;
 
 	public RecipeBackground(int x, int y, int width, int height) {

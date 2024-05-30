@@ -8,11 +8,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class EmiNetwork {
-	public static final CustomPayload.Id<FillRecipeC2SPacket> FILL_RECIPE = CustomPayload.id("emi:fill_recipe");
-	public static final CustomPayload.Id<CreateItemC2SPacket> CREATE_ITEM = CustomPayload.id("emi:create_item");
-	public static final CustomPayload.Id<CommandS2CPacket> COMMAND = CustomPayload.id("emi:command");
-	public static final CustomPayload.Id<EmiChessPacket> CHESS = CustomPayload.id("emi:chess");
-	public static final CustomPayload.Id<PingS2CPacket> PING = CustomPayload.id("emi:ping");
+	public static final CustomPayload.Id<FillRecipeC2SPacket> FILL_RECIPE = new CustomPayload.Id<>(Identifier.of("emi:fill_recipe"));
+	public static final CustomPayload.Id<CreateItemC2SPacket> CREATE_ITEM = new CustomPayload.Id<>(Identifier.of("emi:create_item"));
+	public static final CustomPayload.Id<CommandS2CPacket> COMMAND = new CustomPayload.Id<>(Identifier.of("emi:command"));
+	public static final CustomPayload.Id<EmiChessPacket> CHESS = new CustomPayload.Id<>(Identifier.of("emi:chess"));
+	public static final CustomPayload.Id<PingS2CPacket> PING = new CustomPayload.Id<>(Identifier.of("emi:ping"));
 	private static BiConsumer<ServerPlayerEntity, EmiPacket> clientSender;
 	private static Consumer<EmiPacket> serverSender;
 

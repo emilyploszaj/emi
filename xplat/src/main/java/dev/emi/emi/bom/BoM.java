@@ -91,13 +91,13 @@ public class BoM {
 		disabledRecipes.clear();
 		JsonArray disabled = JsonHelper.getArray(object, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = Identifier.of(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			disabledRecipes.add(recipe);
 		}
 		JsonArray added = JsonHelper.getArray(object, "added", new JsonArray());
 		for (JsonElement el : added) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = Identifier.of(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && !disabledRecipes.contains(recipe)) {
 				for (EmiStack output : recipe.getOutputs()) {
@@ -107,7 +107,7 @@ public class BoM {
 		}
 		JsonObject resolutions = JsonHelper.getObject(object, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			Identifier id = new Identifier(key);
+			Identifier id = Identifier.of(key);
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && JsonHelper.hasArray(resolutions, key)) {
 				JsonArray arr = JsonHelper.getArray(resolutions, key);

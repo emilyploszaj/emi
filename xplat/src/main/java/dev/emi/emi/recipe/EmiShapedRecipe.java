@@ -14,6 +14,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
@@ -40,7 +41,8 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				List<EmiStack> stacks = input.get(i).getEmiStacks();
 				for (EmiStack stack : stacks) {
 					inv.setStack(i, stack.getItemStack().copy());
-					ItemStack remainder = recipe.getRemainder(inv).get(i);
+					// TODO This doesn't actually work on 1.21 because CraftingRecipeInput adjusts its size to fit the recipe, so the index "i" is wrong
+					ItemStack remainder = recipe.getRemainder(CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks())).get(i);
 					if (!remainder.isEmpty()) {
 						stack.setRemainder(EmiStack.of(remainder));
 					}

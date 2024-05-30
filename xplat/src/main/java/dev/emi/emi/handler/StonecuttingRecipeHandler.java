@@ -2,6 +2,7 @@ package dev.emi.emi.handler;
 
 import java.util.List;
 
+import net.minecraft.recipe.input.SingleStackRecipeInput;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -12,8 +13,6 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.StonecuttingRecipe;
@@ -55,7 +54,7 @@ public class StonecuttingRecipeHandler implements StandardRecipeHandler<Stonecut
 		boolean action = StandardRecipeHandler.super.craft(recipe, context);
 		MinecraftClient client = MinecraftClient.getInstance();
 		World world = client.world;
-		Inventory inv = new SimpleInventory(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
+		SingleStackRecipeInput inv = new SingleStackRecipeInput(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
 		List<StonecuttingRecipe> recipes = world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, inv, world).stream().map(RecipeEntry::value).toList();
 		for (int i = 0; i < recipes.size(); i++) {
 			if (EmiPort.getId(recipes.get(i)) != null && EmiPort.getId(recipes.get(i)).equals(recipe.getId())) {

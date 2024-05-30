@@ -105,8 +105,8 @@ public class EmiSidebars {
 			for (JsonElement el : JsonHelper.getArray(json, "craft_history")) {
 				if (JsonHelper.isString(el)) {
 					String s = el.getAsString();
-					if (Identifier.isValid(s)) {
-						Identifier id = new Identifier(s);
+					Identifier id = Identifier.tryParse(s);
+					if (id != null) {
 						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 						if (recipe != null) {
 							craftHistory.add(new EmiFavorite.Craftable(recipe));

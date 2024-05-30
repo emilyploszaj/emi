@@ -112,11 +112,11 @@ public class EmiDrawContext {
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y) {
-		stack.render(raw(), x, y, client.getTickDelta());
+		stack.render(raw(), x, y, client.getRenderTickCounter().getTickDelta(false));
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, int flags) {
-		drawStack(stack, x, y, client.getTickDelta(), flags);
+		drawStack(stack, x, y, client.getRenderTickCounter().getTickDelta(false), flags);
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, float delta, int flags) {

@@ -16,10 +16,11 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = Identifier.of("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	private final Item tool;
 	private final Identifier id;
@@ -75,6 +76,7 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	private EmiStack getTool(Random random, Boolean enchanted){
 		ItemStack itemStack = new ItemStack(tool);
 		int enchantments = 1 + Math.max(random.nextInt(5), random.nextInt(3));
+		var registry = EmiPort.getEnchantmentRegistry();
 
 		List<Enchantment> list = Lists.newArrayList();
 
@@ -92,16 +94,17 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 			}
 			
 			for (Enchantment e : list) {
-				if (e == enchantment || !e.canCombine(enchantment)) {
+				if (e == enchantment || !Enchantment.canBeCombined(registry.getEntry(e), registry.getEntry(enchantment))) {
 					continue outer;
 				}
 			}
 			list.add(enchantment);
 
-			if (enchantment.isCursed()) {
-				itemStack.addEnchantment(enchantment, lvl);
+			var entry = registry.getEntry(enchantment);
+			if (entry.isIn(EnchantmentTags.CURSE)) {
+				itemStack.addEnchantment(entry, lvl);
 			} else if (enchanted) {
-				itemStack.addEnchantment(enchantment, lvl);
+				itemStack.addEnchantment(entry, lvl);
 			}
 		}
 		return EmiStack.of(itemStack);

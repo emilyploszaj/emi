@@ -9,7 +9,7 @@ import net.minecraft.client.toast.ToastManager;
 import net.minecraft.util.Identifier;
 
 public class DisabledToast implements Toast {
-	private static final Identifier TEXTURE = new Identifier("toast/advancement");
+	private static final Identifier TEXTURE = Identifier.of("toast/advancement");
 
 	@Override
 	public Visibility draw(DrawContext raw, ToastManager manager, long time) {

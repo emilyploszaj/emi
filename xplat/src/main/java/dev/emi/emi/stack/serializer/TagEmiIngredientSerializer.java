@@ -30,14 +30,14 @@ public class TagEmiIngredientSerializer implements EmiIngredientSerializer<TagEm
 			String s = element.getAsString();
 			Matcher m = STACK_REGEX.matcher(s);
 			if (m.matches()) {
-				Identifier registry = new Identifier(m.group(1));
-				Identifier id = new Identifier(m.group(2), m.group(3));
+				Identifier registry = Identifier.of(m.group(1));
+				Identifier id = Identifier.of(m.group(2), m.group(3));
 				return EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), 1);
 			}
 		} else if (element.isJsonObject()) {
 			JsonObject json = element.getAsJsonObject();
-			Identifier registry = new Identifier(json.get("registry").getAsString());
-			Identifier id = new Identifier(json.get("id").getAsString());
+			Identifier registry = Identifier.of(json.get("registry").getAsString());
+			Identifier id = Identifier.of(json.get("id").getAsString());
 			long amount = JsonHelper.getLong(json, "amount", 1);
 			float chance = JsonHelper.getFloat(json, "chance", 1);
 			EmiIngredient stack = EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), amount);

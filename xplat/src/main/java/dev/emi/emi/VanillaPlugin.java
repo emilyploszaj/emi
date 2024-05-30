@@ -152,7 +152,9 @@ import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.BlastFurnaceScreenHandler;
@@ -165,44 +167,44 @@ import net.minecraft.util.Identifier;
 
 @EmiEntrypoint
 public class VanillaPlugin implements EmiPlugin {
-	public static EmiRecipeCategory TAG = new EmiRecipeCategory(new Identifier("emi:tag"),
+	public static EmiRecipeCategory TAG = new EmiRecipeCategory(Identifier.of("emi:tag"),
 		EmiStack.of(Items.NAME_TAG), simplifiedRenderer(240, 208), EmiRecipeSorting.none());
 	
-	public static EmiRecipeCategory INGREDIENT = new EmiRecipeCategory(new Identifier("emi:ingredient"),
+	public static EmiRecipeCategory INGREDIENT = new EmiRecipeCategory(Identifier.of("emi:ingredient"),
 		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
-	public static EmiRecipeCategory RESOLUTION = new EmiRecipeCategory(new Identifier("emi:resolution"),
+	public static EmiRecipeCategory RESOLUTION = new EmiRecipeCategory(Identifier.of("emi:resolution"),
 		EmiStack.of(Items.COMPASS), simplifiedRenderer(240, 208));
 
 	static {
-		CRAFTING = new EmiRecipeCategory(new Identifier("minecraft:crafting"),
+		CRAFTING = new EmiRecipeCategory(Identifier.of("minecraft:crafting"),
 			EmiStack.of(Items.CRAFTING_TABLE), simplifiedRenderer(240, 240), EmiRecipeSorting.compareOutputThenInput());
-		SMELTING = new EmiRecipeCategory(new Identifier("minecraft:smelting"),
+		SMELTING = new EmiRecipeCategory(Identifier.of("minecraft:smelting"),
 			EmiStack.of(Items.FURNACE), simplifiedRenderer(224, 240), EmiRecipeSorting.compareOutputThenInput());
-		BLASTING = new EmiRecipeCategory(new Identifier("minecraft:blasting"),
+		BLASTING = new EmiRecipeCategory(Identifier.of("minecraft:blasting"),
 			EmiStack.of(Items.BLAST_FURNACE), simplifiedRenderer(208, 240), EmiRecipeSorting.compareOutputThenInput());
-		SMOKING = new EmiRecipeCategory(new Identifier("minecraft:smoking"),
+		SMOKING = new EmiRecipeCategory(Identifier.of("minecraft:smoking"),
 			EmiStack.of(Items.SMOKER), simplifiedRenderer(192, 240), EmiRecipeSorting.compareOutputThenInput());
-		CAMPFIRE_COOKING = new EmiRecipeCategory(new Identifier("minecraft:campfire_cooking"),
+		CAMPFIRE_COOKING = new EmiRecipeCategory(Identifier.of("minecraft:campfire_cooking"),
 			EmiStack.of(Items.CAMPFIRE), simplifiedRenderer(176, 240), EmiRecipeSorting.compareOutputThenInput());
-		STONECUTTING = new EmiRecipeCategory(new Identifier("minecraft:stonecutting"),
+		STONECUTTING = new EmiRecipeCategory(Identifier.of("minecraft:stonecutting"),
 			EmiStack.of(Items.STONECUTTER), simplifiedRenderer(160, 240), EmiRecipeSorting.compareInputThenOutput());
-		SMITHING = new EmiRecipeCategory(new Identifier("minecraft:smithing"),
+		SMITHING = new EmiRecipeCategory(Identifier.of("minecraft:smithing"),
 			EmiStack.of(Items.SMITHING_TABLE), simplifiedRenderer(240, 224), EmiRecipeSorting.compareInputThenOutput());
-		ANVIL_REPAIRING = new EmiRecipeCategory(new Identifier("emi:anvil_repairing"),
+		ANVIL_REPAIRING = new EmiRecipeCategory(Identifier.of("emi:anvil_repairing"),
 			EmiStack.of(Items.ANVIL), simplifiedRenderer(240, 224), EmiRecipeSorting.none());
-		GRINDING = new EmiRecipeCategory(new Identifier("emi:grinding"),
+		GRINDING = new EmiRecipeCategory(Identifier.of("emi:grinding"),
 			EmiStack.of(Items.GRINDSTONE), simplifiedRenderer(192, 224), EmiRecipeSorting.none());
-		BREWING = new EmiRecipeCategory(new Identifier("minecraft:brewing"),
+		BREWING = new EmiRecipeCategory(Identifier.of("minecraft:brewing"),
 			EmiStack.of(Items.BREWING_STAND), simplifiedRenderer(224, 224), EmiRecipeSorting.none());
-		WORLD_INTERACTION = new EmiRecipeCategory(new Identifier("emi:world_interaction"),
+		WORLD_INTERACTION = new EmiRecipeCategory(Identifier.of("emi:world_interaction"),
 			EmiStack.of(Items.GRASS_BLOCK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 		EmiRenderable flame = (matrices, x, y, delta) -> {
 			EmiTexture.FULL_FLAME.render(matrices, x + 1, y + 1, delta);
 		};
-		FUEL = new EmiRecipeCategory(new Identifier("emi:fuel"), flame, flame, EmiRecipeSorting.compareInputThenOutput());
-		COMPOSTING = new EmiRecipeCategory(new Identifier("emi:composting"), EmiStack.of(Items.COMPOSTER),
+		FUEL = new EmiRecipeCategory(Identifier.of("emi:fuel"), flame, flame, EmiRecipeSorting.compareInputThenOutput());
+		COMPOSTING = new EmiRecipeCategory(Identifier.of("emi:composting"), EmiStack.of(Items.COMPOSTER),
 			EmiStack.of(Items.COMPOSTER), EmiRecipeSorting.compareInputThenOutput());
-		INFO = new EmiRecipeCategory(new Identifier("emi:info"),
+		INFO = new EmiRecipeCategory(Identifier.of("emi:info"),
 			EmiStack.of(Items.WRITABLE_BOOK), simplifiedRenderer(208, 224), EmiRecipeSorting.none());
 	}
 
@@ -546,7 +548,7 @@ public class VanillaPlugin implements EmiPlugin {
 			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
-			if (!e.isCursed()) {
+			if (!EmiPort.getEnchantmentRegistry().getEntry(e).isIn(EnchantmentTags.CURSE)) {
 				int max = Math.min(10, e.getMaxLevel());
 				int min = e.getMinLevel();
 				while (min <= max) {
@@ -740,7 +742,7 @@ public class VanillaPlugin implements EmiPlugin {
 
 	private static EmiIngredient getPreferredTag(List<String> candidates, EmiIngredient fallback) {
 		for (String id : candidates) {
-			EmiIngredient potential = EmiIngredient.of(TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier(id)));
+			EmiIngredient potential = EmiIngredient.of(TagKey.of(EmiPort.getItemRegistry().getKey(), Identifier.of(id)));
 			if (!potential.isEmpty()) {
 				return potential;
 			}
@@ -815,10 +817,10 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static Identifier synthetic(String type, String name) {
-		return new Identifier("emi", "/" + type + "/" + name);
+		return Identifier.of("emi", "/" + type + "/" + name);
 	}
 
-	private static <C extends Inventory, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
+	private static <C extends RecipeInput, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
 		return registry.getRecipeManager().listAllOfType(type).stream().map(e -> e.value())::iterator;
 	}
 

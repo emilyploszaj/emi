@@ -55,7 +55,7 @@ public class EmiFavorites {
 				JsonObject json = el.getAsJsonObject();
 				EmiRecipe recipe = null;
 				if (JsonHelper.hasString(json, "recipe")) {
-					recipe = EmiApi.getRecipeManager().getRecipe(new Identifier(JsonHelper.getString(json, "recipe")));
+					recipe = EmiApi.getRecipeManager().getRecipe(Identifier.of(JsonHelper.getString(json, "recipe")));
 				}
 				if (JsonHelper.hasElement(json, "stack")) {
 					EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack"));

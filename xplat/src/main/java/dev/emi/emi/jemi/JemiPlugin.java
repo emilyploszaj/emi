@@ -86,7 +86,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 	@Override
 	public Identifier getPluginUid() {
-		return new Identifier("emi:jemi");
+		return Identifier.of("emi:jemi");
 	}
 
 	public void registerItemSubtypes(ISubtypeRegistration registration) {

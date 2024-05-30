@@ -8,7 +8,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.util.Identifier;
 
 public class IngredientTooltipComponent implements EmiTooltipComponent {
-	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/widgets.png");
+	private static final Identifier TEXTURE = Identifier.of("emi", "textures/gui/widgets.png");
 	private static final int MAX_DISPLAYED = 63;
 	private final List<? extends EmiIngredient> ingredients;
 	

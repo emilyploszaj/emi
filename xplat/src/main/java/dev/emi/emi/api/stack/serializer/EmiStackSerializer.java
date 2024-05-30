@@ -33,12 +33,12 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			String s = element.getAsString();
 			Matcher m = STACK_REGEX.matcher(s);
 			if (m.matches()) {
-				id = new Identifier(m.group(2), m.group(3));
+				id = Identifier.of(m.group(2), m.group(3));
 				nbt = m.group(4);
 			}
 		} else if (element.isJsonObject()) {
 			JsonObject json = element.getAsJsonObject();
-			id = new Identifier(JsonHelper.getString(json, "id"));
+			id = Identifier.of(JsonHelper.getString(json, "id"));
 			nbt = JsonHelper.getString(json, "nbt", null);
 			amount = JsonHelper.getLong(json, "amount", 1);
 			chance = JsonHelper.getFloat(json, "chance", 1);

@@ -2,8 +2,8 @@ package dev.emi.emi.mixin;
 
 import java.util.List;
 
-import net.minecraft.client.item.TooltipType;
 import net.minecraft.item.Item;
+import net.minecraft.item.tooltip.TooltipType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

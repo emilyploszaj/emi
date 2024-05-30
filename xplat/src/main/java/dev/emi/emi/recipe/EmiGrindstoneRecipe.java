@@ -9,7 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneRecipe extends EmiAnvilRepairItemRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = Identifier.of("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
 	public EmiGrindstoneRecipe(Item tool, Identifier id) {

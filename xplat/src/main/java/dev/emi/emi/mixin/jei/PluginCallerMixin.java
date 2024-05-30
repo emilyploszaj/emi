@@ -21,7 +21,7 @@ import net.minecraft.util.Identifier;
 public class PluginCallerMixin {
 	@Unique
 	private static final Set<Identifier> SKIPPED = Sets.newHashSet(
-		new Identifier("jei", "minecraft"), new Identifier("jei", "gui"), new Identifier("jei", "fabric_gui"), new Identifier("jei", "forge_gui")
+		Identifier.of("jei", "minecraft"), Identifier.of("jei", "gui"), Identifier.of("jei", "fabric_gui"), Identifier.of("jei", "forge_gui")
 	);
 	
 	@Redirect(at = @At(value = "INVOKE", target = "java/util/function/Consumer.accept(Ljava/lang/Object;)V"),
