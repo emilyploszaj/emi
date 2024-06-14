@@ -225,4 +225,12 @@ public final class EmiPort {
 	public static ComponentChanges emptyExtraData() {
 		return ComponentChanges.EMPTY;
 	}
+
+	public static Identifier id(String id) {
+		return new Identifier(id);
+	}
+
+	public static Identifier id(String namespace, String path) {
+		return new Identifier(namespace, path);
+	}
 }

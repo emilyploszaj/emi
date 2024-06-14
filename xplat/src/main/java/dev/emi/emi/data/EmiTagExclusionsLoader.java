@@ -20,7 +20,7 @@ import net.minecraft.util.profiler.Profiler;
 public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<TagExclusions>
 		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
-	private static final Identifier ID = new Identifier("emi:tag_exclusions");
+	private static final Identifier ID = EmiPort.id("emi:tag_exclusions");
 
 	@Override
 	public TagExclusions prepare(ResourceManager manager, Profiler profiler) {
@@ -38,20 +38,20 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Ta
 							exclusions.clear();
 						}
 						for (String key : json.keySet()) {
-							Identifier type = new Identifier(key);
+							Identifier type = EmiPort.id(key);
 							if (JsonHelper.hasArray(json, key)) {
 								JsonArray arr = JsonHelper.getArray(json, key);
 								for (JsonElement el : arr) {
-									Identifier eid = new Identifier(el.getAsString());
+									Identifier eid = EmiPort.id(el.getAsString());
 									if (key.equals("exclusions")) {
 										exclusions.add(eid);
 										if (eid.getNamespace().equals("c")) {
-											exclusions.add(new Identifier("forge", eid.getPath()));
+											exclusions.add(EmiPort.id("forge", eid.getPath()));
 										}
 									} else {
 										exclusions.add(type, eid);
 										if (eid.getNamespace().equals("c")) {
-											exclusions.add(type, new Identifier("forge", eid.getPath()));
+											exclusions.add(type, EmiPort.id("forge", eid.getPath()));
 										}
 									}
 								}

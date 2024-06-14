@@ -40,7 +40,7 @@ import net.minecraft.util.Identifier;
 public class EmiTags {
 	public static final InheritanceMap<EmiRegistryAdapter<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
 	public static final Map<Registry<?>, EmiRegistryAdapter<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
-	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = new Identifier("c", "hidden_from_recipe_viewers");
+	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = EmiPort.id("c", "hidden_from_recipe_viewers");
 	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
 	private static final Map<TagKey<?>, List<?>> TAG_CONTENTS = Maps.newHashMap();
@@ -188,7 +188,7 @@ public class EmiTags {
 			return s;
 		}
 		if (id.getNamespace().equals("forge")) {
-			s = EmiUtil.translateId(prefix, new Identifier("c", id.getPath()));
+			s = EmiUtil.translateId(prefix, EmiPort.id("c", id.getPath()));
 			if (I18n.hasTranslation(s)) {
 				return s;
 			}
@@ -199,7 +199,7 @@ public class EmiTags {
 	public static @Nullable Identifier getCustomModel(TagKey<?> key) {
 		Identifier rid = key.id();
 		if (rid.getNamespace().equals("forge") && !EmiTags.MODELED_TAGS.containsKey(key)) {
-			key = TagKey.of(key.registry(), new Identifier("c", rid.getPath()));
+			key = TagKey.of(key.registry(), EmiPort.id("c", rid.getPath()));
 		}
 		return EmiTags.MODELED_TAGS.get(key);
 	}
@@ -215,8 +215,8 @@ public class EmiTags {
 			path = path.substring(11, path.length() - 5);
 			String[] parts = path.split("/");
 			if (parts.length > 1) {
-				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(new Identifier("minecraft", parts[0])), new Identifier(id.getNamespace(), path.substring(1 + parts[0].length())));
-				Identifier mid = new Identifier(id.getNamespace(), "tag/" + path);
+				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(EmiPort.id("minecraft", parts[0])), EmiPort.id(id.getNamespace(), path.substring(1 + parts[0].length())));
+				Identifier mid = EmiPort.id(id.getNamespace(), "tag/" + path);
 				EmiTags.MODELED_TAGS.put(key, mid);
 				consumer.accept(mid);
 			}
@@ -227,7 +227,7 @@ public class EmiTags {
 			String[] parts = path.substring(17).split("/");
 			if (id.getNamespace().equals("emi") && parts.length > 1) {
 				Identifier mid = new ModelIdentifier(id.getNamespace(), path.substring(12), "inventory");
-				EmiTags.MODELED_TAGS.put(TagKey.of(EmiPort.getItemRegistry().getKey(), new Identifier(parts[0], path.substring(18 + parts[0].length()))), mid);
+				EmiTags.MODELED_TAGS.put(TagKey.of(EmiPort.getItemRegistry().getKey(), EmiPort.id(parts[0], path.substring(18 + parts[0].length()))), mid);
 				consumer.accept(mid);
 			}
 		}

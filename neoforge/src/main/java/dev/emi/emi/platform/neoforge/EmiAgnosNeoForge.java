@@ -146,7 +146,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
 						if (recipe.ingredient.getMatchingStacks().length > 0) {
-							Identifier id = new Identifier("emi", "/brewing/" + pid
+							Identifier id = EmiPort.id("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
@@ -170,7 +170,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						Potion potion = entry.value();
 						if (brewingRegistry.isBrewable(entry)) {
-							Identifier id = new Identifier("emi", "brewing/item/"
+							Identifier id = EmiPort.id("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), potion)), EmiIngredient.of(recipe.ingredient),
@@ -195,7 +195,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 						EmiStack input = EmiStack.of(is);
 						EmiIngredient ingredient = EmiIngredient.of(recipe.getIngredient());
 						EmiStack output = EmiStack.of(recipe.getOutput(is, recipe.getIngredient().getMatchingStacks()[0]));
-						Identifier id = new Identifier("emi", "brewing/neoforge/"
+						Identifier id = EmiPort.id("emi", "brewing/neoforge/"
 							+ EmiUtil.subId(input.getId()) + "/"
 							+ EmiUtil.subId(ingredient.getEmiStacks().get(0).getId()) + "/"
 							+ EmiUtil.subId(output.getId()));

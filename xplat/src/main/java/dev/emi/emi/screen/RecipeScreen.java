@@ -43,7 +43,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen {
-	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
+	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
 	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
 	public HandledScreen<?> old;
