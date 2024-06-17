@@ -16,6 +16,7 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
@@ -92,16 +93,16 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 			}
 			
 			for (Enchantment e : list) {
-				if (e == enchantment || !e.canCombine(enchantment)) {
+				if (e == enchantment || !Enchantment.canBeCombined(EmiPort.getEnchantmentRegistry().getEntry(e), EmiPort.getEnchantmentRegistry().getEntry(enchantment))) {
 					continue outer;
 				}
 			}
 			list.add(enchantment);
 
-			if (enchantment.isCursed()) {
-				itemStack.addEnchantment(enchantment, lvl);
+			if (EmiPort.getEnchantmentRegistry().getEntry(enchantment).isIn(EnchantmentTags.CURSE)) {
+				itemStack.addEnchantment(EmiPort.getEnchantmentRegistry().getEntry(enchantment), lvl);
 			} else if (enchanted) {
-				itemStack.addEnchantment(enchantment, lvl);
+				itemStack.addEnchantment(EmiPort.getEnchantmentRegistry().getEntry(enchantment), lvl);
 			}
 		}
 		return EmiStack.of(itemStack);

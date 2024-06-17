@@ -14,6 +14,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
@@ -40,9 +41,12 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				List<EmiStack> stacks = input.get(i).getEmiStacks();
 				for (EmiStack stack : stacks) {
 					inv.setStack(i, stack.getItemStack().copy());
-					ItemStack remainder = recipe.getRemainder(inv).get(i);
-					if (!remainder.isEmpty()) {
-						stack.setRemainder(EmiStack.of(remainder));
+					CraftingRecipeInput cri = CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks());
+					if (cri.getWidth() <= 3 && cri.getHeight() <= 3) {
+						ItemStack remainder = recipe.getRemainder(cri).get((i / 3 * cri.getWidth()) + (i % 3));
+						if (!remainder.isEmpty()) {
+							stack.setRemainder(EmiStack.of(remainder));
+						}
 					}
 				}
 				inv.clear();

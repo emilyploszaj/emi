@@ -148,7 +148,7 @@ public final class EmiPort {
 	}
 
 	public static void setPositionColorTexShader() {
-		RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 	}
 
 	public static Registry<Item> getItemRegistry() {
@@ -168,7 +168,8 @@ public final class EmiPort {
 	}
 
 	public static Registry<Enchantment> getEnchantmentRegistry() {
-		return Registries.ENCHANTMENT;
+		MinecraftClient client = MinecraftClient.getInstance();
+		return client.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
 	}
 
 	public static ButtonWidget newButton(int x, int y, int w, int h, Text name, PressAction action) {
@@ -227,10 +228,10 @@ public final class EmiPort {
 	}
 
 	public static Identifier id(String id) {
-		return new Identifier(id);
+		return Identifier.of(id);
 	}
 
 	public static Identifier id(String namespace, String path) {
-		return new Identifier(namespace, path);
+		return Identifier.of(namespace, path);
 	}
 }

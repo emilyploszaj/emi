@@ -62,8 +62,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
 	mappings loom.layered {
 		it.mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
-		// Needed to fix "Unfixable conflicts" in 1.20.5
-		it.mappings(project.projectDir.toPath().resolve("mappings/fix.tiny").toFile())
+		it.mappings("dev.architectury:yarn-mappings-patch-neoforge:${project.neoforge_yarn_patch}")
 	}
 
 	neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"

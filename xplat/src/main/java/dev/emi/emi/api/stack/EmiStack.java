@@ -1,14 +1,10 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentHolder;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -22,7 +18,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -88,13 +83,13 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract ComponentChanges getComponentChanges();
 
-	public <T> @Nullable T get(DataComponentType<? extends T> type) {
+	public <T> @Nullable T get(ComponentType<? extends T> type) {
 		var opt = getComponentChanges().get(type);
 		//noinspection OptionalAssignedToNull
 		return opt != null ? opt.orElse(null) : null;
 	}
 
-	public <T> T getOrDefault(DataComponentType<? extends T> type, T fallback) {
+	public <T> T getOrDefault(ComponentType<? extends T> type, T fallback) {
 		var componentValue = this.get(type);
 		return componentValue != null ? componentValue : fallback;
 	}

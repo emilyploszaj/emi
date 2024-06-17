@@ -152,7 +152,9 @@ import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.BlastFurnaceScreenHandler;
@@ -546,7 +548,7 @@ public class VanillaPlugin implements EmiPlugin {
 			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
-			if (!e.isCursed()) {
+			if (!EmiPort.getEnchantmentRegistry().getEntry(e).isIn(EnchantmentTags.CURSE)) {
 				int max = Math.min(10, e.getMaxLevel());
 				int min = e.getMinLevel();
 				while (min <= max) {
@@ -818,7 +820,7 @@ public class VanillaPlugin implements EmiPlugin {
 		return EmiPort.id("emi", "/" + type + "/" + name);
 	}
 
-	private static <C extends Inventory, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
+	private static <C extends RecipeInput, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
 		return registry.getRecipeManager().listAllOfType(type).stream().map(e -> e.value())::iterator;
 	}
 

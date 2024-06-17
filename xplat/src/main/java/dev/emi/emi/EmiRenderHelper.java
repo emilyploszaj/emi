@@ -94,8 +94,7 @@ public class EmiRenderHelper {
 		float g = ((color >> 8) & 255) / 256f;
 		float b = (color & 255) / 256f;
 		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		float xMin = (float) x;
 		float yMin = (float) y;
 		float xMax = xMin + width;
@@ -107,10 +106,10 @@ public class EmiRenderHelper {
 		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
 		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
 		Matrix4f model = matrices.peek().getPositionMatrix();
-		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax).next();
-		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax).next();
-		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin).next();
-		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin).next();
+		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax);
+		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax);
+		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin);
+		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin);
 		EmiPort.draw(bufferBuilder);
 	}
 
@@ -344,7 +343,7 @@ public class EmiRenderHelper {
 			context.matrices().translate(x + 4, y + 4, 0);
 
 			recipe.addWidgets(holder);
-			float delta = MinecraftClient.getInstance().getTickDelta();
+			float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
 			for (Widget widget : widgets) {
 				widget.render(context.raw(), -1000, -1000, delta);
 			}
