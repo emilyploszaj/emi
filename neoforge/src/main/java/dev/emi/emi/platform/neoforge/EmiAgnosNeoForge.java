@@ -40,7 +40,6 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BasicBakedModel;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -288,10 +287,5 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 			}
 		}
 		return fuelMap;
-	}
-
-	@Override
-	protected BakedModel getBakedTagModelAgnos(Identifier id) {
-		return MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier(id, ModelIdentifier.STANDALONE_VARIANT));
 	}
 }

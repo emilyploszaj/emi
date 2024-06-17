@@ -38,12 +38,10 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.item.ItemStack;
 
 /**
  * @author Una "unascribed" Thompson
- * TODO 1.21 changes broke the batcher, currently disabled
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
@@ -107,12 +105,11 @@ public class StackBatcher {
 	public static final List<RenderLayer> EXTRA_RENDER_LAYERS = Lists.newArrayList();
 
 	private static boolean isEnabled() {
-		return false;
-		// TODO return EmiConfig.useBatchedRenderer && !isIncompatibleSodiumLoaded;
+		return EmiConfig.useBatchedRenderer && !isIncompatibleSodiumLoaded;
 	}
 
 	public StackBatcher() {
-		Map<RenderLayer, BufferAllocator> buffers = new HashMap<>();
+		Map<RenderLayer, BufferBuilder> buffers = new HashMap<>();
 		assign(buffers, RenderLayer.getSolid());
 		assign(buffers, RenderLayer.getCutout());
 		assign(buffers, RenderLayer.getTranslucent());
@@ -120,17 +117,17 @@ public class StackBatcher {
 		assign(buffers, TexturedRenderLayers.getEntityCutout());
 		assign(buffers, TexturedRenderLayers.getEntityTranslucentCull());
 		assign(buffers, RenderLayer.getGlint());
-		//assign(buffers, RenderLayer.getDirectGlint());
+		assign(buffers, RenderLayer.getDirectGlint());
 		assign(buffers, RenderLayer.getEntityGlint());
 		for (RenderLayer layer : EXTRA_RENDER_LAYERS) {
 			assign(buffers, layer);
 		}
-		imm = new BatcherVertexConsumerProvider(new BufferAllocator(256), buffers);
+		imm = new BatcherVertexConsumerProvider(new BufferBuilder(256), buffers);
 		unlitFacade = new UnlitFacade(imm);
 	}
 
-	private void assign(Map<RenderLayer, BufferAllocator> buffers, RenderLayer layer) {
-		buffers.put(layer, new BufferAllocator(layer.getExpectedBufferSize()));
+	private void assign(Map<RenderLayer, BufferBuilder> buffers, RenderLayer layer) {
+		buffers.put(layer, new BufferBuilder(layer.getExpectedBufferSize()));
 	}
 
 	public boolean isPopulated() {
@@ -234,17 +231,18 @@ public class StackBatcher {
 		imm.drawCurrentLayer();
 		buffers.values().forEach(VertexBuffer::close);
 		buffers.clear();
-		for (Map.Entry<RenderLayer, BufferBuilder> entry : imm.getPendingLayerBuffers().entrySet()) {
-			bake(entry.getKey(), entry.getValue());
+		for (RenderLayer layer : imm.getLayerBuffers().keySet()) {
+			bake(layer);
 		}
 	}
 
-	public void bake(RenderLayer layer, BufferBuilder bldr) {
-		// TODO if (!imm.getActiveConsumers().remove(bldr)) return;
+	public void bake(RenderLayer layer) {
+		BufferBuilder bldr = imm.getBufferInternal(layer);
+		if (!imm.getActiveConsumers().remove(bldr)) return;
 		VertexBuffer vb = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
 		EmiPort.upload(vb, bldr);
 		buffers.put(layer, vb);
-		// TODO bldr.reset();
+		bldr.reset();
 	}
 
 	// Apparently BufferBuilder leaks memory in vanilla. Go figure
@@ -277,24 +275,22 @@ public class StackBatcher {
 	}
 
 	/*
-	 * This class is mostly a copy of a 1.21 implementation of VertexConsumerProvider.Immediate
+	 * This class is mostly a copy of a 1.18.2 implementation of VertexConsumerProvider.Immediate
 	 * The reimplementation allows compatibility with shader mods, as well as less hackery.
 	 */
 	private static class BatcherVertexConsumerProvider implements VertexConsumerProvider {
-		protected final BufferAllocator fallbackBuffer;
-		protected final Map<RenderLayer, BufferAllocator> layerBuffers;
-		protected final Map<RenderLayer, BufferBuilder> pending = new HashMap<>();
+		protected final BufferBuilder fallbackBuffer;
+		protected final Map<RenderLayer, BufferBuilder> layerBuffers;
 		protected Optional<RenderLayer> currentLayer = Optional.empty();
-		protected final Set<BufferAllocator> activeConsumers = Sets.newHashSet();
+		protected final Set<BufferBuilder> activeConsumers = Sets.newHashSet();
 
-		protected BatcherVertexConsumerProvider(BufferAllocator fallbackBuffer, Map<RenderLayer, BufferAllocator> layerBuffers) {
+		protected BatcherVertexConsumerProvider(BufferBuilder fallbackBuffer, Map<RenderLayer, BufferBuilder> layerBuffers) {
 			this.fallbackBuffer = fallbackBuffer;
 			this.layerBuffers = layerBuffers;
 		}
 
 		@Override
 		public VertexConsumer getBuffer(RenderLayer renderLayer) {
-			/* TODO
 			Optional<RenderLayer> optional = renderLayer.asOptional();
 			BufferBuilder bufferBuilder = this.getBufferInternal(renderLayer);
 			if (!Objects.equals(this.currentLayer, optional)) {
@@ -308,10 +304,9 @@ public class StackBatcher {
 				this.currentLayer = optional;
 			}
 			return bufferBuilder;
-			*/ return null;
 		}
 
-		private BufferAllocator getBufferInternal(RenderLayer layer) {
+		private BufferBuilder getBufferInternal(RenderLayer layer) {
 			return this.layerBuffers.getOrDefault(layer, this.fallbackBuffer);
 		}
 
@@ -326,19 +321,26 @@ public class StackBatcher {
 		}
 
 		public void draw(RenderLayer layer) {
-			BufferAllocator bufferAllocator = this.getBufferInternal(layer);
-			if (!Objects.equals(this.currentLayer.orElse(null), layer) && bufferAllocator == this.fallbackBuffer) {
+			BufferBuilder bufferBuilder = this.getBufferInternal(layer);
+			boolean bl = Objects.equals(this.currentLayer, layer.asOptional());
+			if (!bl && bufferBuilder == this.fallbackBuffer) {
 				return;
 			}
-			if (!this.activeConsumers.remove(bufferAllocator)) {
+			if (!this.activeConsumers.remove(bufferBuilder)) {
 				return;
 			}
-			// TODO layer.draw(bufferAllocator, VertexSorter.BY_Z);
-			this.currentLayer = Optional.empty();
+			layer.draw(bufferBuilder, VertexSorter.BY_Z);
+			if (bl) {
+				this.currentLayer = Optional.empty();
+			}
 		}
-
-		public Map<RenderLayer, BufferBuilder> getPendingLayerBuffers() {
-			return pending;
+		
+		public Map<RenderLayer, BufferBuilder> getLayerBuffers() {
+			return layerBuffers;
+		}
+		
+		public Set<BufferBuilder> getActiveConsumers() {
+			return activeConsumers;
 		}
 	}
 
@@ -371,9 +373,14 @@ public class StackBatcher {
 			// all other methods are direct delegation
 
 			@Override
-			public VertexConsumer vertex(float x, float y, float z) {
+			public VertexConsumer vertex(double x, double y, double z) {
 				delegate.vertex(x, y, z);
 				return this;
+			}
+
+			@Override
+			public void unfixColor() {
+				delegate.unfixColor();
 			}
 
 			@Override
@@ -389,9 +396,19 @@ public class StackBatcher {
 			}
 
 			@Override
+			public void next() {
+				delegate.next();
+			}
+
+			@Override
 			public VertexConsumer light(int u, int v) {
 				delegate.light(u, v);
 				return this;
+			}
+
+			@Override
+			public void fixedColor(int r, int g, int b, int a) {
+				delegate.fixedColor(r, g, b, a);
 			}
 
 			@Override

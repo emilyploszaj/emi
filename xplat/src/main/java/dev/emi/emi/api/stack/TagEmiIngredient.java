@@ -14,7 +14,6 @@ import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
-import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
@@ -111,7 +110,8 @@ public class TagEmiIngredient implements EmiIngredient {
 					stacks.get(0).render(context.raw(), x, y, delta, -1 ^ RENDER_AMOUNT);
 				}
 			} else {
-				BakedModel model = EmiAgnos.getBakedTagModel(EmiTags.getCustomModel(key));
+				BakedModel model = ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
+					.getOrDefault(EmiTags.getCustomModel(key), client.getBakedModelManager().getMissingModel());
 
 				context.matrices().push();
 				context.matrices().translate(x + 8, y + 8, 150);

@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.util.Identifier;
 
 @Mixin(BakedModelManager.class)
 public interface BakedModelManagerAccessor {
 	
 	@Accessor("models")
-    Map<ModelIdentifier, BakedModel> getModels();
+    Map<Identifier, BakedModel> getModels();
 }

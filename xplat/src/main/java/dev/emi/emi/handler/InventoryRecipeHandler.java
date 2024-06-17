@@ -83,7 +83,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	@Override
 	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
 		ScreenHandler sh = context.getScreenHandler();
-		if (sh instanceof AbstractRecipeScreenHandler<?, ?> arsh) {
+		if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
 			if (recipe instanceof EmiCraftingRecipe crafting) {
 				return crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())
 					&& StandardRecipeHandler.super.canCraft(recipe, context);
@@ -96,7 +96,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	public List<TooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
 		if (!canCraft(recipe, context)) {
 			ScreenHandler sh = context.getScreenHandler();
-			if (sh instanceof AbstractRecipeScreenHandler<?, ?> arsh) {
+			if (sh instanceof AbstractRecipeScreenHandler<?> arsh) {
 				if (recipe instanceof EmiCraftingRecipe crafting) {
 					if (!crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())) {
 						return List.of(TooltipComponent.of(EmiPort.ordered(TOO_SMALL)));

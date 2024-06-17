@@ -16,7 +16,6 @@ import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.ModelIdentifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -52,7 +51,7 @@ public class EmiClientNeoForge {
 	@SubscribeEvent
 	public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		EmiTags.registerTagModels(client.getResourceManager(), event::register, ModelIdentifier.STANDALONE_VARIANT);
+		EmiTags.registerTagModels(client.getResourceManager(), event::register);
 	}
 
 	@SubscribeEvent
@@ -77,7 +76,7 @@ public class EmiClientNeoForge {
 			context.push();
 			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
 			EmiPort.setPositionTexShader();
-			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickDelta(false));
+			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			context.pop();
 		}
 	}
@@ -93,7 +92,7 @@ public class EmiClientNeoForge {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
 			EmiPort.setPositionTexShader();
-			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickDelta(false));
+			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			context.pop();
 		}
 	}

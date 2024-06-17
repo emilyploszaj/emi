@@ -213,7 +213,7 @@ public class EmiTags {
 		return getCustomModel(key) != null;
 	}
 
-	public static void registerTagModels(ResourceManager manager, Consumer<ModelIdentifier> consumer, String variant) {
+	public static void registerTagModels(ResourceManager manager, Consumer<Identifier> consumer) {
 		EmiTags.MODELED_TAGS.clear();
 		for (Identifier id : EmiPort.findResources(manager, "models/tag", s -> s.endsWith(".json"))) {
 			String path = id.getPath();
@@ -223,11 +223,9 @@ public class EmiTags {
 				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(EmiPort.id("minecraft", parts[0])), EmiPort.id(id.getNamespace(), path.substring(1 + parts[0].length())));
 				Identifier mid = EmiPort.id(id.getNamespace(), "tag/" + path);
 				EmiTags.MODELED_TAGS.put(key, mid);
-				consumer.accept(new ModelIdentifier(mid, variant));
+				consumer.accept(mid);
 			}
 		}
-		/*
-		Disable legacy tag models in 1.21+ due to modeling complications
 		for (Identifier id : EmiPort.findResources(manager, "models/item/tags", s -> s.endsWith(".json"))) {
 			String path = id.getPath();
 			path = path.substring(0, path.length() - 5);
@@ -238,7 +236,6 @@ public class EmiTags {
 				consumer.accept(mid);
 			}
 		}
-		*/
 	}
 	
 	public static void reload() {

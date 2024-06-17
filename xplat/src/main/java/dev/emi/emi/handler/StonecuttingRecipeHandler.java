@@ -17,7 +17,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -56,7 +55,7 @@ public class StonecuttingRecipeHandler implements StandardRecipeHandler<Stonecut
 		boolean action = StandardRecipeHandler.super.craft(recipe, context);
 		MinecraftClient client = MinecraftClient.getInstance();
 		World world = client.world;
-		SingleStackRecipeInput inv = new SingleStackRecipeInput(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
+		Inventory inv = new SimpleInventory(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
 		List<StonecuttingRecipe> recipes = world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, inv, world).stream().map(RecipeEntry::value).toList();
 		for (int i = 0; i < recipes.size(); i++) {
 			if (EmiPort.getId(recipes.get(i)) != null && EmiPort.getId(recipes.get(i)).equals(recipe.getId())) {

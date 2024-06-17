@@ -33,7 +33,7 @@ public class CraftingResultSlotMixin {
 	private void onCrafted(ItemStack stack, CallbackInfo info) {
 		World world = player.getWorld();
 		if (world.isClient) {
-			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input.createPositionedRecipeInput().input(), world).map(RecipeEntry::value);
+			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world).map(RecipeEntry::value);
 			if (opt.isPresent()) {
 				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.getId(opt.get()));
 				if (recipe != null) {
