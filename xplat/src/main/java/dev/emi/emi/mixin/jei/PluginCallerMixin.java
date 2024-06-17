@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import com.google.common.collect.Sets;
 
+import dev.emi.emi.EmiPort;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.library.load.PluginCaller;
 import net.minecraft.util.Identifier;
@@ -21,7 +22,7 @@ import net.minecraft.util.Identifier;
 public class PluginCallerMixin {
 	@Unique
 	private static final Set<Identifier> SKIPPED = Sets.newHashSet(
-		new Identifier("jei", "minecraft"), new Identifier("jei", "gui"), new Identifier("jei", "fabric_gui"), new Identifier("jei", "forge_gui")
+		EmiPort.id("jei", "minecraft"), EmiPort.id("jei", "gui"), EmiPort.id("jei", "fabric_gui"), EmiPort.id("jei", "forge_gui")
 	);
 	
 	@Redirect(at = @At(value = "INVOKE", target = "java/util/function/Consumer.accept(Ljava/lang/Object;)V"),
