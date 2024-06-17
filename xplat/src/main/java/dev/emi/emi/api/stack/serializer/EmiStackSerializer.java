@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
@@ -31,12 +32,12 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			String s = element.getAsString();
 			Matcher m = STACK_REGEX.matcher(s);
 			if (m.matches()) {
-				id = new Identifier(m.group(2), m.group(3));
+				id = EmiPort.id(m.group(2), m.group(3));
 				nbt = m.group(4);
 			}
 		} else if (element.isJsonObject()) {
 			JsonObject json = element.getAsJsonObject();
-			id = new Identifier(JsonHelper.getString(json, "id"));
+			id = EmiPort.id(JsonHelper.getString(json, "id"));
 			nbt = JsonHelper.getString(json, "nbt", null);
 			amount = JsonHelper.getLong(json, "amount", 1);
 			chance = JsonHelper.getFloat(json, "chance", 1);

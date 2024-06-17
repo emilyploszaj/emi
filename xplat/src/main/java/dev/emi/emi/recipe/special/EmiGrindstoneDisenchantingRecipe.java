@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	private final Item tool;
 	private final Identifier id;

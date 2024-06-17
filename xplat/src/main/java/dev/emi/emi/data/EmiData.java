@@ -40,7 +40,7 @@ public class EmiData {
 		register.accept(new EmiTagExclusionsLoader());
 		register.accept(
 			new EmiDataLoader<Map<String, EmiRecipeCategoryProperties>>(
-				new Identifier("emi:category_properties"), "category/properties", Maps::newHashMap,
+				EmiPort.id("emi:category_properties"), "category/properties", Maps::newHashMap,
 				(map, json, id) -> {
 					for (String k : json.keySet()) {
 						if (JsonHelper.hasJsonObject(json, k)) {
@@ -52,7 +52,7 @@ public class EmiData {
 							if (JsonHelper.hasJsonObject(val, "icon")) {
 								JsonObject icon = val.getAsJsonObject("icon");
 								if (JsonHelper.hasString(icon, "texture")) {
-									props.icon = () -> new EmiTexture(new Identifier(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
+									props.icon = () -> new EmiTexture(EmiPort.id(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
 								} else if (JsonHelper.hasString(icon, "stack")) {
 									props.icon = () -> EmiIngredientSerializer.getDeserialized(icon.get("stack"));
 								}
@@ -60,7 +60,7 @@ public class EmiData {
 							if (JsonHelper.hasJsonObject(val, "simplified_icon")) {
 								JsonObject icon = val.getAsJsonObject("simplified_icon");
 								if (JsonHelper.hasString(icon, "texture")) {
-									props.simplified = () -> new EmiTexture(new Identifier(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
+									props.simplified = () -> new EmiTexture(EmiPort.id(JsonHelper.getString(icon, "texture")), 0, 0, 16, 16, 16, 16, 16, 16);
 								} else if (JsonHelper.hasString(icon, "stack")) {
 									props.simplified = () -> EmiIngredientSerializer.getDeserialized(icon.get("stack"));
 								}
@@ -86,7 +86,7 @@ public class EmiData {
 				}, map -> categoryPriorities = map));
 		register.accept(
 			new EmiDataLoader<List<Predicate<EmiRecipe>>>(
-				new Identifier("emi:recipe_filters"), "recipe/filters", Lists::newArrayList,
+				EmiPort.id("emi:recipe_filters"), "recipe/filters", Lists::newArrayList,
 				(list, json, oid) -> {
 					JsonArray arr = JsonHelper.getArray(json, "filters", new JsonArray());
 					for (JsonElement el : arr) {
@@ -138,7 +138,7 @@ public class EmiData {
 				}, list -> recipeFilters = list));
 		register.accept(
 			new EmiDataLoader<List<Supplier<IndexStackData>>>(
-				new Identifier("emi:index_stacks"), "index/stacks", Lists::newArrayList,
+				EmiPort.id("emi:index_stacks"), "index/stacks", Lists::newArrayList,
 				(list, json, oid) -> list.add(() -> {
 					List<IndexStackData.Added> added = Lists.newArrayList();
 					List<EmiIngredient> removed = Lists.newArrayList();
@@ -179,7 +179,7 @@ public class EmiData {
 				}), list -> stackData = list));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiAlias>>>(
-				new Identifier("emi:aliases"), "aliases", Lists::newArrayList,
+				EmiPort.id("emi:aliases"), "aliases", Lists::newArrayList,
 				(list, json, id) -> {
 					if (JsonHelper.hasArray(json, "aliases")) {
 						for (JsonElement el : json.getAsJsonArray("aliases")) {
@@ -194,10 +194,10 @@ public class EmiData {
 				}, list -> aliases = list));
 		register.accept(
 			new EmiDataLoader<List<Supplier<EmiRecipe>>>(
-				new Identifier("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
+				EmiPort.id("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
 				(list, json, oid) -> {
 					String s = JsonHelper.getString(json, "type", "");
-					Identifier id = new Identifier("emi:/generated/" + oid.getPath());
+					Identifier id = EmiPort.id("emi:/generated/" + oid.getPath());
 					if (s.equals("emi:info")) {
 						list.add(() -> new EmiInfoRecipe(getArrayOrSingleton(json, "stacks").map(EmiIngredientSerializer::getDeserialized).toList(),
 							getArrayOrSingleton(json, "text").map(t -> (Text) EmiPort.translatable(t.getAsString())).toList(),

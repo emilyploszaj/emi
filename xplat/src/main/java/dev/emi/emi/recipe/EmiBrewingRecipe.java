@@ -16,7 +16,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 public class EmiBrewingRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/brewing_stand.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/brewing_stand.png");
 	private static final EmiStack BLAZE_POWDER = EmiStack.of(Items.BLAZE_POWDER);
 	private final EmiIngredient input, ingredient;
 	private final EmiStack output, input3, output3;

@@ -48,13 +48,13 @@ public class EmiRenderHelper {
 	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
 	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
-	public static final Identifier WIDGETS = new Identifier("emi", "textures/gui/widgets.png");
-	public static final Identifier BUTTONS = new Identifier("emi", "textures/gui/buttons.png");
-	public static final Identifier BACKGROUND = new Identifier("emi", "textures/gui/background.png");
-	public static final Identifier GRID = new Identifier("emi", "textures/gui/grid.png");
-	public static final Identifier DASH = new Identifier("emi", "textures/gui/dash.png");
-	public static final Identifier CONFIG = new Identifier("emi", "textures/gui/config.png");
-	public static final Identifier PIECES = new Identifier("emi", "textures/gui/pieces.png");
+	public static final Identifier WIDGETS = EmiPort.id("emi", "textures/gui/widgets.png");
+	public static final Identifier BUTTONS = EmiPort.id("emi", "textures/gui/buttons.png");
+	public static final Identifier BACKGROUND = EmiPort.id("emi", "textures/gui/background.png");
+	public static final Identifier GRID = EmiPort.id("emi", "textures/gui/grid.png");
+	public static final Identifier DASH = EmiPort.id("emi", "textures/gui/dash.png");
+	public static final Identifier CONFIG = EmiPort.id("emi", "textures/gui/config.png");
+	public static final Identifier PIECES = EmiPort.id("emi", "textures/gui/pieces.png");
 
 	public static void drawNinePatch(EmiDrawContext context, Identifier texture, int x, int y, int w, int h, int u, int v, int cornerLength, int centerLength) {
 		int cor = cornerLength;

@@ -2,13 +2,14 @@ package dev.emi.emi.screen.tooltip;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.runtime.EmiDrawContext;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.util.Identifier;
 
 public class IngredientTooltipComponent implements EmiTooltipComponent {
-	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/widgets.png");
+	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/widgets.png");
 	private static final int MAX_DISPLAYED = 63;
 	private final List<? extends EmiIngredient> ingredients;
 	

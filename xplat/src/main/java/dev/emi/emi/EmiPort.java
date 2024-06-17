@@ -211,4 +211,12 @@ public final class EmiPort {
 	public static NbtCompound emptyExtraData() {
 		return null;
 	}
+
+	public static Identifier id(String id) {
+		return new Identifier(id);
+	}
+
+	public static Identifier id(String namespace, String path) {
+		return new Identifier(namespace, path);
+	}
 }

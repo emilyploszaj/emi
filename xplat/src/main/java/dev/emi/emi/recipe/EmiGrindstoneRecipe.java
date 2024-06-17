@@ -1,5 +1,6 @@
 package dev.emi.emi.recipe;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -9,7 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneRecipe extends EmiAnvilRepairItemRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
 	public EmiGrindstoneRecipe(Item tool, Identifier id) {
