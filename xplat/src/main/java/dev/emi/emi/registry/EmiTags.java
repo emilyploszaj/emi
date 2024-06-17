@@ -73,7 +73,7 @@ public class EmiTags {
 		}
 		EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
 		if (adapter != null) {
-			List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
+			List<T> values = (List<T>) EmiUtil.values(key).map(RegistryEntry::value).toList();
 			return values.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
 		}
 		return List.of();
@@ -174,7 +174,12 @@ public class EmiTags {
 	private static @Nullable String getTagTranslationKey(TagKey<?> key) {
 		Identifier registry = key.registry().getValue();
 		if (registry.getNamespace().equals("minecraft")) {
-			String s = translatePrefix("tag." + registry.getPath() + ".", key.id());
+			String s = translatePrefix("tag." + registry.getPath().replace("/", ".") + ".", key.id());
+			if (s != null) {
+				return s;
+			}
+		} else {
+			String s = translatePrefix("tag." + registry.getNamespace() + "." + registry.getPath().replace("/", ".") + ".", key.id());
 			if (s != null) {
 				return s;
 			}
