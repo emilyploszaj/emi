@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.IndexSource;
@@ -140,7 +141,27 @@ public class EmiStackList {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({"deprecation", "unchecked"})
+	private static <T> boolean isHiddenFromRecipeViewers(T key) {
+		if (key instanceof Item i) {
+			if (i instanceof BlockItem bi && bi.getBlock().getDefaultState().isIn(BLOCK_HIDDEN)) {
+				return true;
+			} else if (i.getRegistryEntry().isIn(ITEM_HIDDEN)) {
+				return true;
+			}
+		} else if (key instanceof Fluid f) {
+			if (f.isIn(FLUID_HIDDEN)) {
+				return true;
+			}
+		} else {
+			EmiRegistryAdapter<T> adapter = (EmiRegistryAdapter<T>) EmiTags.ADAPTERS_BY_CLASS.get(key.getClass());
+			if (adapter != null) {
+				return adapter.getRegistry().getEntry(key).isIn(TagKey.of(adapter.getRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS));
+			}
+		}
+		return false;
+	}
+
 	public static void bake() {
 		stacks.removeIf(s -> {
 			try {
@@ -152,16 +173,8 @@ public class EmiStackList {
 						return true;
 					}
 				}
-				if (s.getKey() instanceof Item i) {
-					if (i instanceof BlockItem bi && bi.getBlock().getDefaultState().isIn(BLOCK_HIDDEN)) {
-						return true;
-					} else if (s.getItemStack().isIn(ITEM_HIDDEN)) {
-						return true;
-					}
-				} else if (s.getKey() instanceof Fluid f) {
-					if (f.isIn(FLUID_HIDDEN)) {
-						return true;
-					}
+				if (isHiddenFromRecipeViewers(s.getKey())) {
+					return true;
 				}
 				return false;
 			} catch (Throwable t) {

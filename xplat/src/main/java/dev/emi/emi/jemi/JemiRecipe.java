@@ -51,7 +51,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.recipe = recipe;
 		this.originalId = category.getRegistryName(recipe);
 		if (this.originalId != null) {
-			this.id = new Identifier("jei", "/" + EmiUtil.subId(this.originalId));
+			this.id = EmiPort.id("jei", "/" + EmiUtil.subId(this.originalId));
 		}
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {

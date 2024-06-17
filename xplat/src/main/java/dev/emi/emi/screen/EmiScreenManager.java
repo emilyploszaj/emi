@@ -886,6 +886,10 @@ public class EmiScreenManager {
 		}
 	}
 
+	private static boolean isClickClicky(int button) {
+		return button >= 0 && button < 3;
+	}
+
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		scrollAcc += amount;
 		int sa = (int) scrollAcc;
@@ -931,7 +935,7 @@ public class EmiScreenManager {
 			return false;
 		}
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
+		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
 			return true;
@@ -991,7 +995,7 @@ public class EmiScreenManager {
 						}
 					}
 				} else {
-					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
 					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;
 					}
@@ -1022,7 +1026,7 @@ public class EmiScreenManager {
 				}
 			}
 			recalculate();
-			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, false);
+			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
 			if (hovered.getStack() != pressedStack && !(pressedStack instanceof EmiFavorite.Synthetic)) {
 				draggedStack = pressedStack;
 			}

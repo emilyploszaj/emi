@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
@@ -30,14 +31,14 @@ public class TagEmiIngredientSerializer implements EmiIngredientSerializer<TagEm
 			String s = element.getAsString();
 			Matcher m = STACK_REGEX.matcher(s);
 			if (m.matches()) {
-				Identifier registry = new Identifier(m.group(1));
-				Identifier id = new Identifier(m.group(2), m.group(3));
+				Identifier registry = EmiPort.id(m.group(1));
+				Identifier id = EmiPort.id(m.group(2), m.group(3));
 				return EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), 1);
 			}
 		} else if (element.isJsonObject()) {
 			JsonObject json = element.getAsJsonObject();
-			Identifier registry = new Identifier(json.get("registry").getAsString());
-			Identifier id = new Identifier(json.get("id").getAsString());
+			Identifier registry = EmiPort.id(json.get("registry").getAsString());
+			Identifier id = EmiPort.id(json.get("id").getAsString());
 			long amount = JsonHelper.getLong(json, "amount", 1);
 			float chance = JsonHelper.getFloat(json, "chance", 1);
 			EmiIngredient stack = EmiIngredient.of(TagKey.of(RegistryKey.ofRegistry(registry), id), amount);

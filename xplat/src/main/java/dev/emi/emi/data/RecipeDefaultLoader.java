@@ -21,7 +21,7 @@ import net.minecraft.util.profiler.Profiler;
 public class RecipeDefaultLoader extends SinglePreparationResourceReloader<RecipeDefaults>
 		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
-	public static final Identifier ID = new Identifier("emi:recipe_defaults");
+	public static final Identifier ID = EmiPort.id("emi:recipe_defaults");
 
 	@Override
 	protected RecipeDefaults prepare(ResourceManager manager, Profiler profiler) {
@@ -60,7 +60,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<Recip
 		}
 		JsonArray disabled = JsonHelper.getArray(json, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			defaults.remove(id);
 		}
 		JsonArray added = JsonHelper.getArray(json, "added", new JsonArray());
@@ -68,12 +68,12 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<Recip
 			added.addAll(JsonHelper.getArray(json, "recipes"));
 		}
 		for (JsonElement el : added) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			defaults.add(id);
 		}
 		JsonObject resolutions = JsonHelper.getObject(json, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			Identifier id = new Identifier(key);
+			Identifier id = EmiPort.id(key);
 			if (JsonHelper.hasArray(resolutions, key)) {
 				defaults.add(id, JsonHelper.getArray(resolutions, key));
 			}
