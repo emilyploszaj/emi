@@ -115,7 +115,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					try {
 						Ingredient recipeIngredient = ((BrewingRecipeRegistryRecipeAccessor) recipe).getIngredient();
 						if (recipeIngredient.getMatchingStacks().length > 0) {
-							Identifier id = new Identifier("emi", "/brewing/" + pid
+							Identifier id = EmiPort.id("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getInput()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId((Potion) ((BrewingRecipeRegistryRecipeAccessor) recipe).getOutput())));

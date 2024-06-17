@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -106,7 +107,7 @@ public class EmiSidebars {
 				if (JsonHelper.isString(el)) {
 					String s = el.getAsString();
 					if (Identifier.isValid(s)) {
-						Identifier id = new Identifier(s);
+						Identifier id = EmiPort.id(s);
 						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 						if (recipe != null) {
 							craftHistory.add(new EmiFavorite.Craftable(recipe));

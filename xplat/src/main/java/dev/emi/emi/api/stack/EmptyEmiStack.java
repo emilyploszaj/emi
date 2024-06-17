@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 @ApiStatus.Internal
 public class EmptyEmiStack extends EmiStack {
-	private static final Identifier ID = new Identifier("emi", "empty");
+	private static final Identifier ID = EmiPort.id("emi", "empty");
 
 	@Override
 	public EmiStack getRemainder() {
