@@ -2,6 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiIngredientRecipe;
@@ -47,6 +48,6 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 
 	@Override
 	public Identifier getId() {
-		return new Identifier("emi", "/tag/" + key.registry().getValue().getPath() + "/" + EmiUtil.subId(key.id()));
+		return EmiPort.id("emi", "/tag/" + key.registry().getValue().getPath() + "/" + EmiUtil.subId(key.id()));
 	}
 }

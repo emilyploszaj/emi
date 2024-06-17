@@ -20,7 +20,7 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = new Identifier("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final Enchantment enchantment;
 	private final int level;
 	private final Identifier id;

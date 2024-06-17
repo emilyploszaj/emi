@@ -143,7 +143,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
 					try {
 						if (recipe.ingredient.getMatchingStacks().length > 0) {
-							Identifier id = new Identifier("emi", "/brewing/" + pid
+							Identifier id = EmiPort.id("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.output)));
@@ -195,7 +195,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 						EmiStack input = EmiStack.of(is);
 						EmiIngredient ingredient = EmiIngredient.of(recipe.getIngredient());
 						EmiStack output = EmiStack.of(recipe.getOutput(is, recipe.getIngredient().getMatchingStacks()[0]));
-						Identifier id = new Identifier("emi", "brewing/neoforge/"
+						Identifier id = EmiPort.id("emi", "brewing/neoforge/"
 							+ EmiUtil.subId(input.getId()) + "/"
 							+ EmiUtil.subId(ingredient.getEmiStacks().get(0).getId()) + "/"
 							+ EmiUtil.subId(output.getId()));

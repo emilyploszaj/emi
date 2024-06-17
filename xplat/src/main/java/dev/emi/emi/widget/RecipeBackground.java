@@ -1,5 +1,6 @@
 package dev.emi.emi.widget;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
@@ -8,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
 public class RecipeBackground extends Widget {
-	private static final Identifier TEXTURE = new Identifier("emi", "textures/gui/background.png");
+	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
 	private final int x, y, width, height;
 
 	public RecipeBackground(int x, int y, int width, int height) {
@@ -20,7 +21,7 @@ public class RecipeBackground extends Widget {
 
 	@Override
 	public Bounds getBounds() {
-		return new Bounds(0, 0, 0, 0);
+		return Bounds.EMPTY;
 	}
 
 	@Override
