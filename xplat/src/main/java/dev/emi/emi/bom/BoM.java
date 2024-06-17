@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
@@ -91,13 +92,13 @@ public class BoM {
 		disabledRecipes.clear();
 		JsonArray disabled = JsonHelper.getArray(object, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			disabledRecipes.add(recipe);
 		}
 		JsonArray added = JsonHelper.getArray(object, "added", new JsonArray());
 		for (JsonElement el : added) {
-			Identifier id = new Identifier(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && !disabledRecipes.contains(recipe)) {
 				for (EmiStack output : recipe.getOutputs()) {
@@ -107,7 +108,7 @@ public class BoM {
 		}
 		JsonObject resolutions = JsonHelper.getObject(object, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			Identifier id = new Identifier(key);
+			Identifier id = EmiPort.id(key);
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && JsonHelper.hasArray(resolutions, key)) {
 				JsonArray arr = JsonHelper.getArray(resolutions, key);

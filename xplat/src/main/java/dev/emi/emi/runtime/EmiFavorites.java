@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -55,7 +56,7 @@ public class EmiFavorites {
 				JsonObject json = el.getAsJsonObject();
 				EmiRecipe recipe = null;
 				if (JsonHelper.hasString(json, "recipe")) {
-					recipe = EmiApi.getRecipeManager().getRecipe(new Identifier(JsonHelper.getString(json, "recipe")));
+					recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.id(JsonHelper.getString(json, "recipe")));
 				}
 				if (JsonHelper.hasElement(json, "stack")) {
 					EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack"));
