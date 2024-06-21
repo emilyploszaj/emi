@@ -256,6 +256,9 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class).getRegistryEntry(), 1000, stack.getComponentChanges());
 		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
 		Identifier texture = ext.getStillTexture(fs);
+		if (texture == null) {
+			return;
+		}
 		int color = ext.getTintColor(fs);
 		MinecraftClient client = MinecraftClient.getInstance();
 		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);

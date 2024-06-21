@@ -56,7 +56,7 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public ComponentChanges getComponentChanges() {
-		return ComponentChanges.EMPTY;
+		return componentChanges;
 	}
 
 	@Override
