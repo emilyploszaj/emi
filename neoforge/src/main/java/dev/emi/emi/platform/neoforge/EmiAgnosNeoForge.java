@@ -142,7 +142,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
 					try {
-						if (recipe.ingredient.getMatchingStacks().length > 0) {
+						if (recipe.ingredient().getMatchingStacks().length > 0) {
 							Identifier id = EmiPort.id("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
@@ -255,6 +255,9 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
 		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
 		Identifier texture = ext.getStillTexture(fs);
+		if (texture == null) {
+			return;
+		}
 		int color = ext.getTintColor(fs);
 		MinecraftClient client = MinecraftClient.getInstance();
 		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);
