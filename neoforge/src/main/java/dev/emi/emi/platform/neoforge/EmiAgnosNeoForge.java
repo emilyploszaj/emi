@@ -146,13 +146,13 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
-						if (recipe.ingredient.getMatchingStacks().length > 0) {
+						if (recipe.ingredient().getMatchingStacks().length > 0) {
 							Identifier id = EmiPort.id("emi", "/brewing/" + pid
-								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
+								+ "/" + EmiUtil.subId(recipe.ingredient().getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.from().value())), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.from().value())), EmiIngredient.of(recipe.ingredient()),
 								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.to().value())), id));
 						}
 					} catch (Exception e) {
@@ -164,17 +164,17 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 
 		for (BrewingRecipeRegistry.Recipe<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
 			try {
-				if (recipe.ingredient.getMatchingStacks().length > 0) {
-					String gid = EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem());
+				if (recipe.ingredient().getMatchingStacks().length > 0) {
+					String gid = EmiUtil.subId(recipe.ingredient().getMatchingStacks()[0].getItem());
 					String iid = EmiUtil.subId(recipe.from().value());
-					String oid = EmiUtil.subId(recipe.to.value());
+					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						Potion potion = entry.value();
 						if (brewingRegistry.isBrewable(entry)) {
 							Identifier id = EmiPort.id("emi", "brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
-								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), potion)), EmiIngredient.of(recipe.ingredient),
+								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), potion)), EmiIngredient.of(recipe.ingredient()),
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.to().value()), potion)), id));
 						}
 					};
