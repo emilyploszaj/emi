@@ -709,7 +709,7 @@ public class BoMScreen extends Screen {
 				drawLine(context, lx, ly, hx, ly);
 				drawLine(context, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
-				if (EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
+				if (StackBatcher.isEnabled() && EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
 					batcher.render(b, context.raw(), x - 18 + midOffset, y - 8, delta);
 				} else {
 					cat.renderSimplified(context.raw(), x - 18 + midOffset, y - 8, delta);

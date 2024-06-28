@@ -20,7 +20,6 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
 public class EmiAnvilEnchantRecipe implements EmiRecipe {
-	public static final List<Enchantment> ENCHANTMENTS = EmiPort.getEnchantmentRegistry().stream().toList();
 	private final Item tool;
 	private final Enchantment enchantment;
 	private final int level;
