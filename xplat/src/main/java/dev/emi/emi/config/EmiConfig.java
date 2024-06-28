@@ -132,15 +132,19 @@ public class EmiConfig {
 	public static SidebarType emptySearchSidebarFocus = SidebarType.NONE;
 
 	@ConfigGroup("ui.recipe-screen")
-	@Comment("The amount of vertical margin to give in the recipe screen.")
-	@ConfigValue("ui.vertical-margin")
-	public static int verticalMargin = 20;
+	@Comment("The maximum height the recipe screen will grow to be if space is available in pixels.")
+	@ConfigValue("ui.maximum-recipe-screen-height")
+	public static int maximumRecipeScreenHeight = 256;
 
 	@Comment("The minimum width of the recipe screen in pixels. "
 		+ "Controls how many tabs there can be, and where the page switching buttons go. "
 		+ "The default is 176, the width of most screens.")
 	@ConfigValue("ui.minimum-recipe-screen-width")
 	public static int minimumRecipeScreenWidth = 176;
+
+	@Comment("The amount of vertical margin to give in the recipe screen.")
+	@ConfigValue("ui.vertical-margin")
+	public static int verticalMargin = 20;
 
 	@ConfigFilter("ui.workstation-location")
 	private static Predicate<SidebarSide> workstationLocationFilter = side -> {
