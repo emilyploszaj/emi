@@ -58,13 +58,7 @@ public class EmiStackList {
 	}
 
 	public static void reload() {
-		try {
-			MinecraftClient client = MinecraftClient.getInstance();
-			ItemGroups.updateDisplayParameters(client.player.networkHandler.getEnabledFeatures(), false);
-		} catch (Throwable t) {
-			EmiLog.error("Failed to update creative tabs. Using fallback index.");
-			EmiLog.error(t);
-		}
+		MinecraftClient client = MinecraftClient.getInstance();
 		List<IndexGroup> groups = Lists.newArrayList();
 		Map<String, IndexGroup> namespaceGroups = new LinkedHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
@@ -83,6 +77,7 @@ public class EmiStackList {
 				String groupName = "null";
 				try {
 					groupName = group.getDisplayName().getString();
+					group.updateEntries(client.player.networkHandler.getEnabledFeatures(), false);
 					Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
 					IndexGroup ig = new IndexGroup();
 					Collection<ItemStack> searchStacks = group.getSearchTabStacks();
