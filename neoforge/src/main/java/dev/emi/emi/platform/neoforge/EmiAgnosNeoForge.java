@@ -142,7 +142,7 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : BrewingRecipeRegistry.POTION_RECIPES) {
 					try {
-						if (recipe.ingredient().getMatchingStacks().length > 0) {
+						if (recipe.ingredient.getMatchingStacks().length > 0) {
 							Identifier id = EmiPort.id("emi", "/brewing/" + pid
 								+ "/" + EmiUtil.subId(recipe.ingredient.getMatchingStacks()[0].getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.input))
