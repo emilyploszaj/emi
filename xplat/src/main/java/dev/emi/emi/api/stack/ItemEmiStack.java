@@ -158,7 +158,7 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return getItemStack().getTooltip(Item.TooltipContext.DEFAULT, client.player, TooltipType.BASIC);
+		return getItemStack().getTooltip(Item.TooltipContext.create(client.world), client.player, TooltipType.BASIC);
 	}
 
 	@Override

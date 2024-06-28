@@ -195,6 +195,7 @@ public class BoMScreen extends Screen {
 	@Override
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.fill(0, 0, width, height, 0xDD000000);
 		this.renderDarkening(context.raw());
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
@@ -712,7 +713,7 @@ public class BoMScreen extends Screen {
 				drawLine(context, lx, ly, hx, ly);
 				drawLine(context, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
-				if (EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
+				if (StackBatcher.isEnabled() && EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
 					batcher.render(b, context.raw(), x - 18 + midOffset, y - 8, delta);
 				} else {
 					cat.renderSimplified(context.raw(), x - 18 + midOffset, y - 8, delta);
