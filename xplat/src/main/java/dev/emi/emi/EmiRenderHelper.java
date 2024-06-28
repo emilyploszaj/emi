@@ -81,6 +81,9 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
+		if (sprite == null) {
+			return;
+		}
 		EmiPort.setPositionColorTexShader();
 		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());

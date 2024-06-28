@@ -102,7 +102,7 @@ public class StackBatcher {
 
 	public static final List<RenderLayer> EXTRA_RENDER_LAYERS = Lists.newArrayList();
 
-	private static boolean isEnabled() {
+	public static boolean isEnabled() {
 		return EmiConfig.useBatchedRenderer && !isIncompatibleSodiumLoaded;
 	}
 
