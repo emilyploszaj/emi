@@ -475,7 +475,7 @@ public class VanillaPlugin implements EmiPlugin {
 	private static void addRepair(EmiRegistry registry, Set<Item> hiddenItems) {
 		List<Enchantment> targetedEnchantments = Lists.newArrayList();
 		List<Enchantment> universalEnchantments = Lists.newArrayList();
-		for (Enchantment enchantment : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+		for (Enchantment enchantment : EmiPort.getEnchantmentRegistry().stream().toList()) {
 			try {
 				if (enchantment.isAcceptableItem(ItemStack.EMPTY)) {
 					universalEnchantments.add(enchantment);
@@ -547,7 +547,7 @@ public class VanillaPlugin implements EmiPlugin {
 		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS),
 			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
-		for (Enchantment e : EmiAnvilEnchantRecipe.ENCHANTMENTS) {
+		for (Enchantment e : EmiPort.getEnchantmentRegistry().stream().toList()) {
 			if (!EmiPort.getEnchantmentRegistry().getEntry(e).isIn(EnchantmentTags.CURSE)) {
 				int max = Math.min(10, e.getMaxLevel());
 				int min = e.getMinLevel();
