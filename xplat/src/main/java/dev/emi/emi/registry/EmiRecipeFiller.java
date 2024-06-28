@@ -120,7 +120,11 @@ public class EmiRecipeFiller {
 			EmiCraftContext<T> context = new EmiCraftContext<T>(screen, inv, type, destination, amount);
 			if (handler.canCraft(recipe, context)) {
 				EmiSidebars.craft(recipe);
-				return handler.craft(recipe, context);
+				boolean crafted = handler.craft(recipe, context);
+				if (crafted) {
+					MinecraftClient.getInstance().setScreen(screen);
+				}
+				return crafted;
 			}
 		}
 		return false;

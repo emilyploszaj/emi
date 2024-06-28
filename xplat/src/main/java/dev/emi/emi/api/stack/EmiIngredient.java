@@ -75,7 +75,7 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {
-		if (ingredient == null) {
+		if (ingredient == null || ingredient.isEmpty()) {
 			return EmiStack.EMPTY;
 		}
 		ItemStack[] stacks = ingredient.getMatchingStacks();
@@ -93,7 +93,7 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	public static EmiIngredient of(Ingredient ingredient, long amount) {
-		if (ingredient == null) {
+		if (ingredient == null || ingredient.isEmpty()) {
 			return EmiStack.EMPTY;
 		}
 		return EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList(), amount);
@@ -107,7 +107,7 @@ public interface EmiIngredient extends EmiRenderable {
 		if (list.size() == 0) {
 			return EmiStack.EMPTY;
 		} else if (list.size() == 1) {
-			return list.get(0);
+			return list.get(0).copy().setAmount(1);
 		} else {
 			long internalAmount = list.get(0).getAmount();
 			for (EmiIngredient i : list) {

@@ -139,8 +139,9 @@
   "config.emi.ui.bottom_sidebar_header": "Header",
   "config.emi.ui.bottom_sidebar_theme": "Theme",
 
-  "config.emi.ui.vertical_margin": "Vertical Margin",
+  "config.emi.ui.maximum_recipe_screen_height": "Maximum Recipe Screen Height",
   "config.emi.ui.minimum_recipe_screen_width": "Minimum Recipe Screen Width",
+  "config.emi.ui.vertical_margin": "Recipe Screen Vertical Margin",
   "config.emi.ui.workstation_location": "Workstation Location",
   "config.emi.ui.miscraft_prevention": "Miscraft Prevention",
   "config.emi.ui.fluid_unit": "Fluid Unit",
