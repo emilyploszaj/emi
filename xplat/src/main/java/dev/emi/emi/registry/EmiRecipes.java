@@ -31,6 +31,7 @@ import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.runtime.dev.EmiDev;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
@@ -228,6 +229,10 @@ public class EmiRecipes {
 						byWorkstation.computeIfAbsent(stack, (s) -> Lists.newArrayList()).addAll(entry.getValue());
 					}
 				}
+			}
+
+			if (EmiConfig.devMode) {
+				EmiDev.duplicateRecipeIds = duplicateIds.keySet();
 			}
 		}
 

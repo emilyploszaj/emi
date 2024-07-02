@@ -22,6 +22,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -111,11 +112,10 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 		addStack(EmiStack.of(fluid, amount));
 		return this;
 	}
-
+	
 	@Override
-	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, NbtCompound tag) {
-		EmiLog.error("TODO update JEMI ingredient acceptor to use components");
-		//addStack(EmiStack.of(fluid, tag, amount));
+	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, ComponentChanges componentChanges) {
+		addStack(EmiStack.of(fluid, componentChanges, amount));
 		return this;
 	}
 }

@@ -11,8 +11,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.util.Identifier;
@@ -54,7 +54,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			try {
 				ComponentChanges changes = ComponentChanges.EMPTY;
 				if (nbt != null) {
-					changes = ComponentChanges.CODEC.decode(NbtOps.INSTANCE, StringNbtReader.parse(nbt)).getOrThrow().getFirst();
+					changes = ComponentChanges.CODEC.decode(MinecraftClient.getInstance().world.getRegistryManager().getOps(NbtOps.INSTANCE), StringNbtReader.parse(nbt)).getOrThrow().getFirst();
 				}
 				EmiStack stack = create(id, changes, amount);
 				if (chance != 1) {
@@ -79,7 +79,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			String s = getType() + ":" + stack.getId();
 			var componentChanges = stack.getComponentChanges();
 			if (componentChanges != ComponentChanges.EMPTY) {
-				s += ComponentChanges.CODEC.encodeStart(NbtOps.INSTANCE, componentChanges).getOrThrow().asString();
+				s += ComponentChanges.CODEC.encodeStart(MinecraftClient.getInstance().world.getRegistryManager().getOps(NbtOps.INSTANCE), componentChanges).getOrThrow().asString();
 			}
 			return new JsonPrimitive(s);
 		} else {

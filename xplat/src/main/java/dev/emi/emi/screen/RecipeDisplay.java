@@ -76,6 +76,9 @@ public class RecipeDisplay {
 						decorator.decorateRecipe(recipe, widgets);
 					}
 				}
+				if (EmiConfig.devMode) {
+					widgets.decorateDevMode();
+				}
 				addButtons(widgets, leftButtons, 0 - 4 - 13, -14);
 				addButtons(widgets, rightButtons, width + 5, 14);
 			} catch (Throwable t) {

@@ -78,7 +78,6 @@ public class EmiClientFabric implements ClientModInitializer {
 	}
 
 	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
-		PayloadTypeRegistry.playS2C().register(id, PacketCodec.ofStatic((buf, v) -> v.write(buf), decode));
 		ClientPlayNetworking.registerGlobalReceiver(id, (payload, context) -> {
 			context.client().execute(() -> {
 				payload.apply(context.client().player);
