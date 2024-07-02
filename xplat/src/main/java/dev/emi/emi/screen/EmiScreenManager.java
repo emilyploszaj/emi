@@ -935,7 +935,7 @@ public class EmiScreenManager {
 			return false;
 		}
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
+		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
 			return true;
