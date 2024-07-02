@@ -254,6 +254,16 @@
   "emi.error.recipe.initialize": "Error Initializing",
   "emi.error.recipe.render": "Error Rendering",
 
+  "emi.dev.severity.error": "Error",
+  "emi.dev.severity.warning": "Warning",
+  "emi.dev.null_recipe_id": "Recipe ID is §7null§r\nRecipes need to have unique IDs to be serialized\nThis will only affect this recipe",
+  "emi.dev.duplicate_recipe_id": "Recipe ID is a duplicate of another recipe\n§7%s§r\nRecipes need to have unique IDs to be serialized\nThis will break other recipes with this ID",
+  "emi.dev.duplicate_vanilla_recipe_id": "Recipe ID is a duplicate of a vanilla recipe\n§7%s§r\nRecipes need to have unique IDs to be serialized\nThis will break the vanilla recipe with the same ID",
+  "emi.dev.synthetic_id": "Use a synthetic ID §7[namespace]§b:/§7[path]§r",
+  "emi.dev.suggest_id": "Use a synthetic ID §7[namespace]§b:/§7[path]§r like\n§7%s§b:/§7%s§r",
+  "emi.dev.null_input_or_output": "Recipe's inputs or outputs are §7null§r\nUse an empty list for no inputs or outputs\nUse §7EmiStack.EMPTY§r to represent an empty stack",
+  "emi.dev.no_output_slots": "Recipe's slots do not include any outputs\nCall §7SlotWidget.recipeContext(this)§r on outputs§r",
+
   "emi.chess.piece.white_pawn": "White Pawn",
   "emi.chess.piece.white_rook": "White Rook",
   "emi.chess.piece.white_knight": "White Knight",

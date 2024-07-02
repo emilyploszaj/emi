@@ -110,7 +110,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 		addStack(EmiStack.of(fluid, amount));
 		return this;
 	}
-
+	
 	@Override
 	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, NbtCompound tag) {
 		addStack(EmiStack.of(fluid, tag, amount));

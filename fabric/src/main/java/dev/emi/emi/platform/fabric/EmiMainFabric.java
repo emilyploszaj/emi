@@ -2,6 +2,7 @@ package dev.emi.emi.platform.fabric;
 
 import java.util.function.Function;
 
+import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiChessPacket;
 import dev.emi.emi.network.EmiNetwork;
@@ -34,6 +35,10 @@ public class EmiMainFabric implements ModInitializer {
 		registerPacketReader(EmiNetwork.FILL_RECIPE, FillRecipeC2SPacket::new);
 		registerPacketReader(EmiNetwork.CREATE_ITEM, CreateItemC2SPacket::new);
 		registerPacketReader(EmiNetwork.CHESS, EmiChessPacket.C2S::new);
+
+		PayloadTypeRegistry.playS2C().register(EmiNetwork.PING, PacketCodec.ofStatic((buf, v) -> v.write(buf), PingS2CPacket::new));
+		PayloadTypeRegistry.playS2C().register(EmiNetwork.COMMAND, PacketCodec.ofStatic((buf, v) -> v.write(buf), CommandS2CPacket::new));
+		PayloadTypeRegistry.playS2C().register(EmiNetwork.CHESS, PacketCodec.ofStatic((buf, v) -> v.write(buf), EmiChessPacket.S2C::new));
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			EmiNetwork.sendToClient(handler.player, new PingS2CPacket());
