@@ -59,23 +59,13 @@ public class JemiUtil {
 		if (stack.isEmpty()) {
 			return Optional.empty();
 		} else if (stack.getKey() instanceof Fluid f) {
-			EmiLog.error("TODO implement JEMI support for fluids again");
-			return Optional.empty();
-			//return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f, stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getComponents()));
+			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f.getRegistryEntry(), stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getComponentChanges()));
 		} else if (stack instanceof JemiStack js) {
 			return JemiPlugin.runtime.getIngredientManager().getIngredientTypeChecked(js.ingredient)
 				.map(t -> (Optional) JemiPlugin.runtime.getIngredientManager().createTypedIngredient(t, js.ingredient))
 				.orElse(Optional.empty());
 		}
 		return (Optional) JemiPlugin.runtime.getIngredientManager().createTypedIngredient(VanillaTypes.ITEM_STACK, stack.getItemStack());
-	}
-
-	public static EmiStack getFluidFromJei(Object object) {
-		if (object instanceof IJeiFluidIngredient fluid) {
-			EmiLog.error("TODO implement JEMI support for fluids again");
-			//return EmiStack.of(fluid.getFluid(), fluid.getTag().orElseGet(() -> null), fluid.getAmount());
-		}
-		return EmiStack.EMPTY;
 	}
 
 	public static IPlatformFluidHelper getFluidHelper() {
