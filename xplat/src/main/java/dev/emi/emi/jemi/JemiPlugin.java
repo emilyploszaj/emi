@@ -383,7 +383,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			}
 			for (Fluid fluid : EmiPort.getFluidRegistry()) {
 				IIngredientTypeWithSubtypes<Object, Object> type = (IIngredientTypeWithSubtypes<Object, Object>) JemiUtil.getFluidType();
-				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid.getRegistryEntry(), 1000))) {
+				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid, 1000))) {
 					registry.setDefaultComparison(fluid, Comparison.compareData(stack -> {
 						ITypedIngredient<?> typed = JemiUtil.getTyped(stack).orElse(null);
 						if (typed != null) {

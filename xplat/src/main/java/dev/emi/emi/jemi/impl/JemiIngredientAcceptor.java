@@ -15,6 +15,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot.IngredientRenderer;
+import dev.emi.emi.runtime.EmiLog;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -110,7 +111,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 		addStack(EmiStack.of(fluid, amount));
 		return this;
 	}
-	
+
 	@Override
 	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, NbtCompound tag) {
 		addStack(EmiStack.of(fluid, tag, amount));
