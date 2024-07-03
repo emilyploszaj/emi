@@ -57,7 +57,8 @@ public class EmiUtil {
 	}
 
 	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
-		Registry<T> registry = Registry.REGISTRIES.get((RegistryKey) key.registry());
+		MinecraftClient client = MinecraftClient.getInstance();
+		Registry<T> registry = client.world.getRegistryManager().get(key.registry());
 		Optional<Named<T>> opt = registry.getEntryList(key);
 		if (opt.isEmpty()) {
 			return Stream.of();
