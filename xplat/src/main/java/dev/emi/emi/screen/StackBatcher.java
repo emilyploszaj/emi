@@ -276,14 +276,14 @@ public class StackBatcher {
 		public VertexConsumer getBuffer(RenderLayer renderLayer) {
 			BufferBuilder bufferBuilder = this.pending.get(renderLayer);
 
-			if(bufferBuilder == null) {
+			if (bufferBuilder == null) {
 				BufferAllocator allocator = this.layerBuffers.get(renderLayer);
-				if(allocator != null) {
+				if (allocator != null) {
 					// Dedicated layer buffer, we can make a new buffer builder safely
 					bufferBuilder = new BufferBuilder(allocator, renderLayer.getDrawMode(), renderLayer.getVertexFormat());
 				} else {
 					// Not dedicated, flush previous layer first
-					if(this.currentLayer != null) {
+					if (this.currentLayer != null) {
 						this.draw(this.currentLayer);
 					}
 					bufferBuilder = new BufferBuilder(this.fallbackBuffer, renderLayer.getDrawMode(), renderLayer.getVertexFormat());
@@ -321,12 +321,12 @@ public class StackBatcher {
 				return;
 			}
 			BuiltBuffer buffer = builder.endNullable();
-			if(buffer != null) {
+			if (buffer != null) {
 				// TODO: do we actually need to sort quads still?
 				buffer.sortQuads(bufferAllocator, VertexSorter.BY_Z);
 				layer.draw(buffer);
 			}
-			if(isSameAsCurrentLayer) {
+			if (isSameAsCurrentLayer) {
 				this.currentLayer = null;
 			}
 		}
