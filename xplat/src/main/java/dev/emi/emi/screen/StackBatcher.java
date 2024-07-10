@@ -53,7 +53,7 @@ public class StackBatcher {
 			Class<?> clazz = null;
 			try {
 				// Try Sodium 0.5 name
-				clazz = Class.forName("nme.jellysquid.mods.sodium.client.render.texture.SpriteUtil");
+				clazz = Class.forName("me.jellysquid.mods.sodium.client.render.texture.SpriteUtil");
 			} catch (Throwable t) {
 			}
 			sodiumSpriteHandle = MethodHandles.lookup()
