@@ -218,9 +218,13 @@ public class StackBatcher {
 	}
 
 	public void bake(RenderLayer layer, BufferBuilder bldr) {
+		var builtBuffer = bldr.endNullable();
+		if (builtBuffer == null) {
+			return;
+		}
 		VertexBuffer vb = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
-		// TODO: EmiPort.upload will explode if the BufferBuilder is empty, since it calls end and not endNullable
-		EmiPort.upload(vb, bldr);
+		vb.bind();
+		vb.upload(builtBuffer);
 		buffers.put(layer, vb);
 	}
 
