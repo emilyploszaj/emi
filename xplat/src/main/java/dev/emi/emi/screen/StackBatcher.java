@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import net.minecraft.client.render.BuiltBuffer;
 import org.joml.Matrix4f;
 
 import com.google.common.collect.Lists;
@@ -43,45 +44,22 @@ import net.minecraft.item.ItemStack;
 
 /**
  * @author Una "unascribed" Thompson
- * TODO 1.21 changes broke the batcher, currently disabled
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
-	private static boolean isIncompatibleSodiumLoaded;
 
 	static {
 		try {
 			Class<?> clazz = null;
-			// TODO this is a 1.18 -> 1.19 refactor for Sodium
 			try {
-				clazz = Class.forName("net.caffeinemc.sodium.render.texture.SpriteUtil");
-			} catch (Throwable t) {
-			}
-			if (clazz == null) {
+				// Try Sodium 0.5 name
 				clazz = Class.forName("me.jellysquid.mods.sodium.client.render.texture.SpriteUtil");
+			} catch (Throwable t) {
 			}
 			sodiumSpriteHandle = MethodHandles.lookup()
 				.findStatic(clazz, "markSpriteActive", MethodType.methodType(void.class, Sprite.class));
 			if (sodiumSpriteHandle != null) {
 				EmiLog.info("Discovered Sodium");
-			}
-
-			if(EmiAgnos.isModLoaded("sodium") || EmiAgnos.isModLoaded("rubidium")) {
-				// Check for the modern VertexBufferWriter API. If so, we are likely on Sodium 0.5+ (or a derivative),
-				// which can generally handle a custom VertexConsumer properly.
-				try {
-					Class.forName("net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter");
-				} catch(Throwable t) {
-					// Check for the legacy VBW API which *cannot* handle this
-					try {
-						Class.forName("me.jellysquid.mods.sodium.client.render.vertex.VertexBufferWriter");
-						// Success means the class exists
-						isIncompatibleSodiumLoaded = true;
-						EmiLog.info("Batching stack renderer disabled for compatibility with legacy Sodium");
-					} catch(Throwable t2) {
-						// Old enough Sodiums shouldn't have an issue
-					}
-				}
 			}
 		} catch (Throwable e) {
 		}
@@ -107,8 +85,7 @@ public class StackBatcher {
 	public static final List<RenderLayer> EXTRA_RENDER_LAYERS = Lists.newArrayList();
 
 	public static boolean isEnabled() {
-		return false;
-		// TODO return EmiConfig.useBatchedRenderer && !isIncompatibleSodiumLoaded;
+		return EmiConfig.useBatchedRenderer;
 	}
 
 	public StackBatcher() {
@@ -237,14 +214,18 @@ public class StackBatcher {
 		for (Map.Entry<RenderLayer, BufferBuilder> entry : imm.getPendingLayerBuffers().entrySet()) {
 			bake(entry.getKey(), entry.getValue());
 		}
+		imm.getPendingLayerBuffers().clear();
 	}
 
 	public void bake(RenderLayer layer, BufferBuilder bldr) {
-		// TODO if (!imm.getActiveConsumers().remove(bldr)) return;
+		BuiltBuffer builtBuffer = bldr.endNullable();
+		if (builtBuffer == null) {
+			return;
+		}
 		VertexBuffer vb = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
-		EmiPort.upload(vb, bldr);
+		vb.bind();
+		vb.upload(builtBuffer);
 		buffers.put(layer, vb);
-		// TODO bldr.reset();
 	}
 
 	// Apparently BufferBuilder leaks memory in vanilla. Go figure
@@ -284,8 +265,7 @@ public class StackBatcher {
 		protected final BufferAllocator fallbackBuffer;
 		protected final Map<RenderLayer, BufferAllocator> layerBuffers;
 		protected final Map<RenderLayer, BufferBuilder> pending = new HashMap<>();
-		protected Optional<RenderLayer> currentLayer = Optional.empty();
-		protected final Set<BufferAllocator> activeConsumers = Sets.newHashSet();
+		protected RenderLayer currentLayer = null;
 
 		protected BatcherVertexConsumerProvider(BufferAllocator fallbackBuffer, Map<RenderLayer, BufferAllocator> layerBuffers) {
 			this.fallbackBuffer = fallbackBuffer;
@@ -294,21 +274,26 @@ public class StackBatcher {
 
 		@Override
 		public VertexConsumer getBuffer(RenderLayer renderLayer) {
-			/* TODO
-			Optional<RenderLayer> optional = renderLayer.asOptional();
-			BufferBuilder bufferBuilder = this.getBufferInternal(renderLayer);
-			if (!Objects.equals(this.currentLayer, optional)) {
-				RenderLayer renderLayer2;
-				if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(renderLayer2 = this.currentLayer.get())) {
-					this.draw(renderLayer2);
+			BufferBuilder bufferBuilder = this.pending.get(renderLayer);
+
+			if (bufferBuilder == null) {
+				BufferAllocator allocator = this.layerBuffers.get(renderLayer);
+				if (allocator != null) {
+					// Dedicated layer buffer, we can make a new buffer builder safely
+					bufferBuilder = new BufferBuilder(allocator, renderLayer.getDrawMode(), renderLayer.getVertexFormat());
+				} else {
+					// Not dedicated, flush previous layer first
+					if (this.currentLayer != null) {
+						this.draw(this.currentLayer);
+					}
+					bufferBuilder = new BufferBuilder(this.fallbackBuffer, renderLayer.getDrawMode(), renderLayer.getVertexFormat());
+					this.currentLayer = renderLayer;
 				}
-				if (this.activeConsumers.add(bufferBuilder)) {
-					bufferBuilder.begin(renderLayer.getDrawMode(), renderLayer.getVertexFormat());
-				}
-				this.currentLayer = optional;
+
+				this.pending.put(renderLayer, bufferBuilder);
 			}
+
 			return bufferBuilder;
-			*/ return null;
 		}
 
 		private BufferAllocator getBufferInternal(RenderLayer layer) {
@@ -316,25 +301,34 @@ public class StackBatcher {
 		}
 
 		public void drawCurrentLayer() {
-			if (this.currentLayer.isPresent()) {
-				RenderLayer renderLayer = this.currentLayer.get();
+			if (this.currentLayer != null) {
+				RenderLayer renderLayer = this.currentLayer;
 				if (!this.layerBuffers.containsKey(renderLayer)) {
 					this.draw(renderLayer);
 				}
-				this.currentLayer = Optional.empty();
+				this.currentLayer = null;
 			}
 		}
 
 		public void draw(RenderLayer layer) {
 			BufferAllocator bufferAllocator = this.getBufferInternal(layer);
-			if (!Objects.equals(this.currentLayer.orElse(null), layer) && bufferAllocator == this.fallbackBuffer) {
+			boolean isSameAsCurrentLayer = Objects.equals(this.currentLayer, layer);
+			if (!isSameAsCurrentLayer && bufferAllocator == this.fallbackBuffer) {
 				return;
 			}
-			if (!this.activeConsumers.remove(bufferAllocator)) {
+			BufferBuilder builder = this.pending.remove(layer);
+			if (builder == null) {
 				return;
 			}
-			// TODO layer.draw(bufferAllocator, VertexSorter.BY_Z);
-			this.currentLayer = Optional.empty();
+			BuiltBuffer buffer = builder.endNullable();
+			if (buffer != null) {
+				// TODO: do we actually need to sort quads still?
+				buffer.sortQuads(bufferAllocator, VertexSorter.BY_Z);
+				layer.draw(buffer);
+			}
+			if (isSameAsCurrentLayer) {
+				this.currentLayer = null;
+			}
 		}
 
 		public Map<RenderLayer, BufferBuilder> getPendingLayerBuffers() {
