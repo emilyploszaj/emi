@@ -218,7 +218,7 @@ public class StackBatcher {
 	}
 
 	public void bake(RenderLayer layer, BufferBuilder bldr) {
-		var builtBuffer = bldr.endNullable();
+		BuiltBuffer builtBuffer = bldr.endNullable();
 		if (builtBuffer == null) {
 			return;
 		}
