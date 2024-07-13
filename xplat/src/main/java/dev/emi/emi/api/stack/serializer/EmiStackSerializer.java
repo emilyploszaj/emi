@@ -1,5 +1,6 @@
 package dev.emi.emi.api.stack.serializer;
 
+import com.mojang.serialization.DynamicOps;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,16 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 	static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	
 	EmiStack create(Identifier id, ComponentChanges componentChanges, long amount);
+
+	private static <T> DynamicOps<T> withRegistryAccess(DynamicOps<T> ops) {
+		MinecraftClient instance = MinecraftClient.getInstance();
+		if (instance == null || instance.world == null) {
+			//Note: instance can be null in datagen, just fall back to a variant that doesn't have registry access
+			// as in the majority of cases this will work fine
+			return ops;
+		}
+		return instance.world.getRegistryManager().getOps(ops);
+	}
 
 	@Override
 	default EmiIngredient deserialize(JsonElement element) {
@@ -54,7 +65,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			try {
 				ComponentChanges changes = ComponentChanges.EMPTY;
 				if (nbt != null) {
-					changes = ComponentChanges.CODEC.decode(MinecraftClient.getInstance().world.getRegistryManager().getOps(NbtOps.INSTANCE), StringNbtReader.parse(nbt)).getOrThrow().getFirst();
+					changes = ComponentChanges.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), StringNbtReader.parse(nbt)).getOrThrow().getFirst();
 				}
 				EmiStack stack = create(id, changes, amount);
 				if (chance != 1) {
@@ -79,7 +90,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			String s = getType() + ":" + stack.getId();
 			var componentChanges = stack.getComponentChanges();
 			if (componentChanges != ComponentChanges.EMPTY) {
-				s += ComponentChanges.CODEC.encodeStart(MinecraftClient.getInstance().world.getRegistryManager().getOps(NbtOps.INSTANCE), componentChanges).getOrThrow().asString();
+				s += ComponentChanges.CODEC.encodeStart(withRegistryAccess(NbtOps.INSTANCE), componentChanges).getOrThrow().asString();
 			}
 			return new JsonPrimitive(s);
 		} else {
