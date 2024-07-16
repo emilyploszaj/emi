@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -79,17 +78,17 @@ public class EmiStackList {
 		}
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
 			// There is an unwritten convention that ItemGroup.updateEntries is only invoked on the main thread
+			long groupReloadStart = System.currentTimeMillis();
+			EmiLog.info("Reloading item groups on client thread...");
 			Map<ItemGroup, Collection<ItemStack>> itemGroupToStacksMap = client.submit(() -> {
 				Map<ItemGroup, Collection<ItemStack>> map = new Reference2ReferenceOpenHashMap<>();
-				Stopwatch watch = Stopwatch.createStarted();
 				for (ItemGroup group : ItemGroups.getGroups()) {
 					group.updateEntries(context);
 					map.put(group, group.getSearchTabStacks());
 				}
-				watch.stop();
-				EmiLog.info("Reloading item group stacks took " + watch);
 				return map;
 			}).join();
+			EmiLog.info("Reloading item groups on client thread took " + (System.currentTimeMillis() - groupReloadStart) + "ms");
 			for (ItemGroup group : itemGroupToStacksMap.keySet()) {
 				String groupName = "null";
 				try {
