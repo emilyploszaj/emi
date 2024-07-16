@@ -28,6 +28,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentChanges;
@@ -78,21 +79,24 @@ public class EmiStackList {
 		}
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
 			// There is an unwritten convention that ItemGroup.updateEntries is only invoked on the main thread
-			client.submitAndJoin(() -> {
+			Map<ItemGroup, Collection<ItemStack>> itemGroupToStacksMap = client.submit(() -> {
+				Map<ItemGroup, Collection<ItemStack>> map = new Reference2ReferenceOpenHashMap<>();
 				Stopwatch watch = Stopwatch.createStarted();
 				for (ItemGroup group : ItemGroups.getGroups()) {
 					group.updateEntries(context);
+					map.put(group, group.getSearchTabStacks());
 				}
 				watch.stop();
 				EmiLog.info("Reloading item group stacks took " + watch);
-			});
-			for (ItemGroup group : ItemGroups.getGroups()) {
+				return map;
+			}).join();
+			for (ItemGroup group : itemGroupToStacksMap.keySet()) {
 				String groupName = "null";
 				try {
 					groupName = group.getDisplayName().getString();
 					Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
 					IndexGroup ig = new IndexGroup();
-					Collection<ItemStack> searchStacks = group.getSearchTabStacks();
+					Collection<ItemStack> searchStacks = itemGroupToStacksMap.get(group);
 					for (ItemStack stack : searchStacks) {
 						EmiStack es = EmiStack.of(stack);
 						String namespace = es.getId().getNamespace();
