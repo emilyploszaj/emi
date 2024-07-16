@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -76,11 +77,19 @@ public class EmiStackList {
 			}
 		}
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
+			// There is an unwritten convention that ItemGroup.updateEntries is only invoked on the main thread
+			client.submitAndJoin(() -> {
+				Stopwatch watch = Stopwatch.createStarted();
+				for (ItemGroup group : ItemGroups.getGroups()) {
+					group.updateEntries(context);
+				}
+				watch.stop();
+				EmiLog.info("Reloading item group stacks took " + watch);
+			});
 			for (ItemGroup group : ItemGroups.getGroups()) {
 				String groupName = "null";
 				try {
 					groupName = group.getDisplayName().getString();
-					group.updateEntries(context);
 					Object2IntMap<String> usedNamespaces = new Object2IntOpenHashMap<>();
 					IndexGroup ig = new IndexGroup();
 					Collection<ItemStack> searchStacks = group.getSearchTabStacks();
