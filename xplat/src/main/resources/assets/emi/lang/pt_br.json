@@ -356,7 +356,7 @@
 
   "emi.error.recipe.initialize": "Erro ao Inicializar",
   "emi.error.recipe.render": "Erro ao Renderizar",
-  ///////////////////////////
+
   "emi.dev.severity.error": "Erro",
   "emi.dev.severity.warning": "Aviso",
   "emi.dev.null_recipe_id": "O ID da receita é §7nulo§r\nAs receitas precisam ter IDs únicos para serem serializadas\nIsso afetará apenas esta receita",
