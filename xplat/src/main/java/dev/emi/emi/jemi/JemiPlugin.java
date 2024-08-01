@@ -69,6 +69,7 @@ import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
@@ -236,7 +237,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					if (type == RecipeTypes.INFORMATION) {
 						addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
 					} else if (type == RecipeTypes.CRAFTING) {
-						addCraftingRecipes(registry, (IRecipeCategory<CraftingRecipe>) c);
+						addCraftingRecipes(registry, (IRecipeCategory<RecipeEntry<CraftingRecipe>>) c);
 					}
 					continue;
 				}
@@ -302,15 +303,15 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		}
 	}
 
-	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<CraftingRecipe> category) {
+	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<RecipeEntry<CraftingRecipe>> category) {
 		Set<Identifier> replaced = Sets.newHashSet();
 		Set<EmiRecipe> replacements = Sets.newHashSet();
-		List<CraftingRecipe> recipes = Stream.concat(
+		List<RecipeEntry<CraftingRecipe>> recipes = Stream.concat(
 			runtime.getRecipeManager().createRecipeLookup(category.getRecipeType()).includeHidden().get(),
-			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream().map(e -> e.value())
-				.filter(r -> r instanceof SpecialCraftingRecipe)
+			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream()
+				.filter(r -> r.value() instanceof SpecialCraftingRecipe)
 		).distinct().toList();
-		for (CraftingRecipe recipe : recipes) {
+		for (RecipeEntry<CraftingRecipe> recipe : recipes) {
 			try {
 				if (category.isHandled(recipe)) {
 					JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
