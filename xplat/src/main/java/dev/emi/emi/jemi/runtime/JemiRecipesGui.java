@@ -14,6 +14,7 @@ import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.client.MinecraftClient;
 
@@ -43,6 +44,11 @@ public class JemiRecipesGui implements IRecipesGui {
 				}
 			}
 		}
+	}
+
+	@Override
+	public <T> void showRecipes(IRecipeCategory<T> recipeCategory, List<T> recipes, List<IFocus<?>> focuses) {
+		//TODO: Figure out how to implement
 	}
 
 	@Override
