@@ -48,7 +48,7 @@ public class JemiRecipesGui implements IRecipesGui {
 
 	@Override
 	public <T> void showRecipes(IRecipeCategory<T> recipeCategory, List<T> recipes, List<IFocus<?>> focuses) {
-		//TODO: Figure out how to implement
+		showTypes(List.of(recipeCategory.getRecipeType()));
 	}
 
 	@Override
