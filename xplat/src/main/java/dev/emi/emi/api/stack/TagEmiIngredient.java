@@ -79,6 +79,11 @@ public class TagEmiIngredient implements EmiIngredient {
 		return stacks;
 	}
 
+	@ApiStatus.Internal
+	public void setEmiStacks(List<EmiStack> stacks) {
+		this.stacks = stacks;
+	}
+
 	@Override
 	public long getAmount() {
 		return amount;
