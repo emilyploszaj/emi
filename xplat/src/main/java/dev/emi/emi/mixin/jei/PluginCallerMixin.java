@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.google.common.collect.Sets;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.library.load.PluginCaller;
 import net.minecraft.util.Identifier;
@@ -24,12 +25,15 @@ public class PluginCallerMixin {
 	private static final Set<Identifier> SKIPPED = Sets.newHashSet(
 		EmiPort.id("jei", "minecraft"), EmiPort.id("jei", "gui"), EmiPort.id("jei", "fabric_gui"), EmiPort.id("jei", "forge_gui")
 	);
+	@Unique
+	private static final Set<String> SKIPPED_MODS = JemiUtil.getHandledMods();
 	
 	@Redirect(at = @At(value = "INVOKE", target = "java/util/function/Consumer.accept(Ljava/lang/Object;)V"),
 		method = "callOnPlugins", remap = false)
 	private static void callOnPlugins(Consumer<IModPlugin> target, Object value, String title, List<IModPlugin> plugins, Consumer<IModPlugin> func) {
 		IModPlugin plugin = (IModPlugin) value;
-		if (SKIPPED.contains(plugin.getPluginUid())) {
+		Identifier uid = plugin.getPluginUid();
+		if (SKIPPED.contains(uid)) {
 			switch (title) {
 				case "Registering categories" -> {}
 				case "Registering ingredients" -> {}
@@ -37,6 +41,11 @@ public class PluginCallerMixin {
 				case "Sending Runtime" -> {}
 				case "Sending Runtime Unavailable" -> {}
 				default -> { return; }
+			}
+		} else if (uid != null) {
+			String namespace = uid.getNamespace();
+			if (SKIPPED_MODS.contains(namespace) && !namespace.equals("jei") && !namespace.equals("emi")) {
+				return;
 			}
 		}
 		target.accept(plugin);

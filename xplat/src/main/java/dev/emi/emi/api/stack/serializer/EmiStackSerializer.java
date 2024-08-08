@@ -1,5 +1,6 @@
 package dev.emi.emi.api.stack.serializer;
 
+import com.mojang.serialization.DynamicOps;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,16 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 	static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	
 	EmiStack create(Identifier id, NbtCompound nbt, long amount);
+
+	private static <T> DynamicOps<T> withRegistryAccess(DynamicOps<T> ops) {
+		MinecraftClient instance = MinecraftClient.getInstance();
+		if (instance == null || instance.world == null) {
+			//Note: instance can be null in datagen, just fall back to a variant that doesn't have registry access
+			// as in the majority of cases this will work fine
+			return ops;
+		}
+		return instance.world.getRegistryManager().getOps(ops);
+	}
 
 	@Override
 	default EmiIngredient deserialize(JsonElement element) {
