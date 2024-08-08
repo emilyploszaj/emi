@@ -304,7 +304,6 @@ public class StackBatcher {
 				this.currentLayer = optional;
 			}
 			return bufferBuilder;
-			*/ return null;
 		}
 
 		private BufferBuilder getBufferInternal(RenderLayer layer) {
