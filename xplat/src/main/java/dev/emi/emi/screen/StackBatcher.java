@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import net.minecraft.client.render.BuiltBuffer;
 import org.joml.Matrix4f;
 
 import com.google.common.collect.Lists;
@@ -45,41 +46,19 @@ import net.minecraft.item.ItemStack;
  */
 public class StackBatcher {
 	private static MethodHandle sodiumSpriteHandle;
-	private static boolean isIncompatibleSodiumLoaded;
 
 	static {
 		try {
 			Class<?> clazz = null;
-			// TODO this is a 1.18 -> 1.19 refactor for Sodium
 			try {
-				clazz = Class.forName("net.caffeinemc.sodium.render.texture.SpriteUtil");
-			} catch (Throwable t) {
-			}
-			if (clazz == null) {
+				// Try Sodium 0.5 name
 				clazz = Class.forName("me.jellysquid.mods.sodium.client.render.texture.SpriteUtil");
+			} catch (Throwable t) {
 			}
 			sodiumSpriteHandle = MethodHandles.lookup()
 				.findStatic(clazz, "markSpriteActive", MethodType.methodType(void.class, Sprite.class));
 			if (sodiumSpriteHandle != null) {
 				EmiLog.info("Discovered Sodium");
-			}
-
-			if(EmiAgnos.isModLoaded("sodium") || EmiAgnos.isModLoaded("rubidium")) {
-				// Check for the modern VertexBufferWriter API. If so, we are likely on Sodium 0.5+ (or a derivative),
-				// which can generally handle a custom VertexConsumer properly.
-				try {
-					Class.forName("net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter");
-				} catch(Throwable t) {
-					// Check for the legacy VBW API which *cannot* handle this
-					try {
-						Class.forName("me.jellysquid.mods.sodium.client.render.vertex.VertexBufferWriter");
-						// Success means the class exists
-						isIncompatibleSodiumLoaded = true;
-						EmiLog.info("Batching stack renderer disabled for compatibility with legacy Sodium");
-					} catch(Throwable t2) {
-						// Old enough Sodiums shouldn't have an issue
-					}
-				}
 			}
 		} catch (Throwable e) {
 		}
@@ -234,13 +213,15 @@ public class StackBatcher {
 		for (RenderLayer layer : imm.getLayerBuffers().keySet()) {
 			bake(layer);
 		}
+		imm.getPendingLayerBuffers().clear();
 	}
 
 	public void bake(RenderLayer layer) {
 		BufferBuilder bldr = imm.getBufferInternal(layer);
 		if (!imm.getActiveConsumers().remove(bldr)) return;
 		VertexBuffer vb = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
-		EmiPort.upload(vb, bldr);
+		vb.bind();
+		vb.upload(builtBuffer);
 		buffers.put(layer, vb);
 		bldr.reset();
 	}
@@ -298,11 +279,10 @@ public class StackBatcher {
 				if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(renderLayer2 = this.currentLayer.get())) {
 					this.draw(renderLayer2);
 				}
-				if (this.activeConsumers.add(bufferBuilder)) {
-					bufferBuilder.begin(renderLayer.getDrawMode(), renderLayer.getVertexFormat());
-				}
-				this.currentLayer = optional;
+
+				this.pending.put(renderLayer, bufferBuilder);
 			}
+
 			return bufferBuilder;
 		}
 
@@ -311,12 +291,12 @@ public class StackBatcher {
 		}
 
 		public void drawCurrentLayer() {
-			if (this.currentLayer.isPresent()) {
-				RenderLayer renderLayer = this.currentLayer.get();
+			if (this.currentLayer != null) {
+				RenderLayer renderLayer = this.currentLayer;
 				if (!this.layerBuffers.containsKey(renderLayer)) {
 					this.draw(renderLayer);
 				}
-				this.currentLayer = Optional.empty();
+				this.currentLayer = null;
 			}
 		}
 

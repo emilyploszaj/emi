@@ -115,8 +115,10 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			for (int i = 0; i < crafting.size(); i++) {
 				Slot s = crafting.get(i);
 				if (s != null && s.canTakeItems(player) && !s.getStack().isEmpty()) {
-					rubble.add(s.getStack().copy());
+					ItemStack taken = s.getStack();
+					rubble.add(taken.copy());
 					s.setStack(ItemStack.EMPTY);
+					s.onTakeItem(player, taken);
 				}
 			}
 			try {	
@@ -225,6 +227,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			ItemStack st = s.getStack();
 			if (ItemStack.areItemsAndComponentsEqual(stack, st)) {
 				int wanted = amount - grabbed;
+				ItemStack taken = st.copy();
 				if (st.getCount() <= wanted) {
 					grabbed += st.getCount();
 					s.setStack(ItemStack.EMPTY);
@@ -232,6 +235,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 					grabbed = amount;
 					st.setCount(st.getCount() - wanted);
 				}
+				s.onTakeItem(player, taken);
 			}
 		}
 		return grabbed;
