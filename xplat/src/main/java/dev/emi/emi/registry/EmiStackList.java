@@ -89,7 +89,7 @@ public class EmiStackList {
 				return map;
 			}).join();
 			EmiLog.info("Reloading item groups on client thread took " + (System.currentTimeMillis() - groupReloadStart) + "ms");
-			for (ItemGroup group : itemGroupToStacksMap.keySet()) {
+			for (ItemGroup group : ItemGroups.getGroups()) {
 				String groupName = "null";
 				try {
 					groupName = group.getDisplayName().getString();

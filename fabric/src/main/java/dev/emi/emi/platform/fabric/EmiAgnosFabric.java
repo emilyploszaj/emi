@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.google.common.collect.Lists;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
@@ -22,6 +24,7 @@ import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.FakeScreen;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -33,6 +36,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.model.BakedModel;
@@ -106,8 +110,16 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected List<EmiPluginContainer> getPluginsAgnos() {
-		return FabricLoader.getInstance().getEntrypointContainers("emi", EmiPlugin.class).stream()
-			.map(p -> new EmiPluginContainer(p.getEntrypoint(), p.getProvider().getMetadata().getId())).toList();
+		List<EmiPluginContainer> list = Lists.newArrayList();
+		for (EntrypointContainer<EmiPlugin> container : FabricLoader.getInstance().getEntrypointContainers("emi", EmiPlugin.class)) {
+			try {
+				list.add(new EmiPluginContainer(container.getEntrypoint(), container.getProvider().getMetadata().getId()));
+			} catch (Throwable t) {
+				EmiLog.error("Critical exception thrown when constructing EMI Plugin from mod " + container.getProvider().getMetadata().getId());
+				EmiLog.error(t);
+			}
+		}
+		return list;
 	}
 
 	@Override

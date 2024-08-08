@@ -837,6 +837,9 @@ public class EmiScreenManager {
 			context.push();
 			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
 			for (Slot slot : hs.getScreenHandler().slots) {
+				if (!slot.isEnabled()) {
+					continue;
+				}
 				EmiStack stack = EmiStack.of(slot.getStack());
 				context.push();
 				context.matrices().translate(0, 0, 300);
@@ -937,10 +940,14 @@ public class EmiScreenManager {
 			return false;
 		}
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
+		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
-			return true;
+			// Don't cancel the event for extra mouse buttons
+			ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
+			if (!ingredient.isEmpty()) {
+				return true;
+			}
 		} else {
 			if (genericInteraction(bind -> bind.matchesMouse(button))) {
 				return true;
