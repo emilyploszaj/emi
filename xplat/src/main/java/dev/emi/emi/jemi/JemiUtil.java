@@ -2,10 +2,15 @@ package dev.emi.emi.jemi;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiLog;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
 import mezz.jei.api.helpers.IPlatformFluidHelper;
@@ -80,5 +85,13 @@ public class JemiUtil {
 
 	public static IIngredientType getFluidType() {
 		return getFluidHelper().getFluidIngredientType();
+	}
+
+	public static Set<String> getHandledMods() {
+		Set<String> set = Sets.newHashSet();
+		for (EmiPluginContainer plugin : EmiAgnos.getPlugins()) {
+			set.add(plugin.id());
+		}
+		return set;
 	}
 }
