@@ -121,6 +121,11 @@ public final class EmiPort {
 		}
 	}
 
+	public static void upload(VertexBuffer vb, BufferBuilder bldr) {
+		vb.bind();
+		vb.upload(bldr.end());
+	}
+
 	public static void setShader(VertexBuffer buf, Matrix4f mat) {
 		buf.bind();
 		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
