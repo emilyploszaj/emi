@@ -111,6 +111,25 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	}
 
 	@Override
+	protected List<String> getModsWithPluginsAgnos() {
+		List<String> mods = Lists.newArrayList();
+		Type entrypointType = Type.getType(EmiEntrypoint.class);
+		for (ModFileScanData data : ModList.get().getAllScanData()) {
+			for (ModFileScanData.AnnotationData annot : data.getAnnotations()) {
+				try {
+					if (entrypointType.equals(annot.annotationType())) {
+						mods.add(data.getIModInfoData().get(0).getMods().get(0).getModId());
+					}
+				} catch (Throwable t) {
+					EmiLog.error("Exception constructing entrypoint:");
+					t.printStackTrace();
+				}
+			}
+		}
+		return mods;
+	}
+
+	@Override
 	protected List<EmiPluginContainer> getPluginsAgnos() {
 		List<EmiPluginContainer> containers = Lists.newArrayList();
 		Type entrypointType = Type.getType(EmiEntrypoint.class);
