@@ -108,6 +108,21 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
+	protected List<String> getModsWithPluginsAgnos() {
+		List<String> list = Lists.newArrayList();
+		for (EntrypointContainer<EmiPlugin> container : FabricLoader.getInstance().getEntrypointContainers("emi", EmiPlugin.class)) {
+			try {
+				list.add(container.getProvider().getMetadata().getId());
+			} catch (Throwable t) {
+				EmiLog.error("Critical exception thrown when reading EMI Plugin from mod " + container.getProvider().getMetadata().getId());
+				EmiLog.error(t);
+			}
+		}
+		return list;
+	}
+
+
+	@Override
 	protected List<EmiPluginContainer> getPluginsAgnos() {
 		List<EmiPluginContainer> list = Lists.newArrayList();
 		for (EntrypointContainer<EmiPlugin> container : FabricLoader.getInstance().getEntrypointContainers("emi", EmiPlugin.class)) {

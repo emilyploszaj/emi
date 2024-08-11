@@ -72,6 +72,12 @@ public abstract class EmiAgnos {
 
 	protected abstract List<String> getAllModAuthorsAgnos();
 
+	public static List<String> getModsWithPlugins() {
+		return delegate.getModsWithPluginsAgnos();
+	}
+
+	protected abstract List<String> getModsWithPluginsAgnos();
+
 	public static List<EmiPluginContainer> getPlugins() {
 		return delegate.getPluginsAgnos();
 	}
