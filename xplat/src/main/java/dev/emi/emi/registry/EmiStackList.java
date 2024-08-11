@@ -80,8 +80,15 @@ public class EmiStackList {
 			Map<ItemGroup, Collection<ItemStack>> itemGroupToStacksMap = client.submit(() -> {
 				Map<ItemGroup, Collection<ItemStack>> map = new Reference2ReferenceOpenHashMap<>();
 				for (ItemGroup group : ItemGroups.getGroups()) {
-					group.updateEntries(client.player.networkHandler.getEnabledFeatures(), false);
-					map.put(group, group.getSearchTabStacks());
+					String groupName = "null";
+					try {
+						groupName = group.getDisplayName().toString();
+						group.updateEntries(client.player.networkHandler.getEnabledFeatures(), false);
+						map.put(group, group.getSearchTabStacks());
+					} catch(Exception e) {
+						EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.");
+						EmiLog.error(e);
+					}
 				}
 				return map;
 			}).join();
