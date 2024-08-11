@@ -82,8 +82,8 @@ public class JemiUtil {
 
 	public static Set<String> getHandledMods() {
 		Set<String> set = Sets.newHashSet();
-		for (EmiPluginContainer plugin : EmiAgnos.getPlugins()) {
-			set.add(plugin.id());
+		for (String mod : EmiAgnos.getModsWithPlugins()) {
+			set.add(mod);
 		}
 		return set;
 	}
