@@ -342,7 +342,7 @@ public class EmiConfig {
 	@ConfigValue("binds.toggle-visibility")
 	public static EmiBind toggleVisibility = new EmiBind("key.emi.toggle_visibility", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_O);
 
-	@Comment("Focuse the search bar.")
+	@Comment("Focus the search bar.")
 	@ConfigValue("binds.focus-search")
 	public static EmiBind focusSearch = new EmiBind("key.emi.focus_search", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_F);
 
