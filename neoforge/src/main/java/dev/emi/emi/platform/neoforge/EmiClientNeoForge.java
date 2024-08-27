@@ -46,7 +46,7 @@ public class EmiClientNeoForge {
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::renderScreenForeground);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::postRenderScreen);
 		ModList.get().getModContainerById("emi").orElseThrow().registerExtensionPoint(IConfigScreenFactory.class,
-				(client, last) -> new ConfigScreen(last));
+				(container, last) -> new ConfigScreen(last));
 	}
 
 	@SubscribeEvent
