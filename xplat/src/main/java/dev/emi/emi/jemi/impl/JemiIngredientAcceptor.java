@@ -2,6 +2,7 @@ package dev.emi.emi.jemi.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,6 +115,27 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 	@Override
 	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, ComponentChanges componentChanges) {
 		addStack(EmiStack.of(fluid, componentChanges, amount));
+		return this;
+	}
+
+	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public JemiIngredientAcceptor addTypedIngredients(List<ITypedIngredient<?>> ingredients) {
+		for (ITypedIngredient<?> i : ingredients) {
+			addIngredient(((IIngredientType) i.getType()), i.getIngredient());
+		}
+		return this;
+	}
+
+	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public JemiIngredientAcceptor addOptionalTypedIngredients(List<Optional<ITypedIngredient<?>>> ingredients) {
+		for (Optional<ITypedIngredient<?>> opt : ingredients) {
+			if (opt.isPresent()) {
+				ITypedIngredient<?> i = opt.get();
+				addIngredient(((IIngredientType) i.getType()), i.getIngredient());
+			}
+		}
 		return this;
 	}
 }
