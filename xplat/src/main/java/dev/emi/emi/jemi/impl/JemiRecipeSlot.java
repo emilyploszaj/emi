@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotRichTooltipCallback;
 import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -23,6 +24,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	public final int x, y;
 	public final Optional<String> name;
 	public final IRecipeSlotTooltipCallback tooltipCallback;
+	public final IRecipeSlotRichTooltipCallback richTooltipCallback;
 	public final OffsetDrawable background, overlay;
 	public final Map<IIngredientType<?>, IngredientRenderer<?>> renderers;
 	public final TankInfo tankInfo;
@@ -36,6 +38,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 		this.y = builder.y;
 		this.name = builder.name;
 		this.tooltipCallback = builder.tooltipCallback;
+		this.richTooltipCallback = builder.richTooltipCallback;
 		this.background = builder.background;
 		this.overlay = builder.overlay;
 		this.renderers = builder.renderers;
@@ -49,6 +52,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 		this.y = 0;
 		this.name = Optional.empty();
 		this.tooltipCallback = null;
+		this.richTooltipCallback = null;
 		this.background = null;
 		this.overlay = null;
 		this.renderers = null;

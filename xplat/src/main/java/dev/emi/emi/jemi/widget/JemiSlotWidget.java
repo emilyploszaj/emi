@@ -16,6 +16,7 @@ import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
+import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -112,7 +113,15 @@ public class JemiSlotWidget extends SlotWidget {
 			}
 		}
 		list.addAll(stack.getTooltip());
-		if (slot.tooltipCallback != null) {
+		if (slot.richTooltipCallback != null) {
+			try {
+				JemiTooltipBuilder tooltipBuilder = new JemiTooltipBuilder();
+				slot.richTooltipCallback.onRichTooltip(slot, tooltipBuilder);
+				list.addAll(tooltipBuilder.tooltip);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (slot.tooltipCallback != null) {
 			try {
 				List<Text> event = Lists.newArrayList();
 				List<Text> original = stack.getEmiStacks().get(0).getTooltipText();
