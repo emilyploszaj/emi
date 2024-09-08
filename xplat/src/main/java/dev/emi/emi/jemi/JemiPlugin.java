@@ -96,7 +96,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					@SuppressWarnings("unchecked")
 					IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
 					SubtypeInterpreters interpreters = ((SubtypeRegistration) registration).getInterpreters();
-					return interpreters.contains(castedType, ingredient);
+					return interpreters.contains(castedType, castedType.getBase(ingredient));
 				};
 			}
 			return;
