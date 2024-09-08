@@ -905,6 +905,13 @@ public class EmiScreenManager {
 		recalculate();
 		SidebarPanel panel = getHoveredPanel((int) mouseX, (int) mouseY);
 		if (panel != null) {
+			int mx = (int) mouseX;
+			int my = (int) mouseY;
+			for (Bounds bounds : EmiExclusionAreas.getExclusion(EmiScreenBase.getCurrent())) {
+				if (bounds.contains(mx, my)) {
+					return false;
+				}
+			}
 			panel.scroll(-sa);
 			return true;
 		}
