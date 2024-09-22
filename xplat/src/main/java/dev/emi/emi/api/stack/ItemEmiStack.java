@@ -159,7 +159,12 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
-		return getItemStack().getTooltip(Item.TooltipContext.create(client.world), client.player, TooltipType.BASIC);
+		if (client.isOnThread()) {
+			return getItemStack().getTooltip(Item.TooltipContext.create(client.world), client.player, TooltipType.BASIC);
+		} else {
+			// Don't provide world or entity as context, as they are not thread safe
+			return getItemStack().getTooltip(Item.TooltipContext.create(client.world.getRegistryManager()), null, TooltipType.BASIC);
+		}
 	}
 
 	@Override
