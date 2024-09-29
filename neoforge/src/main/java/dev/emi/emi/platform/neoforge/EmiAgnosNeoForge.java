@@ -51,6 +51,7 @@ import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.common.brewing.BrewingRecipe;
@@ -260,7 +261,13 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 
 	@Override
 	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges) {
-		return List.of(getFluidName(fluid, componentChanges));
+		List<Text> tooltip = Lists.newArrayList();
+		tooltip.add(getFluidName(fluid, componentChanges));
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.options.advancedItemTooltips) {
+			tooltip.add(EmiPort.literal(EmiPort.getFluidRegistry().getId(fluid).toString()).formatted(Formatting.DARK_GRAY));
+		}
+		return tooltip;
 	}
 
 	@Override
