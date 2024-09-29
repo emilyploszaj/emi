@@ -91,23 +91,10 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	}
 
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		try {
-			if (((SubtypeRegistration) registration).getInterpreters() != null) {
-				hasSubtype = (type, ingredient) -> {
-					@SuppressWarnings("unchecked")
-					IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
-					SubtypeInterpreters interpreters = ((SubtypeRegistration) registration).getInterpreters();
-					return interpreters.contains(castedType, ingredient);
-				};
-			}
-			return;
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
 		hasSubtype = (type, ingredient) -> {
 			@SuppressWarnings("unchecked")
 			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
-			return subtypeManager.getSubtypeInfo(castedType, ingredient, UidContext.Recipe) != IIngredientSubtypeInterpreter.NONE;
+			return subtypeManager.hasSubtypes(castedType, ingredient);
 		};
 	}
 
