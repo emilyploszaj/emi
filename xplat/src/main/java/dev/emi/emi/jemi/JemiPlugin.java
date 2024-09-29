@@ -106,7 +106,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		hasSubtype = (type, ingredient) -> {
 			@SuppressWarnings("unchecked")
 			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
-			return subtypeManager.getSubtypeInfo(castedType, ingredient, UidContext.Recipe) != IIngredientSubtypeInterpreter.NONE;
+			return subtypeManager.hasSubtypes(castedType, ingredient);
 		};
 	}
 
