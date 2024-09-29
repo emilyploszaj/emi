@@ -106,7 +106,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		hasSubtype = (type, ingredient) -> {
 			@SuppressWarnings("unchecked")
 			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
-			return subtypeManager.getSubtypeInfo(castedType, ingredient, UidContext.Recipe) != IIngredientSubtypeInterpreter.NONE;
+			return subtypeManager.hasSubtypes(castedType, ingredient);
 		};
 	}
 
@@ -364,6 +364,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 				}
 			} catch (Throwable t) {
 				EmiLog.error("[JEMI] Exception thrown setting JEI crafting recipe");
+				EmiLog.error(t);
 			}
 		}
 		registry.removeRecipes(r -> r instanceof EmiCraftingRecipe && replaced.contains(r.getId()) && !replacements.contains(r));

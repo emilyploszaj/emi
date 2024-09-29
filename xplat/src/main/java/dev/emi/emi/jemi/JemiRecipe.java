@@ -20,11 +20,13 @@ import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
+import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
+import mezz.jei.api.gui.inputs.IJeiUserInput;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.library.focus.FocusGroup;
@@ -170,10 +172,9 @@ public class JemiRecipe<T> implements EmiRecipe {
 
 		@Override
 		public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-			return category.getTooltipStrings(recipe, recipeLayoutDrawable.getRecipeSlotsView(), mouseX, mouseY)
-				.stream()
-				.map(t -> TooltipComponent.of(t.asOrderedText()))
-				.toList();
+			JemiTooltipBuilder builder = new JemiTooltipBuilder();
+			category.getTooltip(builder, recipe, recipeLayoutDrawable.getRecipeSlotsView(), mouseX, mouseY);
+			return builder.tooltip;
 		}
 
 		@Override

@@ -20,7 +20,13 @@ public interface EmiRecipe {
 	EmiRecipeCategory getCategory();
 
 	/**
-	 * @return The unique id of the recipe, or null. If null, the recipe cannot be serialized.
+	 * IDs should be standard formatting (minecraft:lime_dye_from_smelting) only if they uniquely represent a data driven json recipe.
+	 * If a mod wants to represent a vanilla recipe with different processing, it cannot reuse the vanilla ID.
+	 * For example, a custom machine's recipe crafting an iron pickaxe cannot use "minecraft:iron_pickaxe".
+	 * If a recipe does not have a normal unique ID, it should use a synthetic ID.
+	 * Synthetic IDs are formatted "namespace:/path" with a "/" at the start of the path.
+	 * Commonly, synthetic IDs will be formatted "mymod:/my_process/unique_name".
+	 * @return The unique ID of the recipe, or null. If null, the recipe cannot be serialized.
 	 */
 	@Nullable Identifier getId();
 	
