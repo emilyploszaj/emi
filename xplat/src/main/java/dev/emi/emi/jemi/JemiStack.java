@@ -8,7 +8,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -92,9 +91,8 @@ public class JemiStack<T> extends EmiStack {
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
 		MinecraftClient client = MinecraftClient.getInstance();
-		JemiTooltipBuilder builder = new JemiTooltipBuilder();
-		renderer.getTooltip(builder, ingredient, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC);
-		list.addAll(builder.tooltip);
+		list.addAll(renderer.getTooltip(ingredient, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC)
+			.stream().map(EmiPort::ordered).map(TooltipComponent::of).toList());
 
 		Identifier id = getId();
 		if (EmiConfig.appendModId && id != null) {
