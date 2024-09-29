@@ -1,4 +1,5 @@
 ### Tweaks
+* NeoForge fluid tooltips now include ID with advanced tooltips on
 * Added new JEI features to JEI/EMI compatibility
 
 ### Fixes
