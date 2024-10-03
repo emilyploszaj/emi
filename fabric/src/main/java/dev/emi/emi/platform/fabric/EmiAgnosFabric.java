@@ -172,7 +172,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
 						if (brewingRegistry.isBrewable(entry)) {
-							Identifier id = EmiPort.id("emi", "brewing/item/"
+							Identifier id = EmiPort.id("emi", "/brewing/item/"
 								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), entry.value())), EmiIngredient.of(recipeIngredient),

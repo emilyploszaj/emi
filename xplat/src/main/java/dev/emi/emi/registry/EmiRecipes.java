@@ -178,6 +178,10 @@ public class EmiRecipes {
 					} else {
 						byId.put(id, recipe);
 					}
+
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
+						EmiReloadLog.warn("Recipe " + id + " not present in recipe manager. Consider prefixing its path with '/' to signify that it is synthetic.");
+					}
 				}
 			}
 	
