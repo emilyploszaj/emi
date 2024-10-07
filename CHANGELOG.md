@@ -1,6 +1,5 @@
 ### Tweaks
-* The "Default Stack" bind will now clear a default when used on a defaulted stack (to clear a tag resolution, for example)
+* Added "Hidden" option for status effect display location #517
 
 ### Fixes
-* #739
-* More update for JEI compatibility #732 #734
+* Properly implement JEI fixes in 1.20.1 #743

@@ -70,6 +70,7 @@
   "emi.effect_location.right_compressed": "Right (Compressed)",
   "emi.effect_location.left": "Left",
   "emi.effect_location.right": "Right",
+  "emi.effect_location.hidden": "Hidden",
   "emi.recipe_book_action.default": "Default",
   "emi.recipe_book_action.toggle_craftables": "Toggle Craftables",
   "emi.recipe_book_action.toggle_visibility": "Toggle Visibility",
