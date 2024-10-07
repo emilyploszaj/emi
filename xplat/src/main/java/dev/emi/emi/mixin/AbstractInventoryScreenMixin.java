@@ -66,7 +66,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 	@ModifyVariable(at = @At(value = "INVOKE", target = "java/util/Collection.size()I", ordinal = 0),
 		method = "drawStatusEffects", ordinal = 0)
 	private Collection<StatusEffectInstance> drawStatusEffects(Collection<StatusEffectInstance> original) {
-		if (EmiConfig.effectLocation == EffectLocation.TOP) {
+		if (EmiConfig.effectLocation == EffectLocation.TOP || EmiConfig.effectLocation == EffectLocation.HIDDEN) {
 			return List.of();
 		}
 		return original;
@@ -132,7 +132,7 @@ public abstract class AbstractInventoryScreenMixin<T extends ScreenHandler> exte
 		method = "drawStatusEffects", ordinal = 2)
 	private int changeEffectSpace(int original) {
 		return switch (EmiConfig.effectLocation) {
-			case RIGHT, RIGHT_COMPRESSED -> original;
+			case RIGHT, RIGHT_COMPRESSED, HIDDEN -> original;
 			case TOP -> this.x;
 			case LEFT_COMPRESSED -> this.x - 2- 32;
 			case LEFT -> this.x - 2 - 120;
