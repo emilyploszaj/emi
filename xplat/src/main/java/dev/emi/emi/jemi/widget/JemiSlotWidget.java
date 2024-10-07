@@ -28,7 +28,7 @@ public class JemiSlotWidget extends SlotWidget {
 	private final JemiRecipeSlot slot;
 
 	public JemiSlotWidget(JemiRecipeSlot slot, EmiRecipe recipe) {
-		super(slot.stack, slot.x - 1, slot.y - 1);
+		super(slot.stack, slot.x - (slot.large ? 6 : 1) , slot.y - (slot.large ? 6 : 1));
 		this.slot = slot;
 		slot.widget = this;
 		if (slot.getRole() == RecipeIngredientRole.OUTPUT) {
@@ -38,6 +38,8 @@ public class JemiSlotWidget extends SlotWidget {
 		IIngredientRenderer<?> renderer = getRenderer();
 		if (renderer != null) {
 			this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
+		} else if (slot.large) {
+			this.large(true);
 		}
 	}
 
