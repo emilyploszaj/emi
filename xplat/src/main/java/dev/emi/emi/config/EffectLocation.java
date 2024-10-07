@@ -9,6 +9,7 @@ public enum EffectLocation implements ConfigEnum {
 	RIGHT_COMPRESSED("right-compressed", true),
 	LEFT("left", false),
 	RIGHT("right", false),
+	HIDDEN("hidden", false),
 	;
 
 	public final String name;
