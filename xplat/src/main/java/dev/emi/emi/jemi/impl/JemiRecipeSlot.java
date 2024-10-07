@@ -1,8 +1,12 @@
 package dev.emi.emi.jemi.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -20,6 +24,7 @@ import net.minecraft.client.gui.DrawContext;
 @SuppressWarnings("unchecked")
 public class JemiRecipeSlot implements IRecipeSlotView {
 	public final RecipeIngredientRole role;
+	public final boolean large;
 	public final int x, y;
 	public final Optional<String> name;
 	public final IRecipeSlotTooltipCallback tooltipCallback;
@@ -32,6 +37,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 
 	public JemiRecipeSlot(JemiRecipeSlotBuilder builder) {
 		this.role = builder.acceptor.role;
+		this.large = builder.large;
 		this.x = builder.x;
 		this.y = builder.y;
 		this.name = builder.name;
@@ -45,6 +51,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 
 	public JemiRecipeSlot(RecipeIngredientRole role, EmiStack stack) {
 		this.role = role;
+		this.large = false;
 		this.x = 0;
 		this.y = 0;
 		this.name = Optional.empty();
@@ -59,6 +66,11 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	@Override
 	public <T> Stream<T> getIngredients(IIngredientType<T> ingredientType) {
 		return (Stream<T>) getAllIngredients().filter(t -> t.getType() == ingredientType).map(t -> t.getIngredient());
+	}
+
+	@Override
+	public @Unmodifiable List<@Nullable ITypedIngredient<?>> getAllIngredientsList() {
+		return getAllIngredients().toList();
 	}
 
 	@Override

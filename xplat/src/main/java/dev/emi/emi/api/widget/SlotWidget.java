@@ -293,7 +293,11 @@ public class SlotWidget extends Widget {
 			}
 		} else if (recipe != null && recipe.supportsRecipeTree()) {
 			if (function.apply(EmiConfig.defaultStack)) {
-				BoM.addRecipe(getStack(), recipe);
+				if (BoM.isDefaultRecipe(getStack(), recipe)) {
+					BoM.removeRecipe(getStack(), recipe);
+				} else {
+					BoM.addRecipe(getStack(), recipe);
+				}
 				return true;
 			}
 		}
