@@ -174,6 +174,15 @@ public class BoM {
 		tree.addResolution(ingredient, recipe);
 	}
 
+	public static boolean isDefaultRecipe(EmiIngredient stack, EmiRecipe recipe) {
+		if (recipe instanceof EmiResolutionRecipe err) {
+			if (getRecipe(err.ingredient) instanceof EmiResolutionRecipe res) {
+				return stack.equals(res.stack);
+			}
+		}
+		return getRecipe(stack) == recipe;
+	}
+
 	public static void addRecipe(EmiRecipe recipe) {
 		disabledRecipes.remove(recipe);
 		for (EmiStack stack : recipe.getOutputs()) {
@@ -194,6 +203,21 @@ public class BoM {
 
 	public static void removeRecipe(EmiRecipe recipe) {
 		for (EmiStack stack : recipe.getOutputs()) {
+			addedRecipes.remove(stack, recipe);
+		}
+		if (getRecipeStatus(recipe) != DefaultStatus.EMPTY) {
+			disabledRecipes.add(recipe);
+		}
+		EmiPersistentData.save();
+		recalculate();
+	}
+
+	public static void removeRecipe(EmiIngredient stack, EmiRecipe recipe) {
+		if (recipe instanceof EmiResolutionRecipe err) {
+			if (addedRecipes.get(err.ingredient) instanceof EmiResolutionRecipe res && stack.equals(res.stack)) {
+				addedRecipes.remove(err.ingredient);
+			}
+		} else {
 			addedRecipes.remove(stack, recipe);
 		}
 		if (getRecipeStatus(recipe) != DefaultStatus.EMPTY) {
