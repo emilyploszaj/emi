@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.FluidUnit;
 import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot.IngredientRenderer;
@@ -104,6 +105,11 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 			addStack(JemiUtil.getStack(o));
 		}
 		return this;
+	}
+
+	@Override
+	public JemiIngredientAcceptor addFluidStack(Fluid fluid) {
+		return addFluidStack(fluid, FluidUnit.BUCKET);
 	}
 
 	@Override
