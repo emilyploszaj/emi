@@ -265,7 +265,7 @@ public class VanillaPlugin implements EmiPlugin {
 		});
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
-			if (screen instanceof AbstractInventoryScreen<?> inv) {
+			if (EmiConfig.effectLocation != EffectLocation.HIDDEN && screen instanceof AbstractInventoryScreen<?> inv) {
 				MinecraftClient client = MinecraftClient.getInstance();
 				Collection<StatusEffectInstance> collection = client.player.getStatusEffects();
 				if (!collection.isEmpty()) {
