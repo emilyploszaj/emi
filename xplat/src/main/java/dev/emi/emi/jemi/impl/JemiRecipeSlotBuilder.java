@@ -24,7 +24,8 @@ import net.minecraft.nbt.NbtCompound;
 
 public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	public final JemiIngredientAcceptor acceptor;
-	public final int x, y;
+	public boolean large = false;
+	public int x, y;
 	public Optional<String> name = Optional.empty();
 	public IRecipeSlotTooltipCallback tooltipCallback;
 	public IRecipeSlotRichTooltipCallback richTooltipCallback;
