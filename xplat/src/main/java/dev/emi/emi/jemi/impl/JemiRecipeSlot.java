@@ -73,11 +73,6 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	}
 
 	@Override
-	public @Unmodifiable List<@Nullable ITypedIngredient<?>> getAllIngredientsList() {
-		return getAllIngredients().toList();
-	}
-
-	@Override
 	public Stream<ITypedIngredient<?>> getAllIngredients() {
 		return stack.getEmiStacks().stream().map(JemiUtil::getTyped).filter(Optional::isPresent).map(Optional::get);
 	}
