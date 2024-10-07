@@ -1,7 +1,6 @@
 ### Tweaks
-* NeoForge fluid tooltips now include ID with advanced tooltips on
-* Added new JEI features to JEI/EMI compatibility
+* The "Default Stack" bind will now clear a default when used on a defaulted stack (to clear a tag resolution, for example)
 
 ### Fixes
-* Fixed JEI ingredient tooltips #719
-* Fixed tooltips passing world off thread #709
+* #739
+* More update for JEI compatibility #732 #734
