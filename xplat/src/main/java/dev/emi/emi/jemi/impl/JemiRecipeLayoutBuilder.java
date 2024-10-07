@@ -15,6 +15,10 @@ public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 	public final List<JemiRecipeSlotBuilder> slots = Lists.newArrayList();
 	public boolean shapeless = false;
 
+	@Override
+	public IRecipeSlotBuilder addSlot(RecipeIngredientRole role) {
+		return addSlot(role, 0, 0);
+	}
 
 	@Override
 	public IRecipeSlotBuilder addSlot(RecipeIngredientRole recipeIngredientRole, int x, int y) {

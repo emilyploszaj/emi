@@ -58,6 +58,12 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	}
 
 	@Override
+	public IRecipeSlotBuilder addFluidStack(Fluid fluid) {
+		acceptor.addFluidStack(fluid);
+		return this;
+	}
+
+	@Override
 	public IRecipeSlotBuilder addFluidStack(Fluid fluid, long amount) {
 		acceptor.addFluidStack(fluid, amount);
 		return this;
@@ -124,6 +130,35 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	@Override
 	public IRecipeSlotBuilder addRichTooltipCallback(IRecipeSlotRichTooltipCallback tooltipCallback) {
 		richTooltipCallback = tooltipCallback;
+		return this;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setPosition(int xPos, int yPos) {
+		this.x = xPos;
+		this.y = yPos;
+		return this;
+	}
+
+	@Override
+	public int getWidth() {
+		return large ? 26 : 18;
+	}
+
+	@Override
+	public int getHeight() {
+		return large ? 26 : 18;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setStandardSlotBackground() {
+		large = false;
+		return this;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setOutputSlotBackground() {
+		large = true;
 		return this;
 	}
 }
