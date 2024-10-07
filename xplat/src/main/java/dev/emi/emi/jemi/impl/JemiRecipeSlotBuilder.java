@@ -54,12 +54,6 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	}
 
 	@Override
-	public IRecipeSlotBuilder addFluidStack(Fluid fluid) {
-		acceptor.addFluidStack(fluid);
-		return this;
-	}
-
-	@Override
 	public IRecipeSlotBuilder addFluidStack(Fluid fluid, long amount) {
 		acceptor.addFluidStack(fluid, amount);
 		return this;
