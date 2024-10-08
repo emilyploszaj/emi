@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -134,18 +136,18 @@ public class EmiUtil {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static EmiRecipe getPreferredRecipe(List<EmiRecipe> recipes, EmiPlayerInventory inventory, boolean requireCraftable) {
+	public static @Nullable EmiRecipe getPreferredRecipe(List<EmiRecipe> recipes, EmiPlayerInventory inventory, boolean requireCraftable) {
 		EmiRecipe preferred = null;
 		int preferredWeight = -1;
 		HandledScreen<?> hs = EmiApi.getHandledScreen();
-		EmiCraftContext context = new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
+		EmiCraftContext context = hs == null ? null : new EmiCraftContext<>(hs, inventory, EmiCraftContext.Type.CRAFTABLE);
 		for (EmiRecipe recipe : recipes) {
 			if (!recipe.supportsRecipeTree()) {
 				continue;
 			}
 			int weight = 0;
 			EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(recipe, hs);
-			if (handler != null && handler.canCraft(recipe, context)) {
+			if (context != null && handler != null && handler.canCraft(recipe, context)) {
 				weight += 16;
 			} else if (requireCraftable) {
 				continue;

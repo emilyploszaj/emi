@@ -46,7 +46,7 @@ public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
 	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
-	public HandledScreen<?> old;
+	public Screen old;
 	private List<RecipeTab> tabs = Lists.newArrayList();
 	private int tabPageSize = 6;
 	private int tabPage = 0, tab = 0, page = 0;
@@ -62,7 +62,7 @@ public class RecipeScreen extends Screen {
 	int x = (this.width - backgroundWidth) / 2;
 	int y = (this.height - backgroundHeight) / 2;
 
-	public RecipeScreen(HandledScreen<?> old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
+	public RecipeScreen(Screen old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
 		super(EmiPort.translatable("screen.emi.recipe"));
 		this.old = old;
 		arrows = List.of(

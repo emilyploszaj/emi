@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -94,8 +95,10 @@ public class EmiRecipeFiller {
 		return List.of();
 	}
 
+	@Contract("_, null -> null")
 	@SuppressWarnings("unchecked")
-	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, HandledScreen<T> screen) {
+	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, @Nullable HandledScreen<T> screen) {
+		if (screen == null) return null;
 		EmiRecipeHandler<T> ret = null;
 		for (EmiRecipeHandler<T> handler : getAllHandlers(screen)) {
 			if (handler.supportsRecipe(recipe)) {
@@ -112,7 +115,8 @@ public class EmiRecipeFiller {
 		return ret;
 	}
 
-	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, HandledScreen<T> screen,
+	@Contract("_,null,_,_,_->false")
+	public static <T extends ScreenHandler> boolean performFill(EmiRecipe recipe, @Nullable HandledScreen<T> screen,
 			EmiCraftContext.Type type, EmiCraftContext.Destination destination, int amount) {
 		EmiRecipeHandler<T> handler = getFirstValidHandler(recipe, screen);
 		if (handler != null && handler.supportsRecipe(recipe)) {

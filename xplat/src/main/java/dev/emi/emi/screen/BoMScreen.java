@@ -46,7 +46,6 @@ import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
@@ -73,13 +72,13 @@ public class BoMScreen extends Screen {
 	private List<Cost> costs = Lists.newArrayList();
 	private EmiPlayerInventory playerInv;
 	private boolean hasRemainders = false;;
-	public HandledScreen<?> old;
+	public Screen old;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
 
-	public BoMScreen(HandledScreen<?> old) {
+	public BoMScreen(Screen old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
 		this.old = old;
 	}
