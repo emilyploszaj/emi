@@ -264,6 +264,7 @@
   "emi.dev.suggest_id": "Use a synthetic ID §7[namespace]§b:/§7[path]§r like\n§7%s§b:/§7%s§r",
   "emi.dev.null_input_or_output": "Recipe's inputs or outputs are §7null§r\nUse an empty list for no inputs or outputs\nUse §7EmiStack.EMPTY§r to represent an empty stack",
   "emi.dev.no_output_slots": "Recipe's slots do not include any outputs\nCall §7SlotWidget.recipeContext(this)§r on outputs§r",
+  "emi.dev.synthetic_nag_explanation": "Recipe ID could not be found in the recipe manager, but is not synthetic\n§7%s§r\nIf a recipe does not correspond to a data driven JSON recipe, it should use a synthetic ID",
 
   "emi.chess.piece.white_pawn": "White Pawn",
   "emi.chess.piece.white_rook": "White Rook",

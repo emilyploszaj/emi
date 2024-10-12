@@ -156,7 +156,7 @@ public class EmiRecipes {
 			this.recipes = List.copyOf(recipes);
 	
 			Object2IntMap<Identifier> duplicateIds = new Object2IntOpenHashMap<>();
-			Set<Identifier> missingIds = new ObjectArraySet<>();
+			Set<Identifier> incorrectIds = new ObjectArraySet<>();
 			for (EmiRecipe recipe : recipes) {
 				Identifier id = recipe.getId();
 				EmiRecipeCategory category = recipe.getCategory();
@@ -181,7 +181,7 @@ public class EmiRecipes {
 					}
 
 					if (!id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
-						missingIds.add(id);
+						incorrectIds.add(id);
 					}
 				}
 			}
@@ -190,8 +190,8 @@ public class EmiRecipes {
 				for (Identifier id : duplicateIds.keySet()) {
 					EmiReloadLog.warn(duplicateIds.getInt(id) + " recipes loaded with the same id: " + id);
 				}
-				for (Identifier id : missingIds) {
-					EmiReloadLog.warn("Recipe " + id + " not present in recipe manager. Consider prefixing its path with '/' to signify that it is synthetic.");
+				for (Identifier id : incorrectIds) {
+					EmiReloadLog.warn("Recipe " + id + " not present in recipe manager. Consider prefixing its path with '/' if it is synthetic.");
 				}
 			}
 	
@@ -241,7 +241,7 @@ public class EmiRecipes {
 
 			if (EmiConfig.devMode) {
 				EmiDev.duplicateRecipeIds = duplicateIds.keySet();
-				EmiDev.missingRecipeIds = missingIds;
+				EmiDev.incorrectRecipeIds = incorrectIds;
 			}
 		}
 
