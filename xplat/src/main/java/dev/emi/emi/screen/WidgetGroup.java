@@ -79,6 +79,11 @@ public class WidgetGroup implements WidgetHolder {
 				tooltip.addAll(EmiTooltip.splitTranslate("emi.dev.synthetic_id"));
 			}
 			errors.add(new RecipeError(RecipeError.Severity.ERROR, tooltip));
+		} else if (EmiDev.incorrectRecipeIds.contains(id)) {
+			List<TooltipComponent> tooltip = Lists.newArrayList();
+			tooltip.addAll(EmiTooltip.splitTranslate("emi.dev.synthetic_nag_explanation", id));
+			tooltip.addAll(EmiTooltip.splitTranslate("emi.dev.synthetic_id"));
+			errors.add(new RecipeError(RecipeError.Severity.ERROR, tooltip));
 		}
 
 		if (recipe.getInputs() == null || recipe.getOutputs() == null || recipe.getCatalysts() == null) {
