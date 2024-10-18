@@ -366,19 +366,13 @@ public class ConfigScreen extends Screen {
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderDarkening(context.raw());
-		list.render(context.raw(), mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
+		list.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
 			EmiRenderHelper.drawTooltip(this, context, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}
 	}
 
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-		// Prevent double background draw
-	}
-	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (activeBind != null) {
