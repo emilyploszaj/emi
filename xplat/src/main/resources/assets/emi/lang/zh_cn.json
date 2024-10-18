@@ -159,7 +159,7 @@
   "config.emi.dev.log_untranslated_tags": "记录未转译的标签",
   "config.emi.dev.log_non_tag_ingredients": "记录无标签的原材料",
   "config.emi.dev.show_recipe_ids": "显示配方ID",
-  "config.emi.dev.show_recipe_decorators": "Show Recipe Decorators",
+  "config.emi.dev.show_recipe_decorators": "显示配方装饰",
   "config.emi.dev.highlight_defaulted": "高亮有默认配方的物品",
   "config.emi.dev.highlight_exclusion_areas": "高亮禁止区",
 
