@@ -26,7 +26,10 @@ public class ConfigJumpButton extends SizedButtonWidget {
 		if (this.isMouseOver(mouseX, mouseY)) {
 			context.setColor(0.5f, 0.6f, 1f);
 		}
+		context.push();
+		context.matrices().translate(0, 0, 100);
 		super.renderWidget(raw, mouseX, mouseY, delta);
+		context.pop();
 		context.resetColor();
 	}
 }

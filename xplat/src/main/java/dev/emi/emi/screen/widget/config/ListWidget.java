@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -37,6 +38,9 @@ import net.minecraft.util.math.MathHelper;
  * This is the lesser of two evils, at least this way I have vanilla compat.
  */
 public class ListWidget extends AbstractParentElement implements Drawable, Selectable {
+	private static final Identifier MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/menu_list_background.png");
+	private static final Identifier INWORLD_MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/inworld_menu_list_background.png");
+
 	protected final MinecraftClient client;
 	private final List<Entry> children = Lists.newArrayList();
 	protected int width;
@@ -165,67 +169,26 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
 
 		{	// Render background
-			RenderSystem.setShaderTexture(0, Screen.MENU_BACKGROUND_TEXTURE);
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			bufferBuilder.vertex(this.left, this.bottom, 0)
-				.texture((float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F)
-				.color(32, 32, 32, 255);
-			bufferBuilder.vertex(this.right, this.bottom, 0)
-				.texture((float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F)
-				.color(32, 32, 32, 255);
-			bufferBuilder.vertex(this.right, this.top, 0)
-				.texture((float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F)
-				.color(32, 32, 32, 255);
-			bufferBuilder.vertex(this.left, this.top, 0)
-				.texture((float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F)
-				.color(32, 32, 32, 255);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			RenderSystem.enableBlend();
+			Identifier identifier = this.client.world == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
+			draw.drawTexture(identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
+			RenderSystem.disableBlend();
 		}
-		
+
+		draw.enableScissor(left, top, right, bottom);
 		int k = this.getRowLeft();
 		int l = this.top + 4 - (int)this.getScrollAmount();
 		this.renderList(draw, k, l, mouseX, mouseY, delta);
+		draw.disableScissor();
 
 
-		{	// Render horizontal shadows
-			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
-			RenderSystem.setShaderTexture(0, Screen.MENU_BACKGROUND_TEXTURE);
-			RenderSystem.enableDepthTest();
-			RenderSystem.depthFunc(519);
-			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-			bufferBuilder.vertex(this.left, this.top, -100).texture(0.0F, (float)this.top / 32.0F).color(64, 64, 64, 255);
-			bufferBuilder.vertex((this.left + this.width), this.top, -100)
-				.texture((float)this.width / 32.0F, (float)this.top / 32.0F)
-				.color(64, 64, 64, 255);
-			bufferBuilder.vertex((this.left + this.width), 0, -100).texture((float)this.width / 32.0F, 0.0F).color(64, 64, 64, 255);
-			bufferBuilder.vertex(this.left, 0, -100).texture(0.0F, 0.0F).color(64, 64, 64, 255);
-			bufferBuilder.vertex(this.left, this.height, -100).texture(0.0F, (float)this.height / 32.0F).color(64, 64, 64, 255);
-			bufferBuilder.vertex((this.left + this.width), this.height, -100)
-				.texture((float)this.width / 32.0F, (float)this.height / 32.0F)
-				.color(64, 64, 64, 255);
-			bufferBuilder.vertex((this.left + this.width), this.bottom, -100)
-				.texture((float)this.width / 32.0F, (float)this.bottom / 32.0F)
-				.color(64, 64, 64, 255);
-			bufferBuilder.vertex(this.left, this.bottom, -100).texture(0.0F, (float)this.bottom / 32.0F).color(64, 64, 64, 255);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-			RenderSystem.depthFunc(515);
-			RenderSystem.disableDepthTest();
+		{	// Render header & footer separators
 			RenderSystem.enableBlend();
-			RenderSystem.blendFuncSeparate(
-				GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE
-			);
-			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-			n = 4;
-			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-			bufferBuilder.vertex(this.left, (this.top + 4), 0).color(0, 0, 0, 0);
-			bufferBuilder.vertex(this.right, (this.top + 4), 0).color(0, 0, 0, 0);
-			bufferBuilder.vertex(this.right, this.top, 0).color(0, 0, 0, 255);
-			bufferBuilder.vertex(this.left, this.top, 0).color(0, 0, 0, 255);
-			bufferBuilder.vertex(this.left, this.bottom, 0).color(0, 0, 0, 255);
-			bufferBuilder.vertex(this.right, this.bottom, 0).color(0, 0, 0, 255);
-			bufferBuilder.vertex(this.right, (this.bottom - 4), 0).color(0, 0, 0, 0);
-			bufferBuilder.vertex(this.left, (this.bottom - 4), 0).color(0, 0, 0, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			Identifier identifier = this.client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE;
+			Identifier identifier2 = this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE;
+			draw.drawTexture(identifier, left, top - 2, 0.0F, 0.0F, width, 2, 32, 2);
+			draw.drawTexture(identifier2, left, bottom, 0.0F, 0.0F, width, 2, 32, 2);
+			RenderSystem.disableBlend();
 		}
 
 		if ((o = this.getMaxScroll()) > 0) {
