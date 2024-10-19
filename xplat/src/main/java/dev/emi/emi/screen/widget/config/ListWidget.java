@@ -171,17 +171,7 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		{	// Render background
 			RenderSystem.enableBlend();
 			Identifier identifier = this.client.world == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
-			draw.drawTexture(
-					identifier,
-					left,
-					top,
-					right,
-					bottom + (int)scrollAmount,
-					right - left,
-					bottom - top,
-					32,
-					32
-			);
+			draw.drawTexture(identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
 			RenderSystem.disableBlend();
 		}
 
