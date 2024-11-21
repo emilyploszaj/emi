@@ -47,6 +47,7 @@ import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
+import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
@@ -96,6 +97,7 @@ import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
+import dev.emi.emi.stack.serializer.ListEmiIngredientSerializer;
 import dev.emi.emi.stack.serializer.TagEmiIngredientSerializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -214,6 +216,7 @@ public class VanillaPlugin implements EmiPlugin {
 		registry.addIngredientSerializer(ItemEmiStack.class, new ItemEmiStackSerializer());
 		registry.addIngredientSerializer(FluidEmiStack.class, new FluidEmiStackSerializer());
 		registry.addIngredientSerializer(TagEmiIngredient.class, new TagEmiIngredientSerializer());
+		registry.addIngredientSerializer(ListEmiIngredient.class, new ListEmiIngredientSerializer());
 
 		registry.addRegistryAdapter(EmiRegistryAdapter.simple(Item.class, EmiPort.getItemRegistry(), EmiStack::of));
 		registry.addRegistryAdapter(EmiRegistryAdapter.simple(Fluid.class, EmiPort.getFluidRegistry(), EmiStack::of));
