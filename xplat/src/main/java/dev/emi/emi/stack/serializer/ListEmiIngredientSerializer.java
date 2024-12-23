@@ -33,7 +33,7 @@ public class ListEmiIngredientSerializer implements EmiIngredientSerializer<List
         for (JsonElement ingredientElement : ingredientsArray) {
             ingredients.add(EmiIngredientSerializers.deserialize(ingredientElement));
         }
-        ListEmiIngredient ingredient = new ListEmiIngredient(ingredients, amount);
+        EmiIngredient ingredient = EmiIngredient.of(ingredients, amount);
         if (chance != 1) {
             ingredient.setChance(chance);
         }
