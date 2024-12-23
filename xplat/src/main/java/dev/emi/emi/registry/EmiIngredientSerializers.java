@@ -64,6 +64,8 @@ public class EmiIngredientSerializers {
 					}
 				}
 				type = json.get("type").getAsString();
+			} else if (element.isJsonArray()) {
+				type = "list";
 			} else {
 				String[] split = element.getAsString().split(":");
 				type = split[0];

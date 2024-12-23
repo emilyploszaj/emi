@@ -22,13 +22,21 @@ public class ListEmiIngredientSerializer implements EmiIngredientSerializer<List
 
     @Override
     public EmiIngredient deserialize(JsonElement element) {
-        if (!element.isJsonObject()) {
+        JsonArray ingredientsArray;
+        long amount;
+        float chance;
+        if (element.isJsonObject()) {
+            JsonObject json = element.getAsJsonObject();
+            amount = JsonHelper.getLong(json, "amount", 1);
+            chance = JsonHelper.getFloat(json, "chance", 1);
+            ingredientsArray = JsonHelper.getArray(json, "ingredients");
+        } else if (element.isJsonArray()) {
+            ingredientsArray = element.getAsJsonArray();
+            amount = 1;
+            chance = 1;
+        } else {
             return EmiStack.EMPTY;
         }
-        JsonObject json = element.getAsJsonObject();
-        long amount = JsonHelper.getLong(json, "amount", 1);
-        float chance = JsonHelper.getFloat(json, "chance", 1);
-        JsonArray ingredientsArray = JsonHelper.getArray(json, "ingredients");
         List<EmiIngredient> ingredients = new ArrayList<>();
         for (JsonElement ingredientElement : ingredientsArray) {
             ingredients.add(EmiIngredientSerializers.deserialize(ingredientElement));
