@@ -52,8 +52,8 @@ public class ListEmiIngredientSerializer implements EmiIngredientSerializer<List
     public JsonElement serialize(ListEmiIngredient stack) {
         if (stack.getAmount() == 1 && stack.getChance() == 1) {
             JsonArray array = new JsonArray();
-            for (EmiStack innerStack : stack.getEmiStacks()) {
-                array.add(EmiIngredientSerializers.serialize(innerStack));
+            for (EmiIngredient inner : stack.getIngredients()) {
+                array.add(EmiIngredientSerializers.serialize(inner));
             }
             return array;
         } else {
@@ -66,8 +66,8 @@ public class ListEmiIngredientSerializer implements EmiIngredientSerializer<List
                 json.addProperty("chance", stack.getChance());
             }
             JsonArray ingredients = new JsonArray();
-            for (EmiStack innerStack : stack.getEmiStacks()) {
-                ingredients.add(EmiIngredientSerializers.serialize(innerStack));
+            for (EmiIngredient inner : stack.getIngredients()) {
+                ingredients.add(EmiIngredientSerializers.serialize(inner));
             }
             json.add("ingredients", ingredients);
             return json;
