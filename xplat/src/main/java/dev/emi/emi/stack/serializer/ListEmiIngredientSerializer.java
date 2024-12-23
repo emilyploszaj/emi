@@ -50,19 +50,27 @@ public class ListEmiIngredientSerializer implements EmiIngredientSerializer<List
 
     @Override
     public JsonElement serialize(ListEmiIngredient stack) {
-        JsonObject json = new JsonObject();
-        json.addProperty("type", getType());
-        if (stack.getAmount() != 1) {
-            json.addProperty("amount", stack.getAmount());
+        if (stack.getAmount() == 1 && stack.getChance() == 1) {
+            JsonArray array = new JsonArray();
+            for (EmiStack innerStack : stack.getEmiStacks()) {
+                array.add(EmiIngredientSerializers.serialize(innerStack));
+            }
+            return array;
+        } else {
+            JsonObject json = new JsonObject();
+            json.addProperty("type", getType());
+            if (stack.getAmount() != 1) {
+                json.addProperty("amount", stack.getAmount());
+            }
+            if (stack.getChance() != 1) {
+                json.addProperty("chance", stack.getChance());
+            }
+            JsonArray ingredients = new JsonArray();
+            for (EmiStack innerStack : stack.getEmiStacks()) {
+                ingredients.add(EmiIngredientSerializers.serialize(innerStack));
+            }
+            json.add("ingredients", ingredients);
+            return json;
         }
-        if (stack.getChance() != 1) {
-            json.addProperty("chance", stack.getChance());
-        }
-        JsonArray ingredients = new JsonArray();
-        for (EmiStack innerStack : stack.getEmiStacks()) {
-            ingredients.add(EmiIngredientSerializers.serialize(innerStack));
-        }
-        json.add("ingredients", ingredients);
-        return json;
     }
 }
