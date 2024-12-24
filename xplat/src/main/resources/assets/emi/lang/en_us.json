@@ -98,6 +98,7 @@
   "config.emi.general.cheat_mode": "Cheat Mode",
   "config.emi.general.help_level": "Help Level",
   "config.emi.general.index_source": "Index Source",
+  "config.emi.general.index_tooltips": "Index Tooltips",
   "config.emi.general.search_tooltip_by_default": "Search Tooltip by Default",
   "config.emi.general.search_mod_name_by_default": "Search Mod Name by Default",
   "config.emi.general.search_tags_by_default": "Search Tags by Default",

@@ -60,7 +60,7 @@ public class EmiConfig {
 	public static IndexSource indexSource = IndexSource.CREATIVE;
 
 	@ConfigGroup("general.search")
-	@Comment("Whether normal search queries should include the tooltip.")
+	@Comment("Whether normal search queries should include the tooltip. Requires index-tooltips to be enabled.")
 	@ConfigValue("general.search-tooltip-by-default")
 	public static boolean searchTooltipByDefault = true;
 
@@ -72,6 +72,12 @@ public class EmiConfig {
 	@Comment("Whether normal search queries should include the stack's tags.")
 	@ConfigValue("general.search-tags-by-default")
 	public static boolean searchTagsByDefault = false;
+
+	@ConfigGroup("general.search")
+	@Comment("Whether tooltip contents should be searchable at all. Disabling this can improve loading speed if"
+		+ " you have slow mods.")
+	@ConfigValue("general.index-tooltips")
+	public static boolean indexTooltips = true;
 
 	// UI
 	@Comment("Which action should be performed when clicking the recipe book.")
