@@ -63,6 +63,7 @@ import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
 import dev.emi.emi.mixin.accessor.SmithingTransformRecipeAccessor;
 import dev.emi.emi.mixin.accessor.SmithingTrimRecipeAccessor;
+import dev.emi.emi.mixin.accessor.ToastManagerAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
@@ -107,6 +108,8 @@ import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.toast.Toast;
+import net.minecraft.client.toast.ToastManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -318,6 +321,20 @@ public class VanillaPlugin implements EmiPlugin {
 						consumer.accept(new Bounds(left, top, width, height));
 					}
 				}
+			}
+		});
+
+		registry.addGenericExclusionArea((screen, consumer) -> {
+			MinecraftClient client = MinecraftClient.getInstance();
+			if (client.options.hudHidden) return;
+			int y = 0;
+			for (ToastManager.Entry<?> entry : ((ToastManagerAccessor) client.getToastManager()).getVisibleEntries()) {
+				Toast toast = entry.getInstance();
+				int width = toast.getWidth();
+				int height = toast.getHeight();
+				int x = client.getWindow().getScaledWidth() - width;
+				consumer.accept(new Bounds(x, y, width, height));
+				y += Toast.BASE_HEIGHT * toast.getRequiredSpaceCount();
 			}
 		});
 

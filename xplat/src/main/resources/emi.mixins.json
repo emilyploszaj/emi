@@ -17,6 +17,7 @@
     "accessor.ShovelItemAccessor",
     "accessor.SmithingTransformRecipeAccessor",
     "accessor.SmithingTrimRecipeAccessor",
+    "accessor.ToastManagerAccessor",
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",
@@ -28,8 +29,7 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "RecipeBookWidgetMixin",
-    "ScreenMixin",
-    "ToastManagerMixin"
+    "ScreenMixin"
   ],
   "mixins": [
   ],
