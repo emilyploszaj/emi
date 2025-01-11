@@ -138,7 +138,10 @@ public class EmiReloadManager {
 						continue;
 					}
 					MinecraftClient client = MinecraftClient.getInstance();
-					if (client.world.getRecipeManager() == null) {
+					if (client.world == null) {
+						EmiReloadLog.warn("World is null");
+						break;
+					} else if (client.world.getRecipeManager() == null) {
 						EmiReloadLog.warn("Recipe Manager is null");
 						break;
 					}

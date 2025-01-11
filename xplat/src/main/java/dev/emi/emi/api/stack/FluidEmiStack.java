@@ -6,10 +6,13 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
+
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.platform.EmiAgnos;
+import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
@@ -82,7 +85,12 @@ public class FluidEmiStack extends EmiStack {
 
 	@Override
 	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = getTooltipText().stream().map(EmiTooltipComponents::of).collect(Collectors.toList());
+		List<TooltipComponent> list = Lists.newArrayList();
+		List<Text> text = getTooltipText();
+		if (!text.isEmpty()) {
+			list.add(new EmiTextTooltipWrapper(this, EmiPort.ordered(text.get(0))));
+		}
+		list.addAll(text.stream().skip(1).map(EmiTooltipComponents::of).collect(Collectors.toList()));
 		if (amount > 1) {
 			list.add(EmiTooltipComponents.getAmount(this));
 		}

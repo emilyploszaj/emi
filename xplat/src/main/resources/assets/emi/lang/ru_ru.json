@@ -73,9 +73,13 @@
   "emi.effect_location.right_compressed": "Справа (сжатые)",
   "emi.effect_location.left": "Слева",
   "emi.effect_location.right": "Справа",
+  "emi.effect_location.hidden": "Скрыты",
   "emi.recipe_book_action.default": "По умолчанию",
   "emi.recipe_book_action.toggle_craftables": "Переключение создаваемых",
   "emi.recipe_book_action.toggle_visibility": "Переключение видимости",
+  "emi.button_visibility.auto": "Автоматически",
+  "emi.button_visibility.shown": "Показана",
+  "emi.button_visibility.hidden": "Скрыта",
   
   "config.emi.group.general": "Основное",
   "config.emi.group.general.search": "Поиск",
@@ -149,6 +153,8 @@
   "config.emi.ui.miscraft_prevention": "Предотвращение случайных крафтов",
   "config.emi.ui.fluid_unit": "Единицы измерения жидкостей",
   "config.emi.ui.show_cost_per_batch": "Показывать цену за несколько",
+  "config.emi.ui.emi_config_button_visibility": "Видимость кнопки настроек EMI",
+  "config.emi.ui.recipe_tree_button_visibility": "Видимость кнопки дерева рецептов",
   "config.emi.ui.recipe_default_button": "Сделать стандартным",
   "config.emi.ui.recipe_tree_button": "Открыть дерево",
   "config.emi.ui.recipe_fill_button": "Заполнить рецепт",
@@ -266,7 +272,8 @@
   "emi.dev.suggest_id": "Используйте синтетический идентификатор §7[пространство_имён]§b:/§7[путь]§r как\n§7%s§b:/§7%s§r",
   "emi.dev.null_input_or_output": "Входные или выходные данные рецепта равны §7нулю§r\nИспользуйте пустой список без каких-либо входных или выходных данных\nИспользуйте §7EmiStack.EMPTY§r для представления пустой стопки",
   "emi.dev.no_output_slots": "Слоты рецепта не содержат никаких выходных данных\nВызовите §7SlotWidget.recipeContext(this)§r для выходных данных§r",
-  
+  "emi.dev.synthetic_nag_explanation": "Не удалось найти идентификатор рецепта в менеджере рецептов, но он не является синтетическим\n§7%s§r\nЕсли рецепт не соответствует рецепту JSON, основанному на данных, он должен использовать синтетический идентификатор",
+
   "emi.chess.piece.white_pawn": "Белая пешка",
   "emi.chess.piece.white_rook": "Белая ладья",
   "emi.chess.piece.white_knight": "Белый конь",

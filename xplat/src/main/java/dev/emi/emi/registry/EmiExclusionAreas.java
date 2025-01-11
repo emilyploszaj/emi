@@ -31,7 +31,9 @@ public class EmiExclusionAreas {
 		// EMI buttons
 		list.add(new Bounds(0, screen.height - 22, base.bounds().left(), 22));
 		// Search bar
-		list.add(new Bounds(EmiScreenManager.search.x - 1, EmiScreenManager.search.y - 1, EmiScreenManager.search.getWidth() + 2, EmiScreenManager.search.getHeight() + 2));
+		if (EmiScreenManager.search.isVisible()) {
+			list.add(new Bounds(EmiScreenManager.search.x - 1, EmiScreenManager.search.y - 1, EmiScreenManager.search.getWidth() + 2, EmiScreenManager.search.getHeight() + 2));
+		}
 		try {
 			if (fromClass.containsKey(screen.getClass())) {
 				for (EmiExclusionArea exclusion : fromClass.get(screen.getClass())) {

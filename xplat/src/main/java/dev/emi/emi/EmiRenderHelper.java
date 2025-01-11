@@ -164,6 +164,9 @@ public class EmiRenderHelper {
 	}
 
 	public static void drawTooltip(Screen screen, EmiDrawContext context, List<TooltipComponent> components, int x, int y, int maxWidth) {
+		if (components.isEmpty()) {
+			return;
+		}
 		y = Math.max(16, y);
 		// Some mods assume this list will be mutable, oblige them
 		List<TooltipComponent> mutable = Lists.newArrayList();

@@ -22,6 +22,14 @@ import net.minecraft.util.Identifier;
 public interface EmiRegistry {
 
 	/**
+	 * @return Whether the provided stack is disabled.
+	 *	Generally, this is not important to check before registering recipes, EMI will handle recipe hiding.
+	 *	There are certain cases where checking this and not including stacks in recipes is desired behavior, however.
+	 */
+	@ApiStatus.Experimental
+	boolean isStackDisabled(EmiIngredient stack);
+
+	/**
 	 * @return The vanilla recipe manager, for iterating recipe types.
 	 */
 	RecipeManager getRecipeManager();

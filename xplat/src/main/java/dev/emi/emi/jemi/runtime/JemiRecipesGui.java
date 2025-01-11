@@ -16,6 +16,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 
 public class JemiRecipesGui implements IRecipesGui {
 
@@ -57,6 +58,11 @@ public class JemiRecipesGui implements IRecipesGui {
 				}
 			}
 		}
+		return Optional.empty();
+	}
+
+	//@Override
+	public Optional<Screen> getParentScreen() {
 		return Optional.empty();
 	}
 }

@@ -83,6 +83,9 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			JsonObject json = new JsonObject();
 			json.addProperty("type", getType());
 			json.addProperty("id", stack.getId().toString());
+			if (stack.hasNbt()) {
+				json.addProperty("nbt", stack.getNbt().asString());
+			}
 			if (stack.getAmount() != 1) {
 				json.addProperty("amount", stack.getAmount());
 			}
