@@ -14,7 +14,9 @@ import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.StackBatcher.Batchable;
+import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.DiffuseLighting;
@@ -158,6 +160,9 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (!isEmpty()) {
 			list.addAll(EmiAgnos.getItemTooltip(stack));
+			if (!list.isEmpty() && list.get(0) instanceof OrderedTextTooltipComponent ottc) {
+				list.set(0, new EmiTextTooltipWrapper(this, ottc));
+			}
 			//String namespace = EmiPort.getItemRegistry().getId(stack.getItem()).getNamespace();
 			//String mod = EmiUtil.getModName(namespace);
 			//list.add(TooltipComponent.of(EmiLang.literal(mod, Formatting.BLUE, Formatting.ITALIC)));

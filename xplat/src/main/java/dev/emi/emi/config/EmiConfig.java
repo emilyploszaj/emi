@@ -60,6 +60,10 @@ public class EmiConfig {
 	public static IndexSource indexSource = IndexSource.CREATIVE;
 
 	@ConfigGroup("general.search")
+	@Comment("Which sidebar should be searched using the search bar.")
+	@ConfigValue("general.search-sidebar")
+	public static SidebarSide searchSidebar = SidebarSide.RIGHT;
+
 	@Comment("Whether normal search queries should include the tooltip.")
 	@ConfigValue("general.search-tooltip-by-default")
 	public static boolean searchTooltipByDefault = true;

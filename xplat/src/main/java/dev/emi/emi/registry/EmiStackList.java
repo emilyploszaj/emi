@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -80,7 +81,7 @@ public class EmiStackList {
 			EmiLog.info("Reloading item groups on client thread...");
 			Map<ItemGroup, Collection<ItemStack>> itemGroupToStacksMap = client.submit(() -> {
 				Map<ItemGroup, Collection<ItemStack>> map = new Reference2ReferenceOpenHashMap<>();
-				for (ItemGroup group : ItemGroups.getGroups()) {
+				Consumer<ItemGroup> itemGroupConsumer = group -> {
 					String groupName = "null";
 					try {
 						groupName = group.getDisplayName().toString();
@@ -90,7 +91,12 @@ public class EmiStackList {
 						EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.");
 						EmiLog.error(e);
 					}
-				}
+				};
+				List<ItemGroup> itemGroups = ItemGroups.getGroups();
+				// Category item groups must be updated before non-category ones, otherwise the search group will
+				// read outdated item lists
+				itemGroups.stream().filter(g -> g.getType() == ItemGroup.Type.CATEGORY).forEach(itemGroupConsumer);
+				itemGroups.stream().filter(g -> g.getType() != ItemGroup.Type.CATEGORY).forEach(itemGroupConsumer);
 				return map;
 			}).join();
 			EmiLog.info("Reloading item groups on client thread took " + (System.currentTimeMillis() - groupReloadStart) + "ms");

@@ -23,7 +23,7 @@ import net.minecraft.util.Identifier;
 public class PluginCallerMixin {
 	@Unique
 	private static final Set<Identifier> SKIPPED = Sets.newHashSet(
-		EmiPort.id("jei", "minecraft"), EmiPort.id("jei", "gui"), EmiPort.id("jei", "fabric_gui"), EmiPort.id("jei", "forge_gui")
+		EmiPort.id("jei", "minecraft"), EmiPort.id("jei", "gui"), EmiPort.id("jei", "fabric_gui"), EmiPort.id("jei", "forge_gui"), EmiPort.id("jei", "neoforge_gui")
 	);
 	@Unique
 	private static final Set<String> SKIPPED_MODS = JemiUtil.getHandledMods();

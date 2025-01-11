@@ -106,7 +106,7 @@ public class EmiTags {
 		if (keys != null) {
 			for (TagKey<T> key : keys) {
 				List<T> values = (List<T>) TAG_CONTENTS.get(key);
-				map.keySet().removeAll(values);
+				values.forEach(map::remove);
 			}
 		} else {
 			keys = Lists.newArrayList();
@@ -117,7 +117,7 @@ public class EmiTags {
 					continue;
 				}
 				if (map.keySet().containsAll(values)) {
-					map.keySet().removeAll(values);
+					values.forEach(map::remove);
 					keys.add(key);
 				}
 				if (map.isEmpty()) {

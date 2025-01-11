@@ -18,6 +18,7 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,6 +28,11 @@ import net.minecraft.screen.ScreenHandlerType;
 
 public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+
+	@Override
+	public boolean isStackDisabled(EmiIngredient stack) {
+		return EmiHidden.isDisabled(stack);
+	}
 
 	@Override
 	public RecipeManager getRecipeManager() {
