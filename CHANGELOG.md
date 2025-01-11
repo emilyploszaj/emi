@@ -1,12 +1,20 @@
 ### Additions
-* Added visibility options for the EMI config and recipe tree buttons
-* EMI config button now is visible by default when toggled, to prevent people from accidentally hiding the mod without knowing how to undo it
+* Search sidebar target can be configured
 
 ### Tweaks
-* EMI visibility toast is now only shown when help level is verbose, due to other features preventing accidental hiding
-* EMI config enum selection screen now is consistent with the rest of the config screen on later versions
+* Notable performance improvements to ingredient construction
+* Wrap packet sends with a check in later versions
+* Improved accuracy of EMI reloading errors
 
 ### Fixes
-* Fixed JEI dependency on 1.19 versions #780
-* Fixed stack default bind not toggling in recipe tree
-* #689
+* Serialization of stacks with sizes other than 1 now serialize properly #803
+* Fix tag ingredient rendering in Fabulous #811
+* Fix stack batcher causing certain recipe tree categories to render at the wrong position #790
+* Populate item groupps in correct order (fixing duplicate items) #774 #603 #621
+* Pick which sidebar search targets #377
+* Fix search baking hang #800
+* Fix certain JEI integration breaking inconsistently on NeoForge
+
+### API
+* Added experimental API to get query if stack is disabled from EmiRegistry
+* Added experimental API to get EmiTooltipMetadata from composed tooltips being rendered for mod compatibility

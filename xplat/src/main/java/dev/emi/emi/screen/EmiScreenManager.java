@@ -355,7 +355,7 @@ public class EmiScreenManager {
 		for (int i = 0; i < exclusion.size(); i++) {
 			Bounds overlap = exclusion.get(i).overlap(bounds);
 			if (!overlap.empty() && !bounds.empty()) {
-				if (overlap.top() < bounds.top() + ENTRY_SIZE + headerOffset || overlap.width() >= bounds.width() / 2
+				if (overlap.top() < bounds.top() + ENTRY_SIZE + headerOffset || overlap.width() >= bounds.width() * 2 / 3
 						|| overlap.height() >= bounds.height() / 3) {
 					int widthFactor = overlap.width() * 10 / bounds.width();
 					int heightFactor = overlap.height() * 10 / bounds.height();
@@ -400,8 +400,9 @@ public class EmiScreenManager {
 	}
 
 	public static void focusSearchSidebarType(SidebarType type) {
-		if (getSearchPanel().supportsType(type)) {
-			getSearchPanel().setType(type);
+		SidebarPanel search = getSearchPanel();
+		if (search != null && search.supportsType(type)) {
+			search.setType(type);
 		}
 	}
 
@@ -484,7 +485,7 @@ public class EmiScreenManager {
 				return panel;
 			}
 		}
-		return panels.get(1);
+		return null;
 	}
 
 	public static void toggleSidebarType(SidebarType type) {
@@ -501,7 +502,11 @@ public class EmiScreenManager {
 	}
 
 	public static List<? extends EmiIngredient> getSearchSource() {
-		return EmiSidebars.getStacks(getSearchPanel().getType());
+		SidebarPanel search = getSearchPanel();
+		if (search == null) {
+			return List.of();
+		}
+		return EmiSidebars.getStacks(search.getType());
 	}
 
 	public static EmiStackInteraction getHoveredStack(int mouseX, int mouseY, boolean notClick) {
@@ -883,11 +888,18 @@ public class EmiScreenManager {
 			search.y = screen.height - 21;
 			search.setWidth(160);
 		} else {
-			search.x = panels.get(1).space.tx;
-			search.y = screen.height - 21;
-			search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
+			if (EmiConfig.searchSidebar == SidebarSide.RIGHT) {
+				search.x = panels.get(1).space.tx;
+				search.y = screen.height - 21;
+				search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
+			} else {
+				search.x = panels.get(0).space.tx;
+				search.y = screen.height - 21 - 21;
+				search.setWidth(panels.get(0).space.tw * ENTRY_SIZE);
+			}
 		}
 		EmiPort.focus(search, false);
+		search.setVisible(EmiConfig.searchSidebar != SidebarSide.NONE);
 
 		emi.x = 2;
 		emi.y = screen.height - 22;
@@ -1542,7 +1554,7 @@ public class EmiScreenManager {
 		}
 
 		public boolean isSearch() {
-			return side == SidebarSide.RIGHT;
+			return side == EmiConfig.searchSidebar;
 		}
 
 		public void updateWidgetPosition() {

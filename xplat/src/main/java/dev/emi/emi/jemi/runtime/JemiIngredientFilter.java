@@ -6,6 +6,7 @@ import java.util.Optional;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.screen.EmiScreenManager;
+import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.runtime.IIngredientFilter;
 
@@ -23,7 +24,11 @@ public class JemiIngredientFilter implements IIngredientFilter {
 
 	@Override
 	public <T> List<T> getFilteredIngredients(IIngredientType<T> ingredientType) {
-		return EmiScreenManager.getSearchPanel().space.getStacks().stream()
+		SidebarPanel search = EmiScreenManager.getSearchPanel();
+		if (search == null || search.space == null) {
+			return List.of();
+		}
+		return search.space.getStacks().stream()
 			.map(i -> JemiUtil.getTyped(i.getEmiStacks().get(0)))
 			.filter(Optional::isPresent).map(Optional::get)
 			.map(i -> i.getIngredient(ingredientType))

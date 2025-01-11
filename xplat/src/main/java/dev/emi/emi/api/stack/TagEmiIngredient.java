@@ -16,6 +16,7 @@ import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
 import net.minecraft.client.MinecraftClient;
@@ -134,7 +135,7 @@ public class TagEmiIngredient implements EmiIngredient {
 					.invokeRenderBakedItemModel(model,
 						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, ms, 
 						ItemRenderer.getDirectItemGlintConsumer(immediate,
-							TexturedRenderLayers.getItemEntityTranslucentCull(), true, false));
+							TexturedRenderLayers.getEntityTranslucentCull(), true, false));
 				immediate.draw();
 
 				if (!model.isSideLit()) {
@@ -163,7 +164,7 @@ public class TagEmiIngredient implements EmiIngredient {
 	@Override
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
-		list.add(TooltipComponent.of(EmiPort.ordered(EmiTags.getTagName(key))));
+		list.add(new EmiTextTooltipWrapper(this, EmiPort.ordered(EmiTags.getTagName(key))));
 		if (EmiUtil.showAdvancedTooltips()) {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
 		}
