@@ -101,6 +101,7 @@
   "config.emi.general.cheat_mode": "Творческий режим",
   "config.emi.general.help_level": "Уровень помощи",
   "config.emi.general.index_source": "Источник индекса",
+  "config.emi.general.search_sidebar": "Панель поиска",
   "config.emi.general.search_tooltip_by_default": "Поиск по подсказке",
   "config.emi.general.search_mod_name_by_default": "Поиск по названию мода",
   "config.emi.general.search_tags_by_default": "Поиск по тегам",
@@ -237,7 +238,7 @@
   "tooltip.emi.config": "Конфигурация %s",
   "tooltip.emi.recipe_tree": "Дерево рецептов",
   
-  "tooltip.emi.config.global": "Использовать глобальную настройку EMI между всеми копиями игры вместо собственной для каждой копии.\n§8(Полезно §8только §8при §8использовании §8лаунчеров, §8создающих §8несколько §8папок §8.minecraft)",
+  "tooltip.emi.config.global": "Использовать глобальную настройку EMI между всеми копиями игры вместо собственной для каждой копии",
   
   "tooltip.emi.synfav.uncraftable": "Невозможно создать §cни одного§r предмета",
   "tooltip.emi.synfav.partially_craftable": "Можно создать §dнекоторые§r предметы\n§6Взаимодействуйте§r, чтобы создать все возможные",
@@ -362,7 +363,7 @@
   "tag.item.minecraft.fox_food": "Лисья еда",
   "tag.item.minecraft.freeze_immune_wearables": "Защищающая от холода броня",
   "tag.item.minecraft.ignored_by_piglin_babies": "Игнорируемые маленькими пиглинами",
-  "tag.item.minecraft.leaves": "Листва",
+  "tag.item.minecraft.leaves": "Листья",
   "tag.item.minecraft.lectern_books": "Книги для кафедры",
   "tag.item.minecraft.music_discs": "Музыкальные пластинки",
   "tag.item.minecraft.occludes_vibration_signals": "Вызывающие вибрацию",
