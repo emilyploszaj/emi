@@ -180,7 +180,7 @@ public class EmiRecipes {
 						byId.put(id, recipe);
 					}
 
-					if (!id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
 						incorrectIds.add(id);
 					}
 				}
