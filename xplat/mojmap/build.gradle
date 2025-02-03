@@ -19,8 +19,6 @@ def mojmapJar = tasks.register('mojmapJar', RemapJarTask, {
 	inputFile.convention(remapJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
-	
-	remapperIsolation = true
 })
 
 def mojmapSourcesJar = tasks.register('mojmapSourcesJar', RemapSourcesJarTask, {
@@ -33,8 +31,6 @@ def mojmapSourcesJar = tasks.register('mojmapSourcesJar', RemapSourcesJarTask, {
 	inputFile.convention(filteredSourcesJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
-	
-	remapperIsolation = true
 })
 
 def mojmapApiJar = tasks.register('mojmapApiJar', RemapJarTask, {
@@ -47,8 +43,6 @@ def mojmapApiJar = tasks.register('mojmapApiJar', RemapJarTask, {
 	inputFile.convention(apiJar.flatMap {it.archiveFile })
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
-	
-	remapperIsolation = true
 })
 
 tasks.named("build").configure {
