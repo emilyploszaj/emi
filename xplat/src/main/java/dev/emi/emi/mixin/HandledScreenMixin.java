@@ -15,18 +15,14 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
-import dev.emi.emi.search.EmiSearch;
-import dev.emi.emi.search.EmiSearch.CompiledQuery;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin extends Screen {
 	@Shadow
-	protected int backgroundWidth, backgroundHeight, x, y;
+	protected int x, y;
 
 	private HandledScreenMixin() { super(null); }
 
@@ -36,13 +32,12 @@ public abstract class HandledScreenMixin extends Screen {
 	}
 
 	@Dynamic
-	@Inject(at = @At("RETURN"), method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V")
-	private void renderBackground(MatrixStack raw, CallbackInfo info) {
-		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		Window window = client.getWindow();
-		int mouseX = (int) (client.mouse.getX() * window.getScaledWidth() / window.getWidth());
-		int mouseY = (int) (client.mouse.getY() * window.getScaledHeight() / window.getHeight());
-		EmiScreenManager.drawBackground(context, mouseX, mouseY, client.getTickDelta());
+	@Inject(at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawBackground(Lnet/minecraft/client/util/math/MatrixStack;FII)V",
+			shift = Shift.AFTER), method = "render")
+	private void renderBackground(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo info) {
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+		EmiScreenManager.drawBackground(context, mouseX, mouseY, delta);
 	}
 
 	@Inject(at = @At(value = "INVOKE",

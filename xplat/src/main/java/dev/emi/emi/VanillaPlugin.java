@@ -712,11 +712,6 @@ public class VanillaPlugin implements EmiPlugin {
 		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.GLASS_BOTTLE), water,
 			EmiStack.of(EmiPort.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
 			synthetic("world/unique", "minecraft/water_bottle")));
-
-		EmiStack waterBottle = EmiStack.of(EmiPort.setPotion(new ItemStack(Items.POTION), Potions.WATER))
-			.setRemainder(EmiStack.of(Items.GLASS_BOTTLE));
-		EmiStack mud = EmiStack.of(Items.MUD);
-		addRecipeSafe(registry, () -> basicWorld(EmiStack.of(Items.DIRT), waterBottle, mud, synthetic("world/unique", "minecraft/mud"), false));
 	}
 
 	private static EmiIngredient damagedTool(EmiIngredient tool, int damage) {

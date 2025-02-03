@@ -12,7 +12,7 @@ import dev.emi.emi.platform.EmiMain;
 import dev.emi.emi.registry.EmiCommands;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -23,7 +23,7 @@ public class EmiMainFabric implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		EmiMain.init();
-		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> EmiCommands.registerCommands(dispatcher));
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> EmiCommands.registerCommands(dispatcher));
 
 		EmiNetwork.initServer((player, packet) -> {
 			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
