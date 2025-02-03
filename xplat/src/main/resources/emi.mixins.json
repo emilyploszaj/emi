@@ -15,7 +15,6 @@
     "accessor.ScreenAccessor",
     "accessor.ShovelItemAccessor",
     "accessor.SmithingRecipeAccessor",
-    "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",
     "HandledScreenMixin",
