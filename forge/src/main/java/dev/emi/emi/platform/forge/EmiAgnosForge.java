@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.objectweb.asm.Type;
 
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
@@ -32,7 +32,6 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BasicBakedModel;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -40,16 +39,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
@@ -105,7 +101,7 @@ public class EmiAgnosForge extends EmiAgnos {
 
 	@Override
 	protected List<String> getAllModNamesAgnos() {
-		return ModList.get().getMods().stream().map(m -> m.getDisplayName()).toList();
+		return ModList.get().getMods().stream().map(IModInfo::getDisplayName).toList();
 	}
 
 	@Override
@@ -190,7 +186,7 @@ public class EmiAgnosForge extends EmiAgnos {
 						}
 						if (BrewingRecipeRegistry.isBrewable(potion)) {
 							Identifier id = EmiPort.id("emi", "brewing/item/"
-								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
+								+ EmiUtil.subId(entry.getKey().orElseThrow().getValue()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.input.get()), potion)), EmiIngredient.of(recipe.ingredient),
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.output.get()), potion)), id));
@@ -199,7 +195,7 @@ public class EmiAgnosForge extends EmiAgnos {
 					if ((recipe.input.get() instanceof PotionItem)) {
 						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
 					} else {
-						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(EmiPort.getPotionRegistry().getRawId(Potions.AWKWARD)).get());
+						potionRecipeGen.accept(EmiPort.getPotionRegistry().getEntry(EmiPort.getPotionRegistry().getRawId(Potions.AWKWARD)).orElseThrow());
 					}
 
 				}
@@ -235,9 +231,9 @@ public class EmiAgnosForge extends EmiAgnos {
 			if (opt.isPresent()) {
 				Object obj = opt.get();
 				if (obj instanceof String authors) {
-					return Lists.newArrayList(authors.split("\\,")).stream().map(s -> s.trim());
+					return Lists.newArrayList(authors.split(",")).stream().map(String::trim);
 				} else if (obj instanceof List<?> list) {
-					if (list.size() > 0 && list.get(0) instanceof String) {
+					if (!list.isEmpty() && list.get(0) instanceof String) {
 						List<String> authors = (List<String>) list;
 						return authors.stream();
 					}
@@ -250,7 +246,7 @@ public class EmiAgnosForge extends EmiAgnos {
 	@Override
 	protected List<TooltipComponent> getItemTooltipAgnos(ItemStack stack) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		List<Text> text = stack.getTooltip(client.player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);;
+		List<Text> text = stack.getTooltip(client.player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
 		return ForgeHooksClient.gatherTooltipComponents(stack, text, stack.getTooltipData(), 0, Integer.MAX_VALUE, Integer.MAX_VALUE, null, client.textRenderer);
 	}
 
@@ -267,18 +263,12 @@ public class EmiAgnosForge extends EmiAgnos {
 	@Override
 	protected boolean isFloatyFluidAgnos(FluidEmiStack stack) {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
-		return fs.getFluid().getFluidType().isLighterThanAir();
+		return fs.getFluid().getAttributes().isLighterThanAir();
 	}
 
 	@Override
 	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
-		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
-		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
-		Identifier texture = ext.getStillTexture(fs);
-		int color = ext.getTintColor(fs);
-		MinecraftClient client = MinecraftClient.getInstance();
-		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
+		throw new UnsupportedOperationException("Unimplemented method 'renderFluidAgnos'");
 	}
 
 	@Override

@@ -8,10 +8,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
-import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiReloadManager;
-import dev.emi.emi.screen.ConfigScreen;
 import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.StackBatcher;
@@ -20,17 +18,14 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.minecraftforge.client.event.ContainerScreenEvent;
-import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -39,26 +34,18 @@ public class EmiClientForge {
 	
 	@SubscribeEvent
 	public static void clientInit(FMLClientSetupEvent event) {
-		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(ForgeRenderTypes.values()).map(f -> f.get()).toList());
+		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(ForgeRenderTypes.values()).map(ForgeRenderTypes::get).toList());
 		EmiClient.init();
-		EmiNetwork.initClient(packet -> EmiPacketHandler.CHANNEL.sendToServer(packet));
+		EmiNetwork.initClient(EmiPacketHandler.CHANNEL::sendToServer);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::recipesReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::tagsReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::renderScreenForeground);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::postRenderScreen);
-		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
-	}
-
-	@SubscribeEvent
-	public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		EmiTags.registerTagModels(client.getResourceManager(), event::register);
 	}
 
 	@SubscribeEvent
 	public static void registerResourceReloaders(RegisterClientReloadListenersEvent event) {
-		EmiData.init(reloader -> event.registerReloadListener(reloader));
+		EmiData.init(event::registerReloadListener);
 	}
 
 	public static void recipesReloaded(RecipesUpdatedEvent event) {
@@ -69,7 +56,7 @@ public class EmiClientForge {
 		EmiReloadManager.reloadTags();
 	}
 
-	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
+	public static void renderScreenForeground(ContainerScreenEvent.DrawForeground event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		HandledScreen<?> screen = event.getContainerScreen();
 		EmiScreenBase base = EmiScreenBase.of(screen);
@@ -86,7 +73,7 @@ public class EmiClientForge {
 		}
 	}
 
-	public static void postRenderScreen(ScreenEvent.Render.Post event) {
+	public static void postRenderScreen(ScreenEvent.DrawScreenEvent.Post event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		Screen screen = event.getScreen();
 		if (!(screen instanceof HandledScreen<?>)) {

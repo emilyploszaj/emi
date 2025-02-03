@@ -39,21 +39,17 @@ public class EmiPacketHandler {
 	}
 
 	private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> serverHandler(BiConsumer<T, PlayerEntity> handler) {
-		return (t, context) -> {
-			context.get().enqueueWork(() -> {
-				handler.accept(t, context.get().getSender());
-				context.get().setPacketHandled(true);
-			});
-		};
+		return (t, context) -> context.get().enqueueWork(() -> {
+            handler.accept(t, context.get().getSender());
+            context.get().setPacketHandled(true);
+        });
 	}
 
 	private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> clientHandler(BiConsumer<T, PlayerEntity> handler) {
-		return (t, context) -> {
-			context.get().enqueueWork(() -> {
-				MinecraftClient client = MinecraftClient.getInstance();
-				handler.accept(t, client.player);
-				context.get().setPacketHandled(true);
-			});
-		};
+		return (t, context) -> context.get().enqueueWork(() -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            handler.accept(t, client.player);
+            context.get().setPacketHandled(true);
+        });
 	}
 }
