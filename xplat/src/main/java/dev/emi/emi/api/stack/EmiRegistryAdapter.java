@@ -18,7 +18,7 @@ public interface EmiRegistryAdapter<T> {
 	Class<T> getBaseClass();
 
 	/**
-	 * @return
+	 * @return the associated registry
 	 */
 	Registry<T> getRegistry();
 

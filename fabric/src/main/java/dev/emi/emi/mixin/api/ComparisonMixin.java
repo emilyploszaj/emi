@@ -16,7 +16,7 @@ public class ComparisonMixin {
 	public TriState amount;
 	public TriState nbt;
 
-	@Inject(at = @At("RETURN"), method = "<init>")
+	@Inject(at = @At("RETURN"), method = "<init>", remap = false)
 	private void constructor(CallbackInfo info) {
 		amount = TriState.FALSE;
 		nbt = TriState.FALSE;

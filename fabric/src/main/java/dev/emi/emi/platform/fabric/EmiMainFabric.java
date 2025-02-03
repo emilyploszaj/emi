@@ -35,17 +35,13 @@ public class EmiMainFabric implements ModInitializer {
 		registerPacketReader(EmiNetwork.CREATE_ITEM, CreateItemC2SPacket::new);
 		registerPacketReader(EmiNetwork.CHESS, EmiChessPacket.C2S::new);
 
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			EmiNetwork.sendToClient(handler.player, new PingS2CPacket());
-		});
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> EmiNetwork.sendToClient(handler.player, new PingS2CPacket()));
 	}
 
 	private void registerPacketReader(Identifier id, Function<PacketByteBuf, EmiPacket> create) {
 		ServerPlayNetworking.registerGlobalReceiver(id, (server, player, networkHandler, buf, sender) -> {
 			EmiPacket packet = create.apply(buf);
-			server.execute(() -> {
-				packet.apply(player);
-			});
+			server.execute(() -> packet.apply(player));
 		});
 	}
 }
