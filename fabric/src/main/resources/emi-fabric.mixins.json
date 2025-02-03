@@ -1,0 +1,34 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.emi.emi.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "dev.emi.emi.mixinsupport.EmiMixinPlugin",
+  "mixins": [],
+  "client": [
+    "accessor.BrewingRecipeRegistryRecipeAccessor",
+    "api.ComparisonBuilderMixin",
+    "api.ComparisonMixin",
+    "api.EmiApiMixin",
+    "api.EmiIngredientMixin",
+    "api.EmiRegistryMixin",
+    "api.EmiStackEntryMixin",
+    "api.EmiStackMixin",
+    "api.EmptyEmiStackEntryMixin",
+    "api.EmptyEmiStackMixin",
+    "api.FluidEmiStackEntryMixin",
+    "api.FluidEmiStackMixin",
+    "api.ItemEmiStackEntryMixin",
+    "api.ItemEmiStackMixin",
+    "api.SlotWidgetMixin",
+    "conversion.FluidMixin",
+    "conversion.ItemConvertibleMixin",
+    "conversion.ItemStackMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "SynchronizeRecipesS2CPacketMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

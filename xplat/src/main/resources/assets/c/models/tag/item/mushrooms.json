@@ -1,0 +1,7 @@
+{
+  "parent": "emi:item/half_item",
+  "textures": {
+    "first": "minecraft:block/red_mushroom",
+    "second": "minecraft:block/brown_mushroom"
+  }
+}
