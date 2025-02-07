@@ -116,6 +116,7 @@
 
   "config.emi.ui.effect_location": "Расположение эффектов",
   "config.emi.ui.center_search_bar": "Отцентровать поисковую строку",
+  "config.emi.ui.top_search_bar": "Поисковая строка сверху",
   "config.emi.ui.show_hover_overlay": "Показывать рамку при наведении",
   "config.emi.ui.append_mod_id": "Добавлять название мода",
   "config.emi.ui.append_item_mod_id": "Принудительно добавлять название мода",

@@ -926,6 +926,9 @@ public class EmiScreenManager {
 				search.setWidth(panels.get(0).space.tw * ENTRY_SIZE);
 			}
 		}
+		if (EmiConfig.topSearchBar) {
+			search.y = 2;
+		}
 		EmiPort.focus(search, false);
 		search.setVisible(EmiConfig.searchSidebar != SidebarSide.NONE);
 

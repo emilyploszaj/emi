@@ -32,6 +32,7 @@
   
     "config.emi.ui.move_effects": "Hareket Efektleri",
     "config.emi.ui.center_search_bar": "Arama Kutucuğunu Ortala",
+    "config.emi.ui.top_search_bar": "Üstteki Arama Kutucuğu",
     "config.emi.ui.show_hover_overlay": "Üstünden Geçirme Kaplamasını Göster",
     "config.emi.ui.append_item_mod_id": "Eşya Mod ID'sini Ekle",
     "config.emi.ui.empty_search_craftable": "Boş aramayla Üretilebilenleri Göster",

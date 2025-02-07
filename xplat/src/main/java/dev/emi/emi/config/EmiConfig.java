@@ -117,6 +117,10 @@ public class EmiConfig {
 	@ConfigValue("ui.center-search-bar")
 	public static boolean centerSearchBar = true;
 
+	@Comment("Whether to have the search bar in the top of the screen, instead of to the bottom.")
+	@ConfigValue("ui.top-search-bar")
+	public static boolean topSearchBar = false;
+
 	@ConfigFilter("ui.search-sidebar-focus")
 	private static Predicate<SidebarType> searchSidebarFocusFilter = type -> {
 		return type != SidebarType.CHESS;
