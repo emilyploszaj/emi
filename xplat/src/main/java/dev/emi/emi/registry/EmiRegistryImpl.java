@@ -1,5 +1,6 @@
 package dev.emi.emi.registry;
 
+import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -77,9 +78,11 @@ public class EmiRegistryImpl implements EmiRegistry {
 
 	@Override
 	public void addEmiStackAfter(EmiStack stack, Predicate<EmiStack> predicate) {
-		for (int i = 0; i < EmiStackList.stacks.size(); i++) {
-			if (predicate.test(EmiStackList.stacks.get(i))) {
-				EmiStackList.stacks.add(i + 1, stack);
+		ListIterator<EmiStack> listIterator = EmiStackList.stacks.listIterator();
+		while (listIterator.hasNext()) {
+			EmiStack candidate = listIterator.next();
+			if (predicate.test(candidate)) {
+				listIterator.add(stack);
 				return;
 			}
 		}
