@@ -81,15 +81,20 @@ public class EmiSearchWidget extends TextFieldWidget {
 		});
 		this.setChangedListener(string -> {
 			if (string.isEmpty()) {
-				this.setSuggestion(I18n.translate("emi.search"));
+				if (!this.isFocused()) {
+					this.setSuggestion(I18n.translate("emi.search"));
+				}
+				
 				EmiScreenManager.focusSearchSidebarType(EmiConfig.emptySearchSidebarFocus);
 			} else {
 				this.setSuggestion("");
 				EmiScreenManager.focusSearchSidebarType(EmiConfig.searchSidebarFocus);
 			}
+
 			Matcher matcher = EmiSearch.TOKENS.matcher(string);
 			List<Pair<Integer, Style>> styles = Lists.newArrayList();
 			int last = 0;
+			
 			while (matcher.find()) {
 				int start = matcher.start();
 				int end = matcher.end();
@@ -151,15 +156,22 @@ public class EmiSearchWidget extends TextFieldWidget {
 		if (!focused) {
 			searchHistoryIndex = 0;
 			String currentSearch = getText();
+			
 			if (!currentSearch.isBlank() && !currentSearch.isEmpty()) {
 				searchHistory.removeIf(String::isBlank);
 				searchHistory.remove(currentSearch);
 				searchHistory.add(0, currentSearch);
+				
 				if (searchHistory.size() > 36) {
 					searchHistory.remove(searchHistory.size() - 1);
 				}
+			} else {
+				this.setSuggestion(I18n.translate("emi.search"));
 			}
+		} else {
+			this.setSuggestion("");
 		}
+
 		isFocused = focused;
 		super.setFocused(focused);
 	}
