@@ -37,8 +37,7 @@ public class RecipeDefaultLoader extends SinglePreparationResourceReloader<Recip
 					loadDefaults(defaults, json);
 				}
 			} catch (Exception e) {
-				EmiLog.error("Error loading recipe default file " + id);
-				e.printStackTrace();
+				EmiLog.error("Error loading recipe default file " + id, e);
 			}
 		}
 		return defaults;

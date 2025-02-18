@@ -14,6 +14,7 @@ import dev.emi.emi.api.widget.TextWidget.Alignment;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
@@ -82,7 +83,7 @@ public class RecipeDisplay {
 				addButtons(widgets, leftButtons, 0 - 4 - 13, -14);
 				addButtons(widgets, rightButtons, width + 5, 14);
 			} catch (Throwable t) {
-				t.printStackTrace();
+				EmiLog.error("Error constructing recipe widgets", t);
 				widgets = new WidgetGroup(recipe, wx, wy, wWidth, wHeight);
 				widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.render")),
 					wWidth / 2, wHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));

@@ -19,6 +19,7 @@ import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotsView;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
@@ -132,7 +133,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 			
 			return handler.transferRecipe(context.getScreenHandler(), rawRecipe != null ? rawRecipe : (R) recipe, view, client.player, context.getAmount() > 1, craft);
 		} catch (Exception e) {
-			e.printStackTrace();
+			EmiLog.error("Error executing JEI craft", e);
 		}
 		return () -> IRecipeTransferError.Type.INTERNAL;
 	}

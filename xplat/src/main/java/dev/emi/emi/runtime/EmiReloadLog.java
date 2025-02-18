@@ -1,7 +1,5 @@
 package dev.emi.emi.runtime;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -25,18 +23,14 @@ public class EmiReloadLog {
 		pendingWarningCount++;
 	}
 
+	public static void warn(String warning, Throwable t) {
+		pendingWarnings.add(warning);
+		EmiLog.error(warning, t);
+		pendingWarningCount++;
+	}
+
 	public static void info(String info) {
 		pendingWarnings.add(info);
 		EmiLog.info(info);
-	}
-
-	public static void error(Throwable e) {
-		e.printStackTrace();
-		StringWriter writer = new StringWriter();
-		e.printStackTrace(new PrintWriter(writer, true));
-		String[] strings = writer.getBuffer().toString().split("/");
-		for (String s : strings) {
-			EmiReloadLog.warn(s);
-		}
 	}
 }

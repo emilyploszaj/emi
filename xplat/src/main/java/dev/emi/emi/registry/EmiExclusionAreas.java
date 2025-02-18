@@ -44,8 +44,7 @@ public class EmiExclusionAreas {
 				exclusion.addExclusionArea(screen, addBounds(list));
 			}
 		} catch (Exception e) {
-			EmiLog.error("Exception thrown when adding exclusion areas");
-			e.printStackTrace();
+			EmiLog.error("Exception thrown when adding exclusion areas", e);
 		}
 		return list;
 	}

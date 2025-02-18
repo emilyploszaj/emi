@@ -1,20 +1,12 @@
 ### Additions
-* Search sidebar target can be configured
+* Added "empty" sidebar type
+* Added "low distraction" config preset which uses an empty sidebar normally, but the index while searching
+* Sidebar and tooltip rendering now handles errors slightly more gracefully, displaying them to the player instead of crashing.
 
 ### Tweaks
-* Notable performance improvements to ingredient construction
-* Wrap packet sends with a check in later versions
-* Improved accuracy of EMI reloading errors
-
-### Fixes
-* Serialization of stacks with sizes other than 1 now serialize properly #803
-* Fix tag ingredient rendering in Fabulous #811
-* Fix stack batcher causing certain recipe tree categories to render at the wrong position #790
-* Populate item groupps in correct order (fixing duplicate items) #774 #603 #621
-* Pick which sidebar search targets #377
-* Fix search baking hang #800
-* Fix certain JEI integration breaking inconsistently on NeoForge
+* EMI logging should be more consistent around errors
+* EMI will avoid loading on screens that are not real
+* Certain routines for stack adding have been greatly sped up
 
 ### API
-* Added experimental API to get query if stack is disabled from EmiRegistry
-* Added experimental API to get EmiTooltipMetadata from composed tooltips being rendered for mod compatibility
+* Added experimental API for registering aliases through code rather than resource packs

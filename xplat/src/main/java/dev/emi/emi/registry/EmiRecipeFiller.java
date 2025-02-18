@@ -20,6 +20,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.handler.CoercedRecipeHandler;
 import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiSidebars;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -232,7 +233,7 @@ public class EmiRecipeFiller {
 				return desired;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			EmiLog.error("Error collecting stacks", e);
 		}
 		return null;
 	}

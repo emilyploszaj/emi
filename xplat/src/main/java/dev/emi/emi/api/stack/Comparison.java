@@ -47,8 +47,7 @@ public class Comparison {
 			return predicate.test(a, b);
 		} catch (Throwable t) {
 			predicate = (na, nb) -> true;
-			EmiLog.error("Comparison threw an exception, disabling");
-			t.printStackTrace();
+			EmiLog.error("Comparison threw an exception, disabling", t);
 		}
 		return true;
 	}
@@ -59,8 +58,7 @@ public class Comparison {
 			return hash.hash(stack);
 		} catch (Throwable t) {
 			hash = s -> 0;
-			EmiLog.error("Comparison threw an exception, disabling");
-			t.printStackTrace();
+			EmiLog.error("Comparison threw an exception, disabling", t);
 		}
 		return 0;
 	}

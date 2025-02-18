@@ -17,6 +17,7 @@ import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.runtime.EmiLog;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -124,7 +125,7 @@ public class JemiSlotWidget extends SlotWidget {
 					list.addAll(index, event.stream().filter(t -> !toRemove.contains(t) && !JemiIngredientAcceptor.FLUID_END.matcher(t.getString()).find()).map(t -> TooltipComponent.of(t.asOrderedText())).toList());
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				EmiLog.error("Error initializing JEI tooltip", e);
 			}
 		}
 	}

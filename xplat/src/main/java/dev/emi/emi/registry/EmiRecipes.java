@@ -166,7 +166,7 @@ public class EmiRecipes {
 					}
 
 					MinecraftClient client = MinecraftClient.getInstance();
-					if (!id.getPath().startsWith("/") && client.world != null && client.world.getRecipeManager().get(id).isEmpty()) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && client.world != null && client.world.getRecipeManager().get(id).isEmpty()) {
 						incorrectIds.add(id);
 					}
 				}

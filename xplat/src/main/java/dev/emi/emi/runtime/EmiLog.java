@@ -1,8 +1,5 @@
 package dev.emi.emi.runtime;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +18,7 @@ public class EmiLog {
 		LOG.error("[EMI] " + str);
 	}
 
-	public static void error(Throwable e) {
-		e.printStackTrace();
-		StringWriter writer = new StringWriter();
-		e.printStackTrace(new PrintWriter(writer, true));
-		String[] strings = writer.getBuffer().toString().split("/");
-		for (String s : strings) {
-			EmiLog.error(s);
-		}
+	public static void error(String str, Throwable t) {
+		LOG.error(str, t);
 	}
 }
