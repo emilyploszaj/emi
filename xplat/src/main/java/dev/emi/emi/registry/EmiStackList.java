@@ -85,8 +85,7 @@ public class EmiStackList {
 					creativeGroups.computeIfAbsent(stacks.get(0).getId().getNamespace(), (k) -> new IndexGroup()).stacks.addAll(stacks);
 				}
 			} catch (Exception e) {
-				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.");
-				EmiLog.error(e);
+				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 			}
 		}
 		if (EmiConfig.indexSource == IndexSource.CREATIVE) {
