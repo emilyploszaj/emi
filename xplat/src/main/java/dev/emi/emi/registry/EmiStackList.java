@@ -19,6 +19,7 @@ import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.IndexSource;
+import dev.emi.emi.data.EmiAlias;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.IndexStackData;
 import dev.emi.emi.runtime.EmiHidden;
@@ -46,6 +47,7 @@ public class EmiStackList {
 	private static final TagKey<Item> ITEM_HIDDEN = TagKey.of(EmiPort.getItemRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS);
 	private static final TagKey<Block> BLOCK_HIDDEN = TagKey.of(EmiPort.getBlockRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS);
 	private static final TagKey<Fluid> FLUID_HIDDEN = TagKey.of(EmiPort.getFluidRegistry().getKey(), EmiTags.HIDDEN_FROM_RECIPE_VIEWERS);
+	public static List<EmiAlias.Baked> registryAliases = Lists.newArrayList();
 	public static List<Predicate<EmiStack>> invalidators = Lists.newArrayList();
 	public static List<EmiStack> stacks = List.of();
 	public static List<EmiStack> filteredStacks = List.of();
@@ -54,6 +56,7 @@ public class EmiStackList {
 
 	public static void clear() {
 		invalidators.clear();
+		registryAliases.clear();
 		stacks = List.of();
 		strictIndices.clear();
 		keyIndices.clear();
@@ -71,8 +74,7 @@ public class EmiStackList {
 				EmiStack stack = EmiStack.of(item);
 				namespaceGroups.computeIfAbsent(stack.getId().getNamespace(), (k) -> new IndexGroup()).stacks.add(stack);
 			} catch (Exception e) {
-				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.");
-				EmiLog.error(e);
+				EmiLog.error("Item " + itemName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 			}
 		}
 		if (EmiConfig.indexSource != IndexSource.REGISTERED) {
@@ -88,8 +90,7 @@ public class EmiStackList {
 						group.updateEntries(context);
 						map.put(group, group.getSearchTabStacks());
 					} catch(Exception e) {
-						EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.");
-						EmiLog.error(e);
+						EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 					}
 				};
 				List<ItemGroup> itemGroups = ItemGroups.getGroups();
@@ -125,8 +126,7 @@ public class EmiStackList {
 					}
 					groups.add(ig);
 				} catch (Exception e) {
-					EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.");
-					EmiLog.error(e);
+					EmiLog.error("Creative item group " + groupName + " threw while EMI was attempting to construct the index, items may be missing.", e);
 				}
 			}
 		}
@@ -141,8 +141,7 @@ public class EmiStackList {
 					fluidGroup.stacks.add(fs);
 				}
 			} catch (Exception e) {
-				EmiLog.error("Fluid  " + fluidName + " threw while EMI was attempting to construct the index, stack may be missing.");
-				EmiLog.error(e);
+				EmiLog.error("Fluid  " + fluidName + " threw while EMI was attempting to construct the index, stack may be missing.", e);
 			}
 		}
 		groups.add(fluidGroup);
@@ -199,8 +198,7 @@ public class EmiStackList {
 				}
 				return false;
 			} catch (Throwable t) {
-				EmiLog.error("Stack threw error while baking");
-				t.printStackTrace();
+				EmiLog.error("Stack threw error while baking", t);
 				return true;
 			}
 		});
@@ -256,8 +254,7 @@ public class EmiStackList {
 				EmiLog.warn("Hiding stack " + name + " with id " + id + " from index due to returning dangerous values");
 				return false;
 			} catch (Throwable t) {
-				EmiLog.warn("Hiding stack " + name + " with id " + id + " from index due to throwing errors");
-				t.printStackTrace();
+				EmiLog.error("Hiding stack " + name + " with id " + id + " from index due to throwing errors", t);
 				return false;
 			}
 		}).toList();

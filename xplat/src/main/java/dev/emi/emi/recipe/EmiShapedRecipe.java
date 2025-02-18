@@ -48,8 +48,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				inv.clear();
 			}
 		} catch (Exception e) {
-			EmiLog.error("Exception thrown setting remainders for " + EmiPort.getId(recipe));
-			e.printStackTrace();
+			EmiLog.error("Exception thrown setting remainders for " + EmiPort.getId(recipe), e);
 		}
 	}
 

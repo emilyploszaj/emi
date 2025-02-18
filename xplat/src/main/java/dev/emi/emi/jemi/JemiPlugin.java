@@ -261,11 +261,11 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					try {
 						registry.addRecipe(new JemiRecipe(category, c, r));
 					} catch (Throwable t) {
-						t.printStackTrace();
+						EmiLog.error("Exception thrown adding adding JEI recipe", t);
 					}
 				}
 			} catch(Throwable t) {
-				t.printStackTrace();
+				EmiLog.error("Exception thrown adding adding JEI recipes", t);
 			}
 		}
 	}
@@ -363,8 +363,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					}
 				}
 			} catch (Throwable t) {
-				EmiLog.error("[JEMI] Exception thrown setting JEI crafting recipe");
-				EmiLog.error(t);
+				EmiLog.error("[JEMI] Exception thrown setting JEI crafting recipe", t);
 			}
 		}
 		registry.removeRecipes(r -> r instanceof EmiCraftingRecipe && replaced.contains(r.getId()) && !replacements.contains(r));
@@ -411,8 +410,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 								}));
 							}
 						} catch (Throwable t) {
-							EmiReloadLog.warn("Exception adding default comparison for JEI ingredient");
-							EmiReloadLog.error(t);
+							EmiReloadLog.warn("Exception adding default comparison for JEI ingredient", t);
 						}
 					}
 				}
@@ -432,8 +430,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		try {
 			runnable.run();
 		} catch (Throwable t) {
-			EmiReloadLog.warn("Exception thrown when reloading " + name  + " step in JEMI plugin");
-			EmiReloadLog.error(t);
+			EmiReloadLog.warn("Exception thrown when reloading " + name  + " step in JEMI plugin", t);
 		}
 	}
 }

@@ -58,13 +58,11 @@ public class EmiTagExclusionsLoader extends SinglePreparationResourceReloader<Ta
 							}
 						}
 					} catch (Exception e) {
-						EmiLog.error("Error loading tag exclusions");
-						e.printStackTrace();
+						EmiLog.error("Error loading tag exclusions", e);
 					}
 				}
 			} catch (Exception e) {
-				EmiLog.error("Error loading tag exclusions");
-				e.printStackTrace();
+				EmiLog.error("Error loading tag exclusions", e);
 			}
 		}
 		return exclusions;

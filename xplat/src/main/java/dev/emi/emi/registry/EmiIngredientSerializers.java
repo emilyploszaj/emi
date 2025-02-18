@@ -31,8 +31,7 @@ public class EmiIngredientSerializers {
 		try {
 			return ((EmiIngredientSerializer) BY_CLASS.get(ingredient.getClass())).serialize(ingredient);
 		} catch (Exception e) {
-			EmiLog.error("Exception serializing stack " + ingredient);
-			e.printStackTrace();
+			EmiLog.error("Exception serializing stack " + ingredient, e);
 			return null;
 		}
 	}
@@ -73,8 +72,7 @@ public class EmiIngredientSerializers {
 			}
 			return ((EmiIngredientSerializer) BY_TYPE.get(type)).deserialize(element);
 		} catch (Exception e) {
-			EmiLog.error("Exception deserializing stack " + element);
-			e.printStackTrace();
+			EmiLog.error("Exception deserializing stack " + element, e);
 			return EmiStack.EMPTY;
 		}
 	}

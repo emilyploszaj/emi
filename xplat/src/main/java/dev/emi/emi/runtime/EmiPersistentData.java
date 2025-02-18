@@ -25,8 +25,7 @@ public class EmiPersistentData {
 			GSON.toJson(json, writer);
 			writer.close();
 		} catch (Exception e) {
-			EmiLog.error("Failed to write persistent data");
-			e.printStackTrace();
+			EmiLog.error("Failed to write persistent data", e);
 		}
 	}
 
@@ -47,8 +46,7 @@ public class EmiPersistentData {
 				EmiHidden.load(JsonHelper.getArray(json, "hidden_stacks"));
 			}
 		} catch (Exception e) {
-			EmiLog.error("Failed to parse persistent data");
-			e.printStackTrace();
+			EmiLog.error("Failed to parse persistent data", e);
 		}
 	}
 }

@@ -80,11 +80,10 @@ public class EmiSearchWidget extends TextFieldWidget {
 		this.setChangedListener(string -> {
 			if (string.isEmpty()) {
 				this.setSuggestion(I18n.translate("emi.search"));
-				EmiScreenManager.focusSearchSidebarType(EmiConfig.emptySearchSidebarFocus);
 			} else {
 				this.setSuggestion("");
-				EmiScreenManager.focusSearchSidebarType(EmiConfig.searchSidebarFocus);
 			}
+			EmiScreenManager.updateSearchSidebar();
 			Matcher matcher = EmiSearch.TOKENS.matcher(string);
 			List<Pair<Integer, Style>> styles = Lists.newArrayList();
 			int last = 0;
@@ -159,6 +158,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 			}
 		}
 		isFocused = focused;
+		EmiScreenManager.updateSearchSidebar();
 	}
 
 	@Override

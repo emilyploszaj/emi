@@ -533,8 +533,7 @@ public class EmiConfig {
 			}
 			writeConfig();
 		} catch (Exception e) {
-			EmiLog.error("Error reading config");
-			e.printStackTrace();
+			EmiLog.error("Error reading config", e);
 		}
 	}
 
@@ -555,8 +554,7 @@ public class EmiConfig {
 				loadConfig();
 			}
 		} catch (Exception e) {
-			EmiLog.error("Error writing global config");
-			e.printStackTrace();
+			EmiLog.error("Error writing global config", e);
 		}
 	}
 
@@ -578,8 +576,7 @@ public class EmiConfig {
 				}
 			}
 		} catch (Exception e) {
-			EmiLog.error("Error reading config");
-			e.printStackTrace();
+			EmiLog.error("Error reading config", e);
 		}
 	}
 
@@ -589,8 +586,7 @@ public class EmiConfig {
 			writer.write(getSavedConfig());
 			writer.close();
 		} catch (Exception e) {
-			EmiLog.error("Error writing config");
-			e.printStackTrace();
+			EmiLog.error("Error writing config", e);
 		}
 	}
 
@@ -618,8 +614,7 @@ public class EmiConfig {
 				try {
 					text += writeField(key, field);
 				} catch (Exception e) {
-					EmiLog.error("Error serializing config");
-					e.printStackTrace();
+					EmiLog.error("Error serializing config", e);
 				}
 				unparsed.computeIfAbsent(group, g -> Lists.newArrayList()).add(text);
 			}
@@ -820,7 +815,7 @@ public class EmiConfig {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			EmiLog.error("Error reflecting config", e);
 		}
 		DEFAULT_CONFIG = getSavedConfig();
 	}
