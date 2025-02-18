@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import dev.emi.emi.EmiPort;
 import net.fabricmc.loader.api.FabricLoader;
+import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -49,7 +50,7 @@ public class FakeScreen extends Screen {
 			try {
 				handle.invokeWithArguments(list, data.get());
 			} catch (Throwable e) {
-				e.printStackTrace();
+				EmiLog.error("Exception converting TooltipComponent", e);
 			}
 		}
 		return list;

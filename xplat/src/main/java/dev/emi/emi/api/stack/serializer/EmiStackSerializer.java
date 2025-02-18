@@ -63,8 +63,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 				}
 				return stack;
 			} catch (Exception e) {
-				EmiLog.error("Error parsing NBT in deserialized stack");
-				e.printStackTrace();
+				EmiLog.error("Error parsing NBT in deserialized stack", e);
 				return EmiStack.EMPTY;
 			}
 		}

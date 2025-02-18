@@ -30,6 +30,7 @@ import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiBind.ModifiedKey;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import dev.emi.emi.screen.widget.config.BooleanWidget;
 import dev.emi.emi.screen.widget.config.ConfigEntryWidget;
@@ -264,7 +265,7 @@ public class ConfigScreen extends Screen {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			EmiLog.error("Error initializing config screen", e);
 		}
 
 		this.addSelectableChild(list);

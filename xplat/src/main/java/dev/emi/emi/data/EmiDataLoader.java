@@ -47,8 +47,7 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
 					prepare.accept(t, json, id);
 				} catch (Exception e) {
-					EmiLog.error("Error loading data for " + this.id + " in " + id);
-					e.printStackTrace();
+					EmiLog.error("Error loading data for " + this.id + " in " + id, e);
 				}
 			}
 		}

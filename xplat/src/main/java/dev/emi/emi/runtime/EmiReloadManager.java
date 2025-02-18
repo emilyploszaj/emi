@@ -63,6 +63,7 @@ public class EmiReloadManager {
 
 	public static void clear() {
 		synchronized (EmiReloadManager.class) {
+			loadedResourcesMask = 0;
 			clear = true;
 			status = 0;
 			reloadWorry = Long.MAX_VALUE;
@@ -159,8 +160,7 @@ public class EmiReloadManager {
 						try {
 							container.plugin().initialize(initRegistry);
 						} catch (Throwable e) {
-							EmiReloadLog.warn("Exception initializing plugin provided by " + container.id());
-							EmiReloadLog.error(e);
+							EmiReloadLog.warn("Exception initializing plugin provided by " + container.id(), e);
 							if (restart) {
 								continue outer;
 							}
@@ -187,8 +187,7 @@ public class EmiReloadManager {
 						try {
 							container.plugin().register(registry);
 						} catch (Throwable e) {
-							EmiReloadLog.warn("Exception loading plugin provided by " + container.id());
-							EmiReloadLog.error(e);
+							EmiReloadLog.warn("Exception loading plugin provided by " + container.id(), e);
 							if (restart) {
 								continue outer;
 							}
@@ -210,8 +209,7 @@ public class EmiReloadManager {
 						try {
 							consumer.accept(registerLateRecipe);
 						} catch (Exception e) {
-							EmiReloadLog.warn("Exception loading late recipes for plugins:");
-							EmiReloadLog.error(e);
+							EmiReloadLog.warn("Exception loading late recipes for plugins:", e);
 							if (restart) {
 								continue outer;
 							}
@@ -230,8 +228,7 @@ public class EmiReloadManager {
 					EmiLog.info("Reloaded EMI in " + (System.currentTimeMillis() - reloadStart) + "ms");
 					status = 2;
 				} catch (Throwable e) {
-					EmiReloadLog.warn("Critical error occured during reload:");
-					EmiReloadLog.error(e);
+					EmiReloadLog.warn("Critical error occured during reload:", e);
 					status = -1;
 					if (retries-- > 0) {
 						restart = true;

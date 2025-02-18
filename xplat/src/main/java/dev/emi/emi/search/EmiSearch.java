@@ -92,8 +92,7 @@ public class EmiSearch {
 					}
 				}
 			} catch (Exception e) {
-				EmiLog.error("EMI caught an exception while baking search for " + stack);
-				EmiLog.error(e);
+				EmiLog.error("EMI caught an exception while baking search for " + stack, e);
 			}
 		}
 		for (Supplier<EmiAlias> supplier : EmiData.aliases) {
@@ -106,6 +105,15 @@ public class EmiSearch {
 				for (EmiIngredient ing : alias.stacks()) {
 					for (EmiStack stack : ing.getEmiStacks()) {
 						aliases.add(stack.copy().comparison(EmiPort.compareStrict()), text);
+					}
+				}
+			}
+		}
+		for (EmiAlias.Baked alias : EmiStackList.registryAliases) {
+			for (Text text : alias.text()) {
+				for (EmiIngredient ing : alias.stacks()) {
+					for (EmiStack stack : ing.getEmiStacks()) {
+						aliases.add(stack.copy().comparison(EmiPort.compareStrict()), text.getString().toLowerCase());
 					}
 				}
 			}
@@ -279,8 +287,7 @@ public class EmiSearch {
 				}
 				apply(this, List.copyOf(stacks));
 			} catch (Exception e) {
-				EmiLog.error("Error when attempting to search:");
-				e.printStackTrace();
+				EmiLog.error("Error when attempting to search:", e);
 			}
 		}
 	}

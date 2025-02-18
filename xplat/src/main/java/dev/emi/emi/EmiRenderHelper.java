@@ -20,6 +20,7 @@ import dev.emi.emi.mixin.accessor.OrderedTextTooltipComponentAccessor;
 import dev.emi.emi.mixin.accessor.ScreenAccessor;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -187,7 +188,7 @@ public class EmiRenderHelper {
 						mutable.add(TooltipComponent.of(o));
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					EmiLog.error("Error converting text", e);
 					mutable.add(comp);
 				}
 			} else {
@@ -369,7 +370,7 @@ public class EmiRenderHelper {
 			RenderSystem.colorMask(true, true, true, true);
 			// Blend should be off by default
 		} catch (Throwable e) {
-			e.printStackTrace();
+			EmiLog.error("Error rendering recipe", e);
 		}
 	}
 }

@@ -30,6 +30,7 @@ import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
 import net.minecraft.client.MinecraftClient;
@@ -226,7 +227,7 @@ public class RecipeScreen extends Screen {
 					widget.render(context.raw(), mx, my, delta);
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				EmiLog.error("Error rendering widget", e);
 				group.error(e);
 			}
 			for (Widget widget : group.widgets) {
@@ -273,7 +274,7 @@ public class RecipeScreen extends Screen {
 					}
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				EmiLog.error("Error rendering widget group", e);
 				group.error(e);
 			}
 		}
@@ -433,7 +434,7 @@ public class RecipeScreen extends Screen {
 					return true;
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				EmiLog.error("Error handling widget input", e);
 				group.error(e);
 			}
 		}
@@ -466,7 +467,7 @@ public class RecipeScreen extends Screen {
 						}
 					}
 				} catch (Throwable e) {
-					e.printStackTrace();
+					EmiLog.error("Error handling widget input", e);
 					group.error(e);
 				}
 			}
@@ -553,7 +554,7 @@ public class RecipeScreen extends Screen {
 					return true;
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				EmiLog.error("Error handling widget input", e);
 				group.error(e);
 			}
 		}

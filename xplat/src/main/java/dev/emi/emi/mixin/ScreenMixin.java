@@ -22,7 +22,7 @@ public class ScreenMixin {
 
 	@Inject(at = @At("RETURN"), method = "init(Lnet/minecraft/client/MinecraftClient;II)V")
 	private void init(MinecraftClient client, int width, int height, CallbackInfo info) {
-		if ((Object) this instanceof HandledScreen hs) {
+		if ((Object) this instanceof HandledScreen hs && client.currentScreen == hs) {
 			client.keyboard.setRepeatEvents(true);
 			EmiScreenManager.addWidgets(hs);
 		}
@@ -30,7 +30,7 @@ public class ScreenMixin {
 
 	@Inject(at = @At("RETURN"), method = "resize(Lnet/minecraft/client/MinecraftClient;II)V")
 	private void resize(MinecraftClient client, int width, int height, CallbackInfo info) {
-		if ((Object) this instanceof HandledScreen hs) {
+		if ((Object) this instanceof HandledScreen hs && client.currentScreen == hs) {
 			client.keyboard.setRepeatEvents(true);
 			EmiScreenManager.addWidgets(hs);
 		}

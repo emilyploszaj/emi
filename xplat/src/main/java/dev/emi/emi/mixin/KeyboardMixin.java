@@ -33,8 +33,7 @@ public class KeyboardMixin {
 				}
 			}
 		} catch (Exception e) {
-			EmiLog.error("Error while handling key press");
-			e.printStackTrace();
+			EmiLog.error("Error while handling key press", e);
 		}
 	}
 	
@@ -59,8 +58,7 @@ public class KeyboardMixin {
 				}
 			}
 		} catch (Exception e) {
-			EmiLog.error("Error while handling char");
-			e.printStackTrace();
+			EmiLog.error("Error while handling char", e);
 		}
 	}
 }
