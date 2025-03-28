@@ -19,7 +19,9 @@ public class EmiNeoForge {
 		EmiMain.init();
 		modEventBus.addListener(EmiPacketHandler::init);
 		EmiNetwork.initServer((player, packet) -> {
-			PacketDistributor.sendToPlayer(player, EmiPacketHandler.wrap(packet));
+			if (player.networkHandler.hasChannel(packet)) {
+				PacketDistributor.sendToPlayer(player, EmiPacketHandler.wrap(packet));
+			}
 		});
 		NeoForge.EVENT_BUS.addListener(this::registerCommands);
 		NeoForge.EVENT_BUS.addListener(this::playerConnect);
