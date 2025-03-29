@@ -10,18 +10,21 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.stack.Comparison;
+import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.screen.MicroTextRenderer;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class EmiFavorite implements EmiIngredient, Batchable {
 	protected final EmiIngredient stack;
@@ -151,12 +154,13 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		public final long batches;
 		public final long amount;
 		public final int state;
-		public long total;
+		public final long total;
 
-		public Synthetic(EmiRecipe recipe, long batches, long amount, int state) {
+		public Synthetic(EmiRecipe recipe, long batches, long amount, long total, int state) {
 			super(recipe.getOutputs().get(0), recipe);
 			this.batches = batches;
 			this.amount = amount;
+			this.total = total;
 			this.state = state;
 		}
 
@@ -171,27 +175,31 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		@Override
 		public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
-			int color = 0xff2200;
+			int color = 0x915900; // Orange
 			if (state == 1) {
-				color = 0xaa00ff;
+				color = 0x790091; // Magenta
 			} else if (state == 2) {
-				color = 0x00dddd;
+				color = 0x00918e; // Blue
 			} else if (state == -1) {
-				color = 0xea842a;
+				color = 0x911300; // Red
 			}
-			context.fill(x - 1, y - 1, 18, 18, 0x44000000 | color);
+			//context.fill(x - 1, y - 1, 18, 18, 0x44000000 | color);
 			stack.render(context.raw(), x, y, delta, flags & (~EmiIngredient.RENDER_AMOUNT));
-			if (recipe != null) {
-				EmiRenderHelper.renderAmount(context, x, y, EmiPort.literal("" + amount));
-			} else {
-				EmiRenderHelper.renderAmount(context, x, y, EmiRenderHelper.getAmountText(stack, amount));
-			}
+			MicroTextRenderer.render(context, amount, stack.getEmiStacks().get(0) instanceof FluidEmiStack, 18, x + 17, y + 17, color);
 		}
 
 		@Override
 		public List<TooltipComponent> getTooltip() {
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(super.getTooltip());
+
+			long diff = total - amount;
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.remaining", EmiRenderHelper.getAmountText(stack, amount)).formatted(Formatting.GRAY)));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.obtained", EmiRenderHelper.getAmountText(stack, diff), EmiRenderHelper.getAmountText(stack, total)).formatted(Formatting.GRAY)));
+			if (batches != amount) {
+				list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.batches_remaining", batches).formatted(Formatting.GRAY)));
+			}
+
 			if (state == -1) {
 				return list;
 			}

@@ -42,7 +42,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
 public class EmiRenderHelper {
-	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("0.##");
+	public static final DecimalFormat TEXT_FORMAT = new DecimalFormat("#,###.##");
 	public static final Text EMPTY_TEXT = EmiPort.literal("");
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Identifier WIDGETS = EmiPort.id("emi", "textures/gui/widgets.png");
@@ -218,7 +218,7 @@ public class EmiRenderHelper {
 		if (stack.getEmiStacks().get(0).getKey() instanceof Fluid) {
 			return getFluidAmount(amount);
 		}
-		return EmiPort.literal("" + amount);
+		return EmiPort.literal(TEXT_FORMAT.format(amount));
 	}
 
 	public static Text getAmountText(EmiIngredient stack, double amount) {
