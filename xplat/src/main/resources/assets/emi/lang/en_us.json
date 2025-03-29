@@ -248,6 +248,9 @@
 
   "tooltip.emi.config.global": "Toggle using a global EMI config between all game instances instead of a separate config per game instance",
 
+  "tooltip.emi.synfav.obtained": "%s/%s obtained",
+  "tooltip.emi.synfav.remaining": "%s remaining",
+  "tooltip.emi.synfav.batches_remaining": "%s crafts remaining",
   "tooltip.emi.synfav.uncraftable": "Unable to craft §cany§r batches",
   "tooltip.emi.synfav.partially_craftable": "Able to craft §dsome§r batches",
   "tooltip.emi.synfav.fully_craftable": "Able to craft §aall %s§r batches",

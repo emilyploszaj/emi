@@ -24,6 +24,10 @@ public class EmiScreenBase {
 	public Bounds bounds() {
 		return bounds;
 	}
+
+	public boolean isEmpty() {
+		return screen == null;
+	}
 	
 	public static EmiScreenBase getCurrent() {
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -47,6 +51,6 @@ public class EmiScreenBase {
 		} else if (screen instanceof RecipeScreen rs) {
 			return new EmiScreenBase(rs, rs.getBounds());
 		}
-		return null;
+		return new EmiScreenBase(null, Bounds.EMPTY);
 	}
 }

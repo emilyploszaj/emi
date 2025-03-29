@@ -143,7 +143,7 @@ public class EmiScreenManager {
 		}
 
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return;
 		}
 		Screen screen = base.screen();
@@ -600,7 +600,7 @@ public class EmiScreenManager {
 		updateMouse(mouseX, mouseY);
 		recalculate();
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base != null) {
+		if (!base.isEmpty()) {
 			EmiProfiler.push("sidebar");
 			for (SidebarPanel panel : panels) {
 				panel.drawBackground(context, mouseX, mouseY, delta);
@@ -613,7 +613,8 @@ public class EmiScreenManager {
 		updateMouse(mouseX, mouseY);
 		recalculate();
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
+			EmiProfiler.pop();
 			return;
 		}
 		boolean visible = !isDisabled();
@@ -669,7 +670,7 @@ public class EmiScreenManager {
 
 	public static void drawForeground(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base != null && !isDisabled()) {
+		if (!base.isEmpty() && !isDisabled()) {
 			renderDraggedStack(context, mouseX, mouseY, delta, base);
 			renderCurrentTooltip(context, mouseX, mouseY, delta, base);
 		}
@@ -904,7 +905,7 @@ public class EmiScreenManager {
 
 	public static void addWidgets(Screen screen) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return;
 		}
 		forceRecalculate();
@@ -947,6 +948,10 @@ public class EmiScreenManager {
 	}
 
 	public static boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		if (base.isEmpty()) {
+			return false;
+		}
 		scrollAcc += amount;
 		int sa = (int) scrollAcc;
 		scrollAcc %= 1;
@@ -958,7 +963,7 @@ public class EmiScreenManager {
 		if (panel != null) {
 			int mx = (int) mouseX;
 			int my = (int) mouseY;
-			for (Bounds bounds : EmiExclusionAreas.getExclusion(EmiScreenBase.getCurrent())) {
+			for (Bounds bounds : EmiExclusionAreas.getExclusion(base)) {
 				if (bounds.contains(mx, my)) {
 					return false;
 				}
@@ -971,7 +976,7 @@ public class EmiScreenManager {
 
 	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return false;
 		}
 		if (search.mouseClicked(mouseX, mouseY, button)) {
@@ -1016,7 +1021,7 @@ public class EmiScreenManager {
 
 	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return false;
 		}
 		try {
@@ -1080,7 +1085,7 @@ public class EmiScreenManager {
 
 	public static boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return false;
 		}
 		if (isDisabled()) {
@@ -1103,7 +1108,7 @@ public class EmiScreenManager {
 
 	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
-		if (base == null) {
+		if (base.isEmpty()) {
 			return false;
 		}
 		if (isDisabled()) {
@@ -1903,8 +1908,12 @@ public class EmiScreenManager {
 		}
 
 		public boolean containsNotExcluded(int x, int y) {
+			EmiScreenBase base = EmiScreenBase.getCurrent();
+			if (base.isEmpty()) {
+				return false;
+			}
 			if (this.contains(lastMouseX, lastMouseY)) {
-				for (Bounds bounds : EmiExclusionAreas.getExclusion(EmiScreenBase.getCurrent())) {
+				for (Bounds bounds : EmiExclusionAreas.getExclusion(base)) {
 					if (bounds.contains(x, y)) {
 						return false;
 					}

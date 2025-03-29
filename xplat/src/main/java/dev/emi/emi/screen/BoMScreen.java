@@ -502,13 +502,20 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 		if (BoM.tree != null && batches.contains(mx, my)) {
+			long adjustment = (long) amount;
 			if (EmiInput.isShiftDown()) {
-				amount *= 16;
+				adjustment *= 16;
+			} else if (EmiInput.isControlDown()) {
+				if (amount > 0) {
+					adjustment = BoM.tree.batches;
+				} else {
+					adjustment = -BoM.tree.batches / 2;
+				}
 			}
-			if (BoM.tree.batches == 1 && amount > 1) {
-				BoM.tree.batches = (int) amount;
+			if (BoM.tree.batches == 1 && adjustment > 1) {
+				BoM.tree.batches = adjustment;
 			} else {
-				BoM.tree.batches += (int) amount;
+				BoM.tree.batches += adjustment;
 			}
 			BoM.tree.batches = Math.max(1, BoM.tree.batches);
 			recalculateTree();
