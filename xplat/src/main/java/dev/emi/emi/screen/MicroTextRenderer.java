@@ -83,9 +83,9 @@ public class MicroTextRenderer {
 				amount /= FluidUnit.literDivisor();
 			}
 			scales = switch (EmiConfig.fluidUnit) {
-				case FluidUnit.MILLIBUCKETS -> BUCKET_VOLUME_SCALES;
-				case FluidUnit.LITERS -> LITER_VOLUME_SCALES;
-				case FluidUnit.DROPLETS -> DROPLET_VOLUME_SCALES;
+				case MILLIBUCKETS -> BUCKET_VOLUME_SCALES;
+				case LITERS -> LITER_VOLUME_SCALES;
+				case DROPLETS -> DROPLET_VOLUME_SCALES;
 			};
 		} else {
 			scales = QUANTITY_SCALES;
