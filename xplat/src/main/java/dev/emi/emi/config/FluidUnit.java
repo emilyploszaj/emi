@@ -28,7 +28,7 @@ public enum FluidUnit implements ConfigEnum {
 		this.translator = translator;
 	}
 
-	private static int literDivisor() {
+	public static int literDivisor() {
 		if (EmiAgnos.isForge()) {
 			return 1;
 		} else {

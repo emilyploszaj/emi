@@ -193,7 +193,14 @@ public class EmiFavorites {
 		syntheticFavorites.clear();
 		if (BoM.tree != null && BoM.craftingMode) {
 			BoM.tree.calculateCost();
+			Map<EmiIngredient, FlatMaterialCost> originalCosts = Maps.newHashMap(BoM.tree.cost.costs);
 			Map<EmiIngredient, ChanceMaterialCost> chancedCosts = Maps.newHashMap(BoM.tree.cost.chanceCosts);
+			Object2LongMap<EmiRecipe> originalBatches = new Object2LongLinkedOpenHashMap<>();
+			Object2LongMap<EmiRecipe> originalAmounts = new Object2LongLinkedOpenHashMap<>();
+			EmiPlayerInventory emptyInventory = new EmiPlayerInventory(List.of());
+			emptyInventory.inventory.clear();
+			BoM.tree.calculateProgress(emptyInventory);
+			countRecipes(originalBatches, originalAmounts, BoM.tree.goal);
 			BoM.tree.calculateProgress(inv);
 			Object2LongMap<EmiRecipe> batches = new Object2LongLinkedOpenHashMap<>();
 			Object2LongMap<EmiRecipe> amounts = new Object2LongLinkedOpenHashMap<>();
@@ -213,14 +220,14 @@ public class EmiFavorites {
 				} else if (inv.canCraft(recipe)) {
 					state = 1;
 				}
-				syntheticFavorites.add(new EmiFavorite.Synthetic(recipe, batch, amount, state));
+				syntheticFavorites.add(new EmiFavorite.Synthetic(recipe, batch, amount, originalAmounts.getOrDefault(recipe, amount), state));
 			}
 			if (!hasSomething) {
 				BoM.craftingMode = false;
 			} else {
 				for (FlatMaterialCost cost : BoM.tree.cost.costs.values()) {
 					if (cost.amount > 0) {
-						syntheticFavorites.add(new EmiFavorite.Synthetic(cost.ingredient, cost.amount, cost.amount));
+						syntheticFavorites.add(new EmiFavorite.Synthetic(cost.ingredient, cost.amount, originalCosts.getOrDefault(cost.ingredient, cost).amount));
 					}
 				}
 				for (ChanceMaterialCost cost : BoM.tree.cost.chanceCosts.values()) {
