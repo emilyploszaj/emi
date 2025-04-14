@@ -134,7 +134,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 						return;
 					} else {
 						Slot s = crafting.get(i);
-						if (s != null && s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount() && stack.getCount() < stack.getMaxCount()) {
+						if (s != null && s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount() && stack.getCount() <= stack.getMaxCount()) {
 							s.setStack(stack);
 						} else {
 							player.getInventory().offerOrDrop(stack);

@@ -145,6 +145,9 @@ public class EmiSearchWidget extends TextFieldWidget {
 
 	@Override
 	public void setFocused(boolean focused) {
+		if (focused == isFocused) {
+			return;
+		}
 		if (!focused) {
 			searchHistoryIndex = 0;
 			String currentSearch = getText();

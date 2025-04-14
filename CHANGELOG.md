@@ -1,9 +1,9 @@
+### Additions
+* List ingredients can now be serialized (and can be coerced into other ingredients)
+
 ### Tweaks
-* Large amounts are now separated at and easier to read in EMI
-* Synthetic favorites no longer overlap with large counts, now use a microfont and display an approximate value
+* Recipe tree should be more conscious of catalyst ingredients, no longer requesting redundant tag ingredients
+* Empty/full search focus now does not trigger on random inputs
 
 ### Fixes
-* Fixed overlapping digits in synfavs #721
-* Fixed EMI on a server requiring clients to have EMI on NeoForge #889
-* Fixed overlap synfav count #905
-* Fixed recipe fill not respecting maximum stack size #906
+* Recipe fills no longer break when filling max stack size #915
