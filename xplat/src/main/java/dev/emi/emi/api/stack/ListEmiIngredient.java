@@ -106,4 +106,9 @@ public class ListEmiIngredient implements EmiIngredient {
 		tooltip.addAll(ingredients.get(item).copy().setAmount(amount).getTooltip());
 		return tooltip;
 	}
+
+	@ApiStatus.Internal
+	public List<? extends EmiIngredient> getIngredients() {
+		return ingredients;
+	}
 }

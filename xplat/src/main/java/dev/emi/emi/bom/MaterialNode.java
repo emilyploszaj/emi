@@ -19,6 +19,7 @@ public class MaterialNode {
 	public long amount = 1;
 	public long divisor = 1;
 	public long remainderAmount = 0;
+	public boolean catalyst = false;
 	// Should these be decoupled from material nodes?
 	public FoldState state = FoldState.EXPANDED;
 	public ProgressState progress = ProgressState.UNSTARTED;
@@ -33,6 +34,14 @@ public class MaterialNode {
 			this.remainder.setAmount(1);
 		} else {
 			this.remainder = EmiStack.EMPTY;
+		}
+		out: {
+			for (EmiStack stack : ingredient.getEmiStacks()) {
+				if (!stack.getRemainder().equals(stack)) {
+					break out;
+				}
+			}
+			catalyst = true;
 		}
 	}
 

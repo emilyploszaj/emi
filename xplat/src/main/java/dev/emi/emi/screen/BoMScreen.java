@@ -308,7 +308,7 @@ public class BoMScreen extends Screen {
 	}
 
 	public TreeVolume addNewNodes(MaterialNode node, long multiplier, long divisor, int depth, ChanceState chance) {
-		if (TreeCost.isCatalyst(node.ingredient)) {
+		if (node.catalyst) {
 			multiplier = node.amount;
 		} else {
 			multiplier = node.amount * (int) Math.ceil(multiplier / (float) divisor);
