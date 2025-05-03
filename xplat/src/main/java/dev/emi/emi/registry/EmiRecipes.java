@@ -36,6 +36,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.recipe.Recipe;
@@ -71,7 +72,7 @@ public class EmiRecipes {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if (client.world != null) {
 			RecipeManager manager = client.world.getRecipeManager();
-			recipeIds = Maps.newIdentityHashMap();
+			recipeIds = new Reference2ObjectOpenHashMap<>();
 			if (manager != null) {
 				for (RecipeEntry<?> entry : manager.values()) {
 					recipeIds.put(entry.value(), entry.id());
