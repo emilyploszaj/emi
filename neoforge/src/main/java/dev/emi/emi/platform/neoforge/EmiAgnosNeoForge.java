@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import net.minecraft.component.ComponentChanges;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.neoforged.neoforge.client.ClientHooks;
@@ -320,5 +322,12 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	@Override
 	protected BakedModel getBakedTagModelAgnos(Identifier id) {
 		return MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier(id, ModelIdentifier.STANDALONE_VARIANT));
+	}
+
+	@Override
+	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
+		ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
+		enchantedBook.addEnchantment(RegistryEntry.of(enchantment), enchantment.getMaxLevel());
+		return super.isEnchantableAgnos(stack, enchantment) && stack.getItem().isEnchantable(stack) && stack.isBookEnchantable(enchantedBook);
 	}
 }

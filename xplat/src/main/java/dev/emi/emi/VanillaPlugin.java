@@ -520,7 +520,7 @@ public class VanillaPlugin implements EmiPlugin {
 						synthetic("anvil/enchanting", EmiUtil.subId(i) + "/" + EmiUtil.subId(EmiPort.getEnchantmentRegistry().getId(e)) + "/" + max)));
 				};
 				for (Enchantment e : targetedEnchantments) {
-					if (e.isAcceptableItem(defaultStack)) {
+					if (EmiAgnos.isEnchantable(defaultStack, e)) {
 						consumer.accept(e);
 						acceptableEnchantments++;
 					}

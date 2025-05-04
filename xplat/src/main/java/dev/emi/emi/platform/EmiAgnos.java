@@ -12,11 +12,10 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -155,4 +154,12 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract BakedModel getBakedTagModelAgnos(Identifier id);
+
+	public static boolean isEnchantable(ItemStack stack, Enchantment enchantment) {
+		return delegate.isEnchantableAgnos(stack, enchantment);
+	}
+
+	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
+		return enchantment.isAcceptableItem(stack) && stack.isEnchantable();
+	}
 }
