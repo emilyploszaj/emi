@@ -97,6 +97,7 @@ public class EmiRecipeFiller {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends ScreenHandler> @Nullable EmiRecipeHandler<T> getFirstValidHandler(EmiRecipe recipe, HandledScreen<T> screen) {
+		if (screen == null) return null;
 		EmiRecipeHandler<T> ret = null;
 		for (EmiRecipeHandler<T> handler : getAllHandlers(screen)) {
 			if (handler.supportsRecipe(recipe)) {
