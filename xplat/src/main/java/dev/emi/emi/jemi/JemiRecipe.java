@@ -44,7 +44,6 @@ public class JemiRecipe<T> implements EmiRecipe {
 	public Identifier originalId, id;
 	public IRecipeCategory<T> category;
 	public T recipe;
-	public JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 	public boolean allowTree = true;
 
 	public JemiRecipe(EmiRecipeCategory recipeCategory, IRecipeCategory<T> category, T recipe) {
@@ -55,6 +54,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		if (this.originalId != null) {
 			this.id = EmiPort.id("jei", "/" + EmiUtil.subId(this.originalId));
 		}
+		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
 			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
