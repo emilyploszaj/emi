@@ -30,6 +30,7 @@ public class EmiSidebars {
 			case INDEX -> EmiConfig.editMode ? EmiStackList.stacks : EmiStackList.filteredStacks;
 			case CRAFTABLES -> craftables;
 			case FAVORITES -> EmiFavorites.favoriteSidebar;
+			case BOOKMARKS -> EmiBookmarks.bookmarks;
 			case LOOKUP_HISTORY -> lookupHistory;
 			case CRAFT_HISTORY -> craftHistory;
 			case EMPTY -> List.of();

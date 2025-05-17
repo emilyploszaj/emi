@@ -140,4 +140,8 @@ public interface EmiIngredient extends EmiRenderable {
 			return EmiTags.getIngredient(tagType, list.stream().flatMap(i -> i.getEmiStacks().stream()).toList(), amount);
 		}
 	}
+
+	public static EmiIngredient of(String text, List<? extends EmiIngredient> results) {
+		return new SearchEmiIngredient(text, results);
+	}
 }
