@@ -363,6 +363,10 @@ public class EmiConfig {
 	@ConfigValue("binds.clear-search")
 	public static EmiBind clearSearch = new EmiBind("key.emi.clear_search", InputUtil.UNKNOWN_KEY.getCode());
 
+	@Comment("Add current search as a Bookmark")
+	@ConfigValue("binds.add-bookmark")
+	public static EmiBind addBookmark = new EmiBind("key.emi.add_bookmark", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_ENTER);
+
 	@Comment("Display the recipes for creating a stack.")
 	@ConfigValue("binds.view-recipes")
 	public static EmiBind viewRecipes = new EmiBind("key.emi.view_recipes",

@@ -264,6 +264,13 @@ public class EmiRenderHelper {
 		context.pop();
 	}
 
+	public static void renderText(EmiDrawContext context, int x, int y, Text text) {
+		context.push();
+		context.matrices().translate(0, 0, 200);
+		context.drawTextWithShadow(text, x + 1, y + 5, -1);
+		context.pop();
+	}
+
 	public static void renderIngredient(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		RenderSystem.enableDepthTest();
 		context.push();
