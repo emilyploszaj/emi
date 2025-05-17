@@ -14,7 +14,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.common.CommonHooks;
 import org.apache.commons.lang3.text.WordUtils;
 import org.objectweb.asm.Type;
 
@@ -47,7 +46,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
@@ -328,6 +326,6 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
 		ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
 		enchantedBook.addEnchantment(RegistryEntry.of(enchantment), enchantment.getMaxLevel());
-		return super.isEnchantableAgnos(stack, enchantment) && stack.getItem().isEnchantable(stack) && stack.isBookEnchantable(enchantedBook);
+		return super.isEnchantableAgnos(stack, enchantment) && stack.isBookEnchantable(enchantedBook);
 	}
 }

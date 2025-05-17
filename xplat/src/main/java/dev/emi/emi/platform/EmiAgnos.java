@@ -160,6 +160,6 @@ public abstract class EmiAgnos {
 	}
 
 	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
-		return enchantment.isAcceptableItem(stack) && stack.isEnchantable();
+		return enchantment.isAcceptableItem(stack) && stack.isEnchantable() && stack.getItem().isEnchantable(stack);
 	}
 }
