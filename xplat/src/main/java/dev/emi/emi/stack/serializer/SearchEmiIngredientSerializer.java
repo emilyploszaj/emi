@@ -15,7 +15,7 @@ import java.util.List;
 public class SearchEmiIngredientSerializer implements EmiIngredientSerializer<SearchEmiIngredient> {
     @Override
     public String getType() {
-        return "text";
+        return "search";
     }
 
     @Override
@@ -35,7 +35,7 @@ public class SearchEmiIngredientSerializer implements EmiIngredientSerializer<Se
     @Override
     public JsonElement serialize(SearchEmiIngredient stack) {
         JsonObject json = new JsonObject();
-//        json.addProperty("type", getType());
+        json.addProperty("type", getType());
         json.addProperty("content", stack.getContent());
 
         JsonArray results = new JsonArray();
