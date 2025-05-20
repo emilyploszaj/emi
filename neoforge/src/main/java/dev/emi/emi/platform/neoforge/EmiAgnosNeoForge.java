@@ -326,6 +326,6 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
 		ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
 		enchantedBook.addEnchantment(RegistryEntry.of(enchantment), enchantment.getMaxLevel());
-		return super.isEnchantableAgnos(stack, enchantment) && stack.isBookEnchantable(enchantedBook);
+		return stack.isBookEnchantable(enchantedBook);
 	}
 }
