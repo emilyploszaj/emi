@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.runtime.EmiBookmarks;
+import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -20,7 +24,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
@@ -205,6 +208,23 @@ public class EmiSearchWidget extends TextFieldWidget {
 			if (EmiConfig.clearSearch.matchesKey(keyCode, scanCode)) {
 				setText("");
 				return true;
+			}
+			if (EmiConfig.addBookmark.matchesKey(keyCode, scanCode)) {
+				String search = EmiApi.getSearchText();
+				if (!search.isEmpty()) {
+					SidebarPanel panel = EmiScreenManager.getSearchPanel();
+
+					if (panel != null) {
+						List<? extends EmiIngredient> list = panel.space.getStacks();
+
+						// Limit to at most 8 items for the bookmark
+						list = list.subList(0, Math.min(list.size(), 8));
+
+						if (!list.isEmpty()) {
+							EmiBookmarks.addBookmark(search, list);
+						}
+					}
+				}
 			}
 			if ((EmiConfig.focusSearch.matchesKey(keyCode, scanCode)
 					|| keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_ESCAPE)) {

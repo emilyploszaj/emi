@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import dev.emi.emi.bom.BoM;
@@ -18,6 +19,7 @@ public class EmiPersistentData {
 		try {
 			JsonObject json = new JsonObject();
 			json.add("favorites", EmiFavorites.save());
+			json.add("bookmarks", EmiBookmarks.save());
 			EmiSidebars.save(json);
 			json.add("recipe_defaults", BoM.saveAdded());
 			json.add("hidden_stacks", EmiHidden.save());
@@ -37,6 +39,9 @@ public class EmiPersistentData {
 			JsonObject json = GSON.fromJson(new FileReader(FILE), JsonObject.class);
 			if (JsonHelper.hasArray(json, "favorites")) {
 				EmiFavorites.load(JsonHelper.getArray(json, "favorites"));
+			}
+			if (JsonHelper.hasArray(json, "bookmarks")) {
+				EmiBookmarks.load(JsonHelper.getArray(json, "bookmarks"));
 			}
 			EmiSidebars.load(json);
 			if (JsonHelper.hasJsonObject(json, "recipe_defaults")) {
