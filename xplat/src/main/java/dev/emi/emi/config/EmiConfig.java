@@ -49,7 +49,7 @@ public class EmiConfig {
 
 	@Comment("Whether cheating in items is enabled.")
 	@ConfigValue("general.cheat-mode")
-	public static boolean cheatMode = false;
+	public static CheatMode cheatMode = CheatMode.CREATIVE_ONLY;
 
 	@Comment("How much EMI should use tooltips and popups to show controls and information.")
 	@ConfigValue("general.help-level")
