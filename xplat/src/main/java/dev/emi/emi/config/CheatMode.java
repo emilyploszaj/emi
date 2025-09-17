@@ -7,10 +7,10 @@ import net.minecraft.text.Text;
 public enum CheatMode implements ConfigEnum {
     ALWAYS("always"),
     NEVER("never"),
-    CREATIVE_ONLY("creative_only")
+    CREATIVE("creative")
     ;
 
-    public final String name;
+    private final String name;
 
     CheatMode(String name) {
         this.name = name;
@@ -27,16 +27,10 @@ public enum CheatMode implements ConfigEnum {
     }
 
     public boolean isEnabled(MinecraftClient client) {
-        switch (this) {
-            case ALWAYS -> {
-                return true;
-            }
-            case CREATIVE_ONLY -> {
-                return client.player == null || client.player.isInCreativeMode();
-            }
-            default -> {
-                return false;
-            }
-        }
+        return switch (this) {
+            case ALWAYS -> true;
+            case CREATIVE -> client.player == null || client.player.isInCreativeMode();
+            case NEVER -> false;
+        };
     }
 }
