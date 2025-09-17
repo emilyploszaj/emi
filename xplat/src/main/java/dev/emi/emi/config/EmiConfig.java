@@ -47,6 +47,7 @@ public class EmiConfig {
 	@ConfigValue("general.enabled")
 	public static boolean enabled = true;
 
+	/** Use {@link dev.emi.emi.api.EmiApi#isCheatMode EmiApi.isCheatMode()} to get the boolean value. */
 	@Comment("Whether cheating in items is enabled.")
 	@ConfigValue("general.cheat-mode")
 	public static CheatMode cheatMode = CheatMode.CREATIVE;

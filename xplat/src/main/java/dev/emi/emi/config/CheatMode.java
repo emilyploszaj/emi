@@ -1,7 +1,6 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
 public enum CheatMode implements ConfigEnum {
@@ -24,13 +23,5 @@ public enum CheatMode implements ConfigEnum {
     @Override
     public Text getText() {
         return EmiPort.translatable("emi.cheat_mode." + name.replace("-", "_"));
-    }
-
-    public boolean isEnabled(MinecraftClient client) {
-        return switch (this) {
-            case ALWAYS -> true;
-            case CREATIVE -> client.player == null || client.player.isInCreativeMode();
-            case NEVER -> false;
-        };
     }
 }
