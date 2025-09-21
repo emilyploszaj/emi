@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.component.ComponentChanges;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
@@ -1361,11 +1362,8 @@ public class EmiScreenManager {
 			return true;
 		} else {
 			if (!is.isEmpty()) {
-				Identifier id = EmiPort.getItemRegistry().getId(is.getItem());
-				String command = "give @s " + id;
-				if (is.getComponentChanges() != ComponentChanges.EMPTY) {
-					command += is.getComponentChanges().toString();
-				}
+				ItemStackArgument argument = new ItemStackArgument(is.getRegistryEntry(), is.getComponentChanges());
+				String command = "give @s " + argument.asString(client.world.getRegistryManager());
 				command += " " + amount;
 				if (command.length() < 256) {
 					client.player.networkHandler.sendChatCommand(command);
