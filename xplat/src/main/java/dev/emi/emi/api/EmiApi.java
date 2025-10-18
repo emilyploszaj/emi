@@ -35,6 +35,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 
 public class EmiApi {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -123,7 +130,7 @@ public class EmiApi {
 	public static void displayRecipe(EmiRecipe recipe) {
 		setPages(Map.of(recipe.getCategory(), List.of(recipe)), EmiStack.EMPTY);
 	}
-	
+
 	public static void displayRecipes(EmiIngredient stack) {
 		if (stack instanceof EmiFavorite fav) {
 			stack = fav.getStack();
@@ -152,6 +159,68 @@ public class EmiApi {
 						pruneUses(getRecipeManager().getRecipesByInput(zero), stack).stream(),
 						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
 			setPages(map, stack);
+		}
+	}
+
+	/**
+	 * Looks inside the currently open container and attempts to pull a matching item
+	 * into the player's inventory.
+	 * @param stack The item to search for and pull
+	 */
+	public static void pullItem(EmiIngredient stack) {
+		if (stack.isEmpty() || !(stack instanceof EmiFavorite)) return;
+
+		long toPull = 1;
+		if (stack instanceof EmiFavorite.Synthetic synthetic) {
+			toPull = synthetic.amount;
+		}
+
+		HandledScreen<?> screen = EmiApi.getHandledScreen();
+		ScreenHandler screenHandler = screen.getScreenHandler();
+
+		MinecraftClient client = MinecraftClient.getInstance();
+		ClientPlayerInteractionManager manager = client.interactionManager;
+		PlayerEntity player = client.player;
+
+		for (EmiStack emiStack : stack.getEmiStacks()) {
+
+			// Sweep through all the non-player inventory slots
+			for (Slot inventorySlot : screenHandler.slots) {
+				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack()) continue;
+				if (!ItemStack.areItemsEqual(emiStack.getItemStack(), inventorySlot.getStack())) continue;
+
+				ItemStack fromStack = inventorySlot.getStack().copy();
+
+				// And attempt to smoosh it into the player inventory
+				// Two loops, once to check combinable slots, then empty slots, to keep the player inventory tidy
+				for (int i = 0; i < 2; i++) {
+					for (Slot playerSlot : screenHandler.slots) {
+						if (!(playerSlot.inventory instanceof PlayerInventory)) continue;
+
+						if (i == 0 && !ItemStack.areItemsAndComponentsEqual(fromStack, playerSlot.getStack())) continue;
+						if (i == 1 && playerSlot.hasStack()) continue;
+
+						manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+
+						if (fromStack.getCount() <= toPull) {
+							toPull -= fromStack.getCount();
+							manager.clickSlot(screenHandler.syncId, playerSlot.id, 0, SlotActionType.PICKUP, player);
+						} else {
+							while (toPull > 0) {
+								manager.clickSlot(screenHandler.syncId, playerSlot.id, 1, SlotActionType.PICKUP, player);
+								toPull--;
+							}
+
+							// put that thing back where it came from, or so help me...!
+							manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+						}
+
+						if (toPull == 0) return;
+
+						break;
+					}
+				}
+			}
 		}
 	}
 

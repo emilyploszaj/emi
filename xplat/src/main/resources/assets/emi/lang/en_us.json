@@ -8,6 +8,7 @@
   "key.emi.clear_search": "Clear Search",
   "key.emi.view_recipes": "View Recipes",
   "key.emi.view_uses": "View Uses",
+  "key.emi.pull_item": "Pull Item",
   "key.emi.favorite": "Favorite",
   "key.emi.set_default": "Set Default",
   "key.emi.default_stack": "Default Stack",
@@ -262,7 +263,7 @@
   "tooltip.emi.bom.mode.view": "§6Viewing§r recipe tree",
   "tooltip.emi.bom.mode.craft": "§6Crafting§r recipe tree\nProgress will be shown in recipe tree\n§bSynthetic favorites§r added to sidebar",
   "tooltip.emi.bom.help": "The recipe tree shows the process and base cost of a recipe\nThe display can be panned and zoomed\n\nLeft click a node to choose a recipe to assign to it\nHold §6[shift]§r to automatically pick based on your inventory\n\nRight click a recipe node to fold it temporarily\nHold §6[shift]§r to clear the recipe\n\nThe initial tree state is controlled by default recipes\nA button next to recipes can set default recipe preferences\n\nThe toggle by total cost can be used to help craft a recipe tree\nWhile crafting, materials that need to be collected will be displayed\n§bSynthetic favorites§r will be added to the favorites sidebar that\nwill show incomplete steps and can be used to craft",
-  
+
   "tooltip.emi.fluid_interaction.basalt.soul_soil": "Below lava",
   "tooltip.emi.fluid_interaction.basalt.blue_ice": "Adjacent to lava",
 
@@ -326,7 +327,7 @@
   "emi.category.emi.fuel": "Fuel",
   "emi.category.emi.composting": "Composting",
   "emi.category.emi.info": "Info",
-  
+
   "emi.category.emi.tag": "Tags",
   "emi.category.emi.ingredient": "Ingredients",
 
@@ -528,7 +529,7 @@
   "tag.item.c.ores_in_ground.stone": "Stone Ores",
   "tag.item.c.ores_in_ground.deepslate": "Deepslate Ores",
   "tag.item.c.ores_in_ground.netherrack": "Netherrack Ores",
-  
+
   "tag.item.c.chest": "Chests",
   "tag.item.c.coal": "Coals",
   "tag.item.c.sand": "Sands",

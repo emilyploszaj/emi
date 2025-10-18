@@ -868,7 +868,7 @@ public class EmiScreenManager {
 			for (EmiFavorite.Synthetic fav : syntheticFavorites) {
 				synfavs.addAll(fav.getEmiStacks());
 			}
-			
+
 			try {
 				HandledScreen<?> hs = EmiApi.getHandledScreen();
 				for (EmiRecipeHandler handler : EmiRecipeFiller.getAllHandlers(hs)) {
@@ -1241,6 +1241,9 @@ public class EmiScreenManager {
 			} else if (function.apply(EmiConfig.viewUses)) {
 				EmiApi.displayUses(ingredient);
 				return true;
+			} else if (function.apply(EmiConfig.pullItem)) {
+				EmiApi.pullItem(ingredient);
+				return true;
 			} else if (function.apply(EmiConfig.favorite)) {
 				EmiFavorites.addFavorite(ingredient, stack.getRecipeContext());
 				repopulatePanels(SidebarType.FAVORITES);
@@ -1373,7 +1376,7 @@ public class EmiScreenManager {
 			return false;
 		}
 	}
-	
+
 	private static boolean deleteCursor(int mx, int my) {
 		if (client.currentScreen instanceof HandledScreen<?> handled) {
 			ItemStack cursor = handled.getScreenHandler().getCursorStack();

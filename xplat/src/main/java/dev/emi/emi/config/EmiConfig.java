@@ -206,7 +206,7 @@ public class EmiConfig {
 	@ConfigValue("ui.left-sidebar-subpanels")
 	public static SidebarSubpanels leftSidebarSubpanels = new SidebarSubpanels(List.of(
 	), SidebarSettings.LEFT);
-	
+
 	@Comment("How many columns and rows of ingredients to limit the left sidebar to")
 	@ConfigValue("ui.left-sidebar-size")
 	public static IntGroup leftSidebarSize = new IntGroup(
@@ -226,7 +226,7 @@ public class EmiConfig {
 	@Comment("Whether to render the header buttons and page count for the left sidebar")
 	@ConfigValue("ui.left-sidebar-header")
 	public static HeaderType leftSidebarHeader = HeaderType.VISIBLE;
-	
+
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the left sidebar")
 	@ConfigValue("ui.left-sidebar-theme")
@@ -267,7 +267,7 @@ public class EmiConfig {
 	@Comment("Whether to render the header buttons and page count for the right sidebar")
 	@ConfigValue("ui.right-sidebar-header")
 	public static HeaderType rightSidebarHeader = HeaderType.VISIBLE;
-	
+
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the right sidebar")
 	@ConfigValue("ui.right-sidebar-theme")
@@ -305,7 +305,7 @@ public class EmiConfig {
 	@Comment("Whether to render the header buttons and page count for the top sidebar")
 	@ConfigValue("ui.top-sidebar-header")
 	public static HeaderType topSidebarHeader = HeaderType.VISIBLE;
-	
+
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the top sidebar")
 	@ConfigValue("ui.top-sidebar-theme")
@@ -343,7 +343,7 @@ public class EmiConfig {
 	@Comment("Whether to render the header buttons and page count for the bottom sidebar")
 	@ConfigValue("ui.bottom-sidebar-header")
 	public static HeaderType bottomSidebarHeader = HeaderType.VISIBLE;
-	
+
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the bottom sidebar")
 	@ConfigValue("ui.bottom-sidebar-theme")
@@ -378,6 +378,10 @@ public class EmiConfig {
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
 
+	@Comment("Pull the stack from any currently open inventory that contains it.")
+	@ConfigValue("binds.pull-item")
+	public static EmiBind pullItem = new EmiBind("key.emi.pull_item", GLFW.GLFW_KEY_V);
+
 	@Comment("Set the default recipe for a given stack in the output of a recipe to that recipe.")
 	@ConfigValue("binds.default-stack")
 	public static EmiBind defaultStack = new EmiBind("key.emi.default_stack",
@@ -409,7 +413,7 @@ public class EmiConfig {
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for as many results as possible.")
 	@ConfigValue("binds.craft-all")
-	public static EmiBind craftAll = new EmiBind("key.emi.craft_all", 
+	public static EmiBind craftAll = new EmiBind("key.emi.craft_all",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.SHIFT_MASK));
 
 	@Comment("When on a stack with an associated recipe:\n"
@@ -425,7 +429,7 @@ public class EmiConfig {
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result and put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
-	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
+	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
 
 	@ConfigGroupEnd
@@ -443,16 +447,16 @@ public class EmiConfig {
 	@ConfigValue("binds.cheat-stack-to-inventory")
 	public static EmiBind cheatStackToInventory = new EmiBind("key.emi.cheat_stack_to_inventory",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
-	
+
 	@Comment("Cheat in one of an item into the cursor.")
 	@ConfigValue("binds.cheat-one-to-cursor")
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiInput.CONTROL_MASK));
-	
+
 	@Comment("Cheat in a stack of an item into the cursor.")
 	@ConfigValue("binds.cheat-stack-to-cursor")
 	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
-	
+
 	@ConfigGroupEnd
 	@Comment("Delete the stack in the cursor when hovering the index")
 	@ConfigValue("binds.delete-cursor-stack")
@@ -472,7 +476,7 @@ public class EmiConfig {
 	@ConfigValue("binds.hide-stack-by-id")
 	public static EmiBind hideStackById = new EmiBind("key.emi.hide_stack_by_id",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK | EmiInput.SHIFT_MASK));
-	
+
 	// Dev
 	@Comment("Whether development functions should be enabled. Not recommended for general play.")
 	@ConfigValue("dev.dev-mode")
@@ -819,7 +823,7 @@ public class EmiConfig {
 		}
 		DEFAULT_CONFIG = getSavedConfig();
 	}
-	
+
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface ConfigValue {
@@ -831,19 +835,19 @@ public class EmiConfig {
 	public static @interface ConfigFilter {
 		public String value();
 	}
-	
+
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Comment {
 		public String value();
 	}
-	
+
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface ConfigGroup {
 		public String value();
 	}
-	
+
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface ConfigGroupEnd {
