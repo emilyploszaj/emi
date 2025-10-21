@@ -24,6 +24,7 @@ import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiRegistryImpl;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.registry.EmiStackProviders;
+import dev.emi.emi.registry.EmiStackPullers;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
@@ -76,7 +77,7 @@ public class EmiReloadManager {
 			}
 		}
 	}
-	
+
 	public static void reload() {
 		synchronized (EmiReloadManager.class) {
 			step(EmiPort.literal("Starting Reload"));
@@ -109,7 +110,7 @@ public class EmiReloadManager {
 	public static int getStatus() {
 		return status;
 	}
-	
+
 	private static class ReloadWorker implements Runnable {
 
 		@Override
@@ -130,6 +131,7 @@ public class EmiReloadManager {
 					EmiExclusionAreas.clear();
 					EmiDragDropHandlers.clear();
 					EmiStackProviders.clear();
+					EmiStackPullers.clear();
 					EmiRecipeFiller.clear();
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();
@@ -149,7 +151,7 @@ public class EmiReloadManager {
 					List<EmiPluginContainer> plugins = Lists.newArrayList();
 					plugins.addAll(EmiAgnos.getPlugins().stream()
 						.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList());
-					
+
 					if (EmiAgnos.isModLoaded("jei")) {
 						plugins.add(new EmiPluginContainer(new JemiPlugin(), "jemi"));
 					}
@@ -180,7 +182,7 @@ public class EmiReloadManager {
 						continue;
 					}
 					EmiRegistry registry = new EmiRegistryImpl();
-					
+
 					for (EmiPluginContainer container : plugins) {
 						step(EmiPort.literal("Loading plugin from " + container.id()), 10_000);
 						long start = System.currentTimeMillis();

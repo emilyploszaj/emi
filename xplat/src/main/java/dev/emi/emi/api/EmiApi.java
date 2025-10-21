@@ -25,6 +25,7 @@ import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.registry.EmiStackPullers;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.runtime.EmiSidebars;
@@ -175,53 +176,72 @@ public class EmiApi {
 			toPull = synthetic.amount;
 		}
 
-		HandledScreen<?> screen = EmiApi.getHandledScreen();
-		ScreenHandler screenHandler = screen.getScreenHandler();
-
 		MinecraftClient client = MinecraftClient.getInstance();
 		ClientPlayerInteractionManager manager = client.interactionManager;
 		PlayerEntity player = client.player;
+		ScreenHandler screenHandler = player.currentScreenHandler;
 
-		for (EmiStack emiStack : stack.getEmiStacks()) {
+		List<ItemStack> searchStacks = stack.getEmiStacks().stream().map(s -> s.getItemStack()).collect(Collectors.toList());
+
+		// Attempt to pull using any registered custom pullers, and stop on a successful pull
+		if (EmiStackPullers.attemptPull(screenHandler, searchStacks, toPull)) return;
+
+		for (ItemStack searchStack : searchStacks) {
 
 			// Sweep through all the non-player inventory slots
 			for (Slot inventorySlot : screenHandler.slots) {
-				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack()) continue;
-				if (!ItemStack.areItemsEqual(emiStack.getItemStack(), inventorySlot.getStack())) continue;
+				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack() || !inventorySlot.canTakeItems(player)) continue;
+				if (!ItemStack.areItemsEqual(searchStack, inventorySlot.getStack())) continue;
 
 				ItemStack fromStack = inventorySlot.getStack().copy();
+				int remaining = fromStack.getCount();
 
 				// And attempt to smoosh it into the player inventory
-				// Two loops, once to check combinable slots, then empty slots, to keep the player inventory tidy
-				for (int i = 0; i < 2; i++) {
-					for (Slot playerSlot : screenHandler.slots) {
-						if (!(playerSlot.inventory instanceof PlayerInventory)) continue;
+				for (Slot playerSlot : getQuickMoveDestinationSlots(screenHandler.slots, fromStack)) {
+					if (playerSlot.hasStack() && !ItemStack.areItemsAndComponentsEqual(fromStack, playerSlot.getStack())) continue;
 
-						if (i == 0 && !ItemStack.areItemsAndComponentsEqual(fromStack, playerSlot.getStack())) continue;
-						if (i == 1 && playerSlot.hasStack()) continue;
+					ItemStack playerStack = playerSlot.getStack();
 
-						manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+					int maxTransfer = fromStack.getMaxCount() - playerStack.getCount();
+					int amountToTransfer = (int) Math.min(maxTransfer, toPull);
 
-						if (fromStack.getCount() <= toPull) {
-							toPull -= fromStack.getCount();
-							manager.clickSlot(screenHandler.syncId, playerSlot.id, 0, SlotActionType.PICKUP, player);
-						} else {
-							while (toPull > 0) {
-								manager.clickSlot(screenHandler.syncId, playerSlot.id, 1, SlotActionType.PICKUP, player);
-								toPull--;
-							}
+					manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
 
-							// put that thing back where it came from, or so help me...!
-							manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+					if (remaining <= amountToTransfer) {
+						manager.clickSlot(screenHandler.syncId, playerSlot.id, 0, SlotActionType.PICKUP, player);
+						toPull -= remaining;
+						remaining = 0;
+					} else {
+						while (amountToTransfer > 0) {
+							manager.clickSlot(screenHandler.syncId, playerSlot.id, 1, SlotActionType.PICKUP, player);
+							toPull--;
+
+							amountToTransfer--;
+							remaining--;
 						}
 
-						if (toPull == 0) return;
-
-						break;
+						// put that thing back where it came from, or so help me...!
+						manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
 					}
+
+					if (toPull <= 0) return;
+					if (remaining <= 0) break;
 				}
 			}
 		}
+	}
+
+	private static List<Slot> getQuickMoveDestinationSlots(List<Slot> slots, ItemStack stackToMove) {
+		List<Slot> destinationSlots = Lists.newArrayList();
+		for (Slot candidateSlot : slots) {
+			if (candidateSlot.inventory instanceof PlayerInventory && candidateSlot.canInsert(stackToMove)) {
+				destinationSlots.add(candidateSlot);
+			}
+		}
+
+		// Sort such that we fill existing stacks first where possible
+		destinationSlots.sort((a, b) -> Boolean.compare(b.hasStack(), a.hasStack()));
+		return destinationSlots;
 	}
 
 	public static void viewRecipeTree() {
