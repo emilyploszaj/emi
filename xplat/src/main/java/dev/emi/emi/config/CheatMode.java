@@ -4,8 +4,8 @@ import dev.emi.emi.EmiPort;
 import net.minecraft.text.Text;
 
 public enum CheatMode implements ConfigEnum {
-    ALWAYS("always"),
-    NEVER("never"),
+    TRUE("true"),
+    FALSE("false"),
     CREATIVE("creative")
     ;
 

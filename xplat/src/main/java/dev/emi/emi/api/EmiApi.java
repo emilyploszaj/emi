@@ -49,9 +49,9 @@ public class EmiApi {
 
 	public static boolean isCheatMode() {
 		return switch (EmiConfig.cheatMode) {
-			case ALWAYS -> true;
+			case TRUE -> true;
 			case CREATIVE -> client.player == null || client.player.isInCreativeMode();
-			case NEVER -> false;
+			case FALSE -> false;
 		};
 	}
 
