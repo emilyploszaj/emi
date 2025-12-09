@@ -121,9 +121,13 @@ public class EmiScreenManager {
 	private static double scrollAcc = 0;
 
 	public static EmiSearchWidget search = new EmiSearchWidget(client.textRenderer, 0, 0, 160, 18);
-	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 0,
-			() -> true, (w) -> client.setScreen(new ConfigScreen(client.currentScreen)),
-			List.of(EmiPort.translatable("tooltip.emi.config", EmiRenderHelper.getEmiText())));
+	public static SizedButtonWidget emi = new SizedButtonWidget(0, 0, 20, 20, 204, 0, () -> true, (w) -> {
+        if(Screen.hasControlDown()) {
+            EmiConfig.cheatMode = !EmiApi.isCheatMode();
+        } else {
+            client.setScreen(new ConfigScreen(client.currentScreen));
+        }
+        }, List.of(EmiPort.translatable("tooltip.emi.config", EmiRenderHelper.getEmiText())));
 	public static SizedButtonWidget tree = new SizedButtonWidget(0, 0, 20, 20, 184, 0,
 			() -> true, (w) -> EmiApi.viewRecipeTree(),
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
@@ -865,7 +869,7 @@ public class EmiScreenManager {
 			for (EmiFavorite.Synthetic fav : syntheticFavorites) {
 				synfavs.addAll(fav.getEmiStacks());
 			}
-			
+
 			try {
 				HandledScreen<?> hs = EmiApi.getHandledScreen();
 				for (EmiRecipeHandler handler : EmiRecipeFiller.getAllHandlers(hs)) {
