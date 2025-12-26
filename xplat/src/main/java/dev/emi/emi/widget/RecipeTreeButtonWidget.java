@@ -3,9 +3,13 @@ package dev.emi.emi.widget;
 import java.util.List;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
+import dev.emi.emi.input.EmiInput;
+import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 public class RecipeTreeButtonWidget extends RecipeButtonWidget {
@@ -17,7 +21,7 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 	@Override
 	public int getTextureOffset(int mouseX, int mouseY) {
 		int v = super.getTextureOffset(mouseX, mouseY);
-		if (BoM.tree != null && BoM.tree.goal.recipe == recipe) {
+		if (BoM.getTree() != null && BoM.getTree().goal.recipe == recipe) {
 			v += 36;
 		}
 		return v;
@@ -30,9 +34,22 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 
 	@Override
 	public boolean mouseClicked(int mouseX, int mouseY, int button) {
-		BoM.setGoal(recipe);
+		if (EmiInput.isShiftDown()) {
+			BoM.addGoal(recipe);
+		} else {
+			BoM.setGoal(recipe);
+		}
 		this.playButtonSound();
 		EmiApi.viewRecipeTree();
 		return true;
+	}
+
+ 	@Override
+ 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+		EmiDrawContext context = EmiDrawContext.wrap(raw);
+		context.resetColor();
+		int u = EmiInput.isShiftDown() ? 24 : this.u;
+		int v = this.v + getTextureOffset(mouseX, mouseY);
+		context.drawTexture(EmiRenderHelper.BUTTONS, x, y, 12, 12, u, v, 12, 12, 256, 256);
 	}
 }

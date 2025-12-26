@@ -23,8 +23,10 @@ public class ResolutionButtonWidget extends ButtonWidget {
 
 	public ResolutionButtonWidget(int x, int y, int width, int height, EmiIngredient stack, Supplier<Widget> hoveredWidget) {
 		super(x, y, width, height, EmiPort.literal(""), button -> {
-			BoM.tree.addResolution(stack, null);
-			EmiHistory.pop();
+			if (BoM.getTree() != null) {
+				BoM.addResolution(stack, null);
+				EmiHistory.pop();
+			}
 		}, s -> s.get());
 		this.stack = stack;
 		this.hoveredWidget = hoveredWidget;

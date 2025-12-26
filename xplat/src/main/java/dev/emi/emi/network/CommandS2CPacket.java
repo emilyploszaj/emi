@@ -52,9 +52,9 @@ public class CommandS2CPacket implements EmiPacket {
 			}
 		} else if (type == EmiCommands.TREE_RESOLUTION) {
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
-			if (recipe != null && BoM.tree != null) {
+			if (recipe != null && BoM.getTree() != null) {
 				for (EmiStack stack : recipe.getOutputs()) {
-					BoM.tree.addResolution(stack, recipe);
+					BoM.addResolution(stack, recipe);
 				}
 			}
 		}

@@ -22,7 +22,9 @@ import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.bom.ChanceMaterialCost;
 import dev.emi.emi.bom.FlatMaterialCost;
+import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.MaterialNode;
+import dev.emi.emi.bom.TreeCost;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.util.Identifier;
@@ -191,20 +193,32 @@ public class EmiFavorites {
 
 	public static void updateSynthetic(EmiPlayerInventory inv) {
 		syntheticFavorites.clear();
-		if (BoM.tree != null && BoM.craftingMode) {
-			BoM.tree.calculateCost();
-			Map<EmiIngredient, FlatMaterialCost> originalCosts = Maps.newHashMap(BoM.tree.cost.costs);
-			Map<EmiIngredient, ChanceMaterialCost> chancedCosts = Maps.newHashMap(BoM.tree.cost.chanceCosts);
+		List<MaterialTree> trees = BoM.getTrees();
+		if (!trees.isEmpty() && BoM.craftingMode) {
+			TreeCost originalCost = new TreeCost();
+			for (MaterialTree tree : trees) {
+				tree.calculateCost();
+				originalCost.merge(tree.cost);
+			}
+			Map<EmiIngredient, FlatMaterialCost> originalCosts = Maps.newHashMap(originalCost.costs);
+			Map<EmiIngredient, ChanceMaterialCost> chancedCosts = Maps.newHashMap(originalCost.chanceCosts);
 			Object2LongMap<EmiRecipe> originalBatches = new Object2LongLinkedOpenHashMap<>();
 			Object2LongMap<EmiRecipe> originalAmounts = new Object2LongLinkedOpenHashMap<>();
 			EmiPlayerInventory emptyInventory = new EmiPlayerInventory(List.of());
 			emptyInventory.inventory.clear();
-			BoM.tree.calculateProgress(emptyInventory);
-			countRecipes(originalBatches, originalAmounts, BoM.tree.goal);
-			BoM.tree.calculateProgress(inv);
+			for (MaterialTree tree : trees) {
+				tree.calculateProgress(emptyInventory);
+				countRecipes(originalBatches, originalAmounts, tree.goal);
+			}
+			TreeCost remainingCost = new TreeCost();
 			Object2LongMap<EmiRecipe> batches = new Object2LongLinkedOpenHashMap<>();
 			Object2LongMap<EmiRecipe> amounts = new Object2LongLinkedOpenHashMap<>();
-			countRecipes(batches, amounts, BoM.tree.goal);
+			for (MaterialTree tree : trees) {
+				tree.calculateProgress(inv);
+				countRecipes(batches, amounts, tree.goal);
+				remainingCost.merge(tree.cost);
+			}
+			BoM.calculateCombinedCosts(inv);
 			boolean hasSomething = false;
 			for (Object2LongMap.Entry<EmiRecipe> entry : batches.object2LongEntrySet()) {
 				EmiRecipe recipe = entry.getKey();
@@ -225,12 +239,12 @@ public class EmiFavorites {
 			if (!hasSomething) {
 				BoM.craftingMode = false;
 			} else {
-				for (FlatMaterialCost cost : BoM.tree.cost.costs.values()) {
+				for (FlatMaterialCost cost : remainingCost.costs.values()) {
 					if (cost.amount > 0) {
 						syntheticFavorites.add(new EmiFavorite.Synthetic(cost.ingredient, cost.amount, originalCosts.getOrDefault(cost.ingredient, cost).amount));
 					}
 				}
-				for (ChanceMaterialCost cost : BoM.tree.cost.chanceCosts.values()) {
+				for (ChanceMaterialCost cost : remainingCost.chanceCosts.values()) {
 					if (cost.getEffectiveAmount() > 0) {
 						long needed = cost.getEffectiveAmount();
 						if (chancedCosts.containsKey(cost.ingredient)) {

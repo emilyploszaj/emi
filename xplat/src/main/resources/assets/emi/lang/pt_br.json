@@ -339,8 +339,10 @@
   "tooltip.emi.synfav.craft_some": "Pressione %s para fabricar o máximo possível",
   "tooltip.emi.synfav.craft_all": "Pressione %s para fabricar todos os §9%s§r lotes",
 
-  "tooltip.emi.bom.batch_size": "Tamanho do lote: %s\nRole para ajustar\nSegure §6[shift]§r para ajustar em 16",
+  "tooltip.emi.bom.batch_size": "Tamanho do lote: %s\nRole para ajustar\nSegure §6[Shift]§r para ajustar em 16",
   "tooltip.emi.bom.batch_size.ideal": "Pressione %s para minimizar sobras",
+  "tooltip.emi.bom.batch_size.multiply": "Segure §6[Ctrl]§r para adicionar multiplicador",
+  "tooltip.emi.bom.batch_size.all": "Segure §6[Alt]§r para aplicar a todos os itens raiz",
   "tooltip.emi.bom.mode.view": "§6Visualizando§r árvore de receitas",
   "tooltip.emi.bom.mode.craft": "§6Criando§r árvore de receitas\nO progresso será mostrado na árvore de receitas\n§bFavoritos sintéticos§r adicionados à barra lateral",
   "tooltip.emi.bom.help": "A Árvore de Receitas mostra o processo e o custo base de criação de uma receita.\nA exibição da Árvore pode ser movida e ampliada.\n\nClique com o botão esquerdo em um nó para atribuir uma receita a ele.\nSegure §6[shift]§r para escolher automaticamente com base no seu inventário.\n\nClique com o botão direito em um nó de receita para o minimizar temporariamente.\nSegure §6[shift]§r para ocultar a receita.\n\nO estado inicial da árvore é controlado por receitas padrão.\nUse o botão ao lado das receitas para definir preferências de receita padrão.\n\nA mudança por custo total pode ser utilizada para ajudar a criar uma árvore de receitas.\nDurante a fabricação, os materiais que precisam ser coletados serão exibidos.\n§bFavoritos sintéticos§r serão adicionados à barra lateral de favoritos,\nmostrando etapas incompletas e podendo ser usados para fabricar.",

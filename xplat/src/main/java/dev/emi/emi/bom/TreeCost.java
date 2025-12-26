@@ -17,19 +17,61 @@ public class TreeCost {
 	public Map<EmiStack, FlatMaterialCost> remainders = Maps.newHashMap();
 	public Map<EmiStack, ChanceMaterialCost> chanceRemainders = Maps.newHashMap();
 
-	public void calculate(MaterialNode node, long batches) {
+	public void clear() {
 		costs.clear();
 		chanceCosts.clear();
 		remainders.clear();
 		chanceRemainders.clear();
+	}
+
+	public void merge(TreeCost other) {
+		for (FlatMaterialCost cost : other.costs.values()) {
+			FlatMaterialCost existing = costs.get(cost.ingredient);
+			if (existing == null) {
+				costs.put(cost.ingredient, new FlatMaterialCost(cost.ingredient, cost.amount));
+			} else {
+				existing.amount += cost.amount;
+			}
+		}
+		for (ChanceMaterialCost cost : other.chanceCosts.values()) {
+			ChanceMaterialCost existing = chanceCosts.get(cost.ingredient);
+			if (existing == null) {
+				existing = new ChanceMaterialCost(cost.ingredient, cost.amount, cost.chance);
+				chanceCosts.put(cost.ingredient, existing);
+			} else {
+				existing.merge(cost.amount, cost.chance);
+			}
+			existing.minBatch(cost.minBatch);
+		}
+		for (FlatMaterialCost remainder : other.remainders.values()) {
+			EmiStack key = (EmiStack) remainder.ingredient;
+			FlatMaterialCost existing = remainders.get(key);
+			if (existing == null) {
+				remainders.put(key, new FlatMaterialCost(key, remainder.amount));
+			} else {
+				existing.amount += remainder.amount;
+			}
+		}
+		for (ChanceMaterialCost remainder : other.chanceRemainders.values()) {
+			EmiStack key = (EmiStack) remainder.ingredient;
+			ChanceMaterialCost existing = chanceRemainders.get(key);
+			if (existing == null) {
+				existing = new ChanceMaterialCost(key, remainder.amount, remainder.chance);
+				chanceRemainders.put(key, existing);
+			} else {
+				existing.merge(remainder.amount, remainder.chance);
+			}
+			existing.minBatch(remainder.minBatch);
+		}
+	}
+
+	public void calculate(MaterialNode node, long batches) {
+		clear();
 		calculateCost(node, batches * node.amount, ChanceState.DEFAULT, false);
 	}
 
 	public void calculateProgress(MaterialNode node, long batches, EmiPlayerInventory inventory) {
-		costs.clear();
-		chanceCosts.clear();
-		remainders.clear();
-		chanceRemainders.clear();
+		clear();
 		for (EmiStack stack : inventory.inventory.values()) {
 			stack = stack.copy();
 			remainders.put(stack, new FlatMaterialCost(stack, stack.getAmount()));

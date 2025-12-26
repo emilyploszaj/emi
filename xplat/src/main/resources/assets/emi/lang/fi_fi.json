@@ -226,8 +226,10 @@
     "tooltip.emi.synfav.craft_some": "Valmista mahdollisimman monta erää painamalla %s",
     "tooltip.emi.synfav.craft_all": "Valmista kaikki §9%2$s§r erää painamalla %1$s",
   
-    "tooltip.emi.bom.batch_size": "Erän koko: %s\nSäädä vierittämällä\nSäädä 16 kerralla pitämällä pohjassa §6[shift]§r-näppäintä",
+    "tooltip.emi.bom.batch_size": "Erän koko: %s\nSäädä vierittämällä\nSäädä 16 kerralla pitämällä pohjassa §6[Shift]§r-näppäintä",
     "tooltip.emi.bom.batch_size.ideal": "Hanki vähäisimmät ylijäämät painamalla %s",
+    "tooltip.emi.bom.batch_size.multiply": "Pidä §6[Ctrl]§r lisätäksesi kertoimen",
+    "tooltip.emi.bom.batch_size.all": "Pidä §6[Alt]§r käyttääksesi kaikkiin juurituotteisiin",
     "tooltip.emi.bom.mode.view": "§6Katsotaan§r reseptipuuta",
     "tooltip.emi.bom.mode.craft": "§6Valmistetaan§r reseptipuuta\nEdistyminen näkyy reseptipuussa\n§bSynteettiset suosikit§r lisätty sivupalkkiin",
     "tooltip.emi.bom.help": "Reseptipuu näyttää reseptin prosessin ja pohjakulut\nNäkymää voi siirrellä ja suurentaa\n\nAseta solmukohdan resepti hiiren vasemmalla painikkeella\nValitse automaattisesti tavaraluettelon perusteella §6[shift]§r-näppäimellä\n\nPienennä reseptisolmu väliaikaisesti hiiren oikealla painikkeella\nTyhjennä resepti §6[shift]§r-näppäimellä\n\nPuun lähtötilaa ohjataan oletusresepteillä\nOletusreseptit voi asettaa reseptien viereisellä painikkeella\n\nReseptipuun valmistamisessa voi auttaa kokonaiskulujen kytkeminen\nValmistuksen aikana näytetään materiaalit, jotka täytyy kerätä\nSuosikkipalkkiin lisätään §bsynteettisiä suosikkeja§r, jotka näyttävät\nkeskeneräiset vaiheet ja joita voi käyttää valmistamiseen",
