@@ -109,6 +109,7 @@ public class BoMScreen extends Screen {
 		rootSlots.clear();
 		rootIndices.clear();
 		rootAmounts.clear();
+		int cy = 0;
 		if (tree != null) {
 			TreeVolume volume = addNewNodes(tree.goal, tree.batches, 1, 0, ChanceState.DEFAULT);
 			nodes = volume.nodes;
@@ -140,7 +141,7 @@ public class BoMScreen extends Screen {
 				EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
 				EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
 			)).toList();
-			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
+			cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			int costX = 0;
 			for (FlatMaterialCost node : treeCosts) {
 				Cost cost = new Cost(node, costX, cy, false);
@@ -202,6 +203,7 @@ public class BoMScreen extends Screen {
 			costs.clear();
 			BoM.combinedCost.clear();
 			BoM.combinedProgress.clear();
+			hasRemainders = false;
 		}
 
 		int rootY = -NODE_VERTICAL_SPACING * 3;
@@ -228,8 +230,33 @@ public class BoMScreen extends Screen {
 			rootIndices.add(index);
 			rootAmounts.add(getRootAmount(roots.get(index)));
 		}
+		adjustInitialView(cy);
 		ensureRootVisible();
 		batcher.repopulate();
+	}
+
+	private void adjustInitialView(int totalCostY) {
+		int top = rootArea.y() - 12;
+		int bottom = totalCostY + 16 + (hasRemainders ? 40 : 0);
+		if (rootArea.height() <= 0) {
+			return;
+		}
+		if (zoom == 0) {
+			int margin = 16;
+			int requiredHeight = bottom - top + margin * 2;
+			int guiScale = (int) this.client.getWindow().getScaleFactor();
+			float desiredScale = Math.min(1f, (float) this.height / requiredHeight);
+			int targetDesired = Math.max(1, Math.round(guiScale * desiredScale));
+			int targetZoom = Math.max(-6, Math.min(4, targetDesired - guiScale));
+			zoom = targetZoom;
+		}
+		float scale = getScale();
+		int visibleHeight = (int) (height / scale);
+		int margin = 16;
+		int middle = (top + bottom) / 2;
+		int min = -visibleHeight / 2 + margin - bottom;
+		int max = visibleHeight / 2 - margin - top;
+		offY = MathHelper.clamp(-middle, min, max);
 	}
 
 	private void ensureRootVisible() {
