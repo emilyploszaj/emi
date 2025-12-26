@@ -87,6 +87,7 @@ public class BoMScreen extends Screen {
 	private List<Integer> rootIndices = Lists.newArrayList();
 	private List<Long> rootAmounts = Lists.newArrayList();
 	private int rootScroll = 0;
+	private boolean initialViewSet = false;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
@@ -230,7 +231,10 @@ public class BoMScreen extends Screen {
 			rootIndices.add(index);
 			rootAmounts.add(getRootAmount(roots.get(index)));
 		}
-		adjustInitialView(cy);
+		if (!initialViewSet && tree != null) {
+			adjustInitialView(cy);
+			initialViewSet = true;
+		}
 		ensureRootVisible();
 		batcher.repopulate();
 	}
