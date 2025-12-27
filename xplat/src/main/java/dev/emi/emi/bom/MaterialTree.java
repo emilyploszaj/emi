@@ -22,6 +22,11 @@ public class MaterialTree {
 		recalculate();
 	}
 
+	public MaterialTree(MaterialNode goal, long batches) {
+		this.goal = goal;
+		this.batches = Math.max(1, batches);
+	}
+
 	public EmiRecipe getRecipe(EmiIngredient stack) {
 		EmiRecipe recipe = resolutions.get(stack);
 		if (recipe == null && !resolutions.containsKey(stack)) {

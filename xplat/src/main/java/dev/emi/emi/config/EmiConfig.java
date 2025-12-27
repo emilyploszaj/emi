@@ -241,7 +241,8 @@ public class EmiConfig {
 	@ConfigValue("ui.right-sidebar-pages")
 	public static SidebarPages rightSidebarPages = new SidebarPages(List.of(
 		new SidebarPages.SidebarPage(SidebarType.INDEX),
-		new SidebarPages.SidebarPage(SidebarType.CRAFTABLES)
+		new SidebarPages.SidebarPage(SidebarType.CRAFTABLES),
+		new SidebarPages.SidebarPage(SidebarType.TREE_BOOKMARKS)
 	), SidebarSettings.RIGHT);
 
 	@Comment("The subpanels in the right sidebar")
@@ -366,6 +367,15 @@ public class EmiConfig {
 	@Comment("Add current search as a Bookmark")
 	@ConfigValue("binds.add-bookmark")
 	public static EmiBind addBookmark = new EmiBind("key.emi.add_bookmark", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_ENTER);
+
+	@Comment("Add current recipe tree as a Tree Bookmark")
+	@ConfigValue("binds.add-tree-bookmark")
+	public static EmiBind addTreeBookmark = new EmiBind("key.emi.add_tree_bookmark", EmiInput.CONTROL_MASK, GLFW.GLFW_KEY_ENTER);
+
+	@Comment("Rename an existing Tree Bookmark in the sidebar")
+	@ConfigValue("binds.rename-tree-bookmark")
+	public static EmiBind renameTreeBookmark = new EmiBind("key.emi.rename_tree_bookmark",
+		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiInput.SHIFT_MASK));
 
 	@Comment("Display the recipes for creating a stack.")
 	@ConfigValue("binds.view-recipes")

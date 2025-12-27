@@ -1066,17 +1066,30 @@ public class EmiScreenManager {
 
 					if (panel != null) {
 						ScreenSpace space = panel.getHoveredSpace(mx, my);
-						if (space != null && space.getType() == SidebarType.BOOKMARKS && pressedStack instanceof SearchEmiIngredient bookmark) {
-							if (button == 1) {
-								EmiBookmarks.removeBookmark(bookmark);
-							} else if (bookmark.getContent() != null) {
-								EmiApi.setSearchText(bookmark.getContent());
-								EmiPort.focus(search, true);
-							}
-
-							return true;
-						}
-					}
+						if (space != null) {
+  					if (space.getType() == SidebarType.BOOKMARKS && pressedStack instanceof SearchEmiIngredient bookmark) {
+  						if (button == 1) {
+  							EmiBookmarks.removeBookmark(bookmark);
+  						} else if (bookmark.getContent() != null) {
+  							EmiApi.setSearchText(bookmark.getContent());
+  							EmiPort.focus(search, true);
+  						}
+  						return true;
+  					} else if (space.getType() == SidebarType.TREE_BOOKMARKS && pressedStack instanceof EmiTreeBookmarks.TreeBookmark treeBookmark) {
+  						if (EmiConfig.renameTreeBookmark.matchesMouse(button)) {
+  							String suggested = treeBookmark.getName();
+  							client.setScreen(new TreeBookmarkNameScreen(client.currentScreen, suggested, name ->
+  								EmiTreeBookmarks.renameBookmark(treeBookmark, name)));
+  						} else if (button == 1) {
+  							EmiTreeBookmarks.removeBookmark(treeBookmark);
+  						} else {
+  							EmiTreeBookmarks.apply(treeBookmark);
+							EmiApi.viewRecipeTree();
+  						}
+  						return true;
+  					}
+   			}
+   		}
 
 					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
 						return true;
@@ -1248,7 +1261,7 @@ public class EmiScreenManager {
 			} else if (function.apply(EmiConfig.viewUses)) {
 				EmiApi.displayUses(ingredient);
 				return true;
-			} else if (function.apply(EmiConfig.favorite)) {
+			} else if (function.apply(EmiConfig.favorite) && !(ingredient instanceof SearchEmiIngredient)) {
 				EmiFavorites.addFavorite(ingredient, stack.getRecipeContext());
 				repopulatePanels(SidebarType.FAVORITES);
 				return true;
