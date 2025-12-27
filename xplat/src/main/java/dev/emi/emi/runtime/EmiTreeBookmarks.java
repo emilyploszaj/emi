@@ -236,6 +236,7 @@ public class EmiTreeBookmarks {
 				MaterialTree tree = new MaterialTree(node, snap.batches);
 				snap.applyResolutions(tree.resolutions);
 				applyNodeResolutions(tree.goal, tree.resolutions);
+				tree.recalculate();
 				tree.cost = new TreeCost();
 				tree.calculateCost();
 				instantiated.add(tree);
