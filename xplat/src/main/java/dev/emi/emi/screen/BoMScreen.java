@@ -371,10 +371,10 @@ public class BoMScreen extends Screen {
 				context.drawCenteredText(EmiPort.translatable("emi.leftovers"), 0, cy - 16 + 40);
 			}
 			for (Cost cost : costs) {
-				cost.render(context);
+				cost.renderBase(context);
 			}
 			for (Node node : nodes) {
-				node.render(context, mx, my, delta);
+				node.renderBase(context, mx, my, delta);
 			}
 			int color = -1;
 			if (batches.contains(mx, my)) {
@@ -389,6 +389,12 @@ public class BoMScreen extends Screen {
 			context.drawTexture(EmiRenderHelper.WIDGETS, mode.x(), mode.y(), BoM.craftingMode ? 16 : 0, 146, mode.width(), mode.height());
 			context.setColor(1f, 1f, 1f, 1f);
 			batcher.draw();
+			for (Cost cost : costs) {
+				cost.renderAmount(context);
+			}
+			for (Node node : nodes) {
+				node.renderAmount(context);
+			}
 		} else {
 			context.drawCenteredText(EmiPort.translatable("emi.tree_welcome", EmiRenderHelper.getEmiText()), 0, -72);
 			context.drawCenteredText(EmiPort.translatable("emi.no_tree"), 0, -48);
@@ -768,8 +774,11 @@ public class BoMScreen extends Screen {
 			this.remainder = remainder;
 		}
 
-		public void render(EmiDrawContext context) {
+		public void renderBase(EmiDrawContext context) {
 			batcher.render(cost.ingredient, context.raw(), x, y, 0, ~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
+		}
+
+		public void renderAmount(EmiDrawContext context) {
 			EmiRenderHelper.renderAmount(context, x, y, getAmountText());
 		}
 
@@ -879,7 +888,7 @@ public class BoMScreen extends Screen {
 			midOffset = tw / -2;
 		}
 
-		public void render(EmiDrawContext context, int mouseX, int mouseY, float delta) {
+		public void renderBase(EmiDrawContext context, int mouseX, int mouseY, float delta) {
 			if (parent != null) {
 				context.push();
 
@@ -934,6 +943,11 @@ public class BoMScreen extends Screen {
 			}
 			context.setColor(1f, 1f, 1f, 1f);
 			batcher.render(node.ingredient, context.raw(), x + xo - 8 + midOffset, y - 8, 0);
+		}
+
+		public void renderAmount(EmiDrawContext context) {
+			int xo = node.recipe != null ? 11 : 0;
+			context.setColor(1f, 1f, 1f, 1f);
 			EmiRenderHelper.renderAmount(context, x + xo - 8 + midOffset, y - 8, getAmountText());
 		}
 
