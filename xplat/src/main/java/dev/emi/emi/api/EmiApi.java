@@ -123,7 +123,7 @@ public class EmiApi {
 		EmiRecipeManager manager = EmiApi.getRecipeManager();
 		setPages(manager.getCategories().stream().collect(Collectors.toMap(c -> c, c -> manager.getRecipes(c))), EmiStack.EMPTY);
 	}
-
+	
 	public static void displayRecipeCategory(EmiRecipeCategory category) {
 		setPages(Map.of(category, getRecipeManager().getRecipes(category)), EmiStack.EMPTY);
 	}

@@ -34,7 +34,7 @@ public interface EmiRegistry {
 	 * @return The vanilla recipe manager, for iterating recipe types.
 	 */
 	RecipeManager getRecipeManager();
-
+	
 	/**
 	 * Adds a recipe category.
 	 * Recipes are organized based on recipe category.
@@ -144,13 +144,13 @@ public interface EmiRegistry {
 
 	/**
 	 * Adds an EmiStackPuller to screens of a given class.
-	 * Stack pullers take items from the currently open container and place them on the player cursor.
+	 * Stack pullers take items from the currently open container and move them into the player's inventory.
 	 */
 	<T extends ScreenHandler> void addStackPuller(Class<T> clazz, EmiStackPuller<T> puller);
 
 	/**
 	 * Adds an EmiStackProvider to every screen.
-	 * Stack pullers take items from the currently open container and place them on the player cursor
+	 * Stack pullers take items from the currently open container and move them into the player's inventory.
 	 */
 	void addGenericStackPuller(EmiStackPuller<ScreenHandler> puller);
 
