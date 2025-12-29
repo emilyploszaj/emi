@@ -213,10 +213,27 @@ public class EmiFavorites {
 			TreeCost remainingCost = new TreeCost();
 			Object2LongMap<EmiRecipe> batches = new Object2LongLinkedOpenHashMap<>();
 			Object2LongMap<EmiRecipe> amounts = new Object2LongLinkedOpenHashMap<>();
+			Map<EmiStack, EmiStack> sharedInventory = Maps.newHashMap();
+			for (EmiStack stack : inv.inventory.values()) {
+				sharedInventory.put(stack, stack.copy());
+			}
 			for (MaterialTree tree : trees) {
-				tree.calculateProgress(inv);
+				EmiPlayerInventory shared = createInventoryFromStacks(sharedInventory);
+				tree.calculateProgress(shared);
 				countRecipes(batches, amounts, tree.goal);
 				remainingCost.merge(tree.cost);
+
+				Map<EmiStack, EmiStack> updatedInventory = Maps.newHashMap();
+				for (Map.Entry<EmiStack, EmiStack> entry : sharedInventory.entrySet()) {
+					EmiStack key = entry.getKey();
+					long before = entry.getValue().getAmount();
+					FlatMaterialCost remainder = tree.cost.remainders.get(key);
+					long after = remainder == null ? 0 : Math.min(before, remainder.amount);
+					if (after > 0) {
+						updatedInventory.put(key, entry.getValue().copy().setAmount(after));
+					}
+				}
+				sharedInventory = updatedInventory;
 			}
 			BoM.calculateCombinedCosts(inv);
 			boolean hasSomething = false;
@@ -259,6 +276,16 @@ public class EmiFavorites {
 				}
 			}
 		}
+	}
+
+	private static EmiPlayerInventory createInventoryFromStacks(Map<EmiStack, EmiStack> stacks) {
+		EmiPlayerInventory shared = new EmiPlayerInventory(List.of());
+		shared.inventory.clear();
+		for (EmiStack stack : stacks.values()) {
+			EmiStack copy = stack.copy();
+			shared.inventory.put(copy, copy);
+		}
+		return shared;
 	}
 
 	public static void countRecipes(Object2LongMap<EmiRecipe> batches, Object2LongMap<EmiRecipe> amounts, MaterialNode node) {

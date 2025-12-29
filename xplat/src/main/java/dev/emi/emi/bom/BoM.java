@@ -293,15 +293,42 @@ public class BoM {
 
 	public static void calculateCombinedCosts(EmiPlayerInventory inventory) {
 		combinedProgress.clear();
+		Map<EmiStack, EmiStack> sharedInventory = Maps.newHashMap();
+		for (EmiStack stack : inventory.inventory.values()) {
+			sharedInventory.put(stack, stack.copy());
+		}
 		for (MaterialTree tree : trees) {
-			tree.calculateProgress(inventory);
+			EmiPlayerInventory shared = createInventoryFromStacks(sharedInventory);
+			tree.calculateProgress(shared);
 			combinedProgress.merge(tree.cost);
+
+			Map<EmiStack, EmiStack> updatedInventory = Maps.newHashMap();
+			for (Map.Entry<EmiStack, EmiStack> entry : sharedInventory.entrySet()) {
+				EmiStack key = entry.getKey();
+				long before = entry.getValue().getAmount();
+				FlatMaterialCost remainder = tree.cost.remainders.get(key);
+				long after = remainder == null ? 0 : Math.min(before, remainder.amount);
+				if (after > 0) {
+					updatedInventory.put(key, entry.getValue().copy().setAmount(after));
+				}
+			}
+			sharedInventory = updatedInventory;
 		}
 		combinedCost.clear();
 		for (MaterialTree tree : trees) {
 			tree.calculateCost();
 			combinedCost.merge(tree.cost);
 		}
+	}
+
+	private static EmiPlayerInventory createInventoryFromStacks(Map<EmiStack, EmiStack> stacks) {
+		EmiPlayerInventory shared = new EmiPlayerInventory(List.of());
+		shared.inventory.clear();
+		for (EmiStack stack : stacks.values()) {
+			EmiStack copy = stack.copy();
+			shared.inventory.put(copy, copy);
+		}
+		return shared;
 	}
 
     private static void recalculate() {
