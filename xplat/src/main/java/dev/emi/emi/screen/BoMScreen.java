@@ -222,7 +222,7 @@ public class BoMScreen extends Screen {
 		int rowWidth = visible > 0 ? ((visible - 1) * 20 + 16) : 0;
 		int startX = visible > 0 ? -((visible - 1) * 20) / 2 : 0;
 		rootLeft = new Bounds(startX - 20, rootY - 4, 12, 12);
-		rootRight = new Bounds(startX + rowWidth + 8, rootY - 4, 12, 12);
+		rootRight = new Bounds(startX + rowWidth - 8, rootY - 4, 12, 12);
 		rootArea = new Bounds(startX - 24, rootY - 12, rowWidth + 48, 24);
 		for (int i = 0; i < visible; i++) {
 			int index = i + rootScroll;
