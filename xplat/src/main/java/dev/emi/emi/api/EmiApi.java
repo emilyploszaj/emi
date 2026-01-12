@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -39,7 +40,6 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -191,19 +191,20 @@ public class EmiApi {
 			// Sweep through all the non-player inventory slots
 			for (Slot inventorySlot : screenHandler.slots) {
 				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack() || !inventorySlot.canTakeItems(player)) continue;
-				if (!ItemStack.areItemsEqual(searchStack.getItemStack(), inventorySlot.getStack())) continue;
+				
+				EmiStack fromStack = EmiStack.of(inventorySlot.getStack());
+				if (!searchStack.isEqual(fromStack)) continue;
 
-				ItemStack fromStack = inventorySlot.getStack().copy();
-				int remaining = fromStack.getCount();
+				long remaining = fromStack.getAmount();
 
 				// And attempt to smoosh it into the player inventory
 				for (Slot playerSlot : getQuickMoveDestinationSlots(screenHandler.slots, fromStack)) {
-					if (playerSlot.hasStack() && !ItemStack.areItemsAndComponentsEqual(fromStack, playerSlot.getStack())) continue;
+					if (playerSlot.hasStack() && !EmiStack.of(playerSlot.getStack()).isEqual(searchStack, EmiPort.compareStrict())) continue;
 
-					ItemStack playerStack = playerSlot.getStack();
+					EmiStack playerStack = EmiStack.of(playerSlot.getStack());
 
-					int maxTransfer = fromStack.getMaxCount() - playerStack.getCount();
-					int amountToTransfer = (int) Math.min(maxTransfer, toPull);
+					long maxTransfer = fromStack.getItemStack().getMaxCount() - playerStack.getAmount();
+					long amountToTransfer = Math.min(maxTransfer, toPull);
 
 					manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
 
@@ -231,10 +232,10 @@ public class EmiApi {
 		}
 	}
 
-	private static List<Slot> getQuickMoveDestinationSlots(List<Slot> slots, ItemStack stackToMove) {
+	private static List<Slot> getQuickMoveDestinationSlots(List<Slot> slots, EmiStack stackToMove) {
 		List<Slot> destinationSlots = Lists.newArrayList();
 		for (Slot candidateSlot : slots) {
-			if (candidateSlot.inventory instanceof PlayerInventory && candidateSlot.canInsert(stackToMove)) {
+			if (candidateSlot.inventory instanceof PlayerInventory && candidateSlot.canInsert(stackToMove.getItemStack())) {
 				destinationSlots.add(candidateSlot);
 			}
 		}
