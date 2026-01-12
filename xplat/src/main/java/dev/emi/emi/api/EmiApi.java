@@ -123,7 +123,7 @@ public class EmiApi {
 		EmiRecipeManager manager = EmiApi.getRecipeManager();
 		setPages(manager.getCategories().stream().collect(Collectors.toMap(c -> c, c -> manager.getRecipes(c))), EmiStack.EMPTY);
 	}
-	
+
 	public static void displayRecipeCategory(EmiRecipeCategory category) {
 		setPages(Map.of(category, getRecipeManager().getRecipes(category)), EmiStack.EMPTY);
 	}
@@ -131,7 +131,7 @@ public class EmiApi {
 	public static void displayRecipe(EmiRecipe recipe) {
 		setPages(Map.of(recipe.getCategory(), List.of(recipe)), EmiStack.EMPTY);
 	}
-
+	
 	public static void displayRecipes(EmiIngredient stack) {
 		if (stack instanceof EmiFavorite fav) {
 			stack = fav.getStack();
@@ -171,7 +171,7 @@ public class EmiApi {
 	public static void pullItem(EmiIngredient stack) {
 		if (stack.isEmpty() || !(stack instanceof EmiFavorite)) return;
 
-		long toPull = 1;
+		long toPull = stack.getAmount();
 		if (stack instanceof EmiFavorite.Synthetic synthetic) {
 			toPull = synthetic.amount;
 		}
@@ -181,17 +181,17 @@ public class EmiApi {
 		PlayerEntity player = client.player;
 		ScreenHandler screenHandler = player.currentScreenHandler;
 
-		List<ItemStack> searchStacks = stack.getEmiStacks().stream().map(s -> s.getItemStack()).collect(Collectors.toList());
+		List<EmiStack> searchStacks = stack.getEmiStacks();
 
 		// Attempt to pull using any registered custom pullers, and stop on a successful pull
 		if (EmiStackPullers.attemptPull(screenHandler, searchStacks, toPull)) return;
 
-		for (ItemStack searchStack : searchStacks) {
+		for (EmiStack searchStack : searchStacks) {
 
 			// Sweep through all the non-player inventory slots
 			for (Slot inventorySlot : screenHandler.slots) {
 				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack() || !inventorySlot.canTakeItems(player)) continue;
-				if (!ItemStack.areItemsEqual(searchStack, inventorySlot.getStack())) continue;
+				if (!ItemStack.areItemsEqual(searchStack.getItemStack(), inventorySlot.getStack())) continue;
 
 				ItemStack fromStack = inventorySlot.getStack().copy();
 				int remaining = fromStack.getCount();

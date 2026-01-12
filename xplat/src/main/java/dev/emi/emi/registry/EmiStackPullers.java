@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.api.EmiStackPuller;
-import net.minecraft.item.ItemStack;
+import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.screen.ScreenHandler;
 
 public class EmiStackPullers {
@@ -21,7 +21,7 @@ public class EmiStackPullers {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static boolean attemptPull(ScreenHandler screenHandler, List<ItemStack> stacks, long toPull) {
+	public static boolean attemptPull(ScreenHandler screenHandler, List<EmiStack> stacks, long toPull) {
 		if (fromClass.containsKey(screenHandler.getClass())) {
 			EmiStackPuller puller = fromClass.get(screenHandler.getClass());
 			if (puller.pullStack(screenHandler, stacks, toPull)) return true;
