@@ -27,7 +27,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.Text;
 
 public class JemiSlotWidget extends SlotWidget {
-	private final JemiRecipeSlot slot;
+	public final JemiRecipeSlot slot;
 
 	public JemiSlotWidget(JemiRecipeSlot slot, EmiRecipe recipe) {
 		super(slot.stack, slot.x - (slot.large ? 6 : 1) , slot.y - (slot.large ? 6 : 1));
@@ -36,7 +36,7 @@ public class JemiSlotWidget extends SlotWidget {
 		if (slot.getRole() == RecipeIngredientRole.OUTPUT) {
 			this.recipeContext(recipe);
 		}
-		this.drawBack(false);
+		this.drawBack(slot.defaultBackground);
 		IIngredientRenderer<?> renderer = getRenderer();
 		if (renderer != null) {
 			this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
