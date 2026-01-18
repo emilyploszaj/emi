@@ -1,6 +1,7 @@
 package dev.emi.emi.screen;
 
 import dev.emi.emi.api.widget.Bounds;
+import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -8,7 +9,14 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.screen.ScreenHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 public class EmiScreenBase {
+
+	protected static List<Function<Screen, EmiScreenBaseBounds>> functionList = new ArrayList<>();
+
 	private final Screen screen;
 	private final Bounds bounds;
 
@@ -34,6 +42,10 @@ public class EmiScreenBase {
 		return of(client.currentScreen);
 	}
 
+	public static void addEmiScreenBaseBounds (Function<Screen, EmiScreenBaseBounds> transformer) {
+		functionList.add(transformer);
+	}
+
 	public static EmiScreenBase of(Screen screen) {
 		if (screen instanceof HandledScreen hs) {
 			HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
@@ -50,6 +62,13 @@ public class EmiScreenBase {
 			}
 		} else if (screen instanceof RecipeScreen rs) {
 			return new EmiScreenBase(rs, rs.getBounds());
+		} else {
+			for (Function<Screen, EmiScreenBaseBounds> function : functionList) {
+				EmiScreenBaseBounds Screen = function.apply(screen);
+				if (Screen != EmiScreenBaseBounds.EMPTY) {
+					return new EmiScreenBase(Screen.screen(), Screen.bounds());
+				}
+			}
 		}
 		return new EmiScreenBase(null, Bounds.EMPTY);
 	}

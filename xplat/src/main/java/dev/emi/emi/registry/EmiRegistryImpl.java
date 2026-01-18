@@ -20,9 +20,11 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import dev.emi.emi.data.EmiAlias;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.screen.EmiScreenBase;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
@@ -32,6 +34,11 @@ import net.minecraft.text.Text;
 
 public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+
+	@Override
+	public void addScreenTransformer(Function<Screen, EmiScreenBaseBounds> transformer) {
+		EmiScreenBase.addEmiScreenBaseBounds(transformer);
+	}
 
 	@Override
 	public boolean isStackDisabled(EmiIngredient stack) {

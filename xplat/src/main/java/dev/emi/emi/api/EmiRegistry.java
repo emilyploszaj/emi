@@ -13,6 +13,7 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.ScreenHandler;
@@ -21,6 +22,22 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public interface EmiRegistry {
+
+	/**
+	 * Adds a screen transformer function to EMI's screen recognition system.
+	 * This allows custom screens to be properly recognized and handled by EMI.
+	 *
+	 * <p>The transformer function should:
+	 * <ul>
+	 *   <li>Return a valid EmiScreenBase.EmiScreenBaseBounds if the screen is recognized</li>
+	 *   <li>Return EmiScreenBase.EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
+	 *   <li>Provide accurate bounds for EMI to position widgets correctly</li>
+	 * </ul>
+	 *
+	 * @param transformer A function that transforms a Screen into EmiScreenBase.EmiScreenBaseBounds
+	 */
+	@ApiStatus.Experimental
+	void addScreenTransformer(Function<Screen, EmiScreenBaseBounds> transformer);
 
 	/**
 	 * @return Whether the provided stack is disabled.
