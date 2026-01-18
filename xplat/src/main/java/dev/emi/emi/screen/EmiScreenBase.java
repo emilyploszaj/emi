@@ -42,7 +42,7 @@ public class EmiScreenBase {
 		return of(client.currentScreen);
 	}
 
-	public static void addEmiScreenBaseBounds (Function<Screen, EmiScreenBaseBounds> transformer) {
+	public static void addEmiScreenBaseBounds(Function<Screen, EmiScreenBaseBounds> transformer) {
 		functionList.add(transformer);
 	}
 
