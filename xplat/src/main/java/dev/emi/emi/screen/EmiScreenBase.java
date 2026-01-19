@@ -77,7 +77,7 @@ public class EmiScreenBase {
 					continue;
 				}
 				EmiScreenBaseBounds bounds = transformer.transform(screen);
-				if (bounds != null && bounds != EmiScreenBaseBounds.EMPTY) {
+				if (bounds != null && !bounds.isEmpty()) {
 					return new EmiScreenBase(bounds.screen(), bounds.bounds());
 				}
 			}

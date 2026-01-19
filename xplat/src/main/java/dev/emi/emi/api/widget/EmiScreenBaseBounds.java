@@ -4,4 +4,8 @@ import net.minecraft.client.gui.screen.Screen;
 
 public record EmiScreenBaseBounds(Screen screen, Bounds bounds) {
 	public static final EmiScreenBaseBounds EMPTY = new EmiScreenBaseBounds(null, Bounds.EMPTY);
+
+	public boolean isEmpty() {
+		return this == EMPTY;
+	}
 }
