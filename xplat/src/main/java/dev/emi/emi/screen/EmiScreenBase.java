@@ -46,6 +46,10 @@ public class EmiScreenBase {
 		functionList.add(transformer);
 	}
 
+	public static void clearEmiScreenBaseBounds() {
+		functionList.clear();
+	}
+
 	public static EmiScreenBase of(Screen screen) {
 		if (screen instanceof HandledScreen hs) {
 			HandledScreenAccessor hsa = (HandledScreenAccessor) hs;

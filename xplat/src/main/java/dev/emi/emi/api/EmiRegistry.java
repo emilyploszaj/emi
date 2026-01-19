@@ -34,6 +34,34 @@ public interface EmiRegistry {
 	 *   <li>Provide accurate bounds for EMI to position widgets correctly</li>
 	 * </ul>
 	 *
+	 * <p>Example usage:
+	 * <pre>{@code
+	 * registry.addScreenTransformer(screen -> {
+	 *     if (screen instanceof HandledScreen hs) {
+	 *         HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
+	 *         ScreenHandler sh = hs.getScreenHandler();
+	 *         if (sh.slots != null && !sh.slots.isEmpty()) {
+	 *             int extra = 0;
+	 *             if (hs instanceof RecipeBookProvider provider) {
+	 *                 if (provider.getRecipeBookWidget().isOpen()) {
+	 *                     extra = 177;
+	 *                 }
+	 *             }
+	 *             Bounds bounds = new Bounds(
+	 *                 hsa.getX() - extra,
+	 *                 hsa.getY(),
+	 *                 hsa.getBackgroundWidth() + extra,
+	 *                 hsa.getBackgroundHeight()
+	 *             );
+	 *             return new EmiScreenBaseBounds(screen, bounds);
+	 *         }
+	 *     } else if (screen instanceof RecipeScreen rs) {
+	 *         return new EmiScreenBaseBounds(rs, rs.getBounds());
+	 *     }
+	 *     return EmiScreenBaseBounds.EMPTY;
+	 * });
+	 * }</pre>
+	 *
 	 * @param transformer A function that transforms a Screen into EmiScreenBase.EmiScreenBaseBounds
 	 */
 	@ApiStatus.Experimental

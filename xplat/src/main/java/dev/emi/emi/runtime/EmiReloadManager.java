@@ -25,6 +25,7 @@ import dev.emi.emi.registry.EmiRegistryImpl;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.registry.EmiStackProviders;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
@@ -134,6 +135,7 @@ public class EmiReloadManager {
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();
 					EmiTags.ADAPTERS_BY_REGISTRY.clear();
+					EmiScreenBase.clearEmiScreenBaseBounds();
 					if (clear) {
 						clear = false;
 						continue;
