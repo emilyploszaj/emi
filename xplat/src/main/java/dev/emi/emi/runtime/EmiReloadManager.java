@@ -217,6 +217,7 @@ public class EmiReloadManager {
 							}
 						}
 					}
+					EmiScreenBase.sortTransformers();
 					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
 					BoM.reload();
