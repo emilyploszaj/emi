@@ -1,5 +1,6 @@
 package dev.emi.emi.screen;
 
+import dev.emi.emi.api.EmiScreenTransformer;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
@@ -10,12 +11,12 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.screen.ScreenHandler;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 public class EmiScreenBase {
 
-	protected static List<Function<Screen, EmiScreenBaseBounds>> functionList = new ArrayList<>();
+	protected static List<EmiScreenTransformer> transformers = new ArrayList<>();
 
 	private final Screen screen;
 	private final Bounds bounds;
@@ -42,12 +43,16 @@ public class EmiScreenBase {
 		return of(client.currentScreen);
 	}
 
-	public static void addEmiScreenBaseBounds(Function<Screen, EmiScreenBaseBounds> transformer) {
-		functionList.add(transformer);
+	public static void addtransformers(EmiScreenTransformer transformer) {
+		transformers.add(transformer);
 	}
 
-	public static void clearEmiScreenBaseBounds() {
-		functionList.clear();
+	public static void cleartransformers() {
+		transformers.clear();
+	}
+
+	public static void sortTransformers() {
+		transformers.sort(Comparator.comparingInt(EmiScreenTransformer::getPriority).reversed());
 	}
 
 	public static EmiScreenBase of(Screen screen) {
@@ -67,10 +72,13 @@ public class EmiScreenBase {
 		} else if (screen instanceof RecipeScreen rs) {
 			return new EmiScreenBase(rs, rs.getBounds());
 		} else {
-			for (Function<Screen, EmiScreenBaseBounds> function : functionList) {
-				EmiScreenBaseBounds Screen = function.apply(screen);
-				if (Screen != EmiScreenBaseBounds.EMPTY) {
-					return new EmiScreenBase(Screen.screen(), Screen.bounds());
+			for (EmiScreenTransformer transformer : transformers) {
+				if (!transformer.canTransform(screen)) {
+					continue;
+				}
+				EmiScreenBaseBounds bounds = transformer.transform(screen);
+				if (bounds != null && bounds != EmiScreenBaseBounds.EMPTY) {
+					return new EmiScreenBase(bounds.screen(), bounds.bounds());
 				}
 			}
 		}

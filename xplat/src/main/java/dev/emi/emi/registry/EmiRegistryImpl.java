@@ -8,10 +8,7 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 
-import dev.emi.emi.api.EmiDragDropHandler;
-import dev.emi.emi.api.EmiExclusionArea;
-import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.EmiStackProvider;
+import dev.emi.emi.api.*;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeDecorator;
@@ -20,7 +17,6 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
-import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import dev.emi.emi.data.EmiAlias;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
@@ -36,8 +32,8 @@ public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 
 	@Override
-	public void addScreenTransformer(Function<Screen, EmiScreenBaseBounds> transformer) {
-		EmiScreenBase.addEmiScreenBaseBounds(transformer);
+	public void addScreenTransformer(EmiScreenTransformer transformer) {
+		EmiScreenBase.addtransformers(transformer);
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
-import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.ScreenHandler;
@@ -24,48 +23,49 @@ import net.minecraft.util.Identifier;
 public interface EmiRegistry {
 
 	/**
-	 * Adds a screen transformer function to EMI's screen recognition system.
+	 * Adds a screen transformer to EMI's screen recognition system.
 	 * This allows custom screens to be properly recognized and handled by EMI.
 	 *
-	 * <p>The transformer function should:
+	 * <p>The transformer should:
 	 * <ul>
 	 *   <li>Return a valid EmiScreenBase.EmiScreenBaseBounds if the screen is recognized</li>
-	 *   <li>Return EmiScreenBase.EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
+	 *   <li>Return null or EmiScreenBase.EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
 	 *   <li>Provide accurate bounds for EMI to position widgets correctly</li>
 	 * </ul>
 	 *
-	 * <p>Example usage:
+	 * <p>Example implementation:
 	 * <pre>{@code
-	 * registry.addScreenTransformer(screen -> {
-	 *     if (screen instanceof HandledScreen hs) {
-	 *         HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
-	 *         ScreenHandler sh = hs.getScreenHandler();
-	 *         if (sh.slots != null && !sh.slots.isEmpty()) {
-	 *             int extra = 0;
-	 *             if (hs instanceof RecipeBookProvider provider) {
-	 *                 if (provider.getRecipeBookWidget().isOpen()) {
-	 *                     extra = 177;
-	 *                 }
-	 *             }
-	 *             Bounds bounds = new Bounds(
-	 *                 hsa.getX() - extra,
-	 *                 hsa.getY(),
-	 *                 hsa.getBackgroundWidth() + extra,
-	 *                 hsa.getBackgroundHeight()
-	 *             );
-	 *             return new EmiScreenBaseBounds(screen, bounds);
-	 *         }
-	 *     } else if (screen instanceof RecipeScreen rs) {
-	 *         return new EmiScreenBaseBounds(rs, rs.getBounds());
+	 * registry.addScreenTransformer(new EmiScreenTransformer() {
+	 *     @Override
+	 *     public boolean canTransform(Screen screen) {
+	 *         return screen instanceof MyCustomScreen;
 	 *     }
-	 *     return EmiScreenBaseBounds.EMPTY;
+	 *
+	 *     @Override
+	 *     public int getPriority() {
+	 *         return 10; // Higher priority than default
+	 *     }
+	 *
+	 *     @Override
+	 *     public EmiScreenBaseBounds transform(Screen screen) {
+	 *         MyCustomScreen myScreen = (MyCustomScreen) screen;
+	 *         return new EmiScreenBaseBounds(
+	 *             myScreen,
+	 *             new Bounds(
+	 *                 myScreen.getX(),
+	 *                 myScreen.getY(),
+	 *                 myScreen.getWidth(),
+	 *                 myScreen.getHeight()
+	 *             )
+	 *         );
+	 *     }
 	 * });
 	 * }</pre>
 	 *
-	 * @param transformer A function that transforms a Screen into EmiScreenBase.EmiScreenBaseBounds
+	 * @param transformer The screen transformer to add
 	 */
 	@ApiStatus.Experimental
-	void addScreenTransformer(Function<Screen, EmiScreenBaseBounds> transformer);
+	void addScreenTransformer(EmiScreenTransformer transformer);
 
 	/**
 	 * @return Whether the provided stack is disabled.

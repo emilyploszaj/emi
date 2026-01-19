@@ -135,7 +135,7 @@ public class EmiReloadManager {
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();
 					EmiTags.ADAPTERS_BY_REGISTRY.clear();
-					EmiScreenBase.clearEmiScreenBaseBounds();
+					EmiScreenBase.cleartransformers();
 					if (clear) {
 						clear = false;
 						continue;
