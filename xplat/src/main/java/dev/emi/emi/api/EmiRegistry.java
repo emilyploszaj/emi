@@ -28,8 +28,8 @@ public interface EmiRegistry {
 	 *
 	 * <p>The transformer should:
 	 * <ul>
-	 *   <li>Return a valid EmiScreenBase.EmiScreenBaseBounds if the screen is recognized</li>
-	 *   <li>Return null or EmiScreenBase.EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
+	 *   <li>Return a valid EmiScreenBaseBounds if the screen is recognized</li>
+	 *   <li>Return null or EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
 	 *   <li>Provide accurate bounds for EMI to position widgets correctly</li>
 	 * </ul>
 	 *
@@ -48,16 +48,18 @@ public interface EmiRegistry {
 	 *
 	 *     @Override
 	 *     public EmiScreenBaseBounds transform(Screen screen) {
-	 *         MyCustomScreen myScreen = (MyCustomScreen) screen;
-	 *         return new EmiScreenBaseBounds(
-	 *             myScreen,
-	 *             new Bounds(
-	 *                 myScreen.getX(),
-	 *                 myScreen.getY(),
-	 *                 myScreen.getWidth(),
-	 *                 myScreen.getHeight()
-	 *             )
-	 *         );
+	 *         if (screen instanceof MyCustomScreen myScreen) {
+	 *             return new EmiScreenBaseBounds(
+	 *                 myScreen,
+	 *                 new Bounds(
+	 *                     myScreen.getX(),
+	 *                     myScreen.getY(),
+	 *                     myScreen.getWidth(),
+	 *                     myScreen.getHeight()
+	 *                 )
+	 *             );
+	 *         }
+	 *         return EmiScreenBaseBounds.EMPTY;
 	 *     }
 	 * });
 	 * }</pre>
