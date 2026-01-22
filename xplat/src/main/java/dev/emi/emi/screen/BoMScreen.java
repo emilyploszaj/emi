@@ -7,8 +7,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+import org.joml.Vector4d;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
@@ -33,7 +33,6 @@ import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.ProgressState;
-import dev.emi.emi.bom.TreeCost;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
@@ -51,8 +50,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -79,6 +76,8 @@ public class BoMScreen extends Screen {
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
+	private Screen screen = MinecraftClient.getInstance().currentScreen;
+	private boolean shouldFullRenderNodes = true;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
@@ -96,6 +95,7 @@ public class BoMScreen extends Screen {
 
 	public void recalculateTree() {
 		help = new Bounds(width - 18, height - 18, 16, 16);
+		shouldFullRenderNodes = true;
 		if (BoM.tree != null) {
 			TreeVolume volume = addNewNodes(BoM.tree.goal, BoM.tree.batches, 1, 0, ChanceState.DEFAULT);
 			nodes = volume.nodes;
@@ -212,6 +212,9 @@ public class BoMScreen extends Screen {
 
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
+		
+		int scaledScreenW = (int) ((screen.width / 2) / scale);
+		int scaledScreenH = (int) ((screen.height / 2) / scale);
 
 		Matrix4fStack view = RenderSystem.getModelViewStack();
 		view.pushMatrix();
@@ -230,8 +233,25 @@ public class BoMScreen extends Screen {
 				cost.render(context);
 			}
 			for (Node node : nodes) {
-				node.render(context, mx, my, delta);
+				if(shouldFullRenderNodes) {
+					node.render(context, mx, my, delta);
+					if(EmiConfig.recipeTreeBoundingBoxes) {
+						node.renderBoundingBox(context);
+					}
+				} else {
+					Vector4d bounds = node.getBoundingBox();
+					if( 	bounds.x + offX < scaledScreenW &&
+							bounds.x + bounds.w + offX > -scaledScreenW &&
+							bounds.y + offY < scaledScreenH &&
+							bounds.y + bounds.z + offY> -scaledScreenH) {
+						node.render(context, mx, my, delta);
+						if(EmiConfig.recipeTreeBoundingBoxes) {
+							node.renderBoundingBox(context);
+						}
+					}
+				}
 			}
+			shouldFullRenderNodes = false;
 			int color = -1;
 			if (batches.contains(mx, my)) {
 				color = 0xff8099ff;
@@ -730,6 +750,42 @@ public class BoMScreen extends Screen {
 			context.setColor(1f, 1f, 1f, 1f);
 			batcher.render(node.ingredient, context.raw(), x + xo - 8 + midOffset, y - 8, 0);
 			EmiRenderHelper.renderAmount(context, x + xo - 8 + midOffset, y - 8, getAmountText());
+		}
+		
+		public void renderBoundingBox(EmiDrawContext context) {
+			Vector4d bounds = getBoundingBox();
+			context.push();
+			
+			context.setColor(0.5f,0.5f,0.5f,0.2f);
+			drawLine(context, (int) bounds.x, (int) bounds.y, (int) this.x, (int) this.y);
+			if(parent != null) {
+				drawLine(context, ((parent.x - this.x)/2 + this.x) - 2, ((parent.y - this.y)/2 + this.y) - 2, ((parent.x - this.x)/2 + this.x) + 2, ((parent.y - this.y)/2 + this.y) + 2);
+			}
+			
+			context.setColor(1, 0, 0);
+			drawLine(context, (int) bounds.x, (int) bounds.y, (int) (bounds.x+bounds.w), (int) bounds.y);
+			drawLine(context, (int) bounds.x, (int) bounds.y, (int) bounds.x, (int) (bounds.y + bounds.z));
+			drawLine(context, (int) (bounds.x+bounds.w), (int) bounds.y, (int) (bounds.x+bounds.w), (int) (bounds.y+bounds.z));
+			drawLine(context, (int) bounds.x, (int) (bounds.y+bounds.z), (int) (bounds.x+bounds.w), (int) (bounds.y+bounds.z));
+			
+			context.pop();
+		}
+		
+		public Vector4d getBoundingBox() {
+			Vector4d bounds = new Vector4d();
+			
+			if(parent != null) {
+				bounds.w = this.width + 10 + (Math.abs(parent.x - this.x));
+				bounds.z = NODE_VERTICAL_SPACING + 10 + (Math.abs(parent.y - this.y));
+				bounds.x = ((parent.x - this.x)/2 + this.x) - bounds.w/2;
+				bounds.y = ((parent.y - this.y)/2 + this.y) - bounds.z/2;
+				return bounds;
+			}
+			bounds.w = this.width + 10;
+			bounds.z = NODE_VERTICAL_SPACING + 10;
+			bounds.x = x - bounds.w/2;
+			bounds.y = y - bounds.z/2;
+			return bounds;
 		}
 
 		public void setColor(EmiDrawContext context, MaterialNode node, boolean chanced, boolean hovered) {

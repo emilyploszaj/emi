@@ -506,6 +506,10 @@ public class EmiConfig {
 	@Comment("Whether to display exclusion areas")
 	@ConfigValue("dev.highlight-exclusion-areas")
 	public static boolean highlightExclusionAreas = false;
+	
+	@Comment("Whether to display Recipe Tree bounding boxes for culling")
+	@ConfigValue("dev.recipe-tree-bounding-boxes")
+	public static boolean recipeTreeBoundingBoxes = false;
 
 	// Persistent (currently empty)
 
