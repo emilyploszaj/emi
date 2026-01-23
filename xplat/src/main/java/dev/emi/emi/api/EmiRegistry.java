@@ -30,7 +30,7 @@ public interface EmiRegistry {
 	 * @param provider The screen bounds provider
 	 */
 	@ApiStatus.Experimental
-	<T extends Screen> void addScreenBoundsProvider(Class<T> clazz, ScreenBoundsProvider<T> provider);
+	<T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider);
 
 	/**
 	 * Adds a screen bounds provider for every screen.
@@ -39,7 +39,7 @@ public interface EmiRegistry {
 	 * @param provider The screen bounds provider
 	 */
 	@ApiStatus.Experimental
-	void addGenericScreenBoundsProvider(ScreenBoundsProvider<Screen> provider);
+	void addGenericScreenBoundsProvider(EmiScreenBoundsProvider<Screen> provider);
 
 	/**
 	 * @return Whether the provided stack is disabled.

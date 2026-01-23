@@ -7,7 +7,7 @@ import dev.emi.emi.api.widget.Bounds;
 import net.minecraft.client.gui.screen.Screen;
 
 @ApiStatus.Experimental
-public interface ScreenBoundsProvider<T extends Screen> {
+public interface EmiScreenBoundsProvider<T extends Screen> {
 
 	/**
 	 * Provides the bounds for a given screen.

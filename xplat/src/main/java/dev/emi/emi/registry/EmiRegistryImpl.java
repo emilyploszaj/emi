@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.ScreenBoundsProvider;
+import dev.emi.emi.api.EmiScreenBoundsProvider;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -36,12 +36,12 @@ public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 
 	@Override
-	public <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, ScreenBoundsProvider<T> provider) {
+	public <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider) {
 		EmiScreenBase.addScreenBoundsProvider(clazz, provider);
 	}
 
 	@Override
-	public void addGenericScreenBoundsProvider(ScreenBoundsProvider<Screen> provider) {
+	public void addGenericScreenBoundsProvider(EmiScreenBoundsProvider<Screen> provider) {
 		EmiScreenBase.addGenericScreenBoundsProvider(provider);
 	}
 

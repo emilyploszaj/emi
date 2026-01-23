@@ -1,7 +1,7 @@
 package dev.emi.emi.screen;
 
 import com.google.common.collect.Lists;
-import dev.emi.emi.api.ScreenBoundsProvider;
+import dev.emi.emi.api.EmiScreenBoundsProvider;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -17,8 +17,8 @@ import java.util.Map;
 
 public class EmiScreenBase {
 
-	private static final Map<Class<?>, List<ScreenBoundsProvider<?>>> PROVIDERS_BY_CLASS = new HashMap<>();
-	private static final List<ScreenBoundsProvider<Screen>> GENERIC_PROVIDERS = new ArrayList<>();
+	private static final Map<Class<?>, List<EmiScreenBoundsProvider<?>>> PROVIDERS_BY_CLASS = new HashMap<>();
+	private static final List<EmiScreenBoundsProvider<Screen>> GENERIC_PROVIDERS = new ArrayList<>();
 
 	private final Screen screen;
 	private final Bounds bounds;
@@ -47,11 +47,11 @@ public class EmiScreenBase {
 		return of(client.currentScreen);
 	}
 
-	public static <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, ScreenBoundsProvider<T> provider) {
+	public static <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider) {
 		PROVIDERS_BY_CLASS.computeIfAbsent(clazz, k -> Lists.newArrayList()).add(provider);
 	}
 
-	public static void addGenericScreenBoundsProvider(ScreenBoundsProvider<Screen> provider) {
+	public static void addGenericScreenBoundsProvider(EmiScreenBoundsProvider<Screen> provider) {
 		GENERIC_PROVIDERS.add(provider);
 	}
 
@@ -66,17 +66,17 @@ public class EmiScreenBase {
 		}
 
 		Class<?> screenClass = screen.getClass();
-		List<ScreenBoundsProvider<?>> classProviders = PROVIDERS_BY_CLASS.get(screenClass);
+		List<EmiScreenBoundsProvider<?>> classProviders = PROVIDERS_BY_CLASS.get(screenClass);
 		if (classProviders != null) {
-			for (ScreenBoundsProvider<?> provider : classProviders) {
+			for (EmiScreenBoundsProvider<?> provider : classProviders) {
 				@SuppressWarnings("unchecked")
-				Bounds bounds = ((ScreenBoundsProvider<Screen>) provider).provideBounds(screen);
+				Bounds bounds = ((EmiScreenBoundsProvider<Screen>) provider).provideBounds(screen);
 				if (bounds != null && !bounds.isEmpty()) {
 					return new EmiScreenBase(screen, bounds);
 				}
 			}
 		}
-		for (ScreenBoundsProvider<Screen> provider : GENERIC_PROVIDERS) {
+		for (EmiScreenBoundsProvider<Screen> provider : GENERIC_PROVIDERS) {
 			Bounds bounds = provider.provideBounds(screen);
 			if (bounds != null && !bounds.isEmpty()) {
 				return new EmiScreenBase(screen, bounds);
