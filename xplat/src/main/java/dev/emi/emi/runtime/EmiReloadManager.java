@@ -135,7 +135,7 @@ public class EmiReloadManager {
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();
 					EmiTags.ADAPTERS_BY_REGISTRY.clear();
-					EmiScreenBase.cleartransformers();
+					EmiScreenBase.clearScreenBoundsProviders();
 					if (clear) {
 						clear = false;
 						continue;
@@ -217,7 +217,6 @@ public class EmiReloadManager {
 							}
 						}
 					}
-					EmiScreenBase.sortTransformers();
 					step(EmiPort.literal("Baking recipes"), 15_000);
 					EmiRecipes.bake();
 					BoM.reload();

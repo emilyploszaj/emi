@@ -27,6 +27,10 @@ public record Bounds(int x, int y, int width, int height) {
 		return width <= 0 || height <= 0;
 	}
 
+	public boolean isEmpty() {
+		return this == EMPTY || this.empty();
+	}
+
 	public Bounds overlap(Bounds another) {
 		int left = Math.max(left(), another.left());
 		int top = Math.max(top(), another.top());

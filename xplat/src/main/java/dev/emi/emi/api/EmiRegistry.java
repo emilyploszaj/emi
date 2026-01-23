@@ -23,51 +23,23 @@ import net.minecraft.util.Identifier;
 public interface EmiRegistry {
 
 	/**
-	 * Adds a screen transformer to EMI's screen recognition system.
-	 * This allows custom screens to be properly recognized and handled by EMI.
+	 * Adds a screen bounds provider for screens of a given class.
+	 * This allows EMI to properly recognize and handle custom screens.
 	 *
-	 * <p>The transformer should:
-	 * <ul>
-	 *   <li>Return a valid EmiScreenBaseBounds if the screen is recognized</li>
-	 *   <li>Return null or EmiScreenBaseBounds.EMPTY if the screen is not recognized</li>
-	 *   <li>Provide accurate bounds for EMI to position widgets correctly</li>
-	 * </ul>
-	 *
-	 * <p>Example implementation:
-	 * <pre>{@code
-	 * registry.addScreenTransformer(new EmiScreenTransformer() {
-	 *     @Override
-	 *     public boolean canTransform(Screen screen) {
-	 *         return screen instanceof MyCustomScreen;
-	 *     }
-	 *
-	 *     @Override
-	 *     public int getPriority() {
-	 *         return 10; // Higher priority than default
-	 *     }
-	 *
-	 *     @Override
-	 *     public EmiScreenBaseBounds transform(Screen screen) {
-	 *         if (screen instanceof MyCustomScreen myScreen) {
-	 *             return new EmiScreenBaseBounds(
-	 *                 myScreen,
-	 *                 new Bounds(
-	 *                     myScreen.getX(),
-	 *                     myScreen.getY(),
-	 *                     myScreen.getWidth(),
-	 *                     myScreen.getHeight()
-	 *                 )
-	 *             );
-	 *         }
-	 *         return EmiScreenBaseBounds.EMPTY;
-	 *     }
-	 * });
-	 * }</pre>
-	 *
-	 * @param transformer The screen transformer to add
+	 * @param clazz The class of screen to provide bounds for
+	 * @param provider The screen bounds provider
 	 */
 	@ApiStatus.Experimental
-	void addScreenTransformer(EmiScreenTransformer transformer);
+	<T extends Screen> void addScreenBoundsProvider(Class<T> clazz, ScreenBoundsProvider<T> provider);
+
+	/**
+	 * Adds a screen bounds provider for every screen.
+	 * This allows EMI to properly recognize and handle custom screens.
+	 *
+	 * @param provider The screen bounds provider
+	 */
+	@ApiStatus.Experimental
+	void addGenericScreenBoundsProvider(ScreenBoundsProvider<Screen> provider);
 
 	/**
 	 * @return Whether the provided stack is disabled.

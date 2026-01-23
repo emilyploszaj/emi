@@ -1,8 +1,8 @@
 package dev.emi.emi.screen;
 
-import dev.emi.emi.api.EmiScreenTransformer;
+import com.google.common.collect.Lists;
+import dev.emi.emi.api.ScreenBoundsProvider;
 import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.EmiScreenBaseBounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,15 +11,19 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.screen.ScreenHandler;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmiScreenBase {
 
-	protected static List<EmiScreenTransformer> transformers = new ArrayList<>();
+	private static final Map<Class<?>, List<ScreenBoundsProvider<?>>> PROVIDERS_BY_CLASS = new HashMap<>();
+	private static final List<ScreenBoundsProvider<Screen>> GENERIC_PROVIDERS = new ArrayList<>();
 
 	private final Screen screen;
 	private final Bounds bounds;
+
+	private static final EmiScreenBase EMPTY = new EmiScreenBase(null, Bounds.EMPTY);
 
 	private EmiScreenBase(Screen screen, Bounds bounds) {
 		this.screen = screen;
@@ -43,19 +47,41 @@ public class EmiScreenBase {
 		return of(client.currentScreen);
 	}
 
-	public static void addtransformers(EmiScreenTransformer transformer) {
-		transformers.add(transformer);
+	public static <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, ScreenBoundsProvider<T> provider) {
+		PROVIDERS_BY_CLASS.computeIfAbsent(clazz, k -> Lists.newArrayList()).add(provider);
 	}
 
-	public static void cleartransformers() {
-		transformers.clear();
+	public static void addGenericScreenBoundsProvider(ScreenBoundsProvider<Screen> provider) {
+		GENERIC_PROVIDERS.add(provider);
 	}
 
-	public static void sortTransformers() {
-		transformers.sort(Comparator.comparingInt(EmiScreenTransformer::getPriority).reversed());
+	public static void clearScreenBoundsProviders() {
+		PROVIDERS_BY_CLASS.clear();
+		GENERIC_PROVIDERS.clear();
 	}
 
 	public static EmiScreenBase of(Screen screen) {
+		if (screen == null) {
+			return EMPTY;
+		}
+
+		Class<?> screenClass = screen.getClass();
+		List<ScreenBoundsProvider<?>> classProviders = PROVIDERS_BY_CLASS.get(screenClass);
+		if (classProviders != null) {
+			for (ScreenBoundsProvider<?> provider : classProviders) {
+				@SuppressWarnings("unchecked")
+				Bounds bounds = ((ScreenBoundsProvider<Screen>) provider).provideBounds(screen);
+				if (bounds != null && !bounds.isEmpty()) {
+					return new EmiScreenBase(screen, bounds);
+				}
+			}
+		}
+		for (ScreenBoundsProvider<Screen> provider : GENERIC_PROVIDERS) {
+			Bounds bounds = provider.provideBounds(screen);
+			if (bounds != null && !bounds.isEmpty()) {
+				return new EmiScreenBase(screen, bounds);
+			}
+		}
 		if (screen instanceof HandledScreen hs) {
 			HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
 			ScreenHandler sh = hs.getScreenHandler();
@@ -71,16 +97,6 @@ public class EmiScreenBase {
 			}
 		} else if (screen instanceof RecipeScreen rs) {
 			return new EmiScreenBase(rs, rs.getBounds());
-		} else {
-			for (EmiScreenTransformer transformer : transformers) {
-				if (!transformer.canTransform(screen)) {
-					continue;
-				}
-				EmiScreenBaseBounds bounds = transformer.transform(screen);
-				if (bounds != null && !bounds.isEmpty()) {
-					return new EmiScreenBase(bounds.screen(), bounds.bounds());
-				}
-			}
 		}
 		return new EmiScreenBase(null, Bounds.EMPTY);
 	}
