@@ -98,6 +98,6 @@ public class EmiScreenBase {
 		} else if (screen instanceof RecipeScreen rs) {
 			return new EmiScreenBase(rs, rs.getBounds());
 		}
-		return new EmiScreenBase(null, Bounds.EMPTY);
+		return EMPTY;
 	}
 }
