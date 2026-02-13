@@ -318,7 +318,7 @@
 
   "tooltip.emi.bom.batch_size": "Quantité: %s\nScrollez pour changer\nMaintenez §6[Shift]§r pour changer par 16",
   "tooltip.emi.bom.batch_size.multiply": "Maintenez §6[Ctrl]§r pour ajouter un multiplicateur",
-  "tooltip.emi.bom.batch_size.all": "Maintenez §6[Alt]§r pour appliquer à tous les objets racine",
+  "tooltip.emi.bom.batch_size.all": "Maintenez §6[Alt]§r pour appliquer à tous les objets principaux",
   "tooltip.emi.bom.mode.view": "§6Assistant de fabrication§r\n(Désactivé)\n\nClic gauche pour l'activer",
   "tooltip.emi.bom.mode.craft": "§6Assistant de fabrication§r\nVotre progression sera\nvisible dans cette liste, des \n§bfavoris temporaires§r seront\najoutés pour vous guider",
   "tooltip.emi.bom.help": "Le graphe liste les ingrédients et les recettes\nVous pouvez déplacer/zoomer ce graphe\n\nClic gauche sur un noeud permet de modifier une recette\nMaintenir §6[Maj]§r permet de choisir automatiquement une recette\n\nClic droit un un noeud permet de le masquer temporairement\nMaintenir §6[Maj]§r permet de supprimer le noeud\n\nLe graphe est généré selon vos recettes par défaut\n\nLe bouton \"§acoeur§r\" permet de mettre des recettes en favoris\nSi vous utilisez l'§6assistant de fabrication§r alors\n\ndes §bfavoris temporaires§r seront placés dans l'onglet\ndes favoris afin de vous guider dans votre fabrication",
