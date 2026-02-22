@@ -14,8 +14,8 @@ public interface EmiScreenBoundsProvider<T extends Screen> {
 	 * Return null or Bounds.EMPTY if this provider does not handle the screen.
 	 *
 	 * @param screen The screen to get bounds for
-	 * @return The bounds for the screen, or null/EMPTY if not handled
+	 * @return The bounds for the screen, or null if not handled
 	 */
 	@Nullable
-	Bounds provideBounds(T screen);
+	Bounds getBounds(T screen);
 }

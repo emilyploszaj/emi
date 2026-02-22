@@ -70,14 +70,14 @@ public class EmiScreenBase {
 		if (classProviders != null) {
 			for (EmiScreenBoundsProvider<?> provider : classProviders) {
 				@SuppressWarnings("unchecked")
-				Bounds bounds = ((EmiScreenBoundsProvider<Screen>) provider).provideBounds(screen);
+				Bounds bounds = ((EmiScreenBoundsProvider<Screen>) provider).getBounds(screen);
 				if (bounds != null && !bounds.empty()) {
 					return new EmiScreenBase(screen, bounds);
 				}
 			}
 		}
 		for (EmiScreenBoundsProvider<Screen> provider : GENERIC_PROVIDERS) {
-			Bounds bounds = provider.provideBounds(screen);
+			Bounds bounds = provider.getBounds(screen);
 			if (bounds != null && !bounds.empty()) {
 				return new EmiScreenBase(screen, bounds);
 			}
