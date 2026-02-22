@@ -71,14 +71,14 @@ public class EmiScreenBase {
 			for (EmiScreenBoundsProvider<?> provider : classProviders) {
 				@SuppressWarnings("unchecked")
 				Bounds bounds = ((EmiScreenBoundsProvider<Screen>) provider).provideBounds(screen);
-				if (bounds != null && !bounds.isEmpty()) {
+				if (bounds != null && !bounds.empty()) {
 					return new EmiScreenBase(screen, bounds);
 				}
 			}
 		}
 		for (EmiScreenBoundsProvider<Screen> provider : GENERIC_PROVIDERS) {
 			Bounds bounds = provider.provideBounds(screen);
-			if (bounds != null && !bounds.isEmpty()) {
+			if (bounds != null && !bounds.empty()) {
 				return new EmiScreenBase(screen, bounds);
 			}
 		}
