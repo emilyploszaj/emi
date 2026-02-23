@@ -70,6 +70,12 @@ public class TreeCost {
 		calculateCost(node, batches * node.amount, ChanceState.DEFAULT, false);
 	}
 
+	public void calculateWithRemainders(MaterialNode node, long batches) {
+		costs.clear();
+		chanceCosts.clear();
+		calculateCost(node, batches * node.amount, ChanceState.DEFAULT, false);
+	}
+
 	public void calculateProgress(MaterialNode node, long batches, EmiPlayerInventory inventory) {
 		clear();
 		for (EmiStack stack : inventory.inventory.values()) {

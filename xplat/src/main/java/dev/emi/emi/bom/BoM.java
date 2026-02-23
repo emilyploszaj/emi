@@ -303,13 +303,10 @@ public class BoM {
 			combinedProgress.merge(tree.cost);
 
 			Map<EmiStack, EmiStack> updatedInventory = Maps.newHashMap();
-			for (Map.Entry<EmiStack, EmiStack> entry : sharedInventory.entrySet()) {
-				EmiStack key = entry.getKey();
-				long before = entry.getValue().getAmount();
-				FlatMaterialCost remainder = tree.cost.remainders.get(key);
-				long after = remainder == null ? 0 : Math.min(before, remainder.amount);
-				if (after > 0) {
-					updatedInventory.put(key, entry.getValue().copy().setAmount(after));
+			for (Map.Entry<EmiStack, FlatMaterialCost> entry : tree.cost.remainders.entrySet()) {
+				if (entry.getValue().amount > 0) {
+					EmiStack key = entry.getKey();
+					updatedInventory.put(key, key.copy().setAmount(entry.getValue().amount));
 				}
 			}
 			sharedInventory = updatedInventory;
@@ -317,7 +314,47 @@ public class BoM {
 		combinedCost.clear();
 		for (MaterialTree tree : trees) {
 			tree.calculateCost();
-			combinedCost.merge(tree.cost);
+		}
+		TreeCost running = new TreeCost();
+		for (MaterialTree tree : trees) {
+			running.clear();
+			for (Map.Entry<EmiStack, FlatMaterialCost> e : combinedCost.remainders.entrySet()) {
+				running.remainders.put(e.getKey(), new FlatMaterialCost(e.getKey(), e.getValue().amount));
+			}
+			for (Map.Entry<EmiStack, ChanceMaterialCost> e : combinedCost.chanceRemainders.entrySet()) {
+				EmiStack k = e.getKey();
+				ChanceMaterialCost v = e.getValue();
+				running.chanceRemainders.put(k, new ChanceMaterialCost(k, v.amount, v.chance));
+			}
+			running.calculateWithRemainders(tree.goal, tree.batches);
+			for (FlatMaterialCost cost : running.costs.values()) {
+				FlatMaterialCost existing = combinedCost.costs.get(cost.ingredient);
+				if (existing == null) {
+					combinedCost.costs.put(cost.ingredient, new FlatMaterialCost(cost.ingredient, cost.amount));
+				} else {
+					existing.amount += cost.amount;
+				}
+			}
+			for (ChanceMaterialCost cost : running.chanceCosts.values()) {
+				ChanceMaterialCost existing = combinedCost.chanceCosts.get(cost.ingredient);
+				if (existing == null) {
+					existing = new ChanceMaterialCost(cost.ingredient, cost.amount, cost.chance);
+					combinedCost.chanceCosts.put(cost.ingredient, existing);
+				} else {
+					existing.merge(cost.amount, cost.chance);
+				}
+				existing.minBatch(cost.minBatch);
+			}
+			combinedCost.remainders.clear();
+			combinedCost.chanceRemainders.clear();
+			for (Map.Entry<EmiStack, FlatMaterialCost> e : running.remainders.entrySet()) {
+				combinedCost.remainders.put(e.getKey(), new FlatMaterialCost(e.getKey(), e.getValue().amount));
+			}
+			for (Map.Entry<EmiStack, ChanceMaterialCost> e : running.chanceRemainders.entrySet()) {
+				EmiStack k = e.getKey();
+				ChanceMaterialCost v = e.getValue();
+				combinedCost.chanceRemainders.put(k, new ChanceMaterialCost(k, v.amount, v.chance));
+			}
 		}
 	}
 
