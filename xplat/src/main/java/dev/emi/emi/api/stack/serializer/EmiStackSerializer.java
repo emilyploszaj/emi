@@ -1,6 +1,7 @@
 package dev.emi.emi.api.stack.serializer;
 
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +39,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 	default EmiIngredient deserialize(JsonElement element) {
 		Identifier id = null;
 		String nbt = null;
+		JsonObject changesJson = null;
 		long amount = 1;
 		float chance = 1;
 		EmiStack remainder = EmiStack.EMPTY;
@@ -52,6 +54,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			JsonObject json = element.getAsJsonObject();
 			id = EmiPort.id(JsonHelper.getString(json, "id"));
 			nbt = JsonHelper.getString(json, "nbt", null);
+			changesJson = JsonHelper.getObject(json, "componentChanges", null);
 			amount = JsonHelper.getLong(json, "amount", 1);
 			chance = JsonHelper.getFloat(json, "chance", 1);
 			if (JsonHelper.hasElement(json, "remainder")) {
@@ -64,7 +67,9 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 		if (id != null) {
 			try {
 				ComponentChanges changes = ComponentChanges.EMPTY;
-				if (nbt != null) {
+				if (changesJson != null) {
+					changes = ComponentChanges.CODEC.decode(withRegistryAccess(JsonOps.INSTANCE), changesJson).getOrThrow().getFirst();
+				} else if (nbt != null) {
 					changes = ComponentChanges.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), StringNbtReader.parse(nbt)).getOrThrow().getFirst();
 				}
 				EmiStack stack = create(id, changes, amount);
