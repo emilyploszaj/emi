@@ -172,14 +172,18 @@ public class EmiSearchWidget extends TextFieldWidget {
 		return isFocused;
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+	public boolean mouseClicked(Click click, boolean doubled) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
 		if (!isMouseOver(mouseX, mouseY) || !EmiConfig.enabled) {
 			EmiPort.focus(this, false);
 			return false;
 		} else {
-			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
-			if (isMouseOver(mouseX, mouseY)) {
+            boolean b = super.mouseClicked(new Click(mouseX, mouseY, new MouseInput(button == 1 ? 0 : button, click.modifiers())), doubled);
+            if (isMouseOver(mouseX, mouseY)) {
 				EmiPort.focus(this, true);
 			}
 			if (this.isFocused()) {
@@ -199,8 +203,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override
+	public boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
+        int scanCode = input.scancode();
+
 		if (this.isFocused()) {
 			if (EmiConfig.clearSearch.matchesKey(keyCode, scanCode)) {
 				setText("");
@@ -222,7 +229,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 				}
 			}
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(input);
 	}
 
 	@Override

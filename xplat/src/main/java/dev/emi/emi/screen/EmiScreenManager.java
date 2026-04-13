@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.component.ComponentChanges;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
@@ -81,14 +83,12 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public class EmiScreenManager {
@@ -977,52 +977,52 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public static boolean mouseClicked(Click click, boolean doubled) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
 		}
-		if (search.mouseClicked(mouseX, mouseY, button)) {
+		if (search.mouseClicked(click, doubled)) {
 			return true;
-		} else if (emi.mouseClicked(mouseX, mouseY, button)) {
+		} else if (emi.mouseClicked(click, doubled)) {
 			return true;
-		} else if (tree.mouseClicked(mouseX, mouseY, button)) {
+		} else if (tree.mouseClicked(click, doubled)) {
 			return true;
 		}
 		for (SidebarPanel panel : panels) {
-			if (panel.cycle.mouseClicked(mouseX, mouseY, button)) {
+			if (panel.cycle.mouseClicked(click, doubled)) {
 				return true;
-			} else if (panel.pageLeft.mouseClicked(mouseX, mouseY, button)) {
+			} else if (panel.pageLeft.mouseClicked(click, doubled)) {
 				return true;
-			} else if (panel.pageRight.mouseClicked(mouseX, mouseY, button)) {
+			} else if (panel.pageRight.mouseClicked(click, doubled)) {
 				return true;
 			}
 		}
 		if (isDisabled()) {
-			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
+			if (EmiConfig.toggleVisibility.matchesMouse(click.button())) {
 				toggleVisibility(true);
 				return true;
 			}
 			return false;
 		}
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
+		EmiIngredient ingredient = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button())).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
 			// Don't cancel the event for extra mouse buttons
-			ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
+			ingredient = getHoveredStack((int) click.x(), (int) click.y(), false).getStack();
 			if (!ingredient.isEmpty()) {
 				return true;
 			}
 		} else {
-			if (genericInteraction(bind -> bind.matchesMouse(button))) {
+			if (genericInteraction(bind -> bind.matchesMouse(click.button()))) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public static boolean mouseReleased(Click click) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1031,10 +1031,10 @@ public class EmiScreenManager {
 			if (isDisabled()) {
 				return false;
 			}
-			int mx = (int) mouseX;
-			int my = (int) mouseY;
+			int mx = (int) click.x();
+			int my = (int) click.y();
 			recalculate();
-			if (EmiApi.isCheatMode() && EmiConfig.deleteCursorStack.matchesMouse(button)) {
+			if (EmiApi.isCheatMode() && EmiConfig.deleteCursorStack.matchesMouse(click.button())) {
 				if (deleteCursor(mx, my)) {
 					// Returning false here makes the handled screen do something and removes a bug, oh well.
 					return false;
@@ -1042,14 +1042,14 @@ public class EmiScreenManager {
 			}
 			SidebarPanel panel = getHoveredPanel(mx, my);
 			if (draggedStack == EmiStack.EMPTY && panel != null && panel.getType() == SidebarType.CHESS) {
-				EmiChess.interact(pressedStack, button);
+				EmiChess.interact(pressedStack, click.button());
 				return true;
 			}
 			if (!pressedStack.isEmpty()) {
 				if (!draggedStack.isEmpty()) {
 					if (panel != null) {
 						ScreenSpace space = panel.getHoveredSpace(mx, my);
-						if (space != null && space.getType() == SidebarType.FAVORITES ) {
+						if (space != null && space.getType() == SidebarType.FAVORITES) {
 							int page = panel.page;
 							int pageSize = space.pageSize;
 							int index = Math.min(space.getClosestEdge(mx, my), EmiFavorites.favorites.size());
@@ -1070,12 +1070,12 @@ public class EmiScreenManager {
 						}
 					}
 				} else {
-					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
-					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
+					EmiStackInteraction hovered = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button()));
+                    if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(click.button()))) {
 						return true;
 					}
 				}
-				if (genericInteraction(bind -> bind.matchesMouse(button))) {
+				if (genericInteraction(bind -> bind.matchesMouse(click.button()))) {
 					return true;
 				}
 			}
@@ -1086,7 +1086,7 @@ public class EmiScreenManager {
 		}
 	}
 
-	public static boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public static boolean mouseDragged(Click click, double deltaX, double deltaY) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1094,14 +1094,14 @@ public class EmiScreenManager {
 		if (isDisabled()) {
 			return false;
 		}
-		if (draggedStack.isEmpty() && button == 0) {
+		if (draggedStack.isEmpty() && click.button() == 0) {
 			if (client.currentScreen instanceof HandledScreen<?> handled) {
 				if (!handled.getScreenHandler().getCursorStack().isEmpty()) {
 					return false;
 				}
 			}
 			recalculate();
-			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
+			EmiStackInteraction hovered = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button()));
 			if (hovered.getStack() != pressedStack && !(pressedStack instanceof EmiFavorite.Synthetic)) {
 				draggedStack = pressedStack;
 			}
@@ -1109,7 +1109,10 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public static boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
+        int scanCode = input.scancode();
+
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1121,7 +1124,7 @@ public class EmiScreenManager {
 			}
 			return false;
 		}
-		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
+		if (EmiScreenManager.search.keyPressed(input) || EmiScreenManager.search.isActive()) {
 			return true;
 		}
 		if (hasFocusedTextField(client.currentScreen, 10)) {
@@ -1312,7 +1315,7 @@ public class EmiScreenManager {
 				}
 				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), EmiCraftContext.Type.CRAFTABLE, destination, amount)) {
 					MinecraftClient.getInstance().getSoundManager()
-							.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+							.play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 					return true;
 				}
 			}
@@ -1329,7 +1332,7 @@ public class EmiScreenManager {
 			repopulatePanels(SidebarType.FAVORITES);
 			return true;
 		} else if (function.apply(EmiConfig.copyId)) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			client.keyboard.setClipboard("" + recipe.getId());
 			return true;
 		}

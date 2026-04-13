@@ -46,10 +46,12 @@ import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -363,12 +365,15 @@ public class BoMScreen extends Screen {
 		return (float) desired / scale;
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override
+	public boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
+        int scanCode = input.scancode();
+
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.close();
 			return true;
-		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+		} else if (this.client.options.inventoryKey.matchesKey(input)) {
 			this.close();
 			return true;
 		}
@@ -399,7 +404,7 @@ public class BoMScreen extends Screen {
 			BoM.tree = null;
 			init();
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(input);
 	}
 
 	private boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
@@ -434,8 +439,12 @@ public class BoMScreen extends Screen {
 		return false;
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+	public boolean mouseClicked(Click click, boolean doubled) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
 		Hover hover = getHoveredStack((int) mouseX, (int) mouseY);
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
@@ -467,7 +476,7 @@ public class BoMScreen extends Screen {
 						MinecraftClient client = MinecraftClient.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.
-						client.currentScreen.init(client, client.currentScreen.width, client.currentScreen.height);
+						client.currentScreen.init(client.currentScreen.width, client.currentScreen.height);
 						if (hover.node != null) {
 							if (hover.node.recipe != null) {
 								EmiApi.focusRecipe(hover.node.recipe);
@@ -478,13 +487,13 @@ public class BoMScreen extends Screen {
 				}
 			}
 		} else if (mode.contains(mx, my)) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			BoM.craftingMode = !BoM.craftingMode;
 			recalculateTree();
 		} else if (batches.contains(mx, my) && BoM.tree != null) {
 			long ideal = BoM.tree.cost.getIdealBatch(BoM.tree.goal, 1, 1);
 			if (ideal != BoM.tree.batches) {
-				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 				BoM.tree.batches = ideal;
 				recalculateTree();
 			}
@@ -494,7 +503,7 @@ public class BoMScreen extends Screen {
 			EmiHistory.pop();
 			return true;
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(click, doubled);
 	}
 
 	@Override
@@ -529,15 +538,15 @@ public class BoMScreen extends Screen {
 		return true;
 	}
 
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (button == 0 || button == 2) {
+    @Override
+	public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+		if (click.button() == 0 || click.button() == 2) {
 			float scale = getScale();
 			offX += deltaX / scale;
 			offY += deltaY / scale;
 			return true;
 		}
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		return super.mouseDragged(click, deltaX, deltaY);
 	}
 
 	@Override

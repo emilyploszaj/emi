@@ -49,11 +49,13 @@ import dev.emi.emi.screen.widget.config.SidebarSubpanelsWidget;
 import dev.emi.emi.screen.widget.config.SubGroupNameWidget;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.StringVisitable;
@@ -143,7 +145,7 @@ public class ConfigScreen extends Screen {
 		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", originalConfig));
 			MinecraftClient client = MinecraftClient.getInstance();
-			this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+			this.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
 		});
 		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.close();
@@ -154,7 +156,7 @@ public class ConfigScreen extends Screen {
 		}));
 		this.addDrawableChild(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 0, () -> true, widget -> {
 			EmiConfig.setGlobalState(!EmiConfig.useGlobalConfig);
-			ConfigScreen.this.resize(client, width, height);
+			ConfigScreen.this.resize(width, height);
 		}, () -> (EmiConfig.useGlobalConfig ? 40 : 0), () -> {
 			return (List<Text>) (Object) Arrays.stream(I18n.translate("tooltip.emi.config.global").split("\n"))
 				.map(s -> client.textRenderer.getTextHandler().wrapLines(StringVisitable.plain(s), maxWidth, Style.EMPTY))
@@ -374,16 +376,16 @@ public class ConfigScreen extends Screen {
 		}
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (activeBind != null) {
-			pushModifier(0);
-			activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.MOUSE.createFromCode(button), activeModifiers));
-			activeBind = null;
-			return true;
-		}
-		return super.mouseClicked(mouseX, mouseY, button);
-	}
+    @Override
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (activeBind != null) {
+            pushModifier(0);
+            activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.MOUSE.createFromCode(click.button()), activeModifiers));
+            activeBind = null;
+            return true;
+        }
+        return super.mouseClicked(click, doubled);
+    }
 
 	private void pushModifier(int lastModifier) {
 		activeModifiers |= EmiInput.maskFromCode(this.lastModifier);
@@ -391,14 +393,14 @@ public class ConfigScreen extends Screen {
 		activeModifiers &= ~EmiInput.maskFromCode(lastModifier);
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override
+	public boolean keyPressed(KeyInput input) {
 		if (activeBind != null) {
-			if (EmiInput.maskFromCode(keyCode) != 0) {
-				pushModifier(keyCode);
+			if (EmiInput.maskFromCode(input.key()) != 0) {
+				pushModifier(input.key());
 			} else {
 				pushModifier(0);
-				if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+				if (input.isEscape()) {
 					activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
 				} else {
 					activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(keyCode), activeModifiers));
@@ -409,22 +411,22 @@ public class ConfigScreen extends Screen {
 			return true;
 		} else {
 			// Element nesting causes crashing for cycling, for some reason
-			if (keyCode == GLFW.GLFW_KEY_TAB) {
+			if (input.isTab()) {
 				return false;
 			}
-			if (super.keyPressed(keyCode, scanCode, modifiers)) {
+			if (super.keyPressed(input)) {
 				return true;
 			}
 			if (this.getFocused() instanceof TextFieldWidget tfw && tfw.isFocused()) {
-				if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+				if (input.isEscape()) {
 					EmiPort.focus(tfw, false);
 					return true;
 				}
 			} else {
-				if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+				if (input.isEscape()) {
 					this.close();
 					return true;
-				} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+				} else if (this.client.options.inventoryKey.matchesKey(input)) {
 					this.close();
 					return true;
 				}
@@ -433,8 +435,9 @@ public class ConfigScreen extends Screen {
 		return false;
 	}
 
-	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    @Override
+	public boolean keyReleased(KeyInput input) {
+        int keyCode = input.key();
 		if (activeBind != null) {
 			activeModifiers &= ~EmiInput.maskFromCode(keyCode);
 			if (keyCode == lastModifier) {
@@ -443,7 +446,7 @@ public class ConfigScreen extends Screen {
 			}
 			return true;
 		}
-		return super.keyReleased(keyCode, scanCode, modifiers);
+		return super.keyReleased(input);
 	}
 
 	@Override

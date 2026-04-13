@@ -13,6 +13,8 @@ import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 
 @Mixin(Keyboard.class)
 public class KeyboardMixin {
@@ -20,14 +22,14 @@ public class KeyboardMixin {
 	private MinecraftClient client;
 	
 	@Inject(at = @At(value = "INVOKE", target =
-			"net/minecraft/client/gui/screen/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
-		method = "onKey(JIIII)V", cancellable = true)
-	public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
+			"Lnet/minecraft/client/gui/screen/Screen;keyPressed(Lnet/minecraft/client/input/KeyInput;)Z"),
+		method = "onKey", cancellable = true)
+	public void onKey(long window, int action, KeyInput input, CallbackInfo info) {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?> hs) {
 				if (action == 1 || action == 2) {
-					if (EmiScreenManager.keyPressed(key, scancode, modifiers)) {
+					if (EmiScreenManager.keyPressed(input)) {
 						info.cancel();
 					}
 				}
@@ -38,18 +40,18 @@ public class KeyboardMixin {
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "onChar(JII)V", cancellable = true)
-	public void onChar(long window, int codePoint, int modifiers, CallbackInfo info) {
+		method = "onChar", cancellable = true)
+	public void onChar(long window, CharInput input, CallbackInfo info) {
 		try {
 			if (window == client.getWindow().getHandle()) {
 				Screen screen = client.currentScreen;
 				if (screen instanceof HandledScreen<?> hs && this.client.getOverlay() == null) {
 					boolean consume = false;
-					if (Character.charCount(codePoint) == 1) {
-						consume = EmiScreenManager.search.charTyped((char) codePoint, modifiers) || consume;
+					if (Character.charCount(input.codepoint()) == 1) {
+						consume = EmiScreenManager.search.charTyped(input) || consume;
 					} else {
-						for (char c : Character.toChars(codePoint)) {
-							consume = EmiScreenManager.search.charTyped(c, modifiers) || consume;
+						for (char c : Character.toChars(input.codepoint())) {
+							consume = EmiScreenManager.search.charTyped(input) || consume;
 						}
 					}
 					if (consume) {

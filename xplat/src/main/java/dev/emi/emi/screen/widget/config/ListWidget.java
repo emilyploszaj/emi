@@ -287,8 +287,12 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return null;
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+	public boolean mouseClicked(Click click, boolean doubled) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
 		this.updateScrollingState(mouseX, mouseY, button);
 		/*
 		for (Entry entry : this.children()) {
@@ -304,8 +308,8 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		}
 		Entry entry = this.getEntryAtPosition(mouseX, mouseY);
 		if (entry != null) {
-			if (entry.mouseClicked(mouseX, mouseY, button)) {
-				this.setFocused((Element)entry);
+			if (entry.mouseClicked(click, doubled)) {
+				this.setFocused(entry);
 				this.setDragging(true);
 				return true;
 			}
@@ -313,25 +317,25 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return this.scrolling;
 	}
 
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    @Override
+	public boolean mouseReleased(Click click) {
 		if (this.getFocused() != null) {
-			this.getFocused().mouseReleased(mouseX, mouseY, button);
+			this.getFocused().mouseReleased(click);
 		}
 		return false;
 	}
 
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+    @Override
+	public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+		if (super.mouseDragged(click, deltaX, deltaY)) {
 			return true;
 		}
-		if (button != 0 || !this.scrolling) {
+		if (click.button() != 0 || !this.scrolling) {
 			return false;
 		}
-		if (mouseY < (double)this.top) {
+		if (click.y() < (double)this.top) {
 			this.setScrollAmount(0.0);
-		} else if (mouseY > (double)this.bottom) {
+		} else if (click.y() > (double)this.bottom) {
 			this.setScrollAmount(this.getMaxScroll());
 		} else {
 			double d = Math.max(1, this.getMaxScroll());

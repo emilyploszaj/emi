@@ -16,6 +16,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 public class ConfigEnumScreen<T> extends Screen {
@@ -65,19 +66,19 @@ public class ConfigEnumScreen<T> extends Screen {
 	public void close() {
 		MinecraftClient.getInstance().setScreen(last);
 	}
-	
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+
+    @Override
+	public boolean keyPressed(KeyInput input) {
+		if (input.isEscape()) {
 			this.close();
 			return true;
-		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+		} else if (this.client.options.inventoryKey.matchesKey(input)) {
 			this.close();
 			return true;
-		} else if (keyCode == GLFW.GLFW_KEY_TAB) {
+		} else if (input.isTab()) {
 			return false;
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(input);
 	}
 
 	public static record Entry<T>(T value, Text name, List<TooltipComponent> tooltip) {

@@ -94,7 +94,7 @@ public class EmiBind {
 		for (ModifiedKey boundKey : boundKeys) {
 			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (boundKey.key.getCategory() == InputUtil.Type.KEYSYM && boundKey.key.getCode() != -1) {
-					if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), boundKey.key.getCode())) {
+					if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), boundKey.key.getCode())) {
 						return true;
 					}
 				}

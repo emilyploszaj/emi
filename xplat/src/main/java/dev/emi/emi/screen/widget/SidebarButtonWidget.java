@@ -36,10 +36,10 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 		texture = EmiRenderHelper.WIDGETS;
 	}
 
-	@Override
-	public void onPress() {
-		panel.cycleType(EmiInput.isShiftDown() ? -1 : 1);
-	}
+    @Override
+    public void onPress(AbstractInput input) {
+        panel.cycleType(EmiInput.isShiftDown() ? -1 : 1);
+    }
 
 	@Override
 	protected int getU(int mouseX, int mouseY) {
