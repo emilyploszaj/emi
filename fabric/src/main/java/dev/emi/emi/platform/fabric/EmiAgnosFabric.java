@@ -58,6 +58,8 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -245,7 +247,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected boolean canBatchAgnos(ItemStack stack) {
-		return ColorProviderRegistry.ITEM.get(stack.getItem()) == null;
+		return false;//ColorProviderRegistry.ITEM.get(stack.getItem()) == null; TODO
 	}
 
 	@Override
@@ -263,9 +265,9 @@ public class EmiAgnosFabric extends EmiAgnos {
 		return fuelMap;
 	}
 
-	@Override
-	protected BakedModel getBakedTagModelAgnos(Identifier id) {
-		return MinecraftClient.getInstance().getBakedModelManager().getModel(id);
+    @Override
+	protected ItemModel getBakedTagModelAgnos(Identifier id) {
+		return MinecraftClient.getInstance().getBakedModelManager().getItemModel(id);
 	}
 
 	@Override
