@@ -11,6 +11,8 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.EmiNetwork;
+
+import net.minecraft.command.DefaultPermissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -23,7 +25,7 @@ public class EmiCommands {
 	
 	public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
 		dispatcher.register(literal("emi")
-			.requires(source -> source.hasPermissionLevel(2))
+			.requires(source -> source.getPermissions().hasPermission(DefaultPermissions.GAMEMASTERS))
 			.then(
 				literal("view")
 				.then(
