@@ -16,15 +16,16 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.FluidUnit;
 import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
-import dev.emi.emi.jemi.impl.JemiRecipeSlot.IngredientRenderer;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
-import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
+import mezz.jei.api.gui.ingredient.IRecipeSlotRichTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.text.Text;
 
 public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredientAcceptor> {
@@ -37,7 +38,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void coerceStacks(IRecipeSlotTooltipCallback tooltipCallback, Map<IIngredientType<?>, IngredientRenderer<?>> renderers) {
+	public void coerceStacks(Object tooltipCallback, Map<IIngredientType<?>, JemiRecipeSlot.IngredientRenderer<?>> renderers) {
 		if (tooltipCallback == null && renderers == null) {
 			return;
 		}
@@ -46,7 +47,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 			if (typed != null && (stack instanceof JemiStack || stack.getKey() instanceof Fluid)) {
 				List<Text> base = Lists.newArrayList();
 				if (renderers != null && renderers.containsKey(typed.getType())) {
-					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipType.BASIC));
+					base.addAll(((JemiRecipeSlot.IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipType.BASIC));
 				}
 				if (base == null || base.isEmpty()) {
 					if (tooltipCallback == null) {
@@ -57,7 +58,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 				}
 				if (tooltipCallback != null) {
 					JemiRecipeSlot jsr = new JemiRecipeSlot(role, stack);
-					tooltipCallback.onTooltip(jsr, base);
+//					tooltipCallback.onTooltip(jsr, base);
 				}
 				for (int i = 0; i < 2 && i < base.size(); i++) {
 					Text t = base.get(i);
@@ -85,7 +86,37 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 		}
 	}
 
-	@Override
+    @Override
+    public JemiIngredientAcceptor add(SlotDisplay slotDisplay) {
+        return null;
+    }
+
+    @Override
+    public JemiIngredientAcceptor add(Fluid fluid) {
+        return null;
+    }
+
+    @Override
+    public JemiIngredientAcceptor add(Fluid fluid, long l) {
+        return null;
+    }
+
+    @Override
+    public JemiIngredientAcceptor add(Fluid fluid, long l, ComponentChanges componentChanges) {
+        return null;
+    }
+
+    @Override
+    public JemiIngredientAcceptor add(Ingredient ingredient) {
+        return null;
+    }
+
+    @Override
+    public <I> JemiIngredientAcceptor add(IIngredientType<I> iIngredientType, I i) {
+        return null;
+    }
+
+    @Override
 	public <I> JemiIngredientAcceptor addIngredients(IIngredientType<I> ingredientType, List<@Nullable I> ingredients) {
 		for (I i : ingredients) {
 			addIngredient(ingredientType, i);

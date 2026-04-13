@@ -18,6 +18,7 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotsView;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -25,19 +26,19 @@ import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.types.IRecipeType;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.ScreenHandler;
 
 public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeHandler<T> {
-	private final RecipeType<R> type;
+    private final IRecipeType<R> type;
 	//private IRecipeCategory<R> category;
 	public IRecipeTransferHandler<T, R> handler;
 
@@ -105,8 +106,8 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 					}
 				});
 				draw.push();
-				draw.matrices().translate(-100000, -100000, -100000);
-				draw.matrices().scale(0, 0, 0);
+				draw.matrices().translate(-100000, -100000/*, -100000*/);
+				draw.matrices().scale(0, 0/*, 0*/);
 				err.showError(raw, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
 				draw.pop();
 				view.getSlotViews().forEach(v -> {
@@ -196,7 +197,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 					addIngredients(builder, slotWidgets, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
 				}
 			}
-			addIngredients(builder, slotWidgets, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
+			addIngredients(builder, slotWidgets, recipe.getCatalysts(), RecipeIngredientRole.RENDER_ONLY); // TODO
 		}
 
 		return new JemiRecipeSlotsView(builder.slots.stream().map(JemiRecipeSlot::new).toList());
@@ -214,19 +215,18 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 					}
 				}
 				if (manager != null) {
-					Optional<? extends RecipeEntry<?>> opt = manager.get(recipe.getId());
-					if (opt.isPresent()) {
-						RecipeEntry<?> r = opt.get();
-						if (type.getRecipeClass().isAssignableFrom(r.getClass())) {
-							return type.getRecipeClass().cast(r);
+					RecipeEntry<?> entry = EmiAgnos.getRecipe(manager, recipe.getId()); // TODO
+					if (entry != null) {
+						if (type.getRecipeClass().isAssignableFrom(entry.getClass())) {
+							return type.getRecipeClass().cast(entry);
 						}
 					}
 				}
 			}
 			if (manager != null) {
-				Optional<? extends RecipeEntry<?>> opt = manager.get(recipe.getId());
-				if (opt.isPresent()) {
-					return (R) opt.get();
+                RecipeEntry<?> entry = EmiAgnos.getRecipe(manager, recipe.getId()); // TODO
+                if (entry != null) {
+					return (R) entry;
 				}
 			}
 		} catch (Exception e) {
