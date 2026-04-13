@@ -14,6 +14,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
+import dev.emi.emi.platform.EmiAgnos;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.RecipeInputInventory;
@@ -62,9 +64,8 @@ public class EmiStackProviders {
 							RecipeInputInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
 							CraftingRecipeInput input = CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks());
 							MinecraftClient client = MinecraftClient.getInstance();
-							List<CraftingRecipe> list
-								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, input, client.world)
-									.stream().map(RecipeEntry::value).toList();
+                            List<CraftingRecipe> list
+								= EmiAgnos.getAllMatchesRecipe(client.world.getRecipeManager(), RecipeType.CRAFTING, input, client.world).map(RecipeEntry::value).toList();
 							if (!list.isEmpty()) {
 								Identifier id = EmiPort.getId(list.get(0));
 								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);

@@ -15,6 +15,7 @@ import dev.emi.emi.runtime.EmiDrawContext;
 
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 //import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.enchantment.Enchantment;
@@ -172,4 +173,34 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllRecipesOfType(RecipeManager recipeManager, RecipeType<T> recipeType) {
+        return delegate.getAllRecipesOfTypeAgnos(recipeManager, recipeType);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllRecipesOfTypeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatchesRecipe(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return delegate.getAllMatchesRecipeAgnos(recipeManager, recipeType, input, world);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatchesRecipeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Optional<RecipeEntry<T>> getFirstMatchRecipe(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return delegate.getFirstMatchRecipeAgnos(recipeManager, recipeType, input, world);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Optional<RecipeEntry<T>> getFirstMatchRecipeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world);
+
+    public static Collection<RecipeEntry<?>> listAllRecipes(RecipeManager recipeManager) {
+        return delegate.getAllRecipesAgnos(recipeManager);
+    }
+
+    protected abstract Collection<RecipeEntry<?>> getAllRecipesAgnos(RecipeManager recipeManager);
+
+    public static RecipeEntry<?> getRecipe(RecipeManager recipeManager, Identifier id) {
+        return delegate.getRecipeAgnos(recipeManager, id);
+    }
+
+    protected abstract RecipeEntry<?> getRecipeAgnos(RecipeManager recipeManager, Identifier id);
 }

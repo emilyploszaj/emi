@@ -2,7 +2,7 @@ package dev.emi.emi;
 
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -11,27 +11,23 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.recipe.display.SlotDisplay;
+import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.registry.RegistryKeys;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.stack.Comparison;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiRecipes;
+import dev.emi.emi.runtime.EmiLog;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
-import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget.PressAction;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -52,6 +48,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 /**
  * Multiversion quarantine, to avoid excessive git pain
@@ -108,7 +105,7 @@ public final class EmiPort {
 	}
 
 	public static BannerPatternsComponent addRandomBanner(BannerPatternsComponent patterns, Random random) {
-		var bannerRegistry = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
+		var bannerRegistry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.BANNER_PATTERN);
 		return new BannerPatternsComponent.Builder().addAll(patterns).add(bannerRegistry.getEntry(random.nextInt(bannerRegistry.size())).get(),
 			DyeColor.values()[random.nextInt(DyeColor.values().length)]).build();
 	}
@@ -164,7 +161,7 @@ public final class EmiPort {
 
 	public static Registry<Enchantment> getEnchantmentRegistry() {
 		MinecraftClient client = MinecraftClient.getInstance();
-		return client.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
+		return client.world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
 	}
 
 	public static ButtonWidget newButton(int x, int y, int w, int h, Text name, PressAction action) {
@@ -172,8 +169,23 @@ public final class EmiPort {
 	}
 
 	public static ItemStack getOutput(Recipe<?> recipe) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return recipe.getResult(client.world.getRegistryManager());
+        // TODO: check this
+        if (recipe.getDisplays().size() > 1) {
+            EmiLog.warn("Recipe " + recipe + " has more than one display, still not known how to handle this");
+            return ItemStack.EMPTY;
+        }
+
+        SlotDisplay slotDisplay = recipe.getDisplays().getFirst().result();
+        if (slotDisplay instanceof SlotDisplay.StackSlotDisplay(ItemStack stack)) {
+            return stack;
+        } else if (slotDisplay instanceof SlotDisplay.SmithingTrimSlotDisplay smithing) {
+            World world = MinecraftClient.getInstance().world;
+            return smithing.getFirst(SlotDisplayContexts.createParameters(Objects.requireNonNull(world)));
+        } else {
+            EmiLog.warn("Recipe " + recipe + " has an unsupported result slot display: " + slotDisplay.getClass()
+                    .getName() + ": " + slotDisplay);
+            return ItemStack.EMPTY;
+        }
 	}
 
 	public static void focus(TextFieldWidget widget, boolean focused) {
@@ -203,7 +215,7 @@ public final class EmiPort {
 		if (client.world != null && id != null) {
 			RecipeManager manager = client.world.getRecipeManager();
 			if (manager != null) {
-				return manager.get(id).orElse(null);
+				return EmiAgnos.getRecipe(manager, id);
 			}
 		}
 		return null;
@@ -231,6 +243,6 @@ public final class EmiPort {
 	}
 
 	public static void applyModelViewMatrix() {
-		RenderSystem.applyModelViewMatrix();
+//		RenderSystem.applyModelViewMatrix();
 	}
 }

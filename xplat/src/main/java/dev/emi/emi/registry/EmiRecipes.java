@@ -28,6 +28,7 @@ import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
@@ -74,8 +75,8 @@ public class EmiRecipes {
 			RecipeManager manager = client.world.getRecipeManager();
 			recipeIds = new Reference2ObjectOpenHashMap<>();
 			if (manager != null) {
-				for (RecipeEntry<?> entry : manager.values()) {
-					recipeIds.put(entry.value(), entry.id());
+				for (RecipeEntry<?> entry : EmiAgnos.listAllRecipes(manager)) {
+					recipeIds.put(entry.value(), entry.id().getValue());
 				}
 			}
 		}
