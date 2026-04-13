@@ -86,7 +86,7 @@ public class EmiRenderHelper {
 		if (sprite == null) {
 			return;
 		}
-        context.drawSpriteStretched(sprite, x, y, width, height, color);
+        context.drawSpriteStretched(sprite, x + xOff, y + yOff, width, height, color);
 
         //		EmiPort.setPositionColorTexShader();
 //		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -211,10 +211,10 @@ public class EmiRenderHelper {
 
 	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h, int z) {
 		context.push();
-		context.matrices().translate(0, 0, z);
-		RenderSystem.colorMask(true, true, true, false);
+//		context.matrices().translate(0, 0, z);
+//		RenderSystem.colorMask(true, true, true, false);
 		context.fill(x, y, w, h, -2130706433);
-		RenderSystem.colorMask(true, true, true, true);
+//		RenderSystem.colorMask(true, true, true, true);
 		context.pop();
 	}
 
@@ -257,7 +257,7 @@ public class EmiRenderHelper {
 
 	public static void renderAmount(EmiDrawContext context, int x, int y, Text amount) {
 		context.push();
-		context.matrices().translate(0, 0, 200);
+//		context.matrices().translate(0, 0, 200);
 		int tx = x + 17 - Math.min(14, CLIENT.textRenderer.getWidth(amount));
 		context.drawTextWithShadow(amount, tx, y + 9, -1);
 		context.pop();
@@ -266,8 +266,8 @@ public class EmiRenderHelper {
 	public static void renderIngredient(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		context.enableDepthTest();
 		context.push();
-		context.matrices().translate(0, 0, 200);
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+//		context.matrices().translate(0, 0, 200);
+//		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 		context.drawTexture(WIDGETS, x, y, 8, 252, 4, 4);
 		context.pop();
 	}
@@ -276,7 +276,7 @@ public class EmiRenderHelper {
 		if (ingredient.getEmiStacks().size() > 1) {
 			context.enableDepthTest();
 			context.push();
-			context.matrices().translate(0, 0, 200);
+//			context.matrices().translate(0, 0, 200);
 			context.drawTexture(WIDGETS, x, y + 12, 0, 252, 4, 4);
 			context.pop();
 		}
@@ -290,7 +290,7 @@ public class EmiRenderHelper {
 					renderCatalyst(ingredient, context, x, y);
 				} else {
 					context.push();
-					context.matrices().translate(0, 0, 200);
+//					context.matrices().translate(0, 0, 200);
 					context.enableDepthTest();
 					context.drawTexture(WIDGETS, x + 12, y, 4, 252, 4, 4);
 					context.pop();
@@ -303,7 +303,7 @@ public class EmiRenderHelper {
 	public static void renderCatalyst(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		context.enableDepthTest();
 		context.push();
-		context.matrices().translate(0, 0, 200);
+//		context.matrices().translate(0, 0, 200);
 		context.drawTexture(WIDGETS, x + 12, y, 12, 252, 4, 4);
 		context.pop();
 		return;
@@ -311,7 +311,7 @@ public class EmiRenderHelper {
 
 	public static void renderRecipeFavorite(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		context.push();
-		context.matrices().translate(0, 0, 200);
+//		context.matrices().translate(0, 0, 200);
 		context.enableDepthTest();
 		context.drawTexture(WIDGETS, x + 12, y, 16, 252, 4, 4);
 		context.pop();
@@ -346,10 +346,11 @@ public class EmiRenderHelper {
 			};
 
 			context.push();
-			context.matrices().translate(x + 4, y + 4, 0);
+			context.matrices().translate(x + 4, y + 4/*, 0*/);
 
 			recipe.addWidgets(holder);
-			float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+            // TODO: check this
+			float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(false);
 			for (Widget widget : widgets) {
 				widget.render(context.raw(), -1000, -1000, delta);
 			}
@@ -371,11 +372,11 @@ public class EmiRenderHelper {
 
 			// Force translucency to match that of the recipe background
 			context.disableBlend();
-			RenderSystem.colorMask(false, false, false, true);
+//			RenderSystem.colorMask(false, false, false, true);
 			context.disableDepthTest();
 			renderRecipeBackground(recipe, context, x, y);
 			context.enableDepthTest();
-			RenderSystem.colorMask(true, true, true, true);
+//			RenderSystem.colorMask(true, true, true, true);
 			// Blend should be off by default
 		} catch (Throwable e) {
 			EmiLog.error("Error rendering recipe", e);

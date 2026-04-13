@@ -20,14 +20,20 @@ public interface EmiTooltipComponent extends TooltipComponent {
     @Override
     default void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext raw) {
         EmiDrawContext context = EmiDrawContext.wrap(raw);
+        context.push();
+        context.matrices().translate(x, y/*, 0*/);
         MinecraftClient client = MinecraftClient.getInstance();
         drawTooltip(context, new TooltipRenderData(textRenderer, client.getItemRenderer(), x, y));
+        context.pop();
     }
 
     @Override
     default void drawText(DrawContext raw, TextRenderer textRenderer, int x, int y) {
         EmiDrawContext context = EmiDrawContext.wrap(raw);
+        context.push();
+        context.matrices().translate(x, y/*, 0*/);
         drawTooltipText(new TextRenderData(context, textRenderer, x, y));
+        context.pop();
     }
 
 	public static class TextRenderData {

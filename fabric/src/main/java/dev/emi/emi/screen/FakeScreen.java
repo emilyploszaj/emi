@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.client.MinecraftClient;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.ItemStack;
@@ -17,8 +17,6 @@ public class FakeScreen extends Screen {
 
 	protected FakeScreen() {
 		super(EmiPort.literal(""));
-		this.client = MinecraftClient.getInstance();
-		this.textRenderer = client.textRenderer;
 		this.width = Integer.MAX_VALUE;
 		this.height = Integer.MAX_VALUE;
 	}

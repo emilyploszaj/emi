@@ -100,7 +100,7 @@ public class MicroTextRenderer {
 		float g = (((color & 0x0000FF00) >>  8) & 0xFF) / 255f;
 		float b = (((color & 0x000000FF) >>  0) & 0xFF) / 255f;
 		context.push();
-		context.matrices().translate(0, 0, 300);
+//		context.matrices().translate(0, 0, 300);
 		context.disableBlend();
 		for (int i = 0; i < string.length(); i++) {
 			MicroChar c = MICRO_CHARS.get(string.charAt(i));

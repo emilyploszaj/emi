@@ -81,7 +81,7 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 		for (int i = 0; i < remainders.size(); i++) {
 			Remainder remainder = remainders.get(i);
 			boolean chanced = remainder.chance != 1;
-			text.draw(EmiPort.literal("->"), 20, 5 + i * 18 - (chanced ? 4 : 0), 0xffffff, true);
+			text.draw(EmiPort.literal("->"), 20, 5 + i * 18 - (chanced ? 4 : 0), 0xFFFFFFFF, true);
 			if (chanced) {
 				Text t = EmiPort.literal(EmiTooltip.TEXT_FORMAT.format(remainder.chance * 100) + "%");
 				int tx = text.renderer.getWidth(t);

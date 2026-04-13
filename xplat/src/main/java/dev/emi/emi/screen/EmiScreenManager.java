@@ -681,7 +681,7 @@ public class EmiScreenManager {
 
 	private static void renderWidgets(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		context.push();
-		context.matrices().translate(0, 0, 100);
+//		context.matrices().translate(0, 0, 100);
 		emi.render(context.raw(), mouseX, mouseY, delta);
 		tree.render(context.raw(), mouseX, mouseY, delta);
 		search.render(context.raw(), mouseX, mouseY, delta);
@@ -694,17 +694,19 @@ public class EmiScreenManager {
 			if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
 				ScreenSpace space = getHoveredSpace(mouseX, mouseY);
 				if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
-					Matrix4fStack view = RenderSystem.getModelViewStack();
-					view.pushMatrix();
-					view.translate(0, 0, 200);
-					EmiPort.applyModelViewMatrix();
+                    context.push();
+//					Matrix4fStack view = RenderSystem.getModelViewStack();
+//					view.pushMatrix();
+					context.matrices().translate(0, 0/*, 200*/);
+//					EmiPort.applyModelViewMatrix();
 					int lhx = space.getRawX(lastHoveredCraftableOffset);
 					int lhy = space.getRawY(lastHoveredCraftableOffset);
 					context.fill(lhx, lhy, 18, 18, 0x44AA00FF);
 					lastHoveredCraftable.getStack().render(context.raw(), lhx + 1, lhy + 1, delta,
 							EmiIngredient.RENDER_ICON);
-					view.popMatrix();
-					EmiPort.applyModelViewMatrix();
+//					view.popMatrix();
+//					EmiPort.applyModelViewMatrix();
+                    context.pop();
 				}
 			}
 		}
@@ -727,7 +729,7 @@ public class EmiScreenManager {
 					}
 					if (index >= 0) {
 						context.push();
-						context.matrices().translate(0, 0, 200);
+//						context.matrices().translate(0, 0, 200);
 						int dx = space.getEdgeX(index);
 						int dy = space.getEdgeY(index);
 						context.fill(dx - 1, dy, 2, 18, 0xFF00FFFF);
@@ -736,7 +738,7 @@ public class EmiScreenManager {
 				}
 			}
 			context.push();
-			context.matrices().translate(0, 0, 400);
+//			context.matrices().translate(0, 0, 400);
 			EmiDragDropHandlers.render(base.screen(), draggedStack, context.raw(), mouseX, mouseY, delta);
 			draggedStack.render(context.raw(), mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 			context.pop();
@@ -810,7 +812,7 @@ public class EmiScreenManager {
 		if (EmiConfig.devMode) {
 			Screen screen = base.screen();
 			EmiProfiler.swap("dev");
-			int color = 0xFFFFFF;
+			int color = 0xFFFFFFFF;
 			Text title = EmiPort.literal("EMI Dev Mode");
 			int off = -16;
 			int devTextX = getDebugTextX();
@@ -883,14 +885,14 @@ public class EmiScreenManager {
 		}
 		if (base.screen() instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
 			context.push();
-			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
+			context.matrices().translate(hsa.getX(), hsa.getY()/*, 0*/);
 			for (Slot slot : hs.getScreenHandler().slots) {
 				if (!slot.isEnabled()) {
 					continue;
 				}
 				EmiStack stack = EmiStack.of(slot.getStack());
 				context.push();
-				context.matrices().translate(0, 0, 300);
+//				context.matrices().translate(0, 0, 300);
 				if (query != null) {
 					if (!query.test(stack)) {
 						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
@@ -913,28 +915,28 @@ public class EmiScreenManager {
 		}
 		forceRecalculate();
 		if (EmiConfig.centerSearchBar || panels.get(0).space == null || panels.get(1).space == null) {
-			search.x = (screen.width - 160) / 2;
-			search.y = screen.height - 21;
+			search.setX((screen.width - 160) / 2); // Initial position of the text will not be calculated if x is assigned
+			search.setY(screen.height - 21);
 			search.setWidth(160);
 		} else {
 			if (EmiConfig.searchSidebar == SidebarSide.RIGHT) {
-				search.x = panels.get(1).space.tx;
-				search.y = screen.height - 21;
+				search.setX(panels.get(1).space.tx);
+				search.setY(screen.height - 21);
 				search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
 			} else {
-				search.x = panels.get(0).space.tx;
-				search.y = screen.height - 21 - 21;
+				search.setX(panels.get(0).space.tx);
+				search.setY(screen.height - 21 - 21);
 				search.setWidth(panels.get(0).space.tw * ENTRY_SIZE);
 			}
 		}
 		EmiPort.focus(search, false);
 		search.setVisible(EmiConfig.searchSidebar != SidebarSide.NONE);
 
-		emi.x = 2;
-		emi.y = screen.height - 22;
+		emi.setX(2);
+		emi.setY(screen.height - 22);
 
-		tree.x = 24;
-		tree.y = screen.height - 22;
+		tree.setX(24);
+		tree.setY(screen.height - 22);
 
 		updateSidebarButtons();
 	}
@@ -1503,7 +1505,7 @@ public class EmiScreenManager {
 				if (isVisible()) {
 					EmiProfiler.swap(side.getName());
 					context.push();
-					context.matrices().translate(0, 0, 100);
+//					context.matrices().translate(0, 0, 100);
 					pageLeft.render(context.raw(), mouseX, mouseY, delta);
 					cycle.render(context.raw(), mouseX, mouseY, delta);
 					pageRight.render(context.raw(), mouseX, mouseY, delta);

@@ -46,6 +46,10 @@ public class EmiDrawContext {
 		drawTexture(texture, x, y, width, height, u, v, width, height, 256, 256);
 	}
 
+    public void drawTexture(Identifier texture, int x, int y, int u, int v, int width, int height, int color) {
+        drawTexture(texture, x, y, width, height, u, v, width, height, 256, 256, color);
+    }
+
 	public void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height) {
 		drawTexture(texture, x, y, z, u, v, width, height, 256, 256);
 	}
@@ -57,6 +61,10 @@ public class EmiDrawContext {
 	public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
 		context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight);
 	}
+
+    public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color) {
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
+    }
 
     public void drawSpriteStretched(Sprite sprite, int x, int y, int width, int height, int color) {
         context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height, color);
@@ -107,39 +115,40 @@ public class EmiDrawContext {
 	}
 
 	public void enableDepthTest() {
-		RenderSystem.enableDepthTest();
+//		RenderSystem.enableDepthTest();
 	}
 
 	public void disableDepthTest() {
-		RenderSystem.disableDepthTest();
+//		RenderSystem.disableDepthTest();
 	}
 
 	public void enableBlend() {
-		RenderSystem.enableBlend();
+//		RenderSystem.enableBlend();
 	}
 
 	public void disableBlend() {
-		RenderSystem.disableBlend();
+//		RenderSystem.disableBlend();
 	}
 
 	public void resetColor() {
-		setColor(1f, 1f, 1f, 1f);
+//		setColor(1f, 1f, 1f, 1f);
 	}
 
 	public void setColor(float r, float g, float b) {
-		setColor(r, g, b, 1f);
+//		setColor(r, g, b, 1f);
 	}
 
 	public void setColor(float r, float g, float b, float a) {
-		raw().setShaderColor(r, g, b, a);
+//		raw().setShaderColor(r, g, b, a);
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y) {
-		stack.render(raw(), x, y, client.getRenderTickCounter().getTickDelta(false));
+        // TODO: check this
+		stack.render(raw(), x, y, client.getRenderTickCounter().getTickProgress(false));
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, int flags) {
-		drawStack(stack, x, y, client.getRenderTickCounter().getTickDelta(false), flags);
+		drawStack(stack, x, y, client.getRenderTickCounter().getTickProgress(false), flags);
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, float delta, int flags) {

@@ -189,7 +189,7 @@ public class RecipeScreen extends Screen {
 		//EmiRenderHelper.drawScroll(context, x + 19 + buttonOff, y + 19 + 10, minimumWidth - 38, 2, page, tabs.get(tab).getPageCount(), -1);
 		
 		boolean categoryHovered = mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY < y + 5 + 12;
-		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
+		int categoryNameColor = categoryHovered ? 0xFF22FFFF : 0xFFFFFFFF;
 
 		RecipeTab tab = tabs.get(this.tab);
 		Text text = tab.category.getName();
@@ -199,7 +199,7 @@ public class RecipeScreen extends Screen {
 		}
 		context.drawCenteredTextWithShadow(text, x + backgroundWidth / 2, y + 7, categoryNameColor);
 		context.drawCenteredTextWithShadow(EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
-			x + backgroundWidth / 2, y + 21, 0xffffff);
+			x + backgroundWidth / 2, y + 21, 0xFFFFFFFF);
 
 		List<EmiIngredient> workstations = EmiApi.getRecipeManager().getWorkstations(tab.category);
 		int workstationAmount = Math.min(workstations.size(), getMaxWorkstations());
@@ -221,8 +221,8 @@ public class RecipeScreen extends Screen {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
 			context.push();
-//			context.matrices().translate(group.x(), group.y(), 0);
-			EmiPort.applyModelViewMatrix();
+			context.matrices().translate(group.x(), group.y()/*, 0*/);
+//			EmiPort.applyModelViewMatrix();
 			try {
 				for (Widget widget : group.widgets) {
 					widget.render(context.raw(), mx, my, delta);
@@ -246,7 +246,7 @@ public class RecipeScreen extends Screen {
 				}
 			}
 			context.pop();
-			EmiPort.applyModelViewMatrix();
+//			EmiPort.applyModelViewMatrix();
 		}
 		EmiScreenManager.drawBackground(context, mouseX, mouseY, delta);
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
