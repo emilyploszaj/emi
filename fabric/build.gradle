@@ -89,16 +89,10 @@ shadowJar {
 }
 
 remapJar {
-    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+    inputFile.convention(shadowJar.archiveFile)
+    injectAccessWidener = true
 }
-
-//def remapJar = tasks.named('remapJar', RemapJarTask)
-//
-//remapJar.configure { RemapJarTask jar ->
-//	dependsOn shadowJar
-//	jar.inputFile.convention(shadowJar.flatMap {it.archiveFile })
-//	jar.injectAccessWidener = true
-//}
 
 sourcesJar {
     def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
@@ -106,24 +100,18 @@ sourcesJar {
 	from zipTree(commonSources.flatMap { it.archiveFile })
 }
 
-//tasks.named('sourcesJar', Jar).configure { Jar jar ->
-//	def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
-//	dependsOn commonSources
-//	jar.from zipTree(commonSources.flatMap { it.archiveFile })
-//}
-
-//def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
-//	archiveClassifier = 'filtered-sources'
-//	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
-//	dependsOn remapSourcesJar
-//	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
-//	exclude 'dev/emi/emi/jemi/**'
-//})
+def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
+	archiveClassifier = 'filtered-sources'
+	dependsOn tasks.remapSourcesJar
+	from zipTree(tasks.remapSourcesJar.archiveFile)
+	exclude 'dev/emi/emi/jemi/**'
+})
 
 def apiJar = tasks.register('apiJar', Jar, {
+    def remapJar = tasks.remapJar
 	archiveClassifier = 'api'
 	dependsOn remapJar
-	from zipTree(remapJar.flatMap { it.archiveFile })
+	from zipTree(remapJar.archiveFile)
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
 	include 'emi-fabric.mixins.json'
@@ -138,7 +126,7 @@ def apiJar = tasks.register('apiJar', Jar, {
 })
 
 build {
-	dependsOn(/*filteredSourcesJar, */apiJar)
+	dependsOn(filteredSourcesJar, apiJar)
 }
 
 components.java {
