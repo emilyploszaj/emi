@@ -48,6 +48,6 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 
 	@Override
 	public Identifier getId() {
-		return EmiPort.id("emi", "/tag/" + key.registry().getValue().getPath() + "/" + EmiUtil.subId(key.id()));
+		return EmiPort.id("emi", "/tag/" + key.registryRef().getValue().getPath() + "/" + EmiUtil.subId(key.id()));
 	}
 }
