@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
+import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiSidebars;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.RecipeInputInventory;
@@ -31,9 +32,9 @@ public class CraftingResultSlotMixin {
 	
 	@Inject(at = @At("HEAD"), method = "onCrafted(Lnet/minecraft/item/ItemStack;)V")
 	private void onCrafted(ItemStack stack, CallbackInfo info) {
-		World world = player.getWorld();
-		if (world.isClient) {
-			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input.createPositionedRecipeInput().input(), world).map(RecipeEntry::value);
+		World world = player.getEntityWorld();
+		if (world.isClient()) {
+			Optional<CraftingRecipe> opt = EmiAgnos.getFirstMatchRecipe(world.getRecipeManager(), RecipeType.CRAFTING, input.createPositionedRecipeInput().input(), world).map(RecipeEntry::value);
 			if (opt.isPresent()) {
 				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.getId(opt.get()));
 				if (recipe != null) {
