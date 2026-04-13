@@ -275,7 +275,7 @@ public class VanillaPlugin implements EmiPlugin {
 		});
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
-			if (EmiConfig.effectLocation != EffectLocation.HIDDEN && screen instanceof AbstractInventoryScreen<?> inv) {
+			if (EmiConfig.effectLocation != EffectLocation.HIDDEN && screen instanceof HandledScreen<?> inv) {
 				MinecraftClient client = MinecraftClient.getInstance();
 				Collection<StatusEffectInstance> collection = client.player.getStatusEffects();
 				if (!collection.isEmpty()) {
@@ -292,7 +292,7 @@ public class VanillaPlugin implements EmiPlugin {
 						if (EmiConfig.effectLocation == EffectLocation.TOP) {
 							int size = collection.size();
 							top = ((HandledScreenAccessor) inv).getY() - 34;
-							if (((Object) screen) instanceof CreativeInventoryScreen) {
+							if (screen instanceof CreativeInventoryScreen) {
 								top -= 28;
 								if (EmiAgnos.isForge()) {
 									top -= 22;

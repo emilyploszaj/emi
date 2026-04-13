@@ -55,7 +55,7 @@ public class EmiDrawContext {
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-		context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, /* z,*/ u, v, width, height, textureWidth, textureHeight); // TODO
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, /* z,*/ u, v, width, height, textureWidth, textureHeight);
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
@@ -143,7 +143,6 @@ public class EmiDrawContext {
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y) {
-        // TODO: check this
 		stack.render(raw(), x, y, client.getRenderTickCounter().getTickProgress(false));
 	}
 
