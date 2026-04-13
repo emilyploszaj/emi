@@ -3,11 +3,9 @@ package dev.emi.emi;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -34,7 +32,6 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
@@ -85,36 +82,38 @@ public class EmiRenderHelper {
 		context.drawTexture(texture, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
 	}
 
-	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
+	public static void drawTintedSprite(EmiDrawContext context, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
 		if (sprite == null) {
 			return;
 		}
-		EmiPort.setPositionColorTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
-		RenderSystem.enableBlend();
-		
-		float r = ((color >> 16) & 255) / 256f;
-		float g = ((color >> 8) & 255) / 256f;
-		float b = (color & 255) / 256f;
-		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		float xMin = (float) x;
-		float yMin = (float) y;
-		float xMax = xMin + width;
-		float yMax = yMin + height;
-		float uSpan = sprite.getMaxU() - sprite.getMinU();
-		float vSpan = sprite.getMaxV() - sprite.getMinV();
-		float uMin = sprite.getMinU() + uSpan / 16 * xOff;
-		float vMin = sprite.getMinV() + vSpan / 16 * yOff;
-		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
-		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
-		Matrix4f model = matrices.peek().getPositionMatrix();
-		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax);
-		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax);
-		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin);
-		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin);
-		EmiPort.draw(bufferBuilder);
+        context.drawSpriteStretched(sprite, x, y, width, height, color);
+
+        //		EmiPort.setPositionColorTexShader();
+//		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+//		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
+//		RenderSystem.enableBlend();
+//
+//		float r = ((color >> 16) & 255) / 256f;
+//		float g = ((color >> 8) & 255) / 256f;
+//		float b = (color & 255) / 256f;
+//
+//		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+//		float xMin = (float) x;
+//		float yMin = (float) y;
+//		float xMax = xMin + width;
+//		float yMax = yMin + height;
+//		float uSpan = sprite.getMaxU() - sprite.getMinU();
+//		float vSpan = sprite.getMaxV() - sprite.getMinV();
+//		float uMin = sprite.getMinU() + uSpan / 16 * xOff;
+//		float vMin = sprite.getMinV() + vSpan / 16 * yOff;
+//		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
+//		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
+//		Matrix4f model = matrices.peek().getPositionMatrix();
+//		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax);
+//		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax);
+//		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin);
+//		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin);
+//		EmiPort.draw(bufferBuilder);
 	}
 
 	public static void drawScroll(EmiDrawContext context, int x, int y, int width, int height, int progress, int total, int color) {
@@ -207,7 +206,7 @@ public class EmiRenderHelper {
 		context.enableDepthTest();
 		EmiPort.setPositionTexShader();
 		context.resetColor();
-		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner);
+		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner, null, false);
 	}
 
 	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h, int z) {

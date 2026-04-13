@@ -5,11 +5,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import org.joml.Matrix3x2fStack;
 
 public class EmiDrawContext {
 	private final MinecraftClient client = MinecraftClient.getInstance();
@@ -27,16 +30,16 @@ public class EmiDrawContext {
 		return context;
 	}
 
-	public MatrixStack matrices() {
+	public Matrix3x2fStack matrices() {
 		return context.getMatrices();
 	}
 
 	public void push() {
-		matrices().push();
+		matrices().pushMatrix();
 	}
 
 	public void pop() {
-		matrices().pop();
+		matrices().popMatrix();
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int u, int v, int width, int height) {
@@ -48,14 +51,16 @@ public class EmiDrawContext {
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-		EmiPort.setPositionTexShader();
-		context.drawTexture(texture, x, y, z, u, v, width, height, textureWidth, textureHeight);
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, /* z,*/ u, v, width, height, textureWidth, textureHeight); // TODO
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
-		EmiPort.setPositionTexShader();
-		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight);
 	}
+
+    public void drawSpriteStretched(Sprite sprite, int x, int y, int width, int height, int color) {
+        context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height, color);
+    }
 
 	public void fill(int x, int y, int width, int height, int color) {
 		context.fill(x, y, x + width, y + height, color);

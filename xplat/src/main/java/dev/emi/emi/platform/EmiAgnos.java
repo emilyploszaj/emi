@@ -1,23 +1,35 @@
 package dev.emi.emi.platform;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiDrawContext;
+
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
+//import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+
+import org.joml.Matrix3x2fStack;
 
 public abstract class EmiAgnos {
 	public static EmiAgnos delegate;
@@ -121,15 +133,15 @@ public abstract class EmiAgnos {
 
 	protected abstract boolean isFloatyFluidAgnos(FluidEmiStack stack);
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
-		renderFluid(stack, matrices, x, y, delta, 0, 0, 16, 16);
+	public static void renderFluid(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta) {
+		renderFluid(stack, context, x, y, delta, 0, 0, 16, 16);
 	}
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
-		delegate.renderFluidAgnos(stack, matrices, x, y, delta, xOff, yOff, width, height);
+	public static void renderFluid(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+		delegate.renderFluidAgnos(stack, context, x, y, delta, xOff, yOff, width, height);
 	}
 
-	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height);
 
 	public static EmiStack createFluidStack(Object object) {
 		return delegate.createFluidStackAgnos(object);

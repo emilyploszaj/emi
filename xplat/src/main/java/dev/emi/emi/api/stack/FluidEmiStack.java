@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
@@ -20,7 +17,6 @@ import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -77,8 +73,8 @@ public class FluidEmiStack extends EmiStack {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if ((flags & RENDER_ICON) != 0) {
 			context.push();
-			context.matrices().translate(0, 0, 100);
-			EmiAgnos.renderFluid(this, context.matrices(), x, y, delta);
+//			context.matrices().translate(0, 0, 100);
+			EmiAgnos.renderFluid(this, context, x, y, delta);
 			context.pop();
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {

@@ -43,12 +43,12 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getHeight() {
+	public int getHeight(TextRenderer textRenderer) {
 		return 18 * remainders.size();
 	}
 
 	@Override
-	public int getWidth(TextRenderer var1) {
+	public int getWidth(TextRenderer textRenderer) {
 		return 18 * 3;
 	}
 
@@ -64,12 +64,12 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 				context.drawStack(input, 18 * 2, 18 * i, EmiIngredient.RENDER_ICON | EmiIngredient.RENDER_AMOUNT);
 				ItemStack is = input.getEmiStacks().get(0).getItemStack().copy();
 				is.setDamage(is.getDamage() - remainder.damage);
-				context.raw().drawItemInSlot(render.text, is, 18 * 2, 18 * i, "");
+				context.raw().drawStackOverlay(render.text, is, 18 * 2, 18 * i, "");
 				context.drawStack(input, 18 * 2, 18 * i, -1 ^ (EmiIngredient.RENDER_ICON | EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
 				Text t = remainder.damage > 0 ? EmiPort.literal("+" + remainder.damage, Formatting.GREEN) : EmiPort.literal("" + remainder.damage, Formatting.RED);
 				int width = render.text.getWidth(t);
 				context.push();
-				context.matrices().translate(0, 0, 200);
+//				context.matrices().translate(0, 0, 200);
 				context.drawText(t, 42 - width, i * 18);
 				context.pop();
 			}

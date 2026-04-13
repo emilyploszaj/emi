@@ -78,7 +78,7 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getHeight() {
+	public int getHeight(TextRenderer textRenderer) {
 		if (!nodes.isEmpty()) {
 			return nodes.get(nodes.size() - 1).y + 18;
 		}

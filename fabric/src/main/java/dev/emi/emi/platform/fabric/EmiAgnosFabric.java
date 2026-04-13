@@ -1,13 +1,16 @@
 package dev.emi.emi.platform.fabric;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import net.minecraft.enchantment.Enchantment;
 import org.apache.commons.lang3.text.WordUtils;
+import org.joml.Matrix3x2fStack;
 
 import com.google.common.collect.Lists;
 
@@ -20,18 +23,17 @@ import dev.emi.emi.api.FabricEmiStack;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
-import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.FakeScreen;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -40,11 +42,11 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
@@ -52,9 +54,15 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -212,7 +220,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+	protected void renderFluidAgnos(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
 		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
 		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
@@ -221,7 +229,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		Sprite sprite = sprites[0];
 		int color = FluidVariantRendering.getColor(fluid);
 		
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
+		EmiRenderHelper.drawTintedSprite(context, sprite, color, x, y, xOff, yOff, width, height);
 	}
 
 	@Override
