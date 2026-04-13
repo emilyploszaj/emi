@@ -403,7 +403,7 @@ public class ConfigScreen extends Screen {
 				if (input.isEscape()) {
 					activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
 				} else {
-					activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(keyCode), activeModifiers));
+					activeBind.setBind(activeBindOffset, new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(input.key()), activeModifiers));
 				}
 				activeBind = null;
 				updateChanges();
