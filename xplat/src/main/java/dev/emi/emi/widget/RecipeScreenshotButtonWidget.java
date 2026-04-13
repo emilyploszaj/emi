@@ -9,6 +9,7 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiScreenshotRecorder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.util.Identifier;
 
@@ -39,7 +40,7 @@ public class RecipeScreenshotButtonWidget extends RecipeButtonWidget {
 		int width = recipe.getDisplayWidth() + 8;
 		int height = recipe.getDisplayHeight() + 8;
 		MinecraftClient client = MinecraftClient.getInstance();
-		DrawContext context = new DrawContext(client, client.getBufferBuilders().getEntityVertexConsumers());
+		DrawContext context = new DrawContext(client, new GuiRenderState(), 0, 0); // TODO
 		EmiScreenshotRecorder.saveScreenshot("emi/recipes/" + path, width, height,
 			() -> EmiRenderHelper.renderRecipe(recipe, EmiDrawContext.wrap(context), 0, 0, false, -1));
 
