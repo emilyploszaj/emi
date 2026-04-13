@@ -215,12 +215,13 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 
-		Matrix4fStack view = RenderSystem.getModelViewStack();
-		view.pushMatrix();
-		view.translate(width / 2, height / 2, 0);
-		view.scale(scale, scale, 1);
-		view.translate((float)offX, (float)offY, 0);
-		EmiPort.applyModelViewMatrix();
+//		Matrix4fStack view = RenderSystem.getModelViewStack();
+//		view.pushMatrix();
+        context.push();
+        context.matrices().translate(width / 2, height / 2/*, 0*/);
+        context.matrices().scale(scale, scale/*, 1*/);
+        context.matrices().translate((float)offX, (float)offY/*, 0*/);
+//		EmiPort.applyModelViewMatrix();
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
@@ -254,8 +255,8 @@ public class BoMScreen extends Screen {
 			context.drawCenteredText(EmiPort.translatable("emi.random_tree_input"), 0, 0);
 		}
 
-		view.popMatrix();
-		EmiPort.applyModelViewMatrix();
+		context.pop();
+//		EmiPort.applyModelViewMatrix();
 
 		if (help.contains(mouseX, mouseY)) {
 			context.setColor(0.5f, 0.6f, 1f, 1f);
