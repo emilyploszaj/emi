@@ -1,8 +1,5 @@
 package dev.emi.emi.platform.fabric;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiChessPacket;
@@ -12,18 +9,22 @@ import dev.emi.emi.network.FillRecipeC2SPacket;
 import dev.emi.emi.network.PingS2CPacket;
 import dev.emi.emi.platform.EmiMain;
 import dev.emi.emi.registry.EmiCommands;
-import io.netty.buffer.Unpooled;
+import dev.emi.emi.runtime.EmiLog;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketDecoder;
-import net.minecraft.network.codec.PacketEncoder;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 public class EmiMainFabric implements ModInitializer {
@@ -46,6 +47,19 @@ public class EmiMainFabric implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			EmiNetwork.sendToClient(handler.player, new PingS2CPacket());
 		});
+
+        // Run through vanilla recipe serializers and sync them
+        for (var entry : Registries.RECIPE_SERIALIZER.getEntrySet()) {
+            RegistryKey<RecipeSerializer<?>> resourceKey = entry.getKey();
+            if (resourceKey.getValue().getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
+                RecipeSerializer<?> serializer = entry.getValue();
+                try {
+                    RecipeSynchronization.synchronizeRecipeSerializer(serializer);
+                } catch (RuntimeException e) {
+                    EmiLog.error("Failed to synchronize recipe serializer", e);
+                }
+            }
+        }
 	}
 
 	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
