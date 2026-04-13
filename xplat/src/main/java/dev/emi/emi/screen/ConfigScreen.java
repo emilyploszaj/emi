@@ -51,6 +51,7 @@ import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -270,10 +271,10 @@ public class ConfigScreen extends Screen {
 			EmiLog.error("Error initializing config screen", e);
 		}
 
+        addJumpButtons(); // Add this before the list, or mouse events will be intercepted by the list
 		this.addSelectableChild(list);
 		list.setScrollAmount(scroll);
 		search.setText(query);
-		addJumpButtons();
 		updateChanges();
 	}
 
@@ -369,8 +370,8 @@ public class ConfigScreen extends Screen {
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
+        list.render(context.raw(), mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
-		list.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
 			EmiRenderHelper.drawTooltip(this, context, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}

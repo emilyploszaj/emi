@@ -73,7 +73,7 @@ public class ConfigPresetScreen extends Screen {
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderDarkening(context.raw());
+//		this.renderDarkening(context.raw()); // This is confusing and makes the blur effect not work?
 		list.render(context.raw(), mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {
@@ -83,10 +83,10 @@ public class ConfigPresetScreen extends Screen {
 		}
 	}
 
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-		// Prevent double background draw
-	}
+//	@Override
+//	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+//		// Prevent double background draw
+//	}
 
 	@Override
 	public void close() {

@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.MinecraftClient;
@@ -25,10 +28,7 @@ import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -165,14 +165,14 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		int j = i + 6;
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+//		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
 
 		{	// Render background
-			RenderSystem.enableBlend();
+//			RenderSystem.enableBlend();
 			Identifier identifier = this.client.world == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
-			draw.drawTexture(identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
-			RenderSystem.disableBlend();
+			draw.drawTexture(RenderPipelines.GUI_TEXTURED, identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
+//			RenderSystem.disableBlend();
 		}
 
 		draw.enableScissor(left, top, right, bottom);
@@ -183,16 +183,16 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 
 
 		{	// Render header & footer separators
-			RenderSystem.enableBlend();
+//			RenderSystem.enableBlend();
 			Identifier identifier = this.client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE;
 			Identifier identifier2 = this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE;
-			draw.drawTexture(identifier, left, top - 2, 0.0F, 0.0F, width, 2, 32, 2);
-			draw.drawTexture(identifier2, left, bottom, 0.0F, 0.0F, width, 2, 32, 2);
-			RenderSystem.disableBlend();
+			draw.drawTexture(RenderPipelines.GUI_TEXTURED, identifier, left, top - 2, 0.0F, 0.0F, width, 2, 32, 2);
+			draw.drawTexture(RenderPipelines.GUI_TEXTURED, identifier2, left, bottom, 0.0F, 0.0F, width, 2, 32, 2);
+//			RenderSystem.disableBlend();
 		}
 
 		if ((o = this.getMaxScroll()) > 0) {
-			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+//			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 			m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
 			m = MathHelper.clamp(m, 32, this.bottom - this.top - 8);
 			n = (int)this.getScrollAmount() * (this.bottom - this.top - m) / o + this.top;
@@ -212,9 +212,10 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			bufferBuilder.vertex(j - 1, n + m - 1, 0).color(192, 192, 192, 255);
 			bufferBuilder.vertex(j - 1, n, 0).color(192, 192, 192, 255);
 			bufferBuilder.vertex(i, n, 0).color(192, 192, 192, 255);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            RenderLayers.debugQuads().draw(bufferBuilder.end());
 		}
-		RenderSystem.disableBlend();
+//        RenderSystem.
+//		RenderSystem.disableBlend();
 	}
 
 	public void centerScrollOn(Entry entry) {
@@ -353,9 +354,9 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 		return true;
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (super.keyPressed(keyCode, scanCode, modifiers)) {
+    @Override
+	public boolean keyPressed(KeyInput input) {
+		if (super.keyPressed(input)) {
 			return true;
 		}
 		/*
@@ -429,21 +430,21 @@ public class ListWidget extends AbstractParentElement implements Drawable, Selec
 			if (this.renderSelection && this.isSelectedEntry(j)) {
 				p = this.left + this.width / 2 - o / 2;
 				int q = this.left + this.width / 2 + o / 2;
-				RenderSystem.setShader(GameRenderer::getPositionProgram);
+//				RenderSystem.setShader(GameRenderer::getPositionProgram);
 				float f = this.isFocused() ? 1.0f : 0.5f;
-				RenderSystem.setShaderColor(f, f, f, 1.0f);
+//				RenderSystem.setShaderColor(f, f, f, 1.0f);
 				bufferBuilder.vertex(p, m + n + 2, 0);
 				bufferBuilder.vertex(q, m + n + 2, 0);
 				bufferBuilder.vertex(q, m - 2, 0);
 				bufferBuilder.vertex(p, m - 2, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-				RenderSystem.setShaderColor(0.0f, 0.0f, 0.0f, 1.0f);
+                RenderLayers.debugQuads().draw(bufferBuilder.end());
+//				RenderSystem.setShaderColor(0.0f, 0.0f, 0.0f, 1.0f);
 				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 				bufferBuilder.vertex(p + 1, m + n + 1, 0);
 				bufferBuilder.vertex(q - 1, m + n + 1, 0);
 				bufferBuilder.vertex(q - 1, m - 1, 0);
 				bufferBuilder.vertex(p + 1, m - 1, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                RenderLayers.debugQuads().draw(bufferBuilder.end());
 			}
 			p = this.getRowLeft();
 			((Entry)entry).render(draw, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);

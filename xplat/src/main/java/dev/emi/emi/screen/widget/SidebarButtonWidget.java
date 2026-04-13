@@ -11,7 +11,8 @@ import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
-import net.minecraft.text.Text;
+
+import net.minecraft.client.input.AbstractInput;
 import net.minecraft.util.Formatting;
 
 public class SidebarButtonWidget extends SizedButtonWidget {
@@ -21,7 +22,7 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 		super(x, y, width, height, 0, 0, () -> {
 			return panel.pages.pages.size() > 0;
 		}, null, () -> 0, () -> {
-			List<Text> list = Lists.newArrayList();
+			List<net.minecraft.text.Text> list = Lists.newArrayList();
 			list.add(panel.getType().getText());
 			list.add(panel.getType().getDescription());
 			if (panel.getType() == SidebarType.FAVORITES && EmiConfig.favorite.isBound()) {
