@@ -175,13 +175,13 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		@Override
 		public void render(DrawContext raw, int x, int y, float delta, int flags) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
-			int color = 0x915900; // Orange
+			int color = 0xFF915900; // Orange
 			if (state == 1) {
-				color = 0x790091; // Magenta
+				color = 0xFF790091; // Magenta
 			} else if (state == 2) {
-				color = 0x00918e; // Blue
+				color = 0xFF00918E; // Blue
 			} else if (state == -1) {
-				color = 0x911300; // Red
+				color = 0xFF911300; // Red
 			}
 			//context.fill(x - 1, y - 1, 18, 18, 0x44000000 | color);
 			stack.render(context.raw(), x, y, delta, flags & (~EmiIngredient.RENDER_AMOUNT));

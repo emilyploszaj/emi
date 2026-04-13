@@ -118,17 +118,17 @@ public final class EmiPort {
 		}
 	}
 
-	public static void setShader(VertexBuffer buf, Matrix4f mat) {
-		buf.bind();
-		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-	}
+//	public static void setShader(VertexBuffer buf, Matrix4f mat) {
+//		buf.bind();
+//		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+//	}
 
-	public static List<BakedQuad> getQuads(BakedModel model) {
-		return model.getQuads(null, null, RANDOM);
-	}
+//	public static List<BakedQuad> getQuads(BakedModel model) {
+//		return model.getQuads(null, null, RANDOM);
+//	}
 
 	public static void draw(BufferBuilder bufferBuilder) {
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+//		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 
 	public static int getGuiScale(MinecraftClient client) {
@@ -136,11 +136,11 @@ public final class EmiPort {
 	}
 
 	public static void setPositionTexShader() {
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+//		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 	}
 
 	public static void setPositionColorTexShader() {
-		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+//		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 	}
 
 	public static Registry<Item> getItemRegistry() {

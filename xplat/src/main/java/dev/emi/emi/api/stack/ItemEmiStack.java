@@ -2,9 +2,11 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 
@@ -23,13 +25,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -109,9 +105,8 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
-			DiffuseLighting.enableGuiDepthLighting();
 			draw.drawItemWithoutEntity(stack, x, y);
-			draw.drawItemInSlot(client.textRenderer, stack, x, y, "");
+			draw.drawStackOverlay(client.textRenderer, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
@@ -127,14 +122,16 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public boolean isSideLit() {
-		return client.getItemRenderer().getModel(getItemStack(), null, null, 0).isSideLit();
+        ItemRenderState state = new ItemRenderState(); // TODO
+        client.getItemModelManager().update(state, getItemStack(), ItemDisplayContext.GUI, client.world, null, 0);
+		return state.isSideLit();
 	}
 	
 	@Override
 	public boolean isUnbatchable() {
 		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasGlint() || stack.isDamaged() || !EmiAgnos.canBatch(stack)
-			|| client.getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
+		return unbatchable || stack.hasGlint() || stack.isDamaged() || !EmiAgnos.canBatch(stack);
+        // || client.getItemRenderer().getModel(getItemStack(), null, null, 0).isBuiltin();
 	}
 	
 	@Override
@@ -144,19 +141,19 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	
 	@Override
 	public void renderForBatch(VertexConsumerProvider vcp, DrawContext draw, int x, int y, int z, float delta) {
-		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		ItemStack stack = getItemStack();
-		ItemRenderer ir = client.getItemRenderer();
-		BakedModel model = ir.getModel(stack, null, null, 0);
-		context.push();
-		try {
-			context.matrices().translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
-			context.matrices().translate(8.0, 8.0, 0.0);
-			context.matrices().scale(16.0f, -16.0f, 16.0f);
-			ir.renderItem(stack, ModelTransformationMode.GUI, false, context.matrices(), vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
-		} finally {
-			context.pop();
-		}
+//		EmiDrawContext context = EmiDrawContext.wrap(draw);
+//		ItemStack stack = getItemStack();
+//		ItemRenderer ir = client.getItemRenderer();
+//		BakedModel model = ir.getModel(stack, null, null, 0);
+//		context.push();
+//		try {
+//			context.matrices().translate(x, y, 100.0f + z + (model.hasDepth() ? 50 : 0));
+//			context.matrices().translate(8.0, 8.0, 0.0);
+//			context.matrices().scale(16.0f, -16.0f, 16.0f);
+//			ir.renderItem(stack, ModelTransformationMode.GUI, false, context.matrices(), vcp, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
+//		} finally {
+//			context.pop();
+//		}
 	}
 
 	@Override
