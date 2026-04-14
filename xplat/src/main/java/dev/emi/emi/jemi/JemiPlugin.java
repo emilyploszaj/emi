@@ -62,6 +62,8 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.library.ingredients.subtypes.SubtypeInterpreters;
+import mezz.jei.library.load.registration.SubtypeRegistration;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -87,6 +89,19 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	}
 
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
+		try {
+			if (((SubtypeRegistration) registration).getInterpreters() != null) {
+				hasSubtype = (type, ingredient) -> {
+					@SuppressWarnings("unchecked")
+					IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
+					SubtypeInterpreters interpreters = ((SubtypeRegistration) registration).getInterpreters();
+					return interpreters.contains(castedType, ingredient);
+				};
+			}
+			return;
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 		hasSubtype = (type, ingredient) -> {
 			@SuppressWarnings("unchecked")
 			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
