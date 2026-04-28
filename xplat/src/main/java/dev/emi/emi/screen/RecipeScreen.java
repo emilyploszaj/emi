@@ -383,9 +383,15 @@ public class RecipeScreen extends Screen {
 			List<EmiIngredient> workstations = EmiApi.getRecipeManager().getWorkstations(tab.category);
 			if (!workstations.isEmpty()) {
 				WidgetGroup widgets = new WidgetGroup(null, 0, 0, 0, 0);
-				for (int i = 0; i < workstations.size() && i < getMaxWorkstations(); i++) {
+				int maxWorkstations = getMaxWorkstations();
+				for (int i = 0; i < workstations.size() && i < maxWorkstations; i++) {
 					Bounds bounds = getWorkstationBounds(i);
-					widgets.add(new SlotWidget(workstations.get(i), bounds.x(), bounds.y()));
+					if (i == maxWorkstations - 1 && workstations.size() > maxWorkstations) {
+						EmiIngredient ingredient = EmiIngredient.of(workstations.subList(i, workstations.size()));
+						widgets.add(new SlotWidget(ingredient, bounds.x(), bounds.y()));
+					} else {
+						widgets.add(new SlotWidget(workstations.get(i), bounds.x(), bounds.y()));
+					}
 				}
 				currentPage.add(widgets);
 			}
