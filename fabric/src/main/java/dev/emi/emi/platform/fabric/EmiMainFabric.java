@@ -65,7 +65,7 @@ public class EmiMainFabric implements ModInitializer {
 	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
 		PayloadTypeRegistry.playC2S().register(id, PacketCodec.ofStatic((buf, v) -> v.write(buf), decode));
 		ServerPlayNetworking.registerGlobalReceiver(id, (payload, context) -> {
-			MinecraftClient.getInstance().getServer().execute(() -> {
+			context.server().execute(() -> {
 				((EmiPacket) payload).apply(context.player());
 			});
 		});
