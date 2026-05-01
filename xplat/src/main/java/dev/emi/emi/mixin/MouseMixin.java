@@ -42,7 +42,7 @@ public abstract class MouseMixin {
     @Inject(at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screen/Screen;mouseClicked(Lnet/minecraft/client/gui/Click;Z)Z"),
             method = "onMouseButton", cancellable = true)
-	private void onMouseDown(long window, MouseInput input, int action, CallbackInfo info, @Local(name = "click") Click click, @Local(name = "bl2") boolean bl2) {
+	private void onMouseDown(long window, MouseInput input, int action, CallbackInfo info, @Local(ordinal = 0) Click click, @Local(ordinal = 1) boolean bl2) {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?>) {
@@ -58,7 +58,7 @@ public abstract class MouseMixin {
     @Inject(at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screen/Screen;mouseReleased(Lnet/minecraft/client/gui/Click;)Z"),
             method = "onMouseButton", cancellable = true)
-	private void onMouseUp(long window, MouseInput input, int action, CallbackInfo info, @Local(name = "click") Click click) {
+	private void onMouseUp(long window, MouseInput input, int action, CallbackInfo info, @Local(ordinal = 0) Click click) {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?>) {
