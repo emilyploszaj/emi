@@ -25,6 +25,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 	default EmiIngredient deserialize(JsonElement element) {
 		Identifier id = null;
 		String nbt = null;
+		JsonObject changesJson = null;
 		long amount = 1;
 		float chance = 1;
 		EmiStack remainder = EmiStack.EMPTY;
@@ -39,6 +40,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 			JsonObject json = element.getAsJsonObject();
 			id = EmiPort.id(JsonHelper.getString(json, "id"));
 			nbt = JsonHelper.getString(json, "nbt", null);
+			changesJson = JsonHelper.getObject(json, "componentChanges", null);
 			amount = JsonHelper.getLong(json, "amount", 1);
 			chance = JsonHelper.getFloat(json, "chance", 1);
 			if (JsonHelper.hasElement(json, "remainder")) {

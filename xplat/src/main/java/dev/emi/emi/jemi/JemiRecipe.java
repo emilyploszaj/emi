@@ -20,11 +20,16 @@ import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
+import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
+import dev.emi.emi.jemi.impl.extras.JemiRecipeExtrasBuilder;
+import dev.emi.emi.jemi.impl.extras.JemiWidgetBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
@@ -43,7 +48,6 @@ public class JemiRecipe<T> implements EmiRecipe {
 	public Identifier originalId, id;
 	public IRecipeCategory<T> category;
 	public T recipe;
-	public JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 	public boolean allowTree = true;
 
 	public JemiRecipe(EmiRecipeCategory recipeCategory, IRecipeCategory<T> category, T recipe) {
@@ -54,6 +58,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		if (this.originalId != null) {
 			this.id = EmiPort.id("jei", "/" + EmiUtil.subId(this.originalId));
 		}
+		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
 			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
@@ -137,6 +142,15 @@ public class JemiRecipe<T> implements EmiRecipe {
 					widgets.add(new JemiSlotWidget(slot, this));
 				}
 			}
+		}
+		try {
+			JemiRecipeExtrasBuilder extras = new JemiRecipeExtrasBuilder(null);
+			category.createRecipeExtras(extras, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+			for (JemiWidgetBuilder b : extras.widgets) {
+				b.addWidgets(widgets);
+			}
+		} catch(Throwable t) {
+			EmiLog.error("Exception adding JEMI extras", t);
 		}
 	}
 

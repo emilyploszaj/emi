@@ -9,12 +9,15 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public abstract class EmiAgnos {
 	public static EmiAgnos delegate;
@@ -141,4 +144,16 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract Map<Item, Integer> getFuelMapAgnos();
+
+	public static BakedModel getBakedTagModel(Identifier id) {
+		return delegate.getBakedTagModelAgnos(id);
+	}
+
+	protected abstract BakedModel getBakedTagModelAgnos(Identifier id);
+
+	public static boolean isEnchantable(ItemStack stack, Enchantment enchantment) {
+		return delegate.isEnchantableAgnos(stack, enchantment);
+	}
+
+	protected abstract boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment);
 }

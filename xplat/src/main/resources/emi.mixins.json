@@ -18,6 +18,7 @@
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",
+    "GlobalMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
     "ItemStackMixin",

@@ -20,6 +20,7 @@ import net.minecraft.client.util.math.MatrixStack;
 @SuppressWarnings("unchecked")
 public class JemiRecipeSlot implements IRecipeSlotView {
 	public final RecipeIngredientRole role;
+	public final boolean large, defaultBackground;
 	public final int x, y;
 	public final Optional<String> name;
 	public final IRecipeSlotTooltipCallback tooltipCallback;
@@ -32,6 +33,8 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 
 	public JemiRecipeSlot(JemiRecipeSlotBuilder builder) {
 		this.role = builder.acceptor.role;
+		this.large = builder.large;
+		this.defaultBackground = builder.defaultBackground;
 		this.x = builder.x;
 		this.y = builder.y;
 		this.name = builder.name;
@@ -45,6 +48,8 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 
 	public JemiRecipeSlot(RecipeIngredientRole role, EmiStack stack) {
 		this.role = role;
+		this.large = false;
+		this.defaultBackground = false;
 		this.x = 0;
 		this.y = 0;
 		this.name = Optional.empty();

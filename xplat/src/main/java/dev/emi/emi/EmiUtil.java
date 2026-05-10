@@ -4,9 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Stream;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -54,23 +52,6 @@ public class EmiUtil {
 
 	public static String subId(Fluid fluid) {
 		return subId(EmiPort.getFluidRegistry().getId(fluid));
-	}
-
-	public static <T> Stream<RegistryEntry<T>> values(TagKey<T> key) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		Registry<T> registry = client.world.getRegistryManager().get(key.registry());
-		Optional<Named<T>> opt = registry.getEntryList(key);
-		if (opt.isEmpty()) {
-			return Stream.of();
-		} else {
-			if (registry == EmiPort.getFluidRegistry()) {
-				return opt.get().stream().filter(o -> {
-					Fluid f = (Fluid) o.value();
-					return f.isStill(f.getDefaultState());
-				});
-			}
-			return opt.get().stream();
-		}
 	}
 
 	public static boolean showAdvancedTooltips() {

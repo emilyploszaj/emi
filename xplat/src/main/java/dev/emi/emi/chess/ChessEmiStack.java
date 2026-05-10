@@ -29,7 +29,7 @@ class ChessEmiStack extends EmiStack {
 	public void render(MatrixStack raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		ChessPiece piece = EmiChess.getBoard().get(position);
-		RenderSystem.enableDepthTest();
+		context.enableDepthTest();
 		EmiChess chess = EmiChess.get();
 		if (chess.pendingPromotion != -1) {
 			PieceType type = null;

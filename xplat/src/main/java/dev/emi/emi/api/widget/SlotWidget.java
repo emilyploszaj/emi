@@ -157,10 +157,11 @@ public class SlotWidget extends Widget {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		EmiPort.setPositionTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		EmiDrawContext context = EmiDrawContext.wrap(matrices);
+		context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 		drawBackground(matrices, mouseX, mouseY, delta);
 		drawStack(matrices, mouseX, mouseY, delta);
-		RenderSystem.disableDepthTest();
+		context.disableDepthTest();
 		drawOverlay(matrices, mouseX, mouseY, delta);
 	}
 

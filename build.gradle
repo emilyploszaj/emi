@@ -7,6 +7,10 @@ architectury {
 	minecraft = rootProject.minecraft_version
 }
 
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.tree.ClassNode
+
 allprojects {
 	apply plugin: "java"
 	apply plugin: "architectury-plugin"
@@ -38,5 +42,109 @@ allprojects {
 
 	java {
 		withSourcesJar()
+	}
+
+	def synthMixinDir = layout.buildDirectory.dir("generated-class")
+
+	tasks.register('generateClassLists') {
+		inputs.files(sourceSets.main.output.classesDirs)
+		outputs.dir(synthMixinDir)
+
+		doLast {
+			def outputFile = new File(synthMixinDir.get().asFile, "dev/emi/emi/mixin/GlobalMixin.class")
+			outputFile.parentFile.mkdirs()
+			
+			def classNames = []
+			def classCount = 0
+
+			(project(":xplat").sourceSets.main.output.classesDirs + sourceSets.main.output.classesDirs).each { dir ->
+				if (dir.exists()) {
+					dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+						def p = file.path.toLowerCase()
+						if (file.name.endsWith('.class') && !p.contains("mixin") && !p.contains('emiconfig$')) {
+							def relativePath = dir.toPath().relativize(file.toPath()).toString()
+							
+							def className = relativePath.replace('.class', '').replace(File.separator, '.')
+							
+							classNames += className
+							classCount++
+						}
+					}
+				}
+			}
+
+			def parseHex = { hex ->
+				return hex.split().collect { j ->
+					Integer.parseInt(j, 16)
+				}
+			}
+			def u2 = { num ->
+				return [(num >> 8), (num & 0xff)]
+			}
+
+			def binary = [0xca, 0xfe, 0xba, 0xbe, 0x00, 0x00, 0x00, 0x34];
+			binary += u2(0x0b + classCount)
+			binary += parseHex("""
+				01 00 1d
+					64 65 76 2f 65 6d 69 2f 65 6d 69 2f 6d 69 78 69
+					6e 2f 47 6c 6f 62 61 6c 4d 69 78 69 6e
+				07 00 01
+				01 00 10
+					6a 61 76 61 2f 6c 61 6e 67 2f 4f 62 6a 65 63 74
+				07 00 03
+				01 00 10
+					47 6c 6f 62 61 6c 4d 69 78 69 6e 2e 6a 61 76 61
+				01 00 24
+					4c 6f 72 67 2f 73 70 6f 6e 67 65 70 6f 77 65 72
+					65 64 2f 61 73 6d 2f 6d 69 78 69 6e 2f 50 73 65
+					75 64 6f 3b
+				01 00 23
+					4c 6f 72 67 2f 73 70 6f 6e 67 65 70 6f 77 65 72
+					65 64 2f 61 73 6d 2f 6d 69 78 69 6e 2f 4d 69 78
+					69 6e 3b
+				01 00 07
+					74 61 72 67 65 74 73
+				01 00 0a
+					53 6f 75 72 63 65 46 69 6c 65
+				01 00 1b
+					52 75 6e 74 69 6d 65 49 6e 76 69 73 69 62 6c 65
+					41 6e 6e 6f 74 61 74 69 6f 6e 73
+			""")
+			for (int i = 0; i < classCount; i++) {
+				binary += parseHex("01")
+				binary += u2(classNames[i].length())
+				binary.addAll(classNames[i].getBytes())
+			}
+			binary += parseHex("""
+				06 01 00 02 00 04
+				00 00
+				00 00
+				00 00
+				00 02
+				00 09 00 00 00 02 00 05
+				00 0a 00 00
+			""")
+			binary += u2(9 + (classCount * 3))
+			binary += parseHex("00 02 00 06 00 00 00 07 00 01 00 08 5b")
+			binary += u2(classCount)
+			for (int i = 0; i < classCount; i++) {
+				binary += parseHex("73") + u2(0x0b + i)
+			}
+			
+			ClassReader reader = new ClassReader(binary as byte[]);
+			ClassWriter writer = new ClassWriter(reader, 0);
+
+			reader.accept(writer, 0)
+
+			outputFile.bytes = writer.toByteArray()
+		}
+	}
+
+	if (!project.name.contains("xplat")) {
+		sourceSets {
+			main {
+				output.dir(synthMixinDir, builtBy: generateClassLists)
+			}
+		}
 	}
 }

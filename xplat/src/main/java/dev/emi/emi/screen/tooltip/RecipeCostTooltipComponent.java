@@ -94,7 +94,7 @@ public class RecipeCostTooltipComponent implements EmiTooltipComponent {
 	@Override
 	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
 		for (Node node : nodes) {
-			context.drawStack(node.stack, node.x, node.y);
+			context.drawStack(node.stack, node.x, node.y, ~EmiIngredient.RENDER_AMOUNT);
 			EmiRenderHelper.renderAmount(context, node.x, node.y, node.text);
 		}
 	}

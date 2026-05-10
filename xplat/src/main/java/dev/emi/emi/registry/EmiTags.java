@@ -5,15 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import dev.emi.emi.EmiPort;
-import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiRegistryAdapter;
 import dev.emi.emi.api.stack.EmiStack;
@@ -24,10 +20,9 @@ import dev.emi.emi.data.TagExclusions;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.util.InheritanceMap;
 import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.tag.TagKey;
@@ -41,23 +36,17 @@ public class EmiTags {
 	public static final InheritanceMap<EmiRegistryAdapter<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
 	public static final Map<Registry<?>, EmiRegistryAdapter<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
 	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = EmiPort.id("c", "hidden_from_recipe_viewers");
-	private static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
-	private static final Map<Set<?>, List<TagKey<?>>> CACHED_TAGS = Maps.newHashMap();
-	private static final Map<TagKey<?>, List<?>> TAG_CONTENTS = Maps.newHashMap();
-	private static final Map<TagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
-	private static final Map<Identifier, List<TagKey<?>>> SORTED_TAGS = Maps.newHashMap();
-	public static final List<TagKey<?>> TAGS = Lists.newArrayList();
+	public static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
+	private static final Map<Set<?>, List<EmiTagKey<?>>> CACHED_TAGS = Maps.newHashMap();
+	private static final Map<EmiTagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
+	private static final Map<Identifier, List<EmiTagKey<?>>> SORTED_TAGS = Maps.newHashMap();
+	public static final List<EmiTagKey<?>> TAGS = Lists.newArrayList();
 	public static TagExclusions exclusions = new TagExclusions();
 
-	public static <T> Registry<T> getRegistry(TagKey<T> key) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return client.world.getRegistryManager().getOptional(key.registry()).orElse(null);
-	}
-
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <T> List<EmiStack> getValues(TagKey<T> key) {
+	public static <T> List<EmiStack> getValues(EmiTagKey<T> key) {
 		if (TAG_VALUES.containsKey(key)) {
-			EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+			EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(key.registry());
 			if (adapter != null) {
 				List<T> values = (List<T>) TAG_VALUES.getOrDefault(key, List.of());
 				return values.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
@@ -67,14 +56,13 @@ public class EmiTags {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <T> List<EmiStack> getRawValues(TagKey<T> key) {
-		if (key.registry().equals(EmiPort.getBlockRegistry().getKey())) {
-			return EmiUtil.values(key).map(e -> EmiStack.of((Block) e.value())).toList();
+	public static <T> List<EmiStack> getRawValues(EmiTagKey<T> key) {
+		if (key.isOf(EmiPort.getBlockRegistry())) {
+			return key.stream().map(e -> EmiStack.of((Block) e)).toList();
 		}
-		EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+		EmiRegistryAdapter adapter = ADAPTERS_BY_REGISTRY.get(key.registry());
 		if (adapter != null) {
-			List<T> values = (List<T>) EmiUtil.values(key).map(RegistryEntry::value).toList();
-			return values.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
+			return key.stream().map(t -> adapter.of(t, EmiPort.emptyExtraData(), 1)).toList();
 		}
 		return List.of();
 	}
@@ -101,18 +89,18 @@ public class EmiTags {
 			return new ListEmiIngredient(stacks, amount);
 		}
 		Registry<T> registry = adapter.getRegistry();
-		List<TagKey<T>> keys = (List<TagKey<T>>) (List) CACHED_TAGS.get(map.keySet());
+		List<EmiTagKey<T>> keys = (List<EmiTagKey<T>>) (List) CACHED_TAGS.get(map.keySet());
 
 		if (keys != null) {
-			for (TagKey<T> key : keys) {
-				List<T> values = (List<T>) TAG_CONTENTS.get(key);
+			for (EmiTagKey<T> key : keys) {
+				List<T> values = key.getList();
 				values.forEach(map::remove);
 			}
 		} else {
 			keys = Lists.newArrayList();
 			Set<T> original = new HashSet<>(map.keySet());
-			for (TagKey<T> key : getTags(registry)) {
-				List<T> values = (List<T>) TAG_CONTENTS.get(key);
+			for (EmiTagKey<T> key : getTags(registry)) {
+				List<T> values = key.getList();
 				if (values.size() < 2) {
 					continue;
 				}
@@ -142,7 +130,7 @@ public class EmiTags {
 		}
 	}
 
-	private static EmiIngredient tagIngredient(TagKey<?> key, long amount) {
+	private static EmiIngredient tagIngredient(EmiTagKey<?> key, long amount) {
 		List<?> list = TAG_VALUES.get(key);
 		if (list == null || list.isEmpty()) {
 			return EmiStack.EMPTY;
@@ -154,63 +142,8 @@ public class EmiTags {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <T> List<TagKey<T>> getTags(Registry<T> registry) {
-		return (List<TagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.getKey().getValue(), List.of());
-	}
-
-	public static Text getTagName(TagKey<?> key) {
-		String s = getTagTranslationKey(key);
-		if (s == null) {
-			return EmiPort.literal("#" + key.id());
-		} else {
-			return EmiPort.translatable(s);
-		}
-	}
-
-	public static boolean hasTranslation(TagKey<?> key) {
-		return getTagTranslationKey(key) != null;
-	}
-
-	private static @Nullable String getTagTranslationKey(TagKey<?> key) {
-		Identifier registry = key.registry().getValue();
-		if (registry.getNamespace().equals("minecraft")) {
-			String s = translatePrefix("tag." + registry.getPath().replace("/", ".") + ".", key.id());
-			if (s != null) {
-				return s;
-			}
-		} else {
-			String s = translatePrefix("tag." + registry.getNamespace() + "." + registry.getPath().replace("/", ".") + ".", key.id());
-			if (s != null) {
-				return s;
-			}
-		}
-		return translatePrefix("tag.", key.id());
-	}
-
-	private static @Nullable String translatePrefix(String prefix, Identifier id) {
-		String s = EmiUtil.translateId(prefix, id);
-		if (I18n.hasTranslation(s)) {
-			return s;
-		}
-		if (id.getNamespace().equals("forge")) {
-			s = EmiUtil.translateId(prefix, EmiPort.id("c", id.getPath()));
-			if (I18n.hasTranslation(s)) {
-				return s;
-			}
-		}
-		return null;
-	}
-
-	public static @Nullable Identifier getCustomModel(TagKey<?> key) {
-		Identifier rid = key.id();
-		if (rid.getNamespace().equals("forge") && !EmiTags.MODELED_TAGS.containsKey(key)) {
-			key = TagKey.of(key.registry(), EmiPort.id("c", rid.getPath()));
-		}
-		return EmiTags.MODELED_TAGS.get(key);
-	}
-
-	public static boolean hasCustomModel(TagKey<?> key) {
-		return getCustomModel(key) != null;
+	public static <T> List<EmiTagKey<T>> getTags(Registry<T> registry) {
+		return (List<EmiTagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.getKey().getValue(), List.of());
 	}
 
 	public static void registerTagModels(ResourceManager manager, Consumer<Identifier> consumer) {
@@ -239,9 +172,9 @@ public class EmiTags {
 	}
 	
 	public static void reload() {
+		EmiTagKey.reload();
 		TAGS.clear();
 		SORTED_TAGS.clear();
-		TAG_CONTENTS.clear();
 		TAG_VALUES.clear();
 		CACHED_TAGS.clear();
 		for (Registry<?> registry : ADAPTERS_BY_REGISTRY.keySet()) {
@@ -251,44 +184,42 @@ public class EmiTags {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> void reloadTags(Registry<T> registry) {
-		Set<T> hidden = EmiUtil.values(TagKey.of(registry.getKey(), HIDDEN_FROM_RECIPE_VIEWERS)).map(RegistryEntry::value).collect(Collectors.toSet());
+		Set<T> hidden = EmiTagKey.of(registry, HIDDEN_FROM_RECIPE_VIEWERS).getSet();
 		Identifier rid = registry.getKey().getValue();
-		List<TagKey<T>> tags = registry.streamTags()
-			.filter(key -> !exclusions.contains(rid, key.id()) && !hidden.containsAll(EmiUtil.values(key).map(RegistryEntry::value).toList()))
+		List<EmiTagKey<T>> tags = EmiTagKey.fromRegistry(registry)
+			.filter(key -> !exclusions.contains(rid, key.id()) && !hidden.containsAll(key.getList()))
 			.toList();
 		logUntranslatedTags(tags);
 		tags = consolodateTags(tags);
-		for (TagKey<T> key : tags) {
-			List<T> contents = EmiUtil.values(key).map(i -> i.value()).toList();
-			TAG_CONTENTS.put(key, contents);
-			List<T> values = contents.stream().filter(s -> !EmiHidden.isDisabled(stackFromKey(key, s))).toList();
+		for (EmiTagKey<T> key : tags) {
+			List<T> values = key.stream().filter(s -> !EmiHidden.isDisabled(stackFromKey(key, s))).toList();
 			if (values.isEmpty()) {
-				TAG_VALUES.put(key, contents);
+				TAG_VALUES.put(key, key.getList());
 			} else {
 				TAG_VALUES.put(key, values);
 			}
 		}
-		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.toString().compareTo(b.toString())).toList());
+		EmiTags.TAGS.addAll(tags.stream().sorted((a, b) -> a.id().toString().compareTo(b.id().toString())).toList());
 		tags = tags.stream()
-			.sorted((a, b) -> Long.compare(EmiUtil.values(b).count(), EmiUtil.values(a).count()))
+			.sorted((a, b) -> Long.compare(b.stream().count(), a.stream().count()))
 			.toList();
 		EmiTags.SORTED_TAGS.put(registry.getKey().getValue(), (List) tags);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> EmiStack stackFromKey(TagKey<T> key, T t) {
-		EmiRegistryAdapter<T> adapter = (EmiRegistryAdapter<T>) ADAPTERS_BY_REGISTRY.get(getRegistry(key));
+	private static <T> EmiStack stackFromKey(EmiTagKey<T> key, T t) {
+		EmiRegistryAdapter<T> adapter = (EmiRegistryAdapter<T>) ADAPTERS_BY_REGISTRY.get(key.registry());
 		if (adapter != null) {
 			return adapter.of(t, EmiPort.emptyExtraData(), 1);
 		}
 		throw new UnsupportedOperationException("Unsupported tag registry " + key);
 	}
 
-	private static <T> void logUntranslatedTags(List<TagKey<T>> tags) {
+	private static <T> void logUntranslatedTags(List<EmiTagKey<T>> tags) {
 		if (EmiConfig.logUntranslatedTags) {
 			List<String> untranslated = Lists.newArrayList();
-			for (TagKey<T> tag : tags) {
-				if (!hasTranslation(tag)) {
+			for (EmiTagKey<T> tag : tags) {
+				if (!tag.hasTranslation()) {
 					untranslated.add(tag.id().toString());
 				}
 			}
@@ -301,12 +232,12 @@ public class EmiTags {
 		}
 	}
 
-	private static <T> List<TagKey<T>> consolodateTags(List<TagKey<T>> tags) {
-		Map<Set<T>, TagKey<T>> map = Maps.newHashMap();
+	private static <T> List<EmiTagKey<T>> consolodateTags(List<EmiTagKey<T>> tags) {
+		Map<Set<T>, EmiTagKey<T>> map = Maps.newHashMap();
 		for (int i = 0; i < tags.size(); i++) {
-			TagKey<T> key = tags.get(i);
-			Set<T> values = EmiUtil.values(key).map(RegistryEntry::value).collect(Collectors.toSet());
-			TagKey<T> original = map.get(values);
+			EmiTagKey<T> key = tags.get(i);
+			Set<T> values = key.getSet();
+			EmiTagKey<T> original = map.get(values);
 			if (original != null) {
 				map.put(values, betterTag(key, original));
 			} else {
@@ -316,12 +247,12 @@ public class EmiTags {
 		return map.values().stream().toList();
 	}
 
-	private static<T> TagKey<T> betterTag(TagKey<T> a, TagKey<T> b) {
-		if (hasTranslation(a) != hasTranslation(b)) {
-			return hasTranslation(a) ? a : b;
+	private static<T> EmiTagKey<T> betterTag(EmiTagKey<T> a, EmiTagKey<T> b) {
+		if (a.hasTranslation() != b.hasTranslation()) {
+			return a.hasTranslation() ? a : b;
 		}
-		if (hasCustomModel(a) != hasCustomModel(b)) {
-			return hasCustomModel(a) ? a : b;
+		if (a.hasCustomModel() != b.hasCustomModel()) {
+			return a.hasCustomModel() ? a : b;
 		}
 		String an = a.id().getNamespace();
 		String bn = b.id().getNamespace();

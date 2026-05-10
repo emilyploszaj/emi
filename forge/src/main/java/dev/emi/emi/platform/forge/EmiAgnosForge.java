@@ -20,6 +20,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
+import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
@@ -34,10 +35,12 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BasicBakedModel;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PotionItem;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
@@ -306,5 +309,19 @@ public class EmiAgnosForge extends EmiAgnos {
 			}
 		}
 		return fuelMap;
+	}
+
+	@Override
+	protected BakedModel getBakedTagModelAgnos(Identifier id) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		return ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
+			.getOrDefault(id, client.getBakedModelManager().getMissingModel());
+	}
+
+	@Override
+	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
+		ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
+		enchantedBook.addEnchantment(enchantment, enchantment.getMaxLevel());
+		return stack.isBookEnchantable(enchantedBook);
 	}
 }

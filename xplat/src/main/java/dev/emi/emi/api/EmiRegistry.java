@@ -23,6 +23,25 @@ import net.minecraft.util.Identifier;
 public interface EmiRegistry {
 
 	/**
+	 * Adds a screen bounds provider for screens of a given class.
+	 * This allows EMI to properly recognize and handle custom screens.
+	 *
+	 * @param clazz The class of screen to provide bounds for
+	 * @param provider The screen bounds provider
+	 */
+	@ApiStatus.Experimental
+	<T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider);
+
+	/**
+	 * Adds a screen bounds provider for every screen.
+	 * This allows EMI to properly recognize and handle custom screens.
+	 *
+	 * @param provider The screen bounds provider
+	 */
+	@ApiStatus.Experimental
+	void addGenericScreenBoundsProvider(EmiScreenBoundsProvider<Screen> provider);
+
+	/**
 	 * @return Whether the provided stack is disabled.
 	 *	Generally, this is not important to check before registering recipes, EMI will handle recipe hiding.
 	 *	There are certain cases where checking this and not including stacks in recipes is desired behavior, however.

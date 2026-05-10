@@ -23,7 +23,8 @@ import net.minecraft.nbt.NbtCompound;
 
 public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	public final JemiIngredientAcceptor acceptor;
-	public final int x, y;
+	public boolean large = false, defaultBackground = false;
+	public int x, y;
 	public Optional<String> name = Optional.empty();
 	public IRecipeSlotTooltipCallback tooltipCallback;
 	public OffsetDrawable background, overlay;
@@ -115,6 +116,42 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	@Override
 	public IRecipeSlotBuilder addOptionalTypedIngredients(List<Optional<ITypedIngredient<?>>> ingredients) {
 		acceptor.addOptionalTypedIngredients(ingredients);
+		return this;
+	}
+
+	@Override
+	public IRecipeSlotBuilder addRichTooltipCallback(IRecipeSlotRichTooltipCallback tooltipCallback) {
+		richTooltipCallback = tooltipCallback;
+		return this;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setPosition(int xPos, int yPos) {
+		this.x = xPos;
+		this.y = yPos;
+		return this;
+	}
+
+	@Override
+	public int getWidth() {
+		return large ? 26 : 18;
+	}
+
+	@Override
+	public int getHeight() {
+		return large ? 26 : 18;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setStandardSlotBackground() {
+		this.defaultBackground = true;
+		return this;
+	}
+
+	@Override
+	public IRecipeSlotBuilder setOutputSlotBackground() {
+		this.defaultBackground = true;
+		this.large = true;
 		return this;
 	}
 }
