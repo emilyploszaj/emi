@@ -101,6 +101,22 @@ public class EmiDrawContext {
 		context.drawCenteredTextWithShadow(client.textRenderer, text.asOrderedText(), x, y, color);
 	}
 
+	public void enableDepthTest() {
+		RenderSystem.enableDepthTest();
+	}
+
+	public void disableDepthTest() {
+		RenderSystem.disableDepthTest();
+	}
+
+	public void enableBlend() {
+		RenderSystem.enableBlend();
+	}
+
+	public void disableBlend() {
+		RenderSystem.disableBlend();
+	}
+
 	public void resetColor() {
 		setColor(1f, 1f, 1f, 1f);
 	}

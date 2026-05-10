@@ -27,7 +27,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.Text;
 
 public class JemiSlotWidget extends SlotWidget {
-	private final JemiRecipeSlot slot;
+	public final JemiRecipeSlot slot;
 
 	public JemiSlotWidget(JemiRecipeSlot slot, EmiRecipe recipe) {
 		super(slot.stack, slot.x - (slot.large ? 6 : 1) , slot.y - (slot.large ? 6 : 1));
@@ -36,7 +36,7 @@ public class JemiSlotWidget extends SlotWidget {
 		if (slot.getRole() == RecipeIngredientRole.OUTPUT) {
 			this.recipeContext(recipe);
 		}
-		this.drawBack(false);
+		this.drawBack(slot.defaultBackground);
 		IIngredientRenderer<?> renderer = getRenderer();
 		if (renderer != null) {
 			this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
@@ -83,7 +83,7 @@ public class JemiSlotWidget extends SlotWidget {
 			Bounds bounds = getBounds();
 			int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
 			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
-			RenderSystem.enableBlend();
+			context.enableBlend();
 			context.push();
 			context.matrices().translate(xOff, yOff, 0);
 			renderer.render(context.raw(), typed.getIngredient());
@@ -97,7 +97,7 @@ public class JemiSlotWidget extends SlotWidget {
 	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
-			RenderSystem.enableBlend();
+			context.enableBlend();
 			context.push();
 			context.matrices().translate(0, 0, 200);
 			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());

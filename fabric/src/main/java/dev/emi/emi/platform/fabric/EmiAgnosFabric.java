@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import net.minecraft.enchantment.Enchantment;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.collect.Lists;
@@ -19,10 +20,12 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.jemi.JemiUtil;
+import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.FakeScreen;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -37,7 +40,9 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -247,5 +252,17 @@ public class EmiAgnosFabric extends EmiAgnos {
 			}
 		}
 		return fuelMap;
+	}
+
+	@Override
+	protected BakedModel getBakedTagModelAgnos(Identifier id) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		return ((BakedModelManagerAccessor) client.getBakedModelManager()).getModels()
+			.getOrDefault(id, client.getBakedModelManager().getMissingModel());
+	}
+
+	@Override
+	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
+		return true;
 	}
 }

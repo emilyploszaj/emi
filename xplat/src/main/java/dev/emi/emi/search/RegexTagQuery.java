@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiTagKey;
 
 public class RegexTagQuery extends Query {
 	private final Set<Object> valid;
@@ -22,23 +22,20 @@ public class RegexTagQuery extends Query {
 			valid = Set.of();
 		} else {
 			final Pattern pat = p;
-			valid = Stream.concat(
-				EmiPort.getItemRegistry().streamTags().filter(t -> {
-					if (EmiTags.hasTranslation(t)) {
-						if (pat.matcher(EmiTags.getTagName(t).getString().toLowerCase()).find()) {
-							return true;
-						}
-					}
-					if (pat.matcher(t.id().toString()).find()) {
+			valid = Stream.<EmiTagKey<?>>concat(
+				EmiTagKey.fromRegistry(EmiPort.getItemRegistry()),
+				EmiTagKey.fromRegistry(EmiPort.getBlockRegistry())
+			).filter(t -> {
+				if (t.hasTranslation()) {
+					if (pat.matcher(t.getTagName().getString().toLowerCase()).find()) {
 						return true;
 					}
-					return false;
-				}).map(t -> EmiPort.getItemRegistry().getEntryList(t)), EmiPort.getBlockRegistry().streamTags().filter(t -> {
-					if (pat.matcher(t.id().toString()).find()) {
-						return true;
-					}
-					return false;
-				}).map(t -> EmiPort.getBlockRegistry().getEntryList(t))).flatMap(v -> v.stream()).collect(Collectors.toSet());
+				}
+				if (pat.matcher(t.id().toString()).find()) {
+					return true;
+				}
+				return false;
+			}).flatMap(v -> v.stream()).collect(Collectors.toSet());
 		}
 	}
 

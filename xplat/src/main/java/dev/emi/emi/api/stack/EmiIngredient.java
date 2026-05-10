@@ -5,6 +5,7 @@ import java.util.List;
 
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.runtime.EmiTagKey;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.Item;
@@ -71,7 +72,7 @@ public interface EmiIngredient extends EmiRenderable {
 	}
 
 	public static <T> EmiIngredient of(TagKey<T> key, long amount) {
-		return EmiIngredient.of(EmiTags.getRawValues(key), amount);
+		return EmiIngredient.of(EmiTags.getRawValues(EmiTagKey.of(key)), amount);
 	}
 
 	public static EmiIngredient of(Ingredient ingredient) {

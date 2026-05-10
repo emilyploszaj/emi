@@ -40,7 +40,7 @@ public class JemiTankWidget extends TankWidget {
 	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
-			RenderSystem.enableBlend();
+			context.enableBlend();
 			context.push();
 			context.matrices().translate(0, 0, 200);
 			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());

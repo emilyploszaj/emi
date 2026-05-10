@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.jemi.JemiPlugin;
+import dev.emi.emi.mixinsupport.EmiMixinTransformation;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.registry.EmiDragDropHandlers;
@@ -25,6 +26,7 @@ import dev.emi.emi.registry.EmiRegistryImpl;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.registry.EmiStackProviders;
 import dev.emi.emi.registry.EmiTags;
+import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import net.minecraft.client.MinecraftClient;
@@ -38,6 +40,10 @@ public class EmiReloadManager {
 	private static Thread thread;
 	public static volatile Text reloadStep = EmiPort.literal("");
 	public static volatile long reloadWorry = Long.MAX_VALUE;
+
+	static {
+		EmiMixinTransformation.preach();
+	}
 
 	public static void reloadTags() {
 		loadedResourcesMask |= 1;
@@ -134,6 +140,7 @@ public class EmiReloadManager {
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();
 					EmiTags.ADAPTERS_BY_REGISTRY.clear();
+					EmiScreenBase.clearScreenBoundsProviders();
 					if (clear) {
 						clear = false;
 						continue;

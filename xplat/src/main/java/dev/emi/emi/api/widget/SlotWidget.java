@@ -161,7 +161,7 @@ public class SlotWidget extends Widget {
 		context.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		drawBackground(draw, mouseX, mouseY, delta);
 		drawStack(draw, mouseX, mouseY, delta);
-		RenderSystem.disableDepthTest();
+		context.disableDepthTest();
 		drawOverlay(draw, mouseX, mouseY, delta);
 	}
 

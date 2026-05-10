@@ -1,9 +1,19 @@
 ### Additions
-* List ingredients can now be serialized (and can be coerced into other ingredients)
+* Add creative-only cheat mode #1043
+* Added support for specifying components in JSON rather than stringified NBT in newer versions #1132
 
 ### Tweaks
-* Recipe tree should be more conscious of catalyst ingredients, no longer requesting redundant tag ingredients
-* Empty/full search focus now does not trigger on random inputs
+* Added recipe filling sanity checks #1125
+* Tweaked overflowing workstations in the recipe screen #1161
+* Various language updates (`ru_ru`, `es_ar`, `pl_pl`, `de_de`, `zh_tw`, `ja_jp`)
+* Added logging for Mixins that target EMI.
 
 ### Fixes
-* Recipe fills no longer break when filling max stack size #915
+* Fix invalid nonexistent ID errors #935
+* Fix JEMI layout builder retention #951
+* Fix unenchantable items having enchantment recipes #938
+* Fix give component syntax for newer versions #1045
+* Fix duplicate cost rendering #1078
+
+### API
+* Added `EmiScreenBoundsProvider` and registration for custom non-handled screens

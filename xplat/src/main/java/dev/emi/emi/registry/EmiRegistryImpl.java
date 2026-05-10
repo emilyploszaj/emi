@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRegistry;
+import dev.emi.emi.api.EmiScreenBoundsProvider;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -23,6 +24,7 @@ import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import dev.emi.emi.data.EmiAlias;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.screen.EmiScreenBase;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.recipe.RecipeManager;
@@ -32,6 +34,16 @@ import net.minecraft.text.Text;
 
 public class EmiRegistryImpl implements EmiRegistry {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+
+	@Override
+	public <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider) {
+		EmiScreenBase.addScreenBoundsProvider(clazz, provider);
+	}
+
+	@Override
+	public void addGenericScreenBoundsProvider(EmiScreenBoundsProvider<Screen> provider) {
+		EmiScreenBase.addGenericScreenBoundsProvider(provider);
+	}
 
 	@Override
 	public boolean isStackDisabled(EmiIngredient stack) {

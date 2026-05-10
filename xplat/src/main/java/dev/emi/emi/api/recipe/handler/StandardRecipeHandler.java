@@ -93,7 +93,7 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 	@ApiStatus.Internal
 	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, DrawContext draw) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		RenderSystem.enableDepthTest();
+		context.enableDepthTest();
 		Map<EmiIngredient, Boolean> availableForCrafting = getAvailable(recipe, inv);
 		for (Widget w : widgets) {
 			if (w instanceof SlotWidget sw) {
