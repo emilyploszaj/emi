@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.jemi.JemiPlugin;
+import dev.emi.emi.mixinsupport.EmiMixinTransformation;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiComparisonDefaults;
 import dev.emi.emi.registry.EmiDragDropHandlers;
@@ -39,6 +40,10 @@ public class EmiReloadManager {
 	private static Thread thread;
 	public static volatile Text reloadStep = EmiPort.literal("");
 	public static volatile long reloadWorry = Long.MAX_VALUE;
+
+	static {
+		EmiMixinTransformation.preach();
+	}
 
 	public static void reloadTags() {
 		loadedResourcesMask |= 1;

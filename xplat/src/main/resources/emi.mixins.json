@@ -21,6 +21,7 @@
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",
     "DrawContextMixin",
+    "GlobalMixin",
     "HandledScreenMixin",
     "HoeItemMixin",
     "ItemStackMixin",
