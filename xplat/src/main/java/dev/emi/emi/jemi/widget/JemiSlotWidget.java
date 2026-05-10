@@ -26,7 +26,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class JemiSlotWidget extends SlotWidget {
-	public final JemiRecipeSlot slot;
+	private final JemiRecipeSlot slot;
 
 	public JemiSlotWidget(JemiRecipeSlot slot, EmiRecipe recipe) {
 		super(slot.stack, slot.x - 1, slot.y - 1);
@@ -35,7 +35,7 @@ public class JemiSlotWidget extends SlotWidget {
 		if (slot.getRole() == RecipeIngredientRole.OUTPUT) {
 			this.recipeContext(recipe);
 		}
-		this.drawBack(slot.defaultBackground);
+		this.drawBack(false);
 		IIngredientRenderer<?> renderer = getRenderer();
 		if (renderer != null) {
 			this.customBackground(null, 0, 0, renderer.getWidth() + 2, renderer.getHeight() + 2);
