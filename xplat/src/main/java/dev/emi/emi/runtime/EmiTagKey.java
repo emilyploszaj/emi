@@ -17,13 +17,12 @@ import dev.emi.emi.registry.EmiTags;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList.Named;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryEntryList.Named;
 
 // Wrapper around TagKeys
 public class EmiTagKey<T> {

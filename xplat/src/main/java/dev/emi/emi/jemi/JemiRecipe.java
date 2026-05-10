@@ -20,7 +20,6 @@ import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
-import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;

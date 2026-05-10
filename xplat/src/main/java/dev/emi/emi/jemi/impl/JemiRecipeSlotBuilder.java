@@ -120,12 +120,6 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	}
 
 	@Override
-	public IRecipeSlotBuilder addRichTooltipCallback(IRecipeSlotRichTooltipCallback tooltipCallback) {
-		richTooltipCallback = tooltipCallback;
-		return this;
-	}
-
-	@Override
 	public IRecipeSlotBuilder setPosition(int xPos, int yPos) {
 		this.x = xPos;
 		this.y = yPos;
