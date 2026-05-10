@@ -118,32 +118,4 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 		acceptor.addOptionalTypedIngredients(ingredients);
 		return this;
 	}
-
-	@Override
-	public IRecipeSlotBuilder setPosition(int xPos, int yPos) {
-		this.x = xPos;
-		this.y = yPos;
-		return this;
-	}
-
-	@Override
-	public int getWidth() {
-		return large ? 26 : 18;
-	}
-
-	@Override
-	public int getHeight() {
-		return large ? 26 : 18;
-	}
-
-	@Override
-	public IRecipeSlotBuilder setStandardSlotBackground() {
-		this.large = true;
-		return this;
-	}
-
-	@Override
-	public IRecipeSlotBuilder setOutputSlotBackground() {
-		return this;
-	}
 }
