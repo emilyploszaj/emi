@@ -43,7 +43,7 @@ public class JemiStack<T> extends EmiStack {
 		}
 	}
 
-    // TODO: check this
+    // TODO: review this
 	public String getJeiUid() {
 		return helper.getUid(ingredient, UidContext.Ingredient).toString();
 	}

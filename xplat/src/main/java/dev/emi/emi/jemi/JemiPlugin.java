@@ -310,7 +310,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 						EmiIngredient stack = acceptor.build();
 						if (acceptor.role == RecipeIngredientRole.INPUT) {
 							inputs.add(stack);
-						} else if (acceptor.role == RecipeIngredientRole.RENDER_ONLY) { // TODO: check this
+						} else if (acceptor.role == RecipeIngredientRole.RENDER_ONLY) { // TODO: review this
 							inputs.add(stack);
 						} else if (acceptor.role == RecipeIngredientRole.OUTPUT) {
 							outputs.addAll(stack.getEmiStacks());

@@ -164,7 +164,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			context.push();
 //			context.matrices().translate(x, y, 0);
-			IDrawable background = category.getIcon(); // TODO: check this
+			IDrawable background = category.getIcon(); // TODO: review this
 			if (background != null) {
 				background.draw(context.raw());
 			}
@@ -180,7 +180,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 			return builder.tooltip;
 		}
 
-        // TODO: check this
+        // TODO: review this
 		@Override
 		public boolean mouseClicked(int mouseX, int mouseY, int button) {
             return false;

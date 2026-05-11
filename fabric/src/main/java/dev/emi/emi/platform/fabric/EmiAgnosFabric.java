@@ -302,4 +302,5 @@ public class EmiAgnosFabric extends EmiAgnos {
     protected RecipeEntry<?> getRecipeAgnos(RecipeManager recipeManager, Identifier id) {
         return recipeManager.getSynchronizedRecipes().get(RegistryKey.of(RegistryKeys.RECIPE, id));
     }
+
 }

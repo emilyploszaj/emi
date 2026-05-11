@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
 
 buildscript {
@@ -79,21 +77,17 @@ processResources {
 	}
 }
 
-def shadowJar = tasks.named('shadowJar', ShadowJar)
+shadowJar {
+    exclude "fabric.mod.json"
+    exclude "architectury.common.json"
 
-shadowJar.configure { ShadowJar jar ->
-	jar.exclude "fabric.mod.json"
-	jar.exclude "architectury.common.json"
-
-	jar.configurations = [project.configurations.shadowCommon]
-	jar.archiveClassifier = "dev-shadow"
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
 }
 
-def remapJar = tasks.named('remapJar', RemapJarTask)
-
-remapJar.configure { RemapJarTask jar ->
-	dependsOn shadowJar
-	jar.inputFile.convention(shadowJar.flatMap {it.archiveFile })
+remapJar {
+    dependsOn shadowJar
+    inputFile.convention(shadowJar.archiveFile)
 }
 
 def sourcesJar = tasks.named('sourcesJar', Jar)
@@ -115,9 +109,10 @@ def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 })
 
 def apiJar = tasks.register('apiJar', Jar, {
-	archiveClassifier = 'api'
+    def remapJar = tasks.remapJar
+    archiveClassifier = 'api'
 	dependsOn remapJar
-	from zipTree(remapJar.flatMap { it.archiveFile })
+    from zipTree(remapJar.archiveFile)
 	include 'emi.mixins.json'
 	include 'emi-neoforge.mixins.json'
 	include 'emi.accesswidener'

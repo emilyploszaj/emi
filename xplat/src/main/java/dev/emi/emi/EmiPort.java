@@ -169,7 +169,7 @@ public final class EmiPort {
 	}
 
 	public static ItemStack getOutput(Recipe<?> recipe) {
-        // TODO: check this
+        // TODO: review this
         if (recipe.getDisplays().size() > 1) {
             EmiLog.warn("Recipe " + recipe + " has more than one display, still not known how to handle this");
             return ItemStack.EMPTY;

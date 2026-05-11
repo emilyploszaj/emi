@@ -20,7 +20,7 @@ def mojmapJar = tasks.register('mojmapJar', RemapJarTask, {
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
-	remapperIsolation = true
+//	remapperIsolation = true
 })
 
 def mojmapSourcesJar = tasks.register('mojmapSourcesJar', RemapSourcesJarTask, {
@@ -34,7 +34,7 @@ def mojmapSourcesJar = tasks.register('mojmapSourcesJar', RemapSourcesJarTask, {
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
-	remapperIsolation = true
+//	remapperIsolation = true
 })
 
 def mojmapApiJar = tasks.register('mojmapApiJar', RemapJarTask, {
@@ -48,7 +48,7 @@ def mojmapApiJar = tasks.register('mojmapApiJar', RemapJarTask, {
 	sourceNamespace = 'intermediary'
 	targetNamespace = 'named'
 	
-	remapperIsolation = true
+//	remapperIsolation = true
 })
 
 tasks.named("build").configure {
