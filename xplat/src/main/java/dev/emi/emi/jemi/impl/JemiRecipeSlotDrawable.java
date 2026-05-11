@@ -11,18 +11,19 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
-import mezz.jei.api.gui.builder.IIngredientConsumer;
+import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.text.Text;
 
 public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	public JemiSlotWidget widget;
-	public List<IIngredientConsumer> overrides = Lists.newArrayList();
+	public List<IIngredientAcceptor<?>> overrides = Lists.newArrayList();
 
 	@Override
 	public Stream<ITypedIngredient<?>> getAllIngredients() {
@@ -76,7 +77,12 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 		// Unimplemented
 	}
 
-	@Override
+    @Override
+    public void drawTooltip(DrawContext guiGraphics, int mouseX, int mouseY) {
+
+    }
+
+    @Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return widget.getBounds().contains((int) mouseX, (int) mouseY);
 	}
@@ -86,27 +92,30 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 		// Nope
 	}
 
-	@Override
-	public IIngredientConsumer createDisplayOverrides() {
-		// "Implemented" but also just ignored
-		JemiIngredientConsumer consumer = new JemiIngredientConsumer();
+//	@Override
+//	public IIngredientConsumer createDisplayOverrides() {
+//		// "Implemented" but also just ignored
+//		JemiIngredientConsumer consumer = new JemiIngredientConsumer();
+//		overrides.add(consumer);
+//		return consumer;
+//	}
+
+    @Override
+    public IIngredientAcceptor<?> createDisplayOverrides() {
+        // "Implemented" but also just ignored
+        IIngredientAcceptor<?> consumer = new JemiIngredientAcceptor(RecipeIngredientRole.RENDER_ONLY); // TODO: review this
 		overrides.add(consumer);
 		return consumer;
-	}
+    }
 
-	@Override
+    @Override
 	public void clearDisplayOverrides() {
 		overrides.clear();
 	}
 
 	@Override
-	public Rect2i getRect() {
-		Bounds bounds = widget.getBounds();
-		return new Rect2i(bounds.x(), bounds.y(), bounds.width(), bounds.height());
-	}
-
-	@Override
 	public Rect2i getAreaIncludingBackground() {
-		return getRect();
+        Bounds bounds = widget.getBounds();
+		return new Rect2i(bounds.x(), bounds.y(), bounds.width(), bounds.height());
 	}
 }

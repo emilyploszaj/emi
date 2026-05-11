@@ -26,6 +26,7 @@ import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.types.IRecipeType;
@@ -140,7 +141,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		return () -> IRecipeTransferError.Type.INTERNAL;
 	}
 
-	public static <R> JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, RecipeType<R> type, List<Widget> widgets) {
+	public static <R> JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, IRecipeType<R> type, List<Widget> widgets) {
 		JemiRecipeLayoutBuilder builder = null;
 		if (rawRecipe != null) {
 			/*
