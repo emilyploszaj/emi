@@ -42,32 +42,38 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 
     @Override
     public IRecipeSlotBuilder add(SlotDisplay slotDisplay) {
-        return null;
+        acceptor.add(slotDisplay);
+        return this;
     }
 
     @Override
     public IRecipeSlotBuilder add(Fluid fluid) {
-        return null;
+        acceptor.add(fluid);
+        return this;
     }
 
     @Override
     public IRecipeSlotBuilder add(Fluid fluid, long l) {
-        return null;
+        acceptor.add(fluid);
+        return this;
     }
 
     @Override
     public IRecipeSlotBuilder add(Fluid fluid, long l, ComponentChanges componentChanges) {
-        return null;
+        acceptor.add(fluid, l, componentChanges);
+        return this;
     }
 
     @Override
     public IRecipeSlotBuilder add(Ingredient ingredient) {
-        return null;
+        acceptor.add(ingredient);
+        return this;
     }
 
     @Override
     public <I> IRecipeSlotBuilder add(IIngredientType<I> iIngredientType, I i) {
-        return null;
+        acceptor.add(iIngredientType, i);
+        return this;
     }
 
     @Override
@@ -76,11 +82,11 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 		return this;
 	}
 
-//	@Override
-//	public <I> IRecipeSlotBuilder addIngredient(IIngredientType<I> ingredientType, I ingredient) {
-//		acceptor.addIngredient(ingredientType, ingredient);
-//		return this;
-//	}
+	@Override
+	public <I> IRecipeSlotBuilder addIngredient(IIngredientType<I> ingredientType, I ingredient) {
+		acceptor.addIngredient(ingredientType, ingredient);
+		return this;
+	}
 
 	@Override
 	public IRecipeSlotBuilder addIngredientsUnsafe(List<?> ingredients) {
@@ -158,11 +164,11 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 		return this;
 	}
 
-//	@Override
-//	public IRecipeSlotBuilder addFluidStack(Fluid fluid) {
-//		acceptor.addFluidStack(fluid);
-//		return this;
-//	}
+	@Override
+	public IRecipeSlotBuilder addFluidStack(Fluid fluid) {
+		acceptor.addFluidStack(fluid);
+		return this;
+	}
 
 	@Override
 	public IRecipeSlotBuilder setPosition(int xPos, int yPos) {
