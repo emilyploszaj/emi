@@ -6,6 +6,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
+import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.screen.ConfigScreen;
@@ -15,7 +16,9 @@ import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.recipe.PreparedRecipes;
+import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -58,7 +61,7 @@ public class EmiClientNeoForge {
 
 	@SubscribeEvent
 	public static void registerResourceReloaders(AddClientReloadListenersEvent event) {
-		EmiData.init(reloader -> event.addListener(EmiPort.id("reloader"), reloader));
+		EmiData.init(reloader -> event.addListener(reloader.getEmiId(), reloader));
 	}
 
 	public static void recipesReloaded(RecipesReceivedEvent event) {
