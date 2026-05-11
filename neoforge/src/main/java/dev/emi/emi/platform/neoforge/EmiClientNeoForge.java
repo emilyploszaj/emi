@@ -3,6 +3,7 @@ package dev.emi.emi.platform.neoforge;
 import java.util.Arrays;
 
 import dev.emi.emi.EmiPort;
+import dev.emi.emi.data.EmiData;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -21,6 +22,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
@@ -54,10 +56,10 @@ public class EmiClientNeoForge {
 //		EmiTags.registerTagModels(client.getResourceManager(), event::register, ModelIdentifier.STANDALONE_VARIANT);
 	}
 
-//	@SubscribeEvent
-//	public static void registerResourceReloaders(RegisterClientReloadListenersEvent event) {
-//		EmiData.init(reloader -> event.registerReloadListener(reloader));
-//	}
+	@SubscribeEvent
+	public static void registerResourceReloaders(AddClientReloadListenersEvent event) {
+		EmiData.init(reloader -> event.addListener(EmiPort.id("reloader"), reloader));
+	}
 
 	public static void recipesReloaded(RecipesReceivedEvent event) {
         SYNCED_RECIPES = event.getRecipeMap();
