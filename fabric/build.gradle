@@ -108,9 +108,8 @@ def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 })
 
 def apiJar = tasks.register('apiJar', Jar, {
-    def remapJar = tasks.remapJar
 	archiveClassifier = 'api'
-	dependsOn remapJar
+	dependsOn tasks.remapJar
 	from zipTree(remapJar.archiveFile)
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
@@ -144,10 +143,10 @@ publishing {
 				builtBy remapJar
 				classifier ''
 			}
-//			artifact(filteredSourcesJar) {
-//				builtBy filteredSourcesJar
-//				classifier 'sources'
-//			}
+			artifact(filteredSourcesJar) {
+				builtBy filteredSourcesJar
+				classifier 'sources'
+			}
 			artifact(apiJar) {
 				builtBy apiJar
 				classifier 'api'

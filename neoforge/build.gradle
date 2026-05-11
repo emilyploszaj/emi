@@ -1,5 +1,3 @@
-import net.fabricmc.loom.task.RemapSourcesJarTask
-
 buildscript {
 	repositories {
 		mavenCentral()
@@ -13,7 +11,7 @@ buildscript {
 
 plugins {
 	id "dev.architectury.loom"
-	id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.gradleup.shadow" version "8.3.6"
 }
 if (System.getenv("MODRINTH_TOKEN")) {
 	apply plugin: "com.modrinth.minotaur"
@@ -33,6 +31,7 @@ loom {
 
 	mods {
 		main {
+            sourceSet sourceSets.main
 			sourceSet project(':xplat').sourceSets.main
 		}
 	}
@@ -49,11 +48,18 @@ repositories {
 }
 
 configurations {
-	common
-	shadowCommon
-	compileClasspath.extendsFrom common
-	runtimeClasspath.extendsFrom common
-	developmentNeoForge.extendsFrom common
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
 }
 
 dependencies {
@@ -66,7 +72,7 @@ dependencies {
 	neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
 	common(project(path: ":xplat", configuration: "namedElements")) { transitive = false }
-	shadowCommon(project(path: ":xplat", configuration: "transformProductionNeoForge")) { transitive = false }
+    shadowBundle(project(path: ":xplat", configuration: "transformProductionNeoForge"))
 }
 
 processResources {
@@ -81,30 +87,27 @@ shadowJar {
     exclude "fabric.mod.json"
     exclude "architectury.common.json"
 
-    configurations = [project.configurations.shadowCommon]
+    configurations = [project.configurations.shadowBundle]
     archiveClassifier = "dev-shadow"
 }
 
 remapJar {
-    dependsOn shadowJar
-    inputFile.convention(shadowJar.archiveFile)
+    dependsOn tasks.shadowJar
+    inputFile.convention(tasks.shadowJar.archiveFile)
 }
 
-def sourcesJar = tasks.named('sourcesJar', Jar)
-
-sourcesJar.configure { Jar jar ->
-	def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
-	dependsOn commonSources
-	jar.from zipTree(commonSources.flatMap { it.archiveFile })
-	//TODO: Fix this in a better way that doesn't lead to stripping out the jemi sources
-	jar.exclude 'dev/emi/emi/jemi/**'
+sourcesJar {
+    def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
+    dependsOn commonSources
+    from zipTree(commonSources.flatMap { it.archiveFile })
+    //TODO: Fix this in a better way that doesn't lead to stripping out the jemi sources
+    exclude 'dev/emi/emi/jemi/**'
 }
 
 def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
-	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
-	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
+	dependsOn tasks.remapSourcesJar
+    from zipTree(tasks.remapSourcesJar.archiveFile)
 	exclude 'dev/emi/emi/jemi/**'
 })
 
