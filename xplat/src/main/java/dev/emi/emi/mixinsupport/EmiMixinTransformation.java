@@ -1,6 +1,7 @@
 package dev.emi.emi.mixinsupport;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -10,14 +11,66 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.spongepowered.asm.mixin.transformer.meta.MixinMerged;
 import org.spongepowered.asm.util.Annotations;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import dev.emi.emi.mixinsupport.annotation.Transform;
+import dev.emi.emi.runtime.EmiLog;
 
 public class EmiMixinTransformation {
 	private static int VISIBILITY_MASK = ~(Opcodes.ACC_PRIVATE | Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED);
+	private static Map<String, Set<String>> cache = Maps.newHashMap();
+	public static boolean speakTheGoodWord = false;
+
+	private static void dictate(String targetClassName, Set<String> tainters) {
+		if (tainters.isEmpty()) {
+			return;
+		}
+		if (speakTheGoodWord) {
+			String warning = targetClassName + " is tainted by";
+			for (String tainter : tainters) {
+				warning += "\n\t * " + tainter;
+			}
+			EmiLog.warn(warning);
+		}
+	}
+
+	public static void preach() {
+		if (cache.isEmpty()) {
+			return; // God's in his heaven, all's right with the world
+		}
+		EmiLog.warn("The following EMI classes have mixins applied to them, which could fundamentally alter behavior and cause issues.");
+		speakTheGoodWord = true;
+		for (Map.Entry<String, Set<String>> entry : cache.entrySet()) {
+			dictate(entry.getKey(), entry.getValue());
+		}
+	}
+
+	public static void exposeSinners(String targetClassName, ClassNode targetClass, String mixinClassName) {
+		if (targetClassName.startsWith("dev.emi.emi")) {
+			Set<String> tainters = cache.computeIfAbsent(targetClassName, k -> Sets.newHashSet());
+			for (var m : targetClass.methods) {
+				AnnotationNode annot = Annotations.getVisible(m, MixinMerged.class);
+				String tainter = Annotations.getValue(annot, "mixin", (String) null);
+				if (tainter != null && !tainter.startsWith("dev.emi.emi.mixin")) {
+					tainters.add(tainter);
+				}
+			}
+			if (!tainters.isEmpty()) {
+				String sinners = "Mixins:";
+				for (String tainter : tainters) {
+					sinners += "\n\t\t * " + tainter;
+				}
+				sinners += "\n\t\t";
+				dictate(targetClassName, tainters);
+				targetClass.sourceFile = sinners;
+				targetClass.sourceDebug = sinners;
+			}
+		}
+	}
 
 	public static void relinkTransforms(ClassNode clazz) {
 		Map<String, MethodNode> changedMethods = Maps.newHashMap();

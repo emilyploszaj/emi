@@ -61,6 +61,7 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 		processClassAnnotations(targetClassName, targetClass, mixinClassName, mixinInfo);
 		EmiMixinTransformation.relinkTransforms(targetClass);
 		processMethodAnnotations(targetClassName, targetClass, mixinClassName, mixinInfo);
+		EmiMixinTransformation.exposeSinners(targetClassName, targetClass, mixinClassName);
 	}
 
 	private void processClassAnnotations(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {

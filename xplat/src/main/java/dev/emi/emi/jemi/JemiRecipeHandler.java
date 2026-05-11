@@ -88,7 +88,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext raw) {
 		EmiDrawContext draw = EmiDrawContext.wrap(raw);
 		R rawRecipe = getRawRecipe(recipe);
-		JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, widgets);
+		JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, type, widgets);
 		IRecipeTransferError err = jeiCraft(recipe, context, false, view);
 		if (err != null) {
 			if (err.getType() == IRecipeTransferError.Type.COSMETIC) {
@@ -126,7 +126,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 			R rawRecipe = getRawRecipe(recipe);
 			
 			if (view == null) {
-				view = createSlotsView(recipe, rawRecipe, List.of());
+				view = createSlotsView(recipe, rawRecipe, type, List.of());
 			}
 
 			if (view == null) {
@@ -140,7 +140,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		return () -> IRecipeTransferError.Type.INTERNAL;
 	}
 
-	private JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, List<Widget> widgets) {
+	public static <R> JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, RecipeType<R> type, List<Widget> widgets) {
 		JemiRecipeLayoutBuilder builder = null;
 		if (rawRecipe != null) {
 			/*
@@ -234,14 +234,14 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		return null;
 	}
 
-	private void addBlankIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, int amount, RecipeIngredientRole role) {
+	private static void addBlankIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, int amount, RecipeIngredientRole role) {
 		for (int i = 0; i < amount; i++) {
 			addIngredients(builder, widgets, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
 		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private void addIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, List<? extends EmiIngredient> stacks, RecipeIngredientRole role) {
+	private static void addIngredients(JemiRecipeLayoutBuilder builder, List<SlotWidget> widgets, List<? extends EmiIngredient> stacks, RecipeIngredientRole role) {
 		for (EmiIngredient ing : stacks) {
 			int x = 0, y = 0;
 			for (SlotWidget w : widgets) {
