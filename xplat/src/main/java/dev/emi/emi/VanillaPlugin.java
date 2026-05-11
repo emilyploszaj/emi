@@ -542,10 +542,6 @@ public class VanillaPlugin implements EmiPlugin {
 						synthetic("world/flower_duping", EmiUtil.subId(i)), false));
 			}
 		}
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.ELYTRA) + "/" + EmiUtil.subId(Items.PHANTOM_MEMBRANE))));
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiPort.getEnchantmentRegistry().stream().toList()) {
 			if (!EmiPort.getEnchantmentRegistry().getEntry(e).isIn(EnchantmentTags.CURSE)) {
