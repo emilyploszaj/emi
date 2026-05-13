@@ -39,10 +39,10 @@ public class EmiMixinTransformation {
 	}
 
 	public static void preach() {
-		if (cache.isEmpty()) {
-			return; // God's in his heaven, all's right with the world
+		// God's in his heaven, all's right with the world
+		if (cache.values().stream().anyMatch(set -> !set.isEmpty())) {
+			EmiLog.warn("The following EMI classes have mixins applied to them, which could fundamentally alter behavior and cause issues.");
 		}
-		EmiLog.warn("The following EMI classes have mixins applied to them, which could fundamentally alter behavior and cause issues.");
 		speakTheGoodWord = true;
 		for (Map.Entry<String, Set<String>> entry : cache.entrySet()) {
 			dictate(entry.getKey(), entry.getValue());
@@ -109,7 +109,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static void applyTransform(ClassNode clazz) {
-		AnnotationNode transform = Annotations.getInvisible(clazz, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(clazz, Transform.class);
 		if (transform != null) {
 			//String name = Annotations.getValue(transform, "name", "");
 			//String desc = Annotations.getValue(transform, "desc", "");
@@ -121,7 +121,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static boolean applyTransform(MethodNode method) {
-		AnnotationNode transform = Annotations.getInvisible(method, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(method, Transform.class);
 		if (transform != null) {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
@@ -141,7 +141,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static boolean applyTransform(FieldNode field) {
-		AnnotationNode transform = Annotations.getInvisible(field, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(field, Transform.class);
 		if (transform != null) {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
