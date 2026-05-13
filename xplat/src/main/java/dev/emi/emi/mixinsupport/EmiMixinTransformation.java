@@ -109,7 +109,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static void applyTransform(ClassNode clazz) {
-		AnnotationNode transform = Annotations.getInvisible(clazz, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(clazz, Transform.class);
 		if (transform != null) {
 			//String name = Annotations.getValue(transform, "name", "");
 			//String desc = Annotations.getValue(transform, "desc", "");
@@ -121,7 +121,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static boolean applyTransform(MethodNode method) {
-		AnnotationNode transform = Annotations.getInvisible(method, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(method, Transform.class);
 		if (transform != null) {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
@@ -141,7 +141,7 @@ public class EmiMixinTransformation {
 	}
 	
 	public static boolean applyTransform(FieldNode field) {
-		AnnotationNode transform = Annotations.getInvisible(field, Transform.class);
+		AnnotationNode transform = EmiMixinPlugin.popInvisible(field, Transform.class);
 		if (transform != null) {
 			String name = Annotations.getValue(transform, "name", "");
 			String desc = Annotations.getValue(transform, "desc", "");
