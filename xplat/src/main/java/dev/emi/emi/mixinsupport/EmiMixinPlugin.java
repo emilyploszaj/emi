@@ -1,10 +1,14 @@
 package dev.emi.emi.mixinsupport;
 
+import java.lang.annotation.Annotation;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -67,11 +71,11 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 	private void processClassAnnotations(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 		//RemapperChain remapper = MixinEnvironment.getCurrentEnvironment().getRemappers();
 		EmiMixinTransformation.applyTransform(targetClass);
-		AnnotationNode extendsAnnot = Annotations.getInvisible(targetClass, Extends.class);
+		AnnotationNode extendsAnnot = popInvisible(targetClass, Extends.class);
 		if (extendsAnnot != null) {
 			targetClass.superName = Annotations.getValue(extendsAnnot, "value", targetClass.superName);
 		}
-		AnnotationNode stripConstructors = Annotations.getInvisible(targetClass, StripConstructors.class);
+		AnnotationNode stripConstructors = popInvisible(targetClass, StripConstructors.class);
 		if (stripConstructors != null) {
 			for (int i = 0; i < targetClass.methods.size(); i++) {
 				if (targetClass.methods.get(i).name.equals("<init>")) {
@@ -87,7 +91,7 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 		ClassNode mixinClass = mixinInfo.getClassNode(0);
 		Map<String, InvokeTargetInfo> targets = Maps.newHashMap();
 		for (MethodNode method : mixinClass.methods) {
-			AnnotationNode invokeTarget = Annotations.getInvisible(method, InvokeTarget.class);
+			AnnotationNode invokeTarget = popInvisible(method, InvokeTarget.class);
 			if (invokeTarget != null) {
 				String owner = Annotations.getValue(invokeTarget, "owner", targetClassName);
 				owner = switch(owner) {
@@ -107,7 +111,7 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 				};
 				targets.put(method.name + method.desc, new InvokeTargetInfo(owner, name, type, desc));
 			}
-			AnnotationNode additionalField = Annotations.getInvisible(method, AdditionalField.class);
+			AnnotationNode additionalField = popInvisible(method, AdditionalField.class);
 			if (additionalField != null) {
 				String value = Annotations.getValue(additionalField, "value", "");
 				String ret = method.desc.split("\\)")[1];
@@ -131,7 +135,7 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 		}
 		for (int i = 0; i < targetClass.methods.size(); i++) {
 			MethodNode method = targetClass.methods.get(i);
-			if (Annotations.getInvisible(method, InvokeTarget.class) != null || Annotations.getInvisible(method, AdditionalField.class) != null) {
+			if (popInvisible(method, InvokeTarget.class) != null || popInvisible(method, AdditionalField.class) != null) {
 				targetClass.methods.remove(i--);
 			}
 		}
@@ -175,5 +179,34 @@ public class EmiMixinPlugin implements IMixinConfigPlugin {
 	}
 
 	private static record InvokeTargetInfo(String owner, String name, int type, String desc) {
+	}
+
+	// Helpers to remove the AnnotationNode upon retrieval, to avoid transformations being applied
+	// multiple times and corrupting class structures. See #1171
+	
+	public static @Nullable AnnotationNode popInvisible(ClassNode node, Class<? extends Annotation> type) {
+		return pop(node.invisibleAnnotations, type);
+	}
+
+	public static @Nullable AnnotationNode popInvisible(MethodNode node, Class<? extends Annotation> type) {
+		return pop(node.invisibleAnnotations, type);
+	}
+
+	public static @Nullable AnnotationNode popInvisible(FieldNode node, Class<? extends Annotation> type) {
+		return pop(node.invisibleAnnotations, type);
+	}
+	
+	private static @Nullable AnnotationNode pop(List<AnnotationNode> anns, Class<? extends Annotation> type) {
+		if (anns == null) return null;
+		String desc = Type.getDescriptor(type);
+		Iterator<AnnotationNode> iter = anns.iterator();
+		while (iter.hasNext()) {
+			AnnotationNode an = iter.next();
+			if (desc.equals(an.desc)) {
+				iter.remove();
+				return an;
+			}
+		}
+		return null;
 	}
 }
