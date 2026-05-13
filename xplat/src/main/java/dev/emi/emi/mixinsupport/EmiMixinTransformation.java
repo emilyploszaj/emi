@@ -39,10 +39,10 @@ public class EmiMixinTransformation {
 	}
 
 	public static void preach() {
-		if (cache.isEmpty()) {
-			return; // God's in his heaven, all's right with the world
+		// God's in his heaven, all's right with the world
+		if (cache.values().stream().anyMatch(set -> !set.isEmpty())) {
+			EmiLog.warn("The following EMI classes have mixins applied to them, which could fundamentally alter behavior and cause issues.");
 		}
-		EmiLog.warn("The following EMI classes have mixins applied to them, which could fundamentally alter behavior and cause issues.");
 		speakTheGoodWord = true;
 		for (Map.Entry<String, Set<String>> entry : cache.entrySet()) {
 			dictate(entry.getKey(), entry.getValue());
