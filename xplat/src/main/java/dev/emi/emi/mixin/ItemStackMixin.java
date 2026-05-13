@@ -17,7 +17,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 @Mixin(value = ItemStack.class, priority = 500)
 public class ItemStackMixin {
@@ -28,7 +27,7 @@ public class ItemStackMixin {
 		if (EmiConfig.appendItemModId && EmiConfig.appendModId && Thread.currentThread() != EmiSearch.searchThread && text != null && !text.isEmpty()) {
 			String namespace = EmiPort.getItemRegistry().getId(((ItemStack) (Object) this).getItem()).getNamespace();
 			String mod = EmiUtil.getModName(namespace);
-			text.add(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC));
+			text.add(EmiPort.literal(mod, EmiConfig.itemModIdColor.getFormatting(), EmiConfig.itemModIdFormat.getFormatting()));
 		}
 	}
 }
