@@ -1132,7 +1132,7 @@ public class EmiScreenManager {
 				return true;
 			}
 		}
-		if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+		if (EmiConfig.displayAllRecipes.matchesKey(keyCode, scanCode)) {
 			EmiApi.displayAllRecipes();
 			return true;
 		} else {
