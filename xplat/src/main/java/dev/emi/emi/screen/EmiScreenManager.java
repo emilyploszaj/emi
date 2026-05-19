@@ -54,6 +54,7 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiDragDropHandlers;
 import dev.emi.emi.registry.EmiExclusionAreas;
 import dev.emi.emi.registry.EmiRecipeFiller;
+import dev.emi.emi.registry.EmiScreenSuppressors;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackProviders;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -132,7 +133,11 @@ public class EmiScreenManager {
 			List.of(EmiPort.translatable("tooltip.emi.recipe_tree")));
 
 	public static boolean isDisabled() {
-		return !EmiReloadManager.isLoaded() || !EmiConfig.enabled;
+		if (!EmiReloadManager.isLoaded() || !EmiConfig.enabled) {
+			return true;
+		}
+		EmiScreenBase base = EmiScreenBase.getCurrent();
+		return !base.isEmpty() && EmiScreenSuppressors.isSuppressed(base.screen());
 	}
 
 	public static void recalculate() {
@@ -626,8 +631,10 @@ public class EmiScreenManager {
 		for (SidebarPanel panel : panels) {
 			panel.updateWidgetVisibility();
 		}
-		renderWidgets(context, mouseX, mouseY, delta, base);
-		if (isDisabled()) {
+		if (visible) {
+			renderWidgets(context, mouseX, mouseY, delta, base);
+		}
+		if (!visible) {
 			int screenHeight = base.screen().height;
 			if (!EmiReloadManager.isLoaded()) {
 				int reloadInfoX = getDebugTextX();

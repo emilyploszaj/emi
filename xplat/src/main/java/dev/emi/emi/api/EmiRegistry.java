@@ -138,6 +138,20 @@ public interface EmiRegistry {
 	void addGenericExclusionArea(EmiExclusionArea<Screen> area);
 
 	/**
+	 * Adds an {@link EmiScreenSuppressor} for screens of a given class.
+	 * When any registered suppressor returns {@code true}, EMI will not render
+	 * its widgets or handle input for that screen.
+	 */
+	<T extends Screen> void addScreenSuppressor(Class<T> clazz, EmiScreenSuppressor<T> suppressor);
+
+	/**
+	 * Adds an {@link EmiScreenSuppressor} for every screen.
+	 * When any registered suppressor returns {@code true}, EMI will not render
+	 * its widgets or handle input for that screen.
+	 */
+	void addGenericScreenSuppressor(EmiScreenSuppressor<Screen> suppressor);
+
+	/**
 	 * Adds an EmiDragDropHandler to screens of a given class.
 	 * Drag drop handlers can consume events related to sidebar stacks being dragged and dropped.
 	 */

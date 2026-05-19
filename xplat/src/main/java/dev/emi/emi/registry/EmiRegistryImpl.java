@@ -12,6 +12,7 @@ import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.EmiScreenBoundsProvider;
+import dev.emi.emi.api.EmiScreenSuppressor;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -122,6 +123,16 @@ public class EmiRegistryImpl implements EmiRegistry {
 	@Override
 	public void addGenericExclusionArea(EmiExclusionArea<Screen> area) {
 		EmiExclusionAreas.generic.add(area);
+	}
+
+	@Override
+	public <T extends Screen> void addScreenSuppressor(Class<T> clazz, EmiScreenSuppressor<T> suppressor) {
+		EmiScreenSuppressors.fromClass.computeIfAbsent(clazz, c -> Lists.newArrayList()).add(suppressor);
+	}
+
+	@Override
+	public void addGenericScreenSuppressor(EmiScreenSuppressor<Screen> suppressor) {
+		EmiScreenSuppressors.generic.add(suppressor);
 	}
 
 	@Override
