@@ -989,6 +989,13 @@ public class EmiScreenManager {
 		if (base.isEmpty()) {
 			return false;
 		}
+		if (isDisabled()) {
+			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
+				toggleVisibility(true);
+				return true;
+			}
+			return false;
+		}
 		if (search.mouseClicked(mouseX, mouseY, button)) {
 			return true;
 		} else if (emi.mouseClicked(mouseX, mouseY, button)) {
@@ -1004,13 +1011,6 @@ public class EmiScreenManager {
 			} else if (panel.pageRight.mouseClicked(mouseX, mouseY, button)) {
 				return true;
 			}
-		}
-		if (isDisabled()) {
-			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
-				toggleVisibility(true);
-				return true;
-			}
-			return false;
 		}
 		recalculate();
 		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
