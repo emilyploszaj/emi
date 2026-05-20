@@ -52,10 +52,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
+import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -269,15 +269,15 @@ public class EmiAgnosForge extends EmiAgnos {
 	@Override
 	protected boolean isFloatyFluidAgnos(FluidEmiStack stack) {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
-		return fs.getFluid().getFluidType().isLighterThanAir();
+		return fs.getFluid().getAttributes().isLighterThanAir();
 	}
 
 	@Override
 	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidStack fs = new FluidStack(stack.getKeyOfType(Fluid.class), 1000, stack.getNbt());
-		IClientFluidTypeExtensions ext = IClientFluidTypeExtensions.of(fs.getFluid());
-		Identifier texture = ext.getStillTexture(fs);
-		int color = ext.getTintColor(fs);
+		FluidAttributes attrs = fs.getFluid().getAttributes();
+		Identifier texture = attrs.getStillTexture(fs);
+		int color = attrs.getColor(fs);
 		MinecraftClient client = MinecraftClient.getInstance();
 		Sprite sprite = client.getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE).apply(texture);
 		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);

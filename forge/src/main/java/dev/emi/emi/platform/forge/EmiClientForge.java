@@ -20,13 +20,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.ConfigGuiHandler;
 import net.minecraftforge.client.ForgeRenderTypes;
-import net.minecraftforge.client.event.ContainerScreenEvent;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -46,14 +43,15 @@ public class EmiClientForge {
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::tagsReloaded);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::renderScreenForeground);
 		MinecraftForge.EVENT_BUS.addListener(EmiClientForge::postRenderScreen);
-		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-			() -> new ConfigScreenHandler.ConfigScreenFactory((client, last) -> new ConfigScreen(last)));
+		ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
+			() -> new ConfigGuiHandler.ConfigGuiFactory((client, last) -> new ConfigScreen(last))
+		);
 	}
 
 	@SubscribeEvent
-	public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
+	public static void registerAdditionalModels(ModelRegistryEvent event) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		EmiTags.registerTagModels(client.getResourceManager(), event::register);
+		EmiTags.registerTagModels(client.getResourceManager(), ForgeModelBakery::addSpecialModel);
 	}
 
 	@SubscribeEvent
@@ -69,7 +67,7 @@ public class EmiClientForge {
 		EmiReloadManager.reloadTags();
 	}
 
-	public static void renderScreenForeground(ContainerScreenEvent.Render.Foreground event) {
+	public static void renderScreenForeground(ContainerScreenEvent.DrawForeground event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		HandledScreen<?> screen = event.getContainerScreen();
 		EmiScreenBase base = EmiScreenBase.of(screen);
@@ -86,7 +84,7 @@ public class EmiClientForge {
 		}
 	}
 
-	public static void postRenderScreen(ScreenEvent.Render.Post event) {
+	public static void postRenderScreen(ScreenEvent.DrawScreenEvent.Post event) {
 		EmiDrawContext context = EmiDrawContext.wrap(event.getPoseStack());
 		Screen screen = event.getScreen();
 		if (!(screen instanceof HandledScreen<?>)) {

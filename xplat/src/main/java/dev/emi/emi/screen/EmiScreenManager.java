@@ -1366,7 +1366,7 @@ public class EmiScreenManager {
 				}
 				command += " " + amount;
 				if (command.length() < 256) {
-					client.player.sendCommand(command);
+					client.player.sendChatMessage("/" + command);
 					return true;
 				}
 			}

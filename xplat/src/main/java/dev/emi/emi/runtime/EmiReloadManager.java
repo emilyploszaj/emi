@@ -11,7 +11,6 @@ import dev.emi.emi.api.EmiInitRegistry;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
-import dev.emi.emi.jemi.JemiPlugin;
 import dev.emi.emi.mixinsupport.EmiMixinTransformation;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiComparisonDefaults;
@@ -158,7 +157,8 @@ public class EmiReloadManager {
 						.sorted((a, b) -> Integer.compare(entrypointPriority(a), entrypointPriority(b))).toList());
 					
 					if (EmiAgnos.isModLoaded("jei")) {
-						plugins.add(new EmiPluginContainer(new JemiPlugin(), "jemi"));
+//						TODO: disable jei?
+//						plugins.add(new EmiPluginContainer(new JemiPlugin(), "jemi"));
 					}
 					EmiInitRegistry initRegistry = new EmiInitRegistryImpl();
 					for (EmiPluginContainer container : plugins) {

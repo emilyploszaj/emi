@@ -34,10 +34,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
@@ -178,7 +175,7 @@ public class EmiRenderHelper {
 			if (comp instanceof OrderedTextTooltipComponent ottc && ottc.getWidth(CLIENT.textRenderer) > wrapWidth) {
 				try {
 					OrderedText ordered = ((OrderedTextTooltipComponentAccessor) ottc).getText();
-					MutableText text = Text.empty();
+					MutableText text = LiteralText.EMPTY.copy();
 					// Mojang, what is this??? Please give me some other way to wrap
 					ordered.accept(((var1, style, codepoint) -> {
 						text.append(EmiPort.literal(String.valueOf(Character.toChars(codepoint)), style));

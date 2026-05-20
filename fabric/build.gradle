@@ -68,7 +68,7 @@ dependencies {
 	modCompileOnly("mezz.jei:${rootProject.jei_version}") {
 		transitive = false
 	}
-	modCompileOnly "com.terraformersmc:modmenu:6.1.0-rc.4"
+	modCompileOnly "com.terraformersmc:modmenu:3.2.5"
 }
 
 processResources {

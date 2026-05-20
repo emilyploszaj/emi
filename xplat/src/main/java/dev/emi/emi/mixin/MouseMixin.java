@@ -84,7 +84,7 @@ public class MouseMixin {
 		try {
 			Screen screen = client.currentScreen;
 			if (screen instanceof HandledScreen<?> hs) {
-				double amount = (client.options.getDiscreteMouseScroll().getValue() ? Math.signum(vertical) : vertical) * client.options.getMouseWheelSensitivity().getValue();
+				double amount = (client.options.discreteMouseScroll ? Math.signum(vertical) : vertical) * client.options.mouseWheelSensitivity;
 				double mx = x * client.getWindow().getScaledWidth() / client.getWindow().getWidth();
 				double my = y * client.getWindow().getScaledHeight() / client.getWindow().getHeight();
 				if (EmiScreenManager.mouseScrolled(mx, my, amount)) {
