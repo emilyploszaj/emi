@@ -41,17 +41,20 @@ public class EmiDataLoader<T> extends SinglePreparationResourceReloader<T>
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
-
 			try {
 				for (Resource resource : manager.getAllResources(id)) {
-					InputStreamReader reader = new InputStreamReader(EmiPort.getInputStream(resource));
-					JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
-					prepare.accept(t, json, id);
+					try {
+						InputStreamReader reader = new InputStreamReader(EmiPort.getInputStream(resource));
+						JsonObject json = JsonHelper.deserialize(GSON, reader, JsonObject.class);
+						prepare.accept(t, json, id);
+					} catch (Exception e) {
+						EmiLog.error("Error loading data for " + this.id + " in " + id);
+						e.printStackTrace();
+					}
 				}
-			}
-			catch (Exception e)
-			{
-				EmiLog.error("Error loading data for " + this.id + " in " + id, e);
+			} catch (Exception e) {
+				EmiLog.error("Error loading data for " + this.id);
+				e.printStackTrace();
 			}
 		}
 		return t;

@@ -12,9 +12,58 @@ import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import mezz.jei.api.runtime.IIngredientListOverlay;
+import mezz.jei.common.filter.IFilterTextSource;
+import mezz.jei.common.gui.GuiScreenHelper;
+import mezz.jei.common.gui.overlay.IIngredientGridSource;
+import mezz.jei.common.gui.overlay.IngredientGridWithNavigation;
+import mezz.jei.common.gui.overlay.IngredientListOverlay;
+import mezz.jei.common.gui.textures.Textures;
+import mezz.jei.common.ingredients.RegisteredIngredients;
+import mezz.jei.common.input.IKeyBindings;
+import mezz.jei.common.network.IConnectionToServer;
+import mezz.jei.core.config.IClientConfig;
+import mezz.jei.core.config.IWorldConfig;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
 
-public class JemiIngredientListOverlay implements IIngredientListOverlay {
+
+/**
+ * The extension of main work class instead of implementing interface is needed, as JEI do not have build in overwrite
+ * functions yet. A lot of rely on implementation class.
+ */
+public class JemiIngredientListOverlay extends IngredientListOverlay {
+
+	/**
+	 * Simpler access to GuiScreenHelper.
+	 */
+	private final GuiScreenHelper guiScreenHelper;
+
+	public JemiIngredientListOverlay(IIngredientGridSource ingredientGridSource,
+		IFilterTextSource filterTextSource,
+		RegisteredIngredients registeredIngredients,
+		GuiScreenHelper guiScreenHelper,
+		IngredientGridWithNavigation contents,
+		IClientConfig clientConfig,
+		IWorldConfig worldConfig,
+		IConnectionToServer connectionToServer,
+		Textures textures,
+		IKeyBindings keyBindings) {
+		super(ingredientGridSource,
+			filterTextSource,
+			registeredIngredients,
+			guiScreenHelper,
+			contents,
+			clientConfig,
+			worldConfig,
+			connectionToServer,
+			textures,
+			keyBindings);
+
+		this.guiScreenHelper = guiScreenHelper;
+	}
+
 
 	@Override
 	public Optional<ITypedIngredient<?>> getIngredientUnderMouse() {
@@ -57,5 +106,53 @@ public class JemiIngredientListOverlay implements IIngredientListOverlay {
 		}
 		return List.of();
 	}
-	
+
+
+    public GuiScreenHelper getGuiScreenHelper() {
+        return this.guiScreenHelper;
+    }
+
+
+	/**
+	 * Disables JEI screen updating
+	 */
+	@Override
+	public void updateScreen(@Nullable Screen guiScreen, boolean exclusionAreasChanged) {
+	}
+
+
+	/**
+	 * Disables JEI screen drawing.
+	 */
+	@Override
+	public void drawOnForeground(MinecraftClient minecraft,
+		MatrixStack poseStack,
+		HandledScreen<?> gui,
+		int mouseX,
+		int mouseY) {
+	}
+
+
+	/**
+	 * Disabled JEI screen drawing
+	 */
+	@Override
+	public void drawScreen(MinecraftClient minecraft, MatrixStack poseStack, int mouseX, int mouseY, float partialTicks) {
+	}
+
+
+	/**
+	 * Disables JEI tooltip drawing
+	 */
+	@Override
+	public void drawTooltips(MinecraftClient minecraft, MatrixStack poseStack, int mouseX, int mouseY) {
+	}
+
+
+	/**
+	 * Disables JEI text field ticking
+	 */
+	@Override
+	public void handleTick() {
+	}
 }

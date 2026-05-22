@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import dev.emi.emi.jemi.JemiUtil;
 import net.minecraft.enchantment.Enchantment;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -229,7 +230,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected EmiStack createFluidStackAgnos(Object object) {
-		return null;
+		return JemiUtil.getFluidFromJei(object);
 	}
 
 	@Override

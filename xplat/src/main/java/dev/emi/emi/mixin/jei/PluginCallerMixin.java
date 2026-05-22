@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.library.load.PluginCaller;
+import mezz.jei.common.load.PluginCaller;
 import net.minecraft.util.Identifier;
 
 @Pseudo

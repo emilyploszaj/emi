@@ -31,11 +31,7 @@ import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
-import dev.emi.emi.jemi.runtime.JemiBookmarkOverlay;
-import dev.emi.emi.jemi.runtime.JemiDragDropHandler;
-import dev.emi.emi.jemi.runtime.JemiIngredientFilter;
-import dev.emi.emi.jemi.runtime.JemiIngredientListOverlay;
-import dev.emi.emi.jemi.runtime.JemiRecipesGui;
+import dev.emi.emi.jemi.runtime.*;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.registry.EmiRecipeFiller;
@@ -57,14 +53,17 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.vanilla.IJeiIngredientInfoRecipe;
 import mezz.jei.api.registration.IModIngredientRegistration;
-import mezz.jei.api.registration.IRuntimeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
-import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
-import mezz.jei.library.ingredients.subtypes.SubtypeInterpreters;
-import mezz.jei.library.load.registration.SubtypeRegistration;
-import net.minecraft.client.util.math.Rect2i;
+import mezz.jei.common.focus.FocusGroup;
+import mezz.jei.common.ingredients.subtypes.SubtypeInterpreters;
+import mezz.jei.common.input.IClickedIngredient;
+import mezz.jei.common.load.registration.SubtypeRegistration;
+import mezz.jei.common.platform.IPlatformScreenHelper;
+import mezz.jei.common.platform.Services;
+import mezz.jei.common.util.ImmutableRect2i;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.CraftingRecipe;
@@ -105,7 +104,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		hasSubtype = (type, ingredient) -> {
 			@SuppressWarnings("unchecked")
 			IIngredientTypeWithSubtypes<Object, Object> castedType = (IIngredientTypeWithSubtypes<Object, Object>) type;
-			return subtypeManager.hasSubtypes(castedType, ingredient);
+			return subtypeManager.getSubtypeInfo(castedType, ingredient, UidContext.Recipe) != null;
 		};
 	}
 
@@ -114,23 +113,12 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		subtypeManager = registration.getSubtypeManager();
 	}
 
-	@Override
-	public void registerRuntime(IRuntimeRegistration registration) {
-		registration.setIngredientListOverlay(new JemiIngredientListOverlay());
-		registration.setBookmarkOverlay(new JemiBookmarkOverlay());
-		registration.setRecipesGui(new JemiRecipesGui());
-		registration.setIngredientFilter(new JemiIngredientFilter());
-	}
 
 	@Override
 	public void onRuntimeAvailable(IJeiRuntime runtime) {
 		JemiPlugin.runtime = runtime;
 	}
 
-	@Override
-	public void onRuntimeUnavailable() {
-		JemiPlugin.runtime = null;
-	}
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -152,9 +140,10 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 
 		EmiReloadManager.step(EmiPort.literal("Loading information from JEI..."), 5_000);
 		registry.addGenericExclusionArea((screen, consumer) -> {
-			if (runtime != null && runtime.getScreenHelper() != null) {
-				List<Rect2i> areas = runtime.getScreenHelper().getGuiExclusionAreas(screen).toList();
-				for (Rect2i r : areas) {
+			if (runtime != null && runtime.getIngredientListOverlay() instanceof JemiIngredientListOverlay overlay)
+			{
+				Set<ImmutableRect2i> areas = overlay.getGuiScreenHelper().getGuiExclusionAreas();
+				for (ImmutableRect2i r : areas) {
 					if (r != null) {
 						consumer.accept(new Bounds(r.getX(), r.getY(), r.getWidth(), r.getHeight()));
 					}
@@ -163,8 +152,19 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		});
 
 		registry.addGenericStackProvider((screen, x, y) -> {
-			return new EmiStackInteraction(runtime.getScreenHelper().getClickableIngredientUnderMouse(screen, x, y)
-					.map(IClickableIngredient::getTypedIngredient).map(JemiUtil::getStack).findFirst().orElse(EmiStack.EMPTY), null, false);
+			if (runtime != null && runtime.getIngredientListOverlay() instanceof JemiIngredientListOverlay overlay) {
+				// JEI still relies on GUI screens.
+				if (screen instanceof HandledScreen<?> handledScreen) {
+					return new EmiStackInteraction(overlay.getGuiScreenHelper()
+						.getPluginsIngredientUnderMouse(handledScreen, x, y)
+						.map(IClickedIngredient::getTypedIngredient)
+						.map(JemiUtil::getStack)
+						.findFirst()
+						.orElse(EmiStack.EMPTY), null, false);
+				}
+			}
+
+			return new EmiStackInteraction(EmiStack.EMPTY);
 		});
 
 		registry.addGenericDragDropHandler(new JemiDragDropHandler());
@@ -313,7 +313,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			try {
 				if (category.isHandled(recipe)) {
 					JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
-					category.setRecipe(builder, recipe, runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+					category.setRecipe(builder, recipe, FocusGroup.EMPTY);
 					List<EmiIngredient> inputs = Lists.newArrayList();
 					List<EmiStack> outputs = Lists.newArrayList();
 					for (JemiIngredientAcceptor acceptor : builder.ingredients) {
@@ -420,7 +420,14 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	private static EmiRecipeHandler<?> getRecipeHandler(ScreenHandler handler, EmiRecipe recipe) {
 		IRecipeCategory<?> category = CATEGORY_MAP.getOrDefault(recipe.getCategory(), null);
 		if (category != null) {
-			return runtime.getRecipeTransferManager().getRecipeTransferHandler(handler, category).map(JemiRecipeHandler::new).orElse(null);
+			if (runtime.getRecipesGui() instanceof JemiRecipesGui recipesGui) {
+				return Optional.ofNullable(recipesGui.getRecipeTransferManager()
+						.getRecipeTransferHandler(handler, category))
+					.map(JemiRecipeHandler::new)
+					.orElse(null);
+			}
+
+			return null;
 		}
 		return null;
 	}

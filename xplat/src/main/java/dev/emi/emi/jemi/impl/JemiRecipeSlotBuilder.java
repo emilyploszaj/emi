@@ -16,7 +16,6 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
-import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
@@ -91,6 +90,14 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 		return this;
 	}
 
+
+	@Override
+	public IRecipeSlotBuilder setFluidRenderer(int capacity, boolean showCapacity, int width, int height) {
+		this.tankInfo = new TankInfo(width, height, capacity, showCapacity);
+		return this;
+	}
+
+
 	@Override
 	public IRecipeSlotBuilder setFluidRenderer(long capacity, boolean showCapacity, int width, int height) {
 		this.tankInfo = new TankInfo(width, height, capacity, showCapacity);
@@ -104,18 +111,6 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 			renderers = Maps.newHashMap();
 		}
 		renderers.put(ingredientType, new IngredientRenderer<T>(ingredientType, ingredientRenderer));
-		return this;
-	}
-
-	@Override
-	public IRecipeSlotBuilder addTypedIngredients(List<ITypedIngredient<?>> ingredients) {
-		acceptor.addTypedIngredients(ingredients);
-		return this;
-	}
-
-	@Override
-	public IRecipeSlotBuilder addOptionalTypedIngredients(List<Optional<ITypedIngredient<?>>> ingredients) {
-		acceptor.addOptionalTypedIngredients(ingredients);
 		return this;
 	}
 }

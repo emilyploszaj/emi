@@ -46,4 +46,8 @@ public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 	@Override
 	public void createFocusLink(IIngredientAcceptor<?>... slots) {
 	}
+
+	@Override
+	public void createFocusLink(IRecipeSlotBuilder... slots) {
+	}
 }

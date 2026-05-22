@@ -10,6 +10,7 @@ import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
+import mezz.jei.common.gui.GuiScreenHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Rect2i;
@@ -58,11 +59,18 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 
 	@SuppressWarnings("deprecation")
 	private <I> List<IGhostIngredientHandler.Target<I>> getTargets(Screen screen, ITypedIngredient<I> typed) {
-		Optional<IGhostIngredientHandler<Screen>> optGhost = JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandler(screen);
-		if (optGhost.isPresent()) {
-			IGhostIngredientHandler<Screen> ghost = optGhost.get();
-			return ghost.getTargets(screen, typed.getIngredient(), false);
+		if (JemiPlugin.runtime != null && JemiPlugin.runtime.getIngredientListOverlay() instanceof JemiIngredientListOverlay overlay) {
+			GuiScreenHelper guiScreenHelper = overlay.getGuiScreenHelper();
+
+			Optional<IGhostIngredientHandler<Screen>> optGhost =
+				Optional.ofNullable(guiScreenHelper.getGhostIngredientHandler(screen));
+
+			if (optGhost.isPresent()) {
+				IGhostIngredientHandler<Screen> ghost = optGhost.get();
+				return ghost.getTargets(screen, typed.getIngredient(), false);
+			}
 		}
+
 		return List.of();
 	}
 }

@@ -25,7 +25,6 @@ import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import net.minecraft.client.MinecraftClient;
@@ -36,13 +35,13 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.screen.ScreenHandler;
 
 public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeHandler<T> {
-	private final RecipeType<R> type;
+	private final Class<R> type;
 	//private IRecipeCategory<R> category;
 	public IRecipeTransferHandler<T, R> handler;
 
 	public JemiRecipeHandler(IRecipeTransferHandler<T, R> handler) {
 		this.handler = handler;
-		type = handler.getRecipeType();
+		type = handler.getRecipeClass();
 		/*
 		if (type != null) {
 			List<IRecipeCategory<R>> categories = (List<IRecipeCategory<R>>) (Object) JemiPlugin.runtime.getRecipeManager().createRecipeCategoryLookup().includeHidden().limitTypes(List.of(type)).get().toList();
@@ -70,16 +69,16 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 	@Override
 	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<T> context) {
 		IRecipeTransferError err = jeiCraft(recipe, context, false, null);
-		return err == null || err.getType().allowsTransfer;
+		return err == null || err.getType() != IRecipeTransferError.Type.INTERNAL;
 	}
 
 	@Override
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
 		IRecipeTransferError err = jeiCraft(recipe, context, true, null);
-		if (err == null || err.getType().allowsTransfer) {
+		if (err == null || err.getType() != IRecipeTransferError.Type.INTERNAL) {
 			MinecraftClient.getInstance().setScreen(context.getScreen());
 		}
-		return err == null || err.getType().allowsTransfer;
+		return err == null || err.getType() != IRecipeTransferError.Type.INTERNAL;
 	}
 
 	@Override
@@ -206,18 +205,18 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 		try {
 			MinecraftClient client = MinecraftClient.getInstance();
 			RecipeManager manager = client.world.getRecipeManager();
-			if (type != null && type.getRecipeClass() != null) {
+			if (type != null) {
 				if (recipe instanceof JemiRecipe jr && jr.recipe != null) {
-					if (type.getRecipeClass().isAssignableFrom(jr.recipe.getClass())) {
-						return type.getRecipeClass().cast(jr.recipe);
+					if (type.isAssignableFrom(jr.recipe.getClass())) {
+						return type.cast(jr.recipe);
 					}
 				}
 				if (manager != null) {
 					Optional<? extends Recipe<?>> opt = manager.get(recipe.getId());
 					if (opt.isPresent()) {
 						Recipe<?> r = opt.get();
-						if (type.getRecipeClass().isAssignableFrom(r.getClass())) {
-							return type.getRecipeClass().cast(r);
+						if (type.isAssignableFrom(r.getClass())) {
+							return type.cast(r);
 						}
 					}
 				}

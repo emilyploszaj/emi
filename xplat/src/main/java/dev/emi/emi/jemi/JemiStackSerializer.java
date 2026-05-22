@@ -1,6 +1,5 @@
 package dev.emi.emi.jemi;
 
-import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,6 +7,7 @@ import com.google.gson.JsonObject;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
+import dev.emi.emi.mixin.jei.accessor.IngredientManagerAccessor;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.runtime.IIngredientManager;
@@ -31,9 +31,14 @@ public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
 			if (type == VanillaTypes.ITEM_STACK || type == JemiUtil.getFluidType()) {
 				continue;
 			}
-			Optional<?> opt = manager.getIngredientByUid(type, uid);
-			if (opt.isPresent()) {
-				return JemiUtil.getStack(type, opt.get()).setAmount(amount);
+
+			Object ingredientByUid = ((IngredientManagerAccessor) manager)
+				.getRegisteredIngredients()
+				.getIngredientInfo(type)
+				.getIngredientByUid(uid);
+
+			if (ingredientByUid != null) {
+				return JemiUtil.getStack(type, ingredientByUid).setAmount(amount);
 			}
 		}
 		return EmiStack.EMPTY;

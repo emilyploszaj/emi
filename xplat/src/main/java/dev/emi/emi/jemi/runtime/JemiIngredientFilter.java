@@ -8,9 +8,22 @@ import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
 import mezz.jei.api.ingredients.IIngredientType;
-import mezz.jei.api.runtime.IIngredientFilter;
+import mezz.jei.common.filter.IFilterTextSource;
+import mezz.jei.common.ingredients.IngredientFilter;
+import mezz.jei.common.ingredients.IngredientFilterApi;
 
-public class JemiIngredientFilter implements IIngredientFilter {
+
+/**
+ * The extension of main work class instead of implementing interface is needed, as JEI do not have build in overwrite
+ * functions yet. A lot of rely on implementation class.
+ */
+public class JemiIngredientFilter extends IngredientFilterApi {
+
+	public JemiIngredientFilter(IngredientFilter ingredientFilter,
+		IFilterTextSource filterTextSource) {
+		super(ingredientFilter, filterTextSource);
+	}
+
 
 	@Override
 	public void setFilterText(String filterText) {

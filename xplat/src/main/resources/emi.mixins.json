@@ -5,16 +5,6 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "dev.emi.emi.mixinsupport.EmiMixinPlugin",
   "client": [
-    "accessor.AxeItemAccessor",
-    "accessor.BakedModelManagerAccessor",
-    "accessor.CraftingResultSlotAccessor",
-    "accessor.HandledScreenAccessor",
-    "accessor.HoeItemAccessor",
-    "accessor.ItemRendererAccessor",
-    "accessor.OrderedTextTooltipComponentAccessor",
-    "accessor.ScreenAccessor",
-    "accessor.ShovelItemAccessor",
-    "accessor.SmithingRecipeAccessor",
     "AbstractInventoryScreenMixin",
     "CraftingResultSlotMixin",
     "HandledScreenMixin",
@@ -25,9 +15,22 @@
     "MouseMixin",
     "RecipeBookWidgetMixin",
     "ScreenMixin",
-    "ToastManagerMixin"
-  ],
-  "mixins": [
+    "ToastManagerMixin",
+    "accessor.AxeItemAccessor",
+    "accessor.BakedModelManagerAccessor",
+    "accessor.CraftingResultSlotAccessor",
+    "accessor.HandledScreenAccessor",
+    "accessor.HoeItemAccessor",
+    "accessor.ItemRendererAccessor",
+    "accessor.OrderedTextTooltipComponentAccessor",
+    "accessor.ScreenAccessor",
+    "accessor.ShovelItemAccessor",
+    "accessor.SmithingRecipeAccessor",
+    "jei.JeiStarterMixin",
+    "jei.OverlayHelperMixin",
+    "jei.PluginCallerMixin",
+    "jei.accessor.RecipeLayoutLegacyAdapterAccessor",
+    "jei.accessor.IngredientManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
