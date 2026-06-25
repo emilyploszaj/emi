@@ -113,6 +113,8 @@
   "config.emi.general.search_tooltip_by_default": "Search Tooltip by Default",
   "config.emi.general.search_mod_name_by_default": "Search Mod Name by Default",
   "config.emi.general.search_tags_by_default": "Search Tags by Default",
+  "config.emi.general.compare_components_by_default": "Compare Components by Default",
+  "config.emi.tooltip.general.compare_components_by_default": "When enabled, EMI's default stack comparison accounts for component data. This can improve recipe trees for recipes that use the same item with different components, but may make component-distinct stacks appear as separate entries. Requires a restart after being changed.",
 
   "config.emi.ui.effect_location": "Effect Location",
   "config.emi.ui.center_search_bar": "Center Search Bar",

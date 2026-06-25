@@ -78,6 +78,10 @@ public class EmiConfig {
 	@ConfigValue("general.search-tags-by-default")
 	public static boolean searchTagsByDefault = false;
 
+	@Comment("When enabled, EMI's default stack comparison accounts for component data. This can improve recipe trees for recipes that use the same item with different components, but may make component-distinct stacks appear as separate entries. Requires a restart after being enabled.")
+	@ConfigValue("general.compare-components-by-default")
+	public static boolean compareComponentsByDefault = false;
+
 	// UI
 	@Comment("Which action should be performed when clicking the recipe book.")
 	@ConfigValue("ui.recipe-book-action")
