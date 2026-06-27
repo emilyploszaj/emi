@@ -305,7 +305,7 @@
   "emi.no_tree": "まだレシピツリーが設定されていません...",
   "emi.random_tree": "ランダムに表示しますか？",
   "emi.random_tree_input": "§6[ctrl + r] を押す",
-  "emi.edit_mode.hide_one": "%s を押してスタックを非常時",
+  "emi.edit_mode.hide_one": "%s を押してスタックを非表示",
   "emi.edit_mode.hide_all": "%s を押してIDでスタックを非表示",
   "tooltip.emi.chance.consume": "消耗率： %s%%",
   "tooltip.emi.chance.produce": "生産確率: %s%%",
