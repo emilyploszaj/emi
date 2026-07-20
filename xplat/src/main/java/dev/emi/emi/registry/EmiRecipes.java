@@ -88,6 +88,15 @@ public class EmiRecipes {
 		invalidators.addAll(EmiData.recipeFilters);
 
 		invalidators.add(r -> {
+			EmiRecipeCategory category = r.getCategory();
+			if (category == null) {
+				EmiReloadLog.warn("Recipe " + r.getId() + " from " + r.getClass().getName() + " has null category");
+				return true;
+			}
+			return false;
+		});
+
+		invalidators.add(r -> {
 			for (EmiIngredient i : Iterables.concat(r.getInputs(), r.getOutputs(), r.getCatalysts())) {
 				if (EmiHidden.isDisabled(i)) {
 					return true;
