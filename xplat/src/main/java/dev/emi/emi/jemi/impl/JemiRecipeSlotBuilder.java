@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import net.minecraft.util.context.ContextParameterMap;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
@@ -28,7 +29,6 @@ public class JemiRecipeSlotBuilder implements IRecipeSlotBuilder {
 	public boolean large = false, defaultBackground = false;
 	public int x, y;
 	public Optional<String> name = Optional.empty();
-//	public IRecipeSlotTooltipCallback tooltipCallback;
 	public IRecipeSlotRichTooltipCallback richTooltipCallback;
 	public OffsetDrawable background, overlay;
 	public Map<IIngredientType<?>, IngredientRenderer<?>> renderers; 

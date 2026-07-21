@@ -18,12 +18,14 @@ import net.minecraft.text.Text;
 
 public class JemiTooltipBuilder implements ITooltipBuilder {
 	public final List<TooltipComponent> tooltip = Lists.newArrayList();
+	public final List<Text> texts = Lists.newArrayList(); // TODO
 
 	@Override
 	public void add(StringVisitable component) {
 		// JEI allows non-text StringVisitable... Minecraft's methods don't easily
 		if (component instanceof Text text) {
 			tooltip.add(TooltipComponent.of(text.asOrderedText()));
+			texts.add(text);
 		}
 	}
 

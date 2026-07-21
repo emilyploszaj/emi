@@ -23,10 +23,8 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
-import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.types.IRecipeType;
@@ -256,7 +254,7 @@ public class JemiRecipeHandler<T extends ScreenHandler, R> implements EmiRecipeH
 				Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(stack);
 				if (opt.isPresent()) {
 					ITypedIngredient<?> typed = opt.get();
-					acceptor.addIngredient((IIngredientType) typed.getType(), typed.getIngredient());
+					acceptor.add(typed.getType(), typed.getIngredient());
 				}
 			}
 		}

@@ -54,20 +54,20 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.recipeCategory = recipeCategory;
 		this.category = category;
 		this.recipe = recipe;
-		this.originalId = category.getRegistryName(recipe);
+		this.originalId = category.getIdentifier(recipe);
 		if (this.originalId != null) {
 			this.id = EmiPort.id("jei", "/" + EmiUtil.subId(this.originalId));
 		}
 		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
-			jrsb.acceptor.coerceStacks(null, /*jrsb.tooltipCallback, */jrsb.renderers); // TODO
+			jrsb.acceptor.coerceStacks(jrsb.richTooltipCallback, jrsb.renderers);
 		}
 		for (JemiIngredientAcceptor acceptor : builder.ingredients) {
 			EmiIngredient stack = acceptor.build();
 			if (acceptor.role == RecipeIngredientRole.INPUT) {
 				inputs.add(stack);
-			} else if (acceptor.role == RecipeIngredientRole.RENDER_ONLY) { // TODO
+			} else if (acceptor.role == RecipeIngredientRole.RENDER_ONLY) {
 				catalysts.add(stack);
 			} else if (acceptor.role == RecipeIngredientRole.OUTPUT) {
 				if (stack.getEmiStacks().size() > 1) {

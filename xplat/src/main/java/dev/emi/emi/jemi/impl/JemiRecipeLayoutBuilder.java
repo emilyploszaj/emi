@@ -52,9 +52,4 @@ public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 	public void createFocusLink(IIngredientAcceptor<?>... slots) {
 	}
 
-//	@Override
-//	public IRecipeSlotBuilder addSlotToWidget(RecipeIngredientRole role, ISlottedWidgetFactory<?> widgetFactory) {
-//		// TODO actually implement this factory method of adding slots
-//		return addSlot(role, 0, 0);
-//	}
 }

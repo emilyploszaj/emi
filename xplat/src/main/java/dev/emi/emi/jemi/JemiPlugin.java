@@ -213,7 +213,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			try {
 				IRecipeType type = c.getRecipeType();
 				Identifier id = type.getUid();
-				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(type).includeHidden().get().map(JemiUtil::getStack).toList();
+				List<EmiStack> catalysts = runtime.getRecipeManager().createCraftingStationLookup(type).includeHidden().get().map(JemiUtil::getStack).toList();
 				if (categoryMap.containsKey(type)) {
 					EmiRecipeCategory category = categoryMap.get(type);
 					CATEGORY_MAP.put(category, c);

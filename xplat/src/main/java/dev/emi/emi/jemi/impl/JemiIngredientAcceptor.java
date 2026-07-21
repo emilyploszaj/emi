@@ -6,6 +6,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.display.SlotDisplayContexts;
+import net.minecraft.util.context.ContextParameterMap;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -28,6 +32,8 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.text.Text;
 
+import javax.naming.Context;
+
 public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredientAcceptor> {
 	public static final Pattern FLUID_END = Pattern.compile("(^|\\s)([\\d,]+)\\s*mB$");
 	public final RecipeIngredientRole role;
@@ -38,7 +44,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void coerceStacks(Object tooltipCallback, Map<IIngredientType<?>, JemiRecipeSlot.IngredientRenderer<?>> renderers) {
+	public void coerceStacks(IRecipeSlotRichTooltipCallback tooltipCallback, Map<IIngredientType<?>, JemiRecipeSlot.IngredientRenderer<?>> renderers) {
 		if (tooltipCallback == null && renderers == null) {
 			return;
 		}
@@ -58,7 +64,9 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 				}
 				if (tooltipCallback != null) {
 					JemiRecipeSlot jsr = new JemiRecipeSlot(role, stack);
-//					tooltipCallback.onTooltip(jsr, base);
+					JemiTooltipBuilder builder = new JemiTooltipBuilder();
+					tooltipCallback.onRichTooltip(jsr, builder);
+					base.addAll(builder.texts);
 				}
 				for (int i = 0; i < 2 && i < base.size(); i++) {
 					Text t = base.get(i);
@@ -88,32 +96,43 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 
     @Override
     public JemiIngredientAcceptor add(SlotDisplay slotDisplay) {
-        return null;
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world != null) {
+			for (ItemStack stack : slotDisplay.getStacks(SlotDisplayContexts.createParameters(client.world))) {
+				addStack(EmiStack.of(stack));
+			}
+		}
+		return this;
     }
 
     @Override
     public JemiIngredientAcceptor add(Fluid fluid) {
-        return null;
+		addFluidStack(fluid);
+        return this;
     }
 
     @Override
-    public JemiIngredientAcceptor add(Fluid fluid, long l) {
-        return null;
+    public JemiIngredientAcceptor add(Fluid fluid, long amount) {
+		addFluidStack(fluid, amount);
+        return this;
     }
 
     @Override
-    public JemiIngredientAcceptor add(Fluid fluid, long l, ComponentChanges componentChanges) {
-        return null;
+    public JemiIngredientAcceptor add(Fluid fluid, long amount, ComponentChanges componentChanges) {
+		addFluidStack(fluid, amount, componentChanges);
+        return this;
     }
 
     @Override
     public JemiIngredientAcceptor add(Ingredient ingredient) {
-        return null;
+		add(ingredient.toDisplay());
+		return this;
     }
 
     @Override
-    public <I> JemiIngredientAcceptor add(IIngredientType<I> iIngredientType, I i) {
-        return null;
+    public <I> JemiIngredientAcceptor add(IIngredientType<I> ingredientType, I i) {
+		addIngredient(ingredientType, i);
+        return this;
     }
 
     @Override
