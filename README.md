@@ -10,8 +10,8 @@ To add EMI to your project as a dependency you need to add the following to your
 ```gradle
 repositories {
 	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/"
+		name = "Sleeping Town"
+		url = "https://repo.sleeping.town/"
 	}
 }
 ```
