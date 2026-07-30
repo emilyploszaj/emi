@@ -28,6 +28,7 @@ import dev.emi.emi.api.stack.ListEmiIngredient;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiData;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
+import dev.emi.emi.hacks.StackFlattener;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
@@ -125,6 +126,7 @@ public class EmiRecipes {
 	}
 
 	public static void addRecipe(EmiRecipe recipe) {
+		StackFlattener.flattenRecipe(recipe);
 		recipes.add(recipe);
 	}
 
@@ -253,6 +255,10 @@ public class EmiRecipes {
 						byWorkstation.computeIfAbsent(stack, (s) -> Lists.newArrayList()).addAll(entry.getValue());
 					}
 				}
+			}
+
+			if (doSort) {
+				StackFlattener.printImpact();
 			}
 
 			if (EmiConfig.devMode) {

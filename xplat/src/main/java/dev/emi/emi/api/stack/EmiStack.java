@@ -162,7 +162,11 @@ public abstract class EmiStack implements EmiIngredient {
 		if (changes != ComponentChanges.EMPTY) {
 			s += changes;
 		}
-		return s + " x" + getAmount();
+		s += " x" + getAmount();
+		if (getChance() != 1) {
+			s += " (" + getChance() + "%)";
+		}
+		return s;
 	}
 
 	public static EmiStack of(ItemStack stack) {
