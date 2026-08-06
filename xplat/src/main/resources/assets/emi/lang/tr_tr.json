@@ -400,5 +400,10 @@
     "tag.fabric.shovels": "Kürekler",
     "tag.fabric.hoes": "Çapalar",
     "tag.fabric.swords": "Kılıçlar",
-    "tag.fabric.shears": "Makaslar"
+    "tag.fabric.shears": "Makaslar",
+
+    "tooltip.emi.bom.batch_size": "Üretim miktarı: %s\nAyarlamak için kaydırın\n16'şar ayarlamak için §6[Shift]§r tuşunu basılı tutun",
+    "tooltip.emi.bom.batch_size.ideal": "Artıkları en aza indirmek için %s tuşuna basın",
+    "tooltip.emi.bom.batch_size.multiply": "Çarpan eklemek için §6[Ctrl]§r tuşunu basılı tutun",
+    "tooltip.emi.bom.batch_size.all": "Tüm kök öğelere uygulamak için §6[Alt]§r tuşunu basılı tutun"
   }

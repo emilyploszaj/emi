@@ -356,6 +356,8 @@
 
   "tooltip.emi.bom.batch_size": "产物份数： %s\n滚动滚轮调整份数\n按住 §6[Shift]§r 滚动会增减16",
   "tooltip.emi.bom.batch_size.ideal": "按 %s 将副产物数量降到最低",
+  "tooltip.emi.bom.batch_size.multiply": "按住 §6[Ctrl]§r 添加倍数",
+  "tooltip.emi.bom.batch_size.all": "按住 §6[Alt]§r 将调整应用到所有根物品",
   "tooltip.emi.bom.mode.view": "正在§6查看§r配方树",
   "tooltip.emi.bom.mode.craft": "正在§6制作§r配方树\n配方树中会显示制作进度\n§b收藏夹§r中可查看并快捷合成",
   "tooltip.emi.bom.help": "欢迎使用配方树\n这里可以分析物品的制作过程和原材料消耗\n按 §6[Ctrl + R]§r 可展示随机配方树\n本界面可以拖动或缩放\n\n配方树会自动使用默认配方分析制作过程\n配方详情页中可以更改默认配方\n\n左键物品/节点可手动选择配方\n按住 §6[Shift]§r 左键自动选择配方（根据物品栏）\n\n右键节点可以暂时折叠配方\n按住 §6[Shift]§r 右键节点可以清除配方\n\n选中最终产物旁的数可以改变产物份数\n\n总耗材旁的按钮可切换至§6制作§r模式\n在§6制作§r模式下，§b收藏夹§r中会显示需要收集的材料\n和中间产物，这些中间产物可以点击以快速合成",

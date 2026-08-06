@@ -863,7 +863,7 @@ public class EmiScreenManager {
 		}
 		Set<Slot> ignoredSlots = Sets.newHashSet();
 		Set<EmiStack> synfavs = Sets.newHashSet();
-		if (BoM.craftingMode && BoM.tree != null) {
+		if (BoM.craftingMode && BoM.getTree() != null) {
 			List<EmiFavorite.Synthetic> syntheticFavorites = EmiFavorites.syntheticFavorites;
 			for (EmiFavorite.Synthetic fav : syntheticFavorites) {
 				synfavs.addAll(fav.getEmiStacks());
@@ -892,13 +892,13 @@ public class EmiScreenManager {
 				context.push();
 				context.matrices().translate(0, 0, 300);
 				if (query != null) {
-					if (!query.test(stack)) {
-						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
-					}
-				} else if (BoM.craftingMode && BoM.tree != null) {
-					if (!(slot.inventory instanceof PlayerInventory) && !ignoredSlots.contains(slot) && synfavs.contains(stack)) {
-						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x7700BBFF);
-					}
+ 				if (!query.test(stack)) {
+ 					context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
+ 				}
+ 			} else if (BoM.craftingMode && BoM.getTree() != null) {
+ 				if (!(slot.inventory instanceof PlayerInventory) && !ignoredSlots.contains(slot) && synfavs.contains(stack)) {
+ 					context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x7700BBFF);
+ 				}
 				}
 				context.pop();
 			}

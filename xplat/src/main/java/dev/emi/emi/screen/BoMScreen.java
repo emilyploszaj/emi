@@ -32,6 +32,7 @@ import dev.emi.emi.bom.ChanceState;
 import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
+import dev.emi.emi.bom.MaterialTree;
 import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.bom.TreeCost;
 import dev.emi.emi.config.EmiConfig;
@@ -79,6 +80,14 @@ public class BoMScreen extends Screen {
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
+	private Bounds rootLeft = new Bounds(0, 0, 12, 12);
+	private Bounds rootRight = new Bounds(0, 0, 12, 12);
+	private Bounds rootArea = new Bounds(0, 0, 0, 0);
+	private List<Bounds> rootSlots = Lists.newArrayList();
+	private List<Integer> rootIndices = Lists.newArrayList();
+	private List<Long> rootAmounts = Lists.newArrayList();
+	private int rootScroll = 0;
+	private boolean initialViewSet = false;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
@@ -86,8 +95,8 @@ public class BoMScreen extends Screen {
 	}
 
 	public void init() {
-		if (BoM.tree != null) {
-			offY = height / -3;
+		if (BoM.getTree() != null) {
+			offY = 0;
 		} else {
 			offY = 0;
 		}
@@ -96,8 +105,14 @@ public class BoMScreen extends Screen {
 
 	public void recalculateTree() {
 		help = new Bounds(width - 18, height - 18, 16, 16);
-		if (BoM.tree != null) {
-			TreeVolume volume = addNewNodes(BoM.tree.goal, BoM.tree.batches, 1, 0, ChanceState.DEFAULT);
+		MaterialTree tree = BoM.getTree();
+		List<MaterialTree> roots = BoM.getTrees();
+		rootSlots.clear();
+		rootIndices.clear();
+		rootAmounts.clear();
+		int cy = 0;
+		if (tree != null) {
+			TreeVolume volume = addNewNodes(tree.goal, tree.batches, 1, 0, ChanceState.DEFAULT);
 			nodes = volume.nodes;
 			int horizontalOffset = (volume.getMaxRight() + volume.getMinLeft()) / 2;
 			for (Node node : volume.nodes) {
@@ -105,30 +120,29 @@ public class BoMScreen extends Screen {
 			}
 			if (!volume.nodes.isEmpty()) {
 				Node node = volume.nodes.get(0);
-				int width = textRenderer.getWidth("x" + BoM.tree.batches);
+				int width = textRenderer.getWidth("x" + tree.batches);
 				batches = new Bounds(node.x + node.width / 2 + 6, node.y - 10, width + 12, 22);
 			}
 
 			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
-			nodeHeight = getNodeHeight(BoM.tree.goal);
+			nodeHeight = getNodeHeight(tree.goal);
 			playerInv = EmiPlayerInventory.of(client.player);
-			BoM.tree.calculateProgress(playerInv);
-			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.tree.cost.costs.values().stream()
+			BoM.calculateCombinedCosts(playerInv);
+			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.combinedProgress.costs.values().stream()
 				.collect(Collectors.toMap(c -> c.ingredient, c -> c));
-			Map<EmiIngredient, ChanceMaterialCost> chanceProgressCosts = BoM.tree.cost.chanceCosts.values().stream()
+			Map<EmiIngredient, ChanceMaterialCost> chanceProgressCosts = BoM.combinedProgress.chanceCosts.values().stream()
 				.collect(Collectors.toMap(c -> c.ingredient, c -> c));
-				
+			
 			costs.clear();
-			BoM.tree.calculateCost();
 
 			List<FlatMaterialCost> treeCosts = Stream.concat(
-				BoM.tree.cost.costs.values().stream(),
-				BoM.tree.cost.chanceCosts.values().stream()
+				BoM.combinedCost.costs.values().stream(),
+				BoM.combinedCost.chanceCosts.values().stream()
 			).sorted((a, b) -> Integer.compare(
 				EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
 				EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
 			)).toList();
-			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
+			cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			int costX = 0;
 			for (FlatMaterialCost node : treeCosts) {
 				Cost cost = new Cost(node, costX, cy, false);
@@ -163,8 +177,8 @@ public class BoMScreen extends Screen {
 			List<Cost> remainders = Lists.newArrayList();
 
 			List<FlatMaterialCost> remainderCosts = Stream.concat(
-				BoM.tree.cost.remainders.values().stream(),
-				BoM.tree.cost.chanceRemainders.values().stream()
+				BoM.combinedCost.remainders.values().stream(),
+				BoM.combinedCost.chanceRemainders.values().stream()
 			).sorted((a, b) -> Integer.compare(
 				EmiStackList.getIndex(a.ingredient.getEmiStacks().get(0)),
 				EmiStackList.getIndex(b.ingredient.getEmiStacks().get(0))
@@ -187,8 +201,89 @@ public class BoMScreen extends Screen {
 			hasRemainders = !remainders.isEmpty();
 		} else {
 			nodes = Lists.newArrayList();
+			costs.clear();
+			BoM.combinedCost.clear();
+			BoM.combinedProgress.clear();
+			hasRemainders = false;
 		}
+
+		int rootY = -NODE_VERTICAL_SPACING * 3;
+		int maxVisible = 7;
+		rootScroll = Math.max(0, Math.min(rootScroll, Math.max(0, roots.size() - maxVisible)));
+		if (BoM.treeIndex >= 0) {
+			if (BoM.treeIndex < rootScroll) {
+				rootScroll = BoM.treeIndex;
+			}
+			if (BoM.treeIndex >= rootScroll + maxVisible) {
+				rootScroll = BoM.treeIndex - maxVisible + 1;
+			}
+		}
+		int visible = Math.min(maxVisible, roots.size());
+		int rowWidth = visible > 0 ? ((visible - 1) * 20 + 16) : 0;
+		int startX = visible > 0 ? -((visible - 1) * 20) / 2 : 0;
+		rootLeft = new Bounds(startX - 20, rootY - 4, 12, 12);
+		rootRight = new Bounds(startX + rowWidth - 8, rootY - 4, 12, 12);
+		rootArea = new Bounds(startX - 24, rootY - 12, rowWidth + 48, 24);
+		for (int i = 0; i < visible; i++) {
+			int index = i + rootScroll;
+			int x = startX + i * 20;
+			rootSlots.add(new Bounds(x - 8, rootY - 8, 16, 16));
+			rootIndices.add(index);
+			rootAmounts.add(getRootAmount(roots.get(index)));
+		}
+		if (!initialViewSet && tree != null) {
+			adjustInitialView(cy);
+			initialViewSet = true;
+		}
+		ensureRootVisible();
 		batcher.repopulate();
+	}
+
+	private void adjustInitialView(int totalCostY) {
+		int top = rootArea.y() - 12;
+		int bottom = totalCostY + 16 + (hasRemainders ? 40 : 0);
+		if (rootArea.height() <= 0) {
+			return;
+		}
+		if (zoom == 0) {
+			int margin = 16;
+			int requiredHeight = bottom - top + margin * 2;
+			int guiScale = (int) this.client.getWindow().getScaleFactor();
+			float desiredScale = Math.min(1f, (float) this.height / requiredHeight);
+			int targetDesired = Math.max(1, Math.round(guiScale * desiredScale));
+			int targetZoom = Math.max(-6, Math.min(4, targetDesired - guiScale));
+			zoom = targetZoom;
+		}
+		float scale = getScale();
+		int visibleHeight = (int) (height / scale);
+		int margin = 16;
+		int middle = (top + bottom) / 2;
+		int min = -visibleHeight / 2 + margin - bottom;
+		int max = visibleHeight / 2 - margin - top;
+		offY = MathHelper.clamp(-middle, min, max);
+	}
+
+	private void ensureRootVisible() {
+		if (rootArea == null) {
+			return;
+		}
+		float scale = getScale();
+		int scaledHeight = (int) (height / scale);
+		int margin = 16;
+		int min = -scaledHeight / 2 + margin - (rootArea.y() + rootArea.height());
+		int max = scaledHeight / 2 - margin - rootArea.y();
+		offY = MathHelper.clamp(offY, min, max);
+	}
+
+	private long getRootAmount(MaterialTree tree) {
+		MaterialNode goal = tree.goal;
+		if (goal == null) {
+			return 0;
+		}
+		if (goal.catalyst) {
+			return goal.amount;
+		}
+		return goal.amount * tree.batches;
 	}
 
 	@Override
@@ -212,6 +307,8 @@ public class BoMScreen extends Screen {
 
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
+		MaterialTree tree = BoM.getTree();
+		List<MaterialTree> roots = BoM.getTrees();
 
 		Matrix4fStack view = RenderSystem.getModelViewStack();
 		view.pushMatrix();
@@ -219,8 +316,52 @@ public class BoMScreen extends Screen {
 		view.scale(scale, scale, 1);
 		view.translate((float)offX, (float)offY, 0);
 		EmiPort.applyModelViewMatrix();
-		if (BoM.tree != null) {
+		if (tree != null) {
 			batcher.begin(0, 0, 0);
+			for (int i = 0; i < rootSlots.size(); i++) {
+				Bounds slot = rootSlots.get(i);
+				int index = rootIndices.get(i);
+				MaterialTree rootTree = roots.get(index);
+				Bounds del = new Bounds(slot.x(), slot.y() - 10, slot.width(), 8);
+				boolean hoveredSlot = slot.contains(mx, my);
+				boolean hoveredDelete = del.contains(mx, my);
+				boolean selected = index == BoM.treeIndex;
+				int border = selected ? 0xff8099ff : 0xffffffff;
+				if (!selected && hoveredSlot) {
+					border = 0xffc0d0ff;
+				}
+				int lx = slot.x() - 1;
+				int ly = slot.y() - 1;
+				int bw = slot.width() + 2;
+				int bh = slot.height() + 2;
+				context.fill(lx, ly, bw, 1, border);
+				context.fill(lx, ly + bh - 1, bw, 1, border);
+				context.fill(lx, ly, 1, bh, border);
+				context.fill(lx + bw - 1, ly, 1, bh, border);
+				context.setColor(1f, 1f, 1f, 1f);
+				rootTree.goal.ingredient.render(context.raw(), slot.x(), slot.y(), delta,
+						~(EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
+				if (i < rootAmounts.size()) {
+					EmiRenderHelper.renderAmount(context, slot.x(), slot.y(),
+							EmiRenderHelper.getAmountText(rootTree.goal.ingredient, rootAmounts.get(i)));
+				}
+				if (hoveredSlot || hoveredDelete) {
+					context.fill(del.x(), del.y(), del.width(), del.height(), 0x88ff0000);
+					context.drawCenteredText(EmiPort.literal("X"), del.x() + del.width() / 2, del.y() + 1);
+				}
+			}
+			if (roots.size() > rootSlots.size()) {
+				if (rootLeft.contains(mx, my)) {
+					context.setColor(0.5f, 0.6f, 1f, 1f);
+				}
+				context.drawCenteredText(EmiPort.literal("<"), rootLeft.x() + rootLeft.width() / 2, rootLeft.y());
+				context.setColor(1f, 1f, 1f, 1f);
+				if (rootRight.contains(mx, my)) {
+					context.setColor(0.5f, 0.6f, 1f, 1f);
+				}
+				context.drawCenteredText(EmiPort.literal(">"), rootRight.x() + rootRight.width() / 2, rootRight.y());
+				context.setColor(1f, 1f, 1f, 1f);
+			}
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
 			context.drawCenteredText(EmiPort.translatable("emi.total_cost"), 0, cy - 16);
 			if (hasRemainders) {
@@ -236,7 +377,7 @@ public class BoMScreen extends Screen {
 			if (batches.contains(mx, my)) {
 				color = 0xff8099ff;
 			}
-			context.drawTextWithShadow(EmiPort.literal("x" + BoM.tree.batches),
+			context.drawTextWithShadow(EmiPort.literal("x" + tree.batches),
 					batches.x() + 6, batches.y() + batches.height() / 2 - 4, color);
 
 			if (mode.contains(mx, my)) {
@@ -264,14 +405,16 @@ public class BoMScreen extends Screen {
 		Hover hover = getHoveredStack(mouseX, mouseY);
 		if (hover != null) {
 			hover.drawTooltip(this, context, mouseX, mouseY);
-		} else if (BoM.tree != null && batches.contains(mx, my)) {
+		} else if (tree != null && batches.contains(mx, my)) {
 			List<TooltipComponent> list = Lists.newArrayList();
-			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches));
+			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", tree.batches));
 			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.ideal", EmiBind.LEFT_CLICK.getBindText())));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.multiply")));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.all")));
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
-		} else if (BoM.tree != null && mode.contains(mx, my)) {
+		} else if (tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
-			List<TooltipComponent> list = EmiTooltip.splitTranslate(key, BoM.tree.batches);
+			List<TooltipComponent> list = EmiTooltip.splitTranslate(key, tree.batches);
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
 			List<TooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
@@ -396,7 +539,9 @@ public class BoMScreen extends Screen {
 				}
 			}
 		} else if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_C) {
-			BoM.tree = null;
+			BoM.getTrees().clear();
+			BoM.treeIndex = -1;
+			BoM.craftingMode = false;
 			init();
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
@@ -440,10 +585,38 @@ public class BoMScreen extends Screen {
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
+		MaterialTree tree = BoM.getTree();
+		List<MaterialTree> roots = BoM.getTrees();
+		for (int i = 0; i < rootSlots.size(); i++) {
+			Bounds slot = rootSlots.get(i);
+			int index = rootIndices.get(i);
+			Bounds del = new Bounds(slot.x(), slot.y() - 10, slot.width(), 8);
+			if (del.contains(mx, my)) {
+				BoM.removeTree(index);
+				recalculateTree();
+				return true;
+			}
+			if (slot.contains(mx, my)) {
+				BoM.selectTree(index);
+				recalculateTree();
+				return true;
+			}
+		}
+		if (roots.size() > rootSlots.size()) {
+			if (rootLeft.contains(mx, my)) {
+				BoM.cycleTree(-1);
+				recalculateTree();
+				return true;
+			} else if (rootRight.contains(mx, my)) {
+				BoM.cycleTree(1);
+				recalculateTree();
+				return true;
+			}
+		}
 		if (hover != null) {
 			if (button == 1 && hover.node != null && hover.node.recipe != null) {
 				if (EmiInput.isShiftDown()) {
-					BoM.tree.addResolution(hover.node.ingredient, null);
+					BoM.addResolution(hover.node.ingredient, null);
 				} else if (!(hover.node.recipe instanceof EmiResolutionRecipe)) {
 					if (hover.node.state == FoldState.EXPANDED) {
 						hover.node.state = FoldState.COLLAPSED;
@@ -456,7 +629,7 @@ public class BoMScreen extends Screen {
 			}
 			if (hover.stack != null) {
 				if (EmiInput.isShiftDown() && button == 0) {
-					if (getAutoResolutions(hover, BoM.tree::addResolution)) {
+					if (getAutoResolutions(hover, BoM::addResolution)) {
 						recalculateTree();
 					}
 					return true;
@@ -481,11 +654,11 @@ public class BoMScreen extends Screen {
 			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			BoM.craftingMode = !BoM.craftingMode;
 			recalculateTree();
-		} else if (batches.contains(mx, my) && BoM.tree != null) {
-			long ideal = BoM.tree.cost.getIdealBatch(BoM.tree.goal, 1, 1);
-			if (ideal != BoM.tree.batches) {
+		} else if (batches.contains(mx, my) && tree != null) {
+			long ideal = tree.cost.getIdealBatch(tree.goal, 1, 1);
+			if (ideal != tree.batches) {
 				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-				BoM.tree.batches = ideal;
+				tree.batches = ideal;
 				recalculateTree();
 			}
 		}
@@ -505,24 +678,43 @@ public class BoMScreen extends Screen {
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
-		if (BoM.tree != null && batches.contains(mx, my)) {
-			long adjustment = (long) amount;
-			if (EmiInput.isShiftDown()) {
-				adjustment *= 16;
-			} else if (EmiInput.isControlDown()) {
-				if (amount > 0) {
-					adjustment = BoM.tree.batches;
+		MaterialTree tree = BoM.getTree();
+		List<MaterialTree> roots = BoM.getTrees();
+		if (!roots.isEmpty() && rootArea.contains(mx, my) && amount != 0) {
+			BoM.cycleTree(-(int) amount);
+			recalculateTree();
+			return true;
+		}
+		if (tree != null && batches.contains(mx, my)) {
+			long scroll = (long) amount;
+			List<MaterialTree> targets = EmiInput.isAltDown() ? roots : List.of(tree);
+			boolean changed = false;
+			for (MaterialTree target : targets) {
+				long adjustment = scroll;
+				if (EmiInput.isShiftDown()) {
+					adjustment *= 16;
+				} else if (EmiInput.isControlDown()) {
+					if (scroll > 0) {
+						adjustment = target.batches;
+					} else {
+						adjustment = -target.batches / 2;
+					}
+				}
+				long newBatches;
+				if (target.batches == 1 && adjustment > 1) {
+					newBatches = adjustment;
 				} else {
-					adjustment = -BoM.tree.batches / 2;
+					newBatches = target.batches + adjustment;
+				}
+				newBatches = Math.max(1, newBatches);
+				if (newBatches != target.batches) {
+					target.batches = newBatches;
+					changed = true;
 				}
 			}
-			if (BoM.tree.batches == 1 && adjustment > 1) {
-				BoM.tree.batches = adjustment;
-			} else {
-				BoM.tree.batches += adjustment;
+			if (changed) {
+				recalculateTree();
 			}
-			BoM.tree.batches = Math.max(1, BoM.tree.batches);
-			recalculateTree();
 			return true;
 		}
 		zoom += (int) amount;

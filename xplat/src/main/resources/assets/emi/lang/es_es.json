@@ -337,6 +337,8 @@
 
   "tooltip.emi.bom.batch_size": "Tamaño del lote: %s\nDesplaza la rueda para ajustar\nMantén §6[shift]§r para ajustar en 16",
   "tooltip.emi.bom.batch_size.ideal": "Pulsa %s para obtener las mínimas sobras posibles",
+  "tooltip.emi.bom.batch_size.multiply": "Mantén §6[Ctrl]§r para añadir un multiplicador",
+  "tooltip.emi.bom.batch_size.all": "Mantén §6[Alt]§r para aplicar a todos los objetos raíz",
   "tooltip.emi.bom.mode.view": "§6Mostrando§r árbol de recetas",
   "tooltip.emi.bom.mode.craft": "§6Fabricando§r árbol de recetas\nEl progreso se mostrará en el árbol de recetas\n§bFavoritos sintéticos§r añadidos a la barra lateral",
   "tooltip.emi.bom.help": "El árbol de recetas muestra la progresión y el coste total de la receta.\nLa vista se puede mover y ampliar.\n\nClick izquierdo en un nodo para seleccionar una receta y asignarla.\nMantén §6[shift]§r para seleccionar automáticamente en función de tu inventario.\n\nClick derecho en un nodo de la receta para plegarlo temporalmente\nMantén §6[shift]§r para vaciar la receta.\n\nEl estado inicial del árbol es controlado por las recetas por defecto.\nUn botón junto a las recetas puede establecer las preferencias por defecto.\n\nEl ajuste por coste total puede usarse para ayudar a crear un árbol.\nMientras esté fabricando, se mostrarán los materiales que hace falta recoger.\nSe añadirán §bFavoritos sintéticos§r a la barra lateral que\nmostrarán los pasos incompletos y podrán usarse para fabricar.",
