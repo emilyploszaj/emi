@@ -39,12 +39,13 @@ public class JemiStack<T> extends EmiStack {
 		if (type instanceof IIngredientTypeWithSubtypes<?, T> iitws) {
 			base = iitws.getBase(ingredient);
 		} else {
-			base = helper.getUniqueId(ingredient, UidContext.Recipe);
+			base = helper.getUid(ingredient, UidContext.Recipe);
 		}
 	}
 
+    // TODO: review this
 	public String getJeiUid() {
-		return helper.getUniqueId(ingredient, UidContext.Ingredient);
+		return helper.getUid(ingredient, UidContext.Ingredient).toString();
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class JemiStack<T> extends EmiStack {
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
 		context.push();
-		context.matrices().translate(x + xOff, y + yOff, 0);
+		context.matrices().translate(x + xOff, y + yOff/*, 0*/);
 		renderer.render(context.raw(), ingredient);
 		context.pop();
 	}
@@ -80,7 +81,7 @@ public class JemiStack<T> extends EmiStack {
 
 	@Override
 	public Identifier getId() {
-		return helper.getResourceLocation(ingredient);
+		return helper.getIdentifier(ingredient);
 	}
 
 	@Override

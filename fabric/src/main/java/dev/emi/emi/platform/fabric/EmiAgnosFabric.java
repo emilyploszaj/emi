@@ -1,11 +1,14 @@
 package dev.emi.emi.platform.fabric;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.enchantment.Enchantment;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -20,18 +23,17 @@ import dev.emi.emi.api.FabricEmiStack;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
-import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.FakeScreen;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
+
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
@@ -40,9 +42,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -52,9 +52,19 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.display.SlotDisplayContexts;
+import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.context.ContextParameterMap;
+import net.minecraft.world.World;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -138,17 +148,20 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected void addBrewingRecipesAgnos(EmiRegistry registry) {
-		BrewingRecipeRegistry brewingRegistry = MinecraftClient.getInstance().world != null ? MinecraftClient.getInstance().world.getBrewingRecipeRegistry() : BrewingRecipeRegistry.EMPTY;
+        World world = MinecraftClient.getInstance().world;
+		BrewingRecipeRegistry brewingRegistry = world != null ? world.getBrewingRecipeRegistry() : BrewingRecipeRegistry.EMPTY;
+        ContextParameterMap paramMap = SlotDisplayContexts.createParameters(world);
 		BrewingRecipeRegistryAccessor brewingRegistryAccess = (BrewingRecipeRegistryAccessor)brewingRegistry;
+
 		for (Ingredient ingredient : brewingRegistryAccess.getPotionTypes()) {
-			for (ItemStack stack : ingredient.getMatchingStacks()) {
+			for (ItemStack stack : ingredient.toDisplay().getStacks(paramMap)) {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (BrewingRecipeRegistry.Recipe<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
 						Ingredient recipeIngredient = recipe.ingredient();
-						if (recipeIngredient.getMatchingStacks().length > 0) {
+						if (!recipeIngredient.toDisplay().getStacks(paramMap).isEmpty()) {
 							Identifier id = EmiPort.id("emi", "/brewing/" + pid
-								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
+								+ "/" + EmiUtil.subId(recipeIngredient.toDisplay().getStacks(paramMap).getFirst().getItem())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
 							registry.addRecipe(new EmiBrewingRecipe(
@@ -165,8 +178,8 @@ public class EmiAgnosFabric extends EmiAgnos {
 		for (BrewingRecipeRegistry.Recipe<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
 			try {
 				Ingredient recipeIngredient = recipe.ingredient();
-				if (recipeIngredient.getMatchingStacks().length > 0) {
-					String gid = EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem());
+				if (!recipeIngredient.toDisplay().getStacks(paramMap).isEmpty()) {
+					String gid = EmiUtil.subId(recipeIngredient.toDisplay().getStacks(paramMap).getFirst().getItem());
 					String iid = EmiUtil.subId(recipe.from().value());
 					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
@@ -212,7 +225,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+	protected void renderFluidAgnos(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
 		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
 		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
@@ -221,7 +234,7 @@ public class EmiAgnosFabric extends EmiAgnos {
 		Sprite sprite = sprites[0];
 		int color = FluidVariantRendering.getColor(fluid);
 		
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
+		EmiRenderHelper.drawTintedSprite(context, sprite, color, x, y, xOff, yOff, width, height);
 	}
 
 	@Override
@@ -234,17 +247,17 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected boolean canBatchAgnos(ItemStack stack) {
-		return ColorProviderRegistry.ITEM.get(stack.getItem()) == null;
+		return false;//ColorProviderRegistry.ITEM.get(stack.getItem()) == null; TODO
 	}
 
 	@Override
 	protected Map<Item, Integer> getFuelMapAgnos() {
 		Object2IntMap<Item> fuelMap = new Object2IntOpenHashMap<>();
 		for (Item item : EmiPort.getItemRegistry()) {
-			if (FuelRegistry.INSTANCE.get(item) == null) {
+			if (!MinecraftClient.getInstance().world.getFuelRegistry().getFuelItems().contains(item)) {
 				continue;
 			}
-			int time = FuelRegistry.INSTANCE.get(item);
+			int time = MinecraftClient.getInstance().world.getFuelRegistry().getFuelTicks(item.getDefaultStack());
 			if (time > 0) {
 				fuelMap.put(item, time);
 			}
@@ -252,13 +265,42 @@ public class EmiAgnosFabric extends EmiAgnos {
 		return fuelMap;
 	}
 
-	@Override
-	protected BakedModel getBakedTagModelAgnos(Identifier id) {
-		return MinecraftClient.getInstance().getBakedModelManager().getModel(id);
+    @Override
+	protected ItemModel getBakedTagModelAgnos(Identifier id) {
+		return MinecraftClient.getInstance().getBakedModelManager().getItemModel(id);
 	}
 
 	@Override
 	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
 		return true;
 	}
+
+    @Override
+    protected <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllRecipesOfTypeAgnos(RecipeManager recipeManager,
+                                                                                     RecipeType<T> recipeType) {
+        return recipeManager.getSynchronizedRecipes().getAllOfType(recipeType);
+    }
+
+    @Override
+    protected <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatchesRecipeAgnos(
+            RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return recipeManager.getSynchronizedRecipes().getAllMatches(recipeType, input, world);
+    }
+
+    @Override
+    protected <I extends RecipeInput, T extends Recipe<I>> Optional<RecipeEntry<T>> getFirstMatchRecipeAgnos(
+            RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return recipeManager.getSynchronizedRecipes().getFirstMatch(recipeType, input, world);
+    }
+
+    @Override
+    protected Collection<RecipeEntry<?>> getAllRecipesAgnos(RecipeManager recipeManager) {
+        return recipeManager.getSynchronizedRecipes().recipes();
+    }
+
+    @Override
+    protected RecipeEntry<?> getRecipeAgnos(RecipeManager recipeManager, Identifier id) {
+        return recipeManager.getSynchronizedRecipes().get(RegistryKey.of(RegistryKeys.RECIPE, id));
+    }
+
 }

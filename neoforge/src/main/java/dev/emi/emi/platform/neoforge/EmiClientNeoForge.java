@@ -16,31 +16,35 @@ import dev.emi.emi.screen.StackBatcher;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.client.render.item.model.ItemModel;
+import net.minecraft.recipe.PreparedRecipes;
+import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-@EventBusSubscriber(modid = "emi", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = "emi", value = Dist.CLIENT)
 public class EmiClientNeoForge {
+
+    public static PreparedRecipes SYNCED_RECIPES = null;
 	
 	@SubscribeEvent
 	public static void clientInit(FMLClientSetupEvent event) {
 		StackBatcher.EXTRA_RENDER_LAYERS.addAll(Arrays.stream(NeoForgeRenderTypes.values()).map(f -> f.get()).toList());
 		EmiClient.init();
-		EmiNetwork.initClient(packet -> PacketDistributor.sendToServer(EmiPacketHandler.wrap(packet)));
+		EmiNetwork.initClient(packet -> ClientPacketDistributor.sendToServer(EmiPacketHandler.wrap(packet)));
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::recipesReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::tagsReloaded);
 		NeoForge.EVENT_BUS.addListener(EmiClientNeoForge::renderScreenForeground);
@@ -50,17 +54,18 @@ public class EmiClientNeoForge {
 	}
 
 	@SubscribeEvent
-	public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
+	public static void registerAdditionalModels(ModelEvent.RegisterStandalone event) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		EmiTags.registerTagModels(client.getResourceManager(), event::register, ModelIdentifier.STANDALONE_VARIANT);
+//		EmiTags.registerTagModels(client.getResourceManager(), event::register, ModelIdentifier.STANDALONE_VARIANT);
 	}
 
 	@SubscribeEvent
-	public static void registerResourceReloaders(RegisterClientReloadListenersEvent event) {
-		EmiData.init(reloader -> event.registerReloadListener(reloader));
+	public static void registerResourceReloaders(AddClientReloadListenersEvent event) {
+		EmiData.init(reloader -> event.addListener(reloader.getEmiId(), reloader));
 	}
 
-	public static void recipesReloaded(RecipesUpdatedEvent event) {
+	public static void recipesReloaded(RecipesReceivedEvent event) {
+        SYNCED_RECIPES = event.getRecipeMap();
 		EmiReloadManager.reloadRecipes();
 	}
 
@@ -75,9 +80,9 @@ public class EmiClientNeoForge {
 		if (base != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
-			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
+			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop()/*, 0.0*/);
 			EmiPort.setPositionTexShader();
-			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickDelta(false));
+			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickProgress(false));
 			context.pop();
 		}
 	}
@@ -93,7 +98,7 @@ public class EmiClientNeoForge {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
 			EmiPort.setPositionTexShader();
-			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickDelta(false));
+			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getRenderTickCounter().getTickProgress(false));
 			context.pop();
 		}
 	}

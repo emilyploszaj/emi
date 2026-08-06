@@ -76,6 +76,7 @@ import dev.emi.emi.recipe.EmiShapelessRecipe;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
 import dev.emi.emi.recipe.EmiStonecuttingRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
+import dev.emi.emi.recipe.EmiTransmuteRecipe;
 import dev.emi.emi.recipe.special.EmiAnvilEnchantRecipe;
 import dev.emi.emi.recipe.special.EmiAnvilRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiArmorDyeRecipe;
@@ -90,7 +91,6 @@ import dev.emi.emi.recipe.special.EmiGrindstoneDisenchantingRecipe;
 import dev.emi.emi.recipe.special.EmiMapCloningRecipe;
 import dev.emi.emi.recipe.special.EmiRepairItemRecipe;
 import dev.emi.emi.recipe.special.EmiSmithingTrimRecipe;
-import dev.emi.emi.recipe.special.EmiSuspiciousStewRecipe;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
@@ -105,30 +105,26 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.Oxidizable;
-import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.TallFlowerBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.component.type.RepairableComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.DyeItem;
 import net.minecraft.item.HoneycombItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.item.ToolItem;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.ArmorDyeRecipe;
 import net.minecraft.recipe.BannerDuplicateRecipe;
@@ -139,22 +135,22 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.FireworkRocketRecipe;
 import net.minecraft.recipe.FireworkStarFadeRecipe;
 import net.minecraft.recipe.FireworkStarRecipe;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.MapCloningRecipe;
 import net.minecraft.recipe.MapExtendingRecipe;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.RepairItemRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.ShieldDecorationRecipe;
-import net.minecraft.recipe.ShulkerBoxColoringRecipe;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.recipe.SmokingRecipe;
-import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.recipe.SuspiciousStewRecipe;
 import net.minecraft.recipe.TippedArrowRecipe;
+import net.minecraft.recipe.TransmuteRecipe;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
@@ -164,7 +160,6 @@ import net.minecraft.screen.BlastFurnaceScreenHandler;
 import net.minecraft.screen.FurnaceScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.SmokerScreenHandler;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -275,7 +270,7 @@ public class VanillaPlugin implements EmiPlugin {
 		});
 
 		registry.addGenericExclusionArea((screen, consumer) -> {
-			if (EmiConfig.effectLocation != EffectLocation.HIDDEN && screen instanceof AbstractInventoryScreen<?> inv) {
+			if (EmiConfig.effectLocation != EffectLocation.HIDDEN && screen instanceof HandledScreen<?> inv) {
 				MinecraftClient client = MinecraftClient.getInstance();
 				Collection<StatusEffectInstance> collection = client.player.getStatusEffects();
 				if (!collection.isEmpty()) {
@@ -292,7 +287,7 @@ public class VanillaPlugin implements EmiPlugin {
 						if (EmiConfig.effectLocation == EffectLocation.TOP) {
 							int size = collection.size();
 							top = ((HandledScreenAccessor) inv).getY() - 34;
-							if (((Object) screen) instanceof CreativeInventoryScreen) {
+							if (screen instanceof CreativeInventoryScreen) {
 								top -= 28;
 								if (EmiAgnos.isForge()) {
 									top -= 22;
@@ -351,19 +346,24 @@ public class VanillaPlugin implements EmiPlugin {
 				), 
 						EmiStack.of(Items.FILLED_MAP),
 						id, false), recipe);
-			} else if (recipe instanceof ShapedRecipe shaped && recipe.fits(3, 3)) {
+			} else if (recipe instanceof ShapedRecipe shaped && shaped.getWidth() <= 3 && shaped.getHeight() <= 3) {
 				addRecipeSafe(registry, () -> new EmiShapedRecipe(shaped), recipe);
-			} else if (recipe instanceof ShapelessRecipe shapeless && recipe.fits(3, 3)) {
+			} else if (recipe instanceof ShapelessRecipe shapeless) {
 				addRecipeSafe(registry, () -> new EmiShapelessRecipe(shapeless), recipe);
-			} else if (recipe instanceof ArmorDyeRecipe dye) {
+			} else if (recipe instanceof TransmuteRecipe transmute) {
+                addRecipeSafe(registry, () -> new EmiTransmuteRecipe(transmute), recipe);
+            } else if (recipe instanceof ArmorDyeRecipe dye) {
 				for (Item i : dyeableItems) {
 					if (!hiddenItems.contains(i)) {
 						addRecipeSafe(registry, () -> new EmiArmorDyeRecipe(i, synthetic("crafting/dying", EmiUtil.subId(i))), recipe);
 					}
 				}
-			} else if (recipe instanceof SuspiciousStewRecipe stew) {
+			}
+            // These are no longer needed
+            /* else if (recipe instanceof SuspiciousStewRecipe stew) {
 				addRecipeSafe(registry, () -> new EmiSuspiciousStewRecipe(id), recipe);
 			} else if (recipe instanceof ShulkerBoxColoringRecipe shulker) {
+			// Shulker boxes are now using transmute recipes;
 				for (DyeColor dye : DyeColor.values()) {
 					DyeItem dyeItem = DyeItem.byColor(dye);
 					Identifier sid = synthetic("crafting/shulker_box_dying", EmiUtil.subId(dyeItem));
@@ -371,7 +371,7 @@ public class VanillaPlugin implements EmiPlugin {
 						List.of(EmiStack.of(Items.SHULKER_BOX), EmiStack.of(dyeItem)),
 						EmiStack.of(ShulkerBoxBlock.getItemStack(dye)), sid), recipe);
 				}
-			} else if (recipe instanceof ShieldDecorationRecipe shield) {
+			}*/ else if (recipe instanceof ShieldDecorationRecipe shield) {
 				addRecipeSafe(registry, () -> new EmiBannerShieldRecipe(id), recipe);
 			} else if (recipe instanceof BookCloningRecipe book) {
 				addRecipeSafe(registry, () -> new EmiBookCloningRecipe(id), recipe);
@@ -407,7 +407,7 @@ public class VanillaPlugin implements EmiPlugin {
 				}
 			} else if (recipe instanceof MapCloningRecipe map) {
 				addRecipeSafe(registry, () -> new EmiMapCloningRecipe(id), recipe);
-			} else if (!(recipe instanceof SpecialCraftingRecipe)) {
+			}/* else if (!(recipe instanceof SpecialCraftingRecipe)) {
 				try {
 					if (!recipe.getIngredients().isEmpty() && !EmiPort.getOutput(recipe).isEmpty() && recipe.fits(3, 3)) {
 						boolean shapeless = recipe.fits(1, recipe.getIngredients().size()) && recipe.fits(recipe.getIngredients().size(), 1);
@@ -432,7 +432,7 @@ public class VanillaPlugin implements EmiPlugin {
 				} catch (Exception e) {
 					EmiReloadLog.warn("Exception when parsing vanilla crafting recipe " + id, e);
 				}
-			}
+			}*/
 		}
 
 		for (SmeltingRecipe recipe : getRecipes(registry, RecipeType.SMELTING)) {
@@ -449,10 +449,9 @@ public class VanillaPlugin implements EmiPlugin {
 		}
 		for (SmithingRecipe recipe : getRecipes(registry, RecipeType.SMITHING)) {
 			//addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
-			MinecraftClient client = MinecraftClient.getInstance();
 			if (recipe instanceof SmithingTransformRecipeAccessor stra) {
-				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe)), recipe);
+				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate().get()), EmiIngredient.of(stra.getBase()),
+					EmiIngredient.of(stra.getAddition().get()), EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe)), recipe);
 			} else if (recipe instanceof SmithingTrimRecipeAccessor stra) {
 				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
 					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), recipe), recipe);
@@ -493,17 +492,16 @@ public class VanillaPlugin implements EmiPlugin {
 				continue;
 			}
 			try {
-				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
-					if (i instanceof ArmorItem ai && ai.getMaterial() != null && ai.getMaterial().value().repairIngredient().get() != null
-							&& !ai.getMaterial().value().repairIngredient().get().isEmpty()) {
-						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ai.getMaterial().value().repairIngredient().get().getMatchingStacks()[0].getItem()));
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ai.getMaterial().value().repairIngredient().get()), id));
-					} else if (i instanceof ToolItem ti && ti.getMaterial().getRepairIngredient() != null
-							&& !ti.getMaterial().getRepairIngredient().isEmpty()) {
-						Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(ti.getMaterial().getRepairIngredient().getMatchingStacks()[0].getItem()));
-						addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(ti.getMaterial().getRepairIngredient()), id));
-					}
-				}
+                if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
+                    RepairableComponent repairable = i.getComponents().get(DataComponentTypes.REPAIRABLE);
+                    if (repairable != null) {
+                        for (RegistryEntry<Item> entry : repairable.items()) {
+                            Item item = entry.value();
+                            Identifier id = synthetic("anvil/repairing/material", EmiUtil.subId(i) + "/" + EmiUtil.subId(item));
+                            addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(i), EmiIngredient.of(Ingredient.ofItem(item)), id));
+                        }
+                    }
+                }
 				// TODO used to be isDamageable, the 20.1 impl of that method appears to just be maxDamage > 0 though
 				if (i.getComponents().getOrDefault(DataComponentTypes.MAX_DAMAGE, 0) > 0) {
 					addRecipeSafe(registry, () -> new EmiAnvilRepairItemRecipe(i, synthetic("anvil/repairing/tool", EmiUtil.subId(i))));
@@ -522,7 +520,6 @@ public class VanillaPlugin implements EmiPlugin {
 				};
 				for (Enchantment e : targetedEnchantments) {
 					if (e.isAcceptableItem(defaultStack) && defaultStack.isEnchantable()
-							&& defaultStack.getItem().isEnchantable(defaultStack)
 							&& EmiAgnos.isEnchantable(defaultStack, e)) {
 						consumer.accept(e);
 						acceptableEnchantments++;
@@ -545,10 +542,6 @@ public class VanillaPlugin implements EmiPlugin {
 						synthetic("world/flower_duping", EmiUtil.subId(i)), false));
 			}
 		}
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.ELYTRA) + "/" + EmiUtil.subId(Items.PHANTOM_MEMBRANE))));
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiPort.getEnchantmentRegistry().stream().toList()) {
 			if (!EmiPort.getEnchantmentRegistry().getEntry(e).isIn(EnchantmentTags.CURSE)) {
@@ -660,7 +653,7 @@ public class VanillaPlugin implements EmiPlugin {
 				.id(synthetic("world/cauldron_washing", EmiUtil.subId(i)))
 				.leftInput(EmiStack.EMPTY, s -> new GeneratedSlotWidget(r -> {
 					ItemStack stack = i.getDefaultStack();
-					stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(r.nextInt(0xFFFFFF + 1), true));
+					stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(r.nextInt(0xFFFFFF + 1)));
 					return EmiStack.of(stack);
 				}, uniq, s.getBounds().x(), s.getBounds().y()))
 				.rightInput(cauldron, true)
@@ -824,7 +817,7 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static <C extends RecipeInput, T extends Recipe<C>> Iterable<T> getRecipes(EmiRegistry registry, RecipeType<T> type) {
-		return registry.getRecipeManager().listAllOfType(type).stream().map(e -> e.value())::iterator;
+		return EmiAgnos.getAllRecipesOfType(registry.getRecipeManager(), type).stream().map(RecipeEntry::value)::iterator;
 	}
 
 	private static void safely(String name, Runnable runnable) {

@@ -42,7 +42,7 @@ public class JemiTankWidget extends TankWidget {
 		if (slot.overlay != null) {
 			context.enableBlend();
 			context.push();
-			context.matrices().translate(0, 0, 200);
+//			context.matrices().translate(0, 0, 200);
 			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
 			context.pop();
 		}

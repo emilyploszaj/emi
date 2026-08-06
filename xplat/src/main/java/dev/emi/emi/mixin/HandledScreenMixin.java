@@ -34,16 +34,16 @@ public abstract class HandledScreenMixin extends Screen {
 	}
 
 	@Inject(at = @At(value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/ingame/HandledScreen.drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V",
+			target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V",
 			shift = Shift.AFTER),
-		method = "render")
+		method = "renderMain")
 	private void renderForeground(DrawContext raw, int mouseX, int mouseY, float delta, CallbackInfo info) {
 		if (EmiAgnos.isForge()) {
 			return;
 		}
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.push();
-		context.matrices().translate(-x, -y, 0.0);
+		context.matrices().translate(-x, -y/*, 0.0*/);
 		EmiPort.setPositionTexShader();
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);

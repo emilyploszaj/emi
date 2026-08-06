@@ -35,7 +35,7 @@ public class RecipeTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getHeight() {
+	public int getHeight(TextRenderer textRenderer) {
 		return height;
 	}
 

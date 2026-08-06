@@ -88,9 +88,9 @@ public class EmiScreenBase {
 			if (sh.slots != null && !sh.slots.isEmpty()) {
 				int extra = 0;
 				if (hs instanceof RecipeBookProvider provider) {
-					if (provider.getRecipeBookWidget().isOpen()) {
-						extra = 177;
-					}
+//					if (provider.getRecipeBookWidget().isOpen()) {
+//						extra = 177;
+//					} TODO
 				}
 				Bounds bounds = new Bounds(hsa.getX() - extra, hsa.getY(), hsa.getBackgroundWidth() + extra, hsa.getBackgroundHeight());
 				return new EmiScreenBase(screen, bounds);

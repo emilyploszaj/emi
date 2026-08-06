@@ -7,7 +7,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 public abstract class EmiChessPacket implements EmiPacket {
 	protected final UUID uuid;
@@ -65,7 +64,7 @@ public abstract class EmiChessPacket implements EmiPacket {
 
 		@Override
 		public void apply(PlayerEntity player) {
-			PlayerEntity opponent = player.getWorld().getPlayerByUuid(uuid);
+			PlayerEntity opponent = player.getEntityWorld().getPlayerByUuid(uuid);
 			if (opponent instanceof ServerPlayerEntity spe) {
 				EmiNetwork.sendToClient(spe, new EmiChessPacket.S2C(player.getUuid(), type, start, end));
 			}

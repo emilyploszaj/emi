@@ -1,23 +1,33 @@
 package dev.emi.emi.platform;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
+import dev.emi.emi.runtime.EmiDrawContext;
+
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public abstract class EmiAgnos {
 	public static EmiAgnos delegate;
@@ -121,15 +131,15 @@ public abstract class EmiAgnos {
 
 	protected abstract boolean isFloatyFluidAgnos(FluidEmiStack stack);
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
-		renderFluid(stack, matrices, x, y, delta, 0, 0, 16, 16);
+	public static void renderFluid(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta) {
+		renderFluid(stack, context, x, y, delta, 0, 0, 16, 16);
 	}
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
-		delegate.renderFluidAgnos(stack, matrices, x, y, delta, xOff, yOff, width, height);
+	public static void renderFluid(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+		delegate.renderFluidAgnos(stack, context, x, y, delta, xOff, yOff, width, height);
 	}
 
-	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, EmiDrawContext context, int x, int y, float delta, int xOff, int yOff, int width, int height);
 
 	public static EmiStack createFluidStack(Object object) {
 		return delegate.createFluidStackAgnos(object);
@@ -149,15 +159,45 @@ public abstract class EmiAgnos {
 
 	protected abstract Map<Item, Integer> getFuelMapAgnos();
 
-	public static BakedModel getBakedTagModel(Identifier id) {
+	public static ItemModel getBakedTagModel(Identifier id) {
 		return delegate.getBakedTagModelAgnos(id);
 	}
 
-	protected abstract BakedModel getBakedTagModelAgnos(Identifier id);
+	protected abstract ItemModel getBakedTagModelAgnos(Identifier id);
 
 	public static boolean isEnchantable(ItemStack stack, Enchantment enchantment) {
 		return delegate.isEnchantableAgnos(stack, enchantment);
 	}
 
 	protected abstract boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllRecipesOfType(RecipeManager recipeManager, RecipeType<T> recipeType) {
+        return delegate.getAllRecipesOfTypeAgnos(recipeManager, recipeType);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllRecipesOfTypeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatchesRecipe(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return delegate.getAllMatchesRecipeAgnos(recipeManager, recipeType, input, world);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatchesRecipeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world);
+
+    public static <I extends RecipeInput, T extends Recipe<I>> Optional<RecipeEntry<T>> getFirstMatchRecipe(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world) {
+        return delegate.getFirstMatchRecipeAgnos(recipeManager, recipeType, input, world);
+    }
+
+    protected abstract <I extends RecipeInput, T extends Recipe<I>> Optional<RecipeEntry<T>> getFirstMatchRecipeAgnos(RecipeManager recipeManager, RecipeType<T> recipeType, I input, World world);
+
+    public static Collection<RecipeEntry<?>> listAllRecipes(RecipeManager recipeManager) {
+        return delegate.getAllRecipesAgnos(recipeManager);
+    }
+
+    protected abstract Collection<RecipeEntry<?>> getAllRecipesAgnos(RecipeManager recipeManager);
+
+    public static RecipeEntry<?> getRecipe(RecipeManager recipeManager, Identifier id) {
+        return delegate.getRecipeAgnos(recipeManager, id);
+    }
+
+    protected abstract RecipeEntry<?> getRecipeAgnos(RecipeManager recipeManager, Identifier id);
 }

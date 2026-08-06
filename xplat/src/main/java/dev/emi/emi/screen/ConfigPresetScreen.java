@@ -3,8 +3,6 @@ package dev.emi.emi.screen;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
@@ -21,6 +19,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 public class ConfigPresetScreen extends Screen {
@@ -42,7 +41,7 @@ public class ConfigPresetScreen extends Screen {
 		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", last.originalConfig));
 			MinecraftClient client = MinecraftClient.getInstance();
-			this.init(client, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
+			this.init(client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
 		});
 		this.addDrawableChild(resetButton);
 		this.addDrawableChild(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
@@ -74,7 +73,7 @@ public class ConfigPresetScreen extends Screen {
 	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderDarkening(context.raw());
+//		this.renderDarkening(context.raw()); // This is confusing and makes the blur effect not work?
 		list.render(context.raw(), mouseX, mouseY, delta);
 		super.render(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {
@@ -84,28 +83,28 @@ public class ConfigPresetScreen extends Screen {
 		}
 	}
 
-	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-		// Prevent double background draw
-	}
+//	@Override
+//	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+//		// Prevent double background draw
+//	}
 
 	@Override
 	public void close() {
 		MinecraftClient.getInstance().setScreen(last);
 	}
-	
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+
+    @Override
+	public boolean keyPressed(KeyInput input) {
+		if (input.isEscape()) {
 			this.close();
 			return true;
-		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+		} else if (this.client.options.inventoryKey.matchesKey(input)) {
 			this.close();
 			return true;
-		} else if (keyCode == GLFW.GLFW_KEY_TAB) {
+		} else if (input.isTab()) {
 			return false;
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(input);
 	}
 
 	public void updateChanges() {

@@ -95,12 +95,12 @@ public class MicroTextRenderer {
 		int height = 7;
 		int x = right - width;
 		int y = bottom - height;
-		float a = (((color & 0xFF000000) >> 24) & 0xFF) / 255f;
-		float r = (((color & 0x00FF0000) >> 16) & 0xFF) / 255f;
-		float g = (((color & 0x0000FF00) >>  8) & 0xFF) / 255f;
-		float b = (((color & 0x000000FF) >>  0) & 0xFF) / 255f;
+//		float a = (((color & 0xFF000000) >> 24) & 0xFF) / 255f;
+//		float r = (((color & 0x00FF0000) >> 16) & 0xFF) / 255f;
+//		float g = (((color & 0x0000FF00) >>  8) & 0xFF) / 255f;
+//		float b = (((color & 0x000000FF) >>  0) & 0xFF) / 255f;
 		context.push();
-		context.matrices().translate(0, 0, 300);
+//		context.matrices().translate(0, 0, 300);
 		context.disableBlend();
 		for (int i = 0; i < string.length(); i++) {
 			MicroChar c = MICRO_CHARS.get(string.charAt(i));
@@ -108,10 +108,10 @@ public class MicroTextRenderer {
 				x += 1;
 				continue;
 			}
-			context.setColor(r, g, b, a);
-			context.drawTexture(TEXTURE, x, y, c.u, c.v, c.width, 7);
-			context.resetColor();
-			context.drawTexture(TEXTURE, x, y, c.u, c.v + 7, c.width, 7);
+//			context.setColor(r, g, b, a);
+			context.drawTexture(TEXTURE, x, y, c.u, c.v, c.width, 7, color);
+//			context.resetColor();
+			context.drawTexture(TEXTURE, x, y, c.u, c.v + 7, c.width, 7, 0xFFFFFFFF);
 			x += c.width - 1;
 		}
 		context.pop();

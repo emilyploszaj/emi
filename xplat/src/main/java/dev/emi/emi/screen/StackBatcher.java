@@ -10,36 +10,37 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import net.minecraft.client.render.BuiltBuffer;
+
+import org.joml.Matrix3x2fc;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.BufferAllocator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -74,7 +75,7 @@ public class StackBatcher {
 
 	private final BatcherVertexConsumerProvider imm;
 	private final VertexConsumerProvider unlitFacade;
-	private final Map<RenderLayer, VertexBuffer> buffers = new LinkedHashMap<>();
+	private final Map<RenderLayer, GpuBuffer> buffers = new LinkedHashMap<>();
 	private final Set<Sprite> spritesToUpdate = Sets.newHashSet();
 	private boolean populated = false;
 	private boolean dirty = false;
@@ -90,15 +91,15 @@ public class StackBatcher {
 
 	public StackBatcher() {
 		Map<RenderLayer, BufferAllocator> buffers = new HashMap<>();
-		assign(buffers, RenderLayer.getSolid());
-		assign(buffers, RenderLayer.getCutout());
-		assign(buffers, RenderLayer.getTranslucent());
+		assign(buffers, RenderLayers.solid());
+		assign(buffers, RenderLayers.cutout());
+//		assign(buffers, RenderLayer.getTranslucent());
 		assign(buffers, TexturedRenderLayers.getEntitySolid());
 		assign(buffers, TexturedRenderLayers.getEntityCutout());
-		assign(buffers, TexturedRenderLayers.getEntityTranslucentCull());
-		assign(buffers, RenderLayer.getGlint());
+//		assign(buffers, TexturedRenderLayers.getEntityTranslucentCull());
+		assign(buffers, RenderLayers.glint());
 		//assign(buffers, RenderLayer.getDirectGlint());
-		assign(buffers, RenderLayer.getEntityGlint());
+		assign(buffers, RenderLayers.entityGlint());
 		for (RenderLayer layer : EXTRA_RENDER_LAYERS) {
 			assign(buffers, layer);
 		}
@@ -143,7 +144,7 @@ public class StackBatcher {
 	}
 
 	public void render(EmiIngredient stack, DrawContext draw, int x, int y, float delta) {
-		render(stack, draw, x, y, delta, -1 ^ EmiIngredient.RENDER_AMOUNT);
+		render(stack, draw, x, y, delta, ~EmiIngredient.RENDER_AMOUNT);
 	}
 
 	public void render(EmiIngredient stack, DrawContext draw, int x, int y, float delta, int flags) {
@@ -152,17 +153,17 @@ public class StackBatcher {
 				try {
 					b.renderForBatch(b.isSideLit() ? imm : unlitFacade, draw, x-this.x, y + this.y, z, delta);
 					if (sodiumSpriteHandle != null && !stack.isEmpty()) {
-						ItemStack is = stack.getEmiStacks().get(0).getItemStack();
+						ItemStack is = stack.getEmiStacks().getFirst().getItemStack();
 						MinecraftClient client = MinecraftClient.getInstance();
-						BakedModel model = client.getItemRenderer().getModels().getModel(is);
-						if (model != null) {
-							List<BakedQuad> quads = EmiPort.getQuads(model);
-							for (BakedQuad quad : quads) {
-								if (quad != null) {
-									spritesToUpdate.add(quad.getSprite());
-								}
-							}
-						}
+//						BakedModel model = client.getItemRenderer().getModels().getModel(is);
+//						if (model != null) {
+//							List<BakedQuad> quads = EmiPort.getQuads(model);
+//							for (BakedQuad quad : quads) {
+//								if (quad != null) {
+//									spritesToUpdate.add(quad.sprite());
+//								}
+//							}
+//						}
 					}
 				} catch (Throwable t) {
 					if (EmiConfig.devMode) {
@@ -193,21 +194,21 @@ public class StackBatcher {
 			bake();
 			populated = true;
 		}
-		RenderSystem.enableDepthTest();
-		DiffuseLighting.enableGuiDepthLighting();
+//		RenderSystem.enableDepthTest();
+//		DiffuseLighting.enableGuiDepthLighting();
 		Matrix4f mat = new Matrix4f(RenderSystem.getModelViewMatrix());
 		mat.mul(new Matrix4f().translation(x, y, 0));
-		for (Map.Entry<RenderLayer, VertexBuffer> en : buffers.entrySet()) {
-			en.getKey().startDrawing();
-			EmiPort.setShader(en.getValue(), mat);
-			en.getKey().endDrawing();
+		for (Map.Entry<RenderLayer, GpuBuffer> en : buffers.entrySet()) {
+//			en.getKey().startDrawing();
+//			EmiPort.setShader(en.getValue(), mat);
+//			en.getKey().endDrawing();
 		}
-		BufferRenderer.reset();
+//		BufferRenderer.reset();
 	}
 	
 	private void bake() {
 		imm.drawCurrentLayer();
-		buffers.values().forEach(VertexBuffer::close);
+//		buffers.values().forEach(VertexBuffer::close);
 		buffers.clear();
 		for (Map.Entry<RenderLayer, BufferBuilder> entry : imm.getPendingLayerBuffers().entrySet()) {
 			bake(entry.getKey(), entry.getValue());
@@ -216,20 +217,41 @@ public class StackBatcher {
 	}
 
 	public void bake(RenderLayer layer, BufferBuilder bldr) {
-		BuiltBuffer builtBuffer = bldr.endNullable();
-		if (builtBuffer == null) {
-			return;
-		}
-		VertexBuffer vb = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
-		vb.bind();
-		vb.upload(builtBuffer);
-		buffers.put(layer, vb);
+//		BuiltBuffer builtBuffer = bldr.endNullable();
+//		if (builtBuffer == null) {
+//			return;
+//		}
+//		VertexBuffer vb = RenderSystem.get
+//		vb.bind();
+//		vb.upload(builtBuffer);
+//		buffers.put(layer, vb);
+
+//        try (BuiltBuffer builtBuffer = bldr.endNullable()) {
+//            if (builtBuffer == null) {
+//                return;
+//            }
+//
+//            BuiltBuffer.Contents contents = builtBuffer.contents();
+//            if (contents == null) return;
+//
+//            GpuBuffer vb = new GpuBuffer(
+//                    GpuBuffer.Usage.DYNAMIC,
+//                    contents.format(),
+//                    contents.indexCount(),
+//                    contents.vertexCount()
+//            );
+//
+//            vb.bind();
+//            vb.upload(contents);
+//
+//            buffers.put(layer, vb);
+//        }
 	}
 
 	// Apparently BufferBuilder leaks memory in vanilla. Go figure
 	public static class ClaimedCollection {
-		private Set<StackBatcher> claimed = Sets.newHashSet();
-		private List<StackBatcher> unclaimed = Lists.newArrayList();
+		private final Set<StackBatcher> claimed = Sets.newHashSet();
+		private final List<StackBatcher> unclaimed = Lists.newArrayList();
 
 		public StackBatcher claim() {
 			synchronized (this) {
@@ -237,7 +259,7 @@ public class StackBatcher {
 				if (unclaimed.isEmpty()) {
 					batcher = new StackBatcher();
 				} else {
-					batcher = unclaimed.remove(unclaimed.size() - 1);
+					batcher = unclaimed.removeLast();
 				}
 				if (batcher == null) {
 					batcher = new StackBatcher();
@@ -256,9 +278,7 @@ public class StackBatcher {
 
 		public void unclaimAll() {
 			synchronized (this) {
-				for (StackBatcher batcher : claimed) {
-					unclaimed.add(batcher);
-				}
+                unclaimed.addAll(claimed);
 				claimed.clear();
 			}
 		}
@@ -356,52 +376,137 @@ public class StackBatcher {
 			return cache.computeIfAbsent(delegate.getBuffer(layer), Consumer::new);
 		}
 
-		private static final class Consumer implements VertexConsumer {
-			private final VertexConsumer delegate;
+        private record Consumer(VertexConsumer delegate) implements VertexConsumer {
 
-			private Consumer(VertexConsumer delegate) {
-				this.delegate = delegate;
-			}
+            @Override
+            public VertexConsumer normal(float x, float y, float z) {
+                delegate.normal(0, -1, 0); // this is the change
+                return this;
+            }
 
-			@Override
-			public VertexConsumer normal(float x, float y, float z) {
-				delegate.normal(0, -1, 0); // this is the change
-				return this;
-			}
-			
-			// all other methods are direct delegation
+            @Override
+            public VertexConsumer normal(MatrixStack.Entry matrix, float x, float y, float z) {
+                delegate.normal(matrix, 0, -1, 0); // this is the change
+                return this;
+            }
 
-			@Override
-			public VertexConsumer vertex(float x, float y, float z) {
-				delegate.vertex(x, y, z);
-				return this;
-			}
+            @Override
+            public VertexConsumer normal(MatrixStack.Entry matrix, Vector3f vec) {
+                delegate.normal(matrix, 0, -1, 0); // this is the change
+                return this;
+            }
 
-			@Override
-			public VertexConsumer texture(float u, float v) {
-				delegate.texture(u, v);
-				return this;
-			}
+            @Override
+            public void vertex(float x, float y, float z, int color, float u, float v, int overlay, int light,
+                               float normalX, float normalY, float normalZ) {
+                delegate.vertex(x, y, z, color, u, v, overlay, light, 0, -1, 0); // this is the change
+            }
 
-			@Override
-			public VertexConsumer overlay(int u, int v) {
-				delegate.overlay(u, v);
-				return this;
-			}
+            // all other methods are direct delegation
 
-			@Override
-			public VertexConsumer light(int u, int v) {
-				delegate.light(u, v);
-				return this;
-			}
+            @Override
+            public VertexConsumer lineWidth(float width) {
+                delegate.lineWidth(width);
+                return this;
+            }
 
-			@Override
-			public VertexConsumer color(int r, int g, int b, int a) {
-				delegate.color(r, g, b, a);
-				return this;
-			}
-			
-		}
-	}
+            @Override
+            public VertexConsumer color(float red, float green, float blue, float alpha) {
+                delegate.color(red, green, blue, alpha);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer light(int uv) {
+                delegate.light(uv);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer overlay(int uv) {
+                delegate.overlay(uv);
+                return this;
+            }
+
+            @Override
+            public void quad(MatrixStack.Entry matrixEntry, BakedQuad quad, float red, float green, float blue,
+                             float alpha, int light, int overlay) {
+                delegate.quad(matrixEntry, quad, red, green, blue, alpha, light, overlay);
+            }
+
+            @Override
+            public void quad(MatrixStack.Entry matrixEntry, BakedQuad quad, float[] brightnesses, float red,
+                             float green, float blue, float alpha, int[] lights, int overlay) {
+                delegate.quad(matrixEntry, quad, brightnesses, red, green, blue, alpha, lights, overlay);
+            }
+
+            @Override
+            public VertexConsumer vertex(Vector3fc vec) {
+                delegate.vertex(vec);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer vertex(MatrixStack.Entry matrix, Vector3f vec) {
+                delegate.vertex(matrix, vec);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer vertex(MatrixStack.Entry matrix, float x, float y, float z) {
+                delegate.vertex(matrix, x, y, z);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer vertex(Matrix4fc matrix, float x, float y, float z) {
+                delegate.vertex(matrix, x, y, z);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer vertex(Matrix3x2fc matrix, float x, float y) {
+                delegate.vertex(matrix, x, y);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer vertex(float x, float y, float z) {
+                delegate.vertex(x, y, z);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer texture(float u, float v) {
+                delegate.texture(u, v);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer overlay(int u, int v) {
+                delegate.overlay(u, v);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer light(int u, int v) {
+                delegate.light(u, v);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer color(int r, int g, int b, int a) {
+                delegate.color(r, g, b, a);
+                return this;
+            }
+
+            @Override
+            public VertexConsumer color(int argb) {
+                delegate.color(argb);
+                return this;
+            }
+        }
+
+    }
 
 }

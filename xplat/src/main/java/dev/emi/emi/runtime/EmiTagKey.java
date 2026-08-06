@@ -54,12 +54,12 @@ public class EmiTagKey<T> {
 
 	public Registry<T> registry() {
 		MinecraftClient client = MinecraftClient.getInstance();
-		return client.world.getRegistryManager().getOptional(raw.registry()).orElse(null);
+		return client.world.getRegistryManager().getOptional(raw.registryRef()).orElse(null);
 	}
 
 	public Stream<T> stream() {
 		Registry<T> registry = registry();
-		Optional<Named<T>> opt = registry.getEntryList(raw);
+		Optional<Named<T>> opt = registry.getOptional(raw);
 		if (opt.isEmpty()) {
 			return Stream.of();
 		} else {
@@ -95,7 +95,7 @@ public class EmiTagKey<T> {
 	}
 
 	private @Nullable String getTagTranslationKey() {
-		Identifier registry = raw.registry().getValue();
+		Identifier registry = raw.registryRef().getValue();
 		if (registry.getNamespace().equals("minecraft")) {
 			String s = translatePrefix("tag." + registry.getPath().replace("/", ".") + ".", this.id());
 			if (s != null) {
@@ -156,7 +156,7 @@ public class EmiTagKey<T> {
 	}
 
 	public static <T> Stream<EmiTagKey<T>> fromRegistry(Registry<T> registry) {
-		return registry.streamTags().map(EmiTagKey::of);
+		return registry.streamTagKeys().map(EmiTagKey::of);
 	}
 
 	public static void reload() {

@@ -3,7 +3,6 @@ package dev.emi.emi.chess;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -14,9 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -47,16 +44,16 @@ class ChessEmiStack extends EmiStack {
 			}
 			if (type != null) {
 				context.push();
-				context.matrices().translate(0, 0, 10);
+//				context.matrices().translate(0, 0, 10);
 				context.fill(x - 1, y - 1, 18, 18, 0x55000000);
-				context.matrices().translate(0, 0, 90);
+//				context.matrices().translate(0, 0, 90);
 				context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, type.u, chess.pendingPromotion > 31 ? 0 : 16, 16, 16, 256, 256);
 				context.pop();
 				return;
 			}
 		}
 		context.push();
-		context.matrices().translate(0, 0, 10);
+//		context.matrices().translate(0, 0, 10);
 		if (chess.isTarget(position)) {
 			context.fill(x - 1, y - 1, 18, 18, 0x5555ff00);
 		}
@@ -71,7 +68,7 @@ class ChessEmiStack extends EmiStack {
 		context.pop();
 		if (piece != null) {
 			context.push();
-			context.matrices().translate(0, 0, 100);
+//			context.matrices().translate(0, 0, 100);
 			context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, piece.type().u, piece.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
 			context.pop();
 		}

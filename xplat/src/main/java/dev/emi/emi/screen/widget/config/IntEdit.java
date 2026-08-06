@@ -58,11 +58,11 @@ public class IntEdit {
 	}
 
 	public void setPosition(int x, int y) {
-		text.x = x + 1;
-		text.y = y + 1;
-		up.x = x + text.getWidth() + 2;
-		up.y = y;
-		down.x = up.x;
-		down.y = y + 10;
+		text.setX(x + 1);
+		text.setY(y + 1);
+		up.setX(x + text.getWidth() + 2);
+		up.setY(y);
+		down.setX(up.x);
+		down.setY(y + 10);
 	}
 }

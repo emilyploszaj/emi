@@ -9,7 +9,7 @@ import net.minecraft.recipe.ShapelessRecipe;
 public class EmiShapelessRecipe extends EmiCraftingRecipe {
 	
 	public EmiShapelessRecipe(ShapelessRecipe recipe) {
-		super(recipe.getIngredients().stream().map(i -> EmiIngredient.of(i)).toList(),
+		super(recipe.getIngredientPlacement().getIngredients().stream().map(EmiIngredient::of).toList(),
 			EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe));
 		EmiShapedRecipe.setRemainders(input, recipe);
 	}

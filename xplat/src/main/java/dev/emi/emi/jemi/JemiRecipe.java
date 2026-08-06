@@ -54,20 +54,20 @@ public class JemiRecipe<T> implements EmiRecipe {
 		this.recipeCategory = recipeCategory;
 		this.category = category;
 		this.recipe = recipe;
-		this.originalId = category.getRegistryName(recipe);
+		this.originalId = category.getIdentifier(recipe);
 		if (this.originalId != null) {
 			this.id = EmiPort.id("jei", "/" + EmiUtil.subId(this.originalId));
 		}
 		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
-			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+			jrsb.acceptor.coerceStacks(jrsb.richTooltipCallback, jrsb.renderers);
 		}
 		for (JemiIngredientAcceptor acceptor : builder.ingredients) {
 			EmiIngredient stack = acceptor.build();
 			if (acceptor.role == RecipeIngredientRole.INPUT) {
 				inputs.add(stack);
-			} else if (acceptor.role == RecipeIngredientRole.CATALYST) {
+			} else if (acceptor.role == RecipeIngredientRole.RENDER_ONLY) {
 				catalysts.add(stack);
 			} else if (acceptor.role == RecipeIngredientRole.OUTPUT) {
 				if (stack.getEmiStacks().size() > 1) {
@@ -130,7 +130,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
-			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+//			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
 		}
 		if (opt.isPresent()) {
 			widgets.add(new JemiWidget(0, 0, getDisplayWidth(), getDisplayHeight(), opt.get()));
@@ -176,8 +176,8 @@ public class JemiRecipe<T> implements EmiRecipe {
 		public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			context.push();
-			context.matrices().translate(x, y, 0);
-			IDrawable background = category.getBackground();
+//			context.matrices().translate(x, y, 0);
+			IDrawable background = category.getIcon(); // TODO: review this
 			if (background != null) {
 				background.draw(context.raw());
 			}
@@ -193,14 +193,16 @@ public class JemiRecipe<T> implements EmiRecipe {
 			return builder.tooltip;
 		}
 
+        // TODO: review this
 		@Override
 		public boolean mouseClicked(int mouseX, int mouseY, int button) {
-			return category.handleInput(recipe, mouseX, mouseY, InputUtil.Type.MOUSE.createFromCode(button));
+            return false;
+//			return category.handleInput(recipe, mouseX, mouseY, InputUtil.Type.MOUSE.createFromCode(button));
 		}
 
 		@Override
 		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-			return category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputUtil.fromKeyCode(keyCode, scanCode));
+			return false;//category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputUtil.fromKeyCode(keyCode, scanCode));
 		}
 	}
 }

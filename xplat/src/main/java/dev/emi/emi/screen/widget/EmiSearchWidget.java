@@ -17,10 +17,12 @@ import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
 import dev.emi.emi.search.QueryType;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
@@ -47,7 +49,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 		this.setEditableColor(-1);
 		this.setUneditableColor(-1);
 		this.setMaxLength(256);
-		this.setRenderTextProvider((string, stringStart) -> {
+		this.addFormatter((string, stringStart) -> {
 			MutableText text = null;
 			int s = 0;
 			int last = 0;
@@ -172,14 +174,18 @@ public class EmiSearchWidget extends TextFieldWidget {
 		return isFocused;
 	}
 
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    @Override
+	public boolean mouseClicked(Click click, boolean doubled) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
 		if (!isMouseOver(mouseX, mouseY) || !EmiConfig.enabled) {
 			EmiPort.focus(this, false);
 			return false;
 		} else {
-			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
-			if (isMouseOver(mouseX, mouseY)) {
+            boolean b = super.mouseClicked(new Click(mouseX, mouseY, new MouseInput(button == 1 ? 0 : button, click.modifiers())), doubled);
+            if (isMouseOver(mouseX, mouseY)) {
 				EmiPort.focus(this, true);
 			}
 			if (this.isFocused()) {
@@ -199,8 +205,11 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 	}
 
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override
+	public boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
+        int scanCode = input.scancode();
+
 		if (this.isFocused()) {
 			if (EmiConfig.clearSearch.matchesKey(keyCode, scanCode)) {
 				setText("");
@@ -222,7 +231,7 @@ public class EmiSearchWidget extends TextFieldWidget {
 				}
 			}
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(input);
 	}
 
 	@Override
@@ -240,20 +249,21 @@ public class EmiSearchWidget extends TextFieldWidget {
 		}
 		lastRender = System.currentTimeMillis();
 		long deg = accumulatedSpin * -180 / 500;
-		Matrix4fStack view = RenderSystem.getModelViewStack();
-		view.pushMatrix();
+//		Matrix4fStack view = RenderSystem.getModelViewStack();
+//		view.pushMatrix();
+        context.push();
 		if (deg != 0) {
-			view.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
-			view.rotate(RotationAxis.NEGATIVE_Z.rotationDegrees(deg));
-			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
-			EmiPort.applyModelViewMatrix();
+            context.matrices().translate(this.x + this.width / 2, this.y + this.height / 2/*, 0*/);
+            context.matrices().rotate(RotationAxis.NEGATIVE_Z.rotationDegrees(deg).angle());
+            context.matrices().translate(-(this.x + this.width / 2), -(this.y + this.height / 2)/*, 0*/);
+//			EmiPort.applyModelViewMatrix();
 		}
 
 		if (lower.contains("jeb_")) {
 			int amount = 0x3FF;
 			float h = ((lastRender & amount) % (float) amount) / (float) amount;
 			int rgb = MathHelper.hsvToRgb(h, 1, 1);
-			context.setColor(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb >> 0) & 0xFF) / 255f);
+//			context.setColor(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb >> 0) & 0xFF) / 255f);
 		}
 
 		if (EmiConfig.enabled) {
@@ -266,8 +276,9 @@ public class EmiSearchWidget extends TextFieldWidget {
 				context.fill(this.x + this.width, this.y - 1, 1, this.height + 2, border);
 			}
 		}
-		context.resetColor();
-		view.popMatrix();
-		EmiPort.applyModelViewMatrix();
+//		context.resetColor();
+        context.pop();
+//		view.popMatrix();
+//		EmiPort.applyModelViewMatrix();
 	}
 }

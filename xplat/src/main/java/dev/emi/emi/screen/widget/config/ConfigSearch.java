@@ -3,6 +3,7 @@ package dev.emi.emi.screen.widget.config;
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
@@ -38,14 +39,14 @@ public class ConfigSearch {
 			super(textRenderer, x, y, width, height, text);
 		}
 
-		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
-			if (button == 1 && isMouseOver(mouseX, mouseY)) {
+        @Override
+		public boolean mouseClicked(Click click, boolean doubled) {
+			if (click.button() == 1 && isMouseOver(click.x(), click.y())) {
 				this.setText("");
 				EmiPort.focus(this, true);
 				return true;
 			}
-			return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(click, doubled);
 		}
 	}
 }

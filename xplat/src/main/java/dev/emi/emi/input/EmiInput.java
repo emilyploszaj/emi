@@ -3,8 +3,7 @@ package dev.emi.emi.input;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.input.SystemKeycodes;
 
 public class EmiInput {
 	public static final int CONTROL_MASK = 1;
@@ -12,21 +11,19 @@ public class EmiInput {
 	public static final int SHIFT_MASK = 4;
 
 	public static boolean isControlDown() {
-		return Screen.hasControlDown();
+		return MinecraftClient.getInstance().isCtrlPressed();
 	}
 
 	public static boolean isAltDown() {
-		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_ALT)
-			|| InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_ALT);
+		return MinecraftClient.getInstance().isAltPressed();
 	}
 
 	public static boolean isShiftDown() {
-		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
-			|| InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+		return MinecraftClient.getInstance().isShiftPressed();
 	}
 
 	public static int maskFromCode(int keyCode) {
-		if (MinecraftClient.IS_SYSTEM_MAC) {
+		if (SystemKeycodes.IS_MAC_OS) {
 			if (keyCode == GLFW.GLFW_KEY_LEFT_SUPER || keyCode == GLFW.GLFW_KEY_RIGHT_SUPER) {
 				return CONTROL_MASK;
 			}

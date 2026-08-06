@@ -13,39 +13,44 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 public class JemiRecipesGui implements IRecipesGui {
 
-	@Override
+    @Override
+    public <V> void show(IFocus<V> focus) {
+        EmiStack stack = JemiUtil.getStack(focus.getTypedValue());
+        if (!stack.isEmpty()) {
+            RecipeIngredientRole role = focus.getRole();
+            if (role == RecipeIngredientRole.OUTPUT) {
+                EmiApi.displayRecipes(stack);
+            } else {
+                EmiApi.displayUses(stack);
+            }
+        }
+    }
+
+    @Override
 	public void show(List<IFocus<?>> focuses) {
 		for (IFocus<?> focus : focuses) {
-			EmiStack stack = JemiUtil.getStack(focus.getTypedValue());
-			if (!stack.isEmpty()) {
-				RecipeIngredientRole role = focus.getRole();
-				if (role == RecipeIngredientRole.OUTPUT) {
-					EmiApi.displayRecipes(stack);
-				} else {
-					EmiApi.displayUses(stack);
-				}
-			}
+			show(focus);
 		}
 	}
 
-	@Override
-	public void showTypes(List<RecipeType<?>> recipeTypes) {
-		for (RecipeType<?> type : recipeTypes) {
+    @Override
+    public void showTypes(List<IRecipeType<?>> recipeTypes) {
+        for (IRecipeType<?> type : recipeTypes) {
 			for (EmiRecipeCategory category : EmiApi.getRecipeManager().getCategories()) {
 				if (category.getId().equals(type.getUid())) {
 					EmiApi.displayRecipeCategory(category);
 				}
 			}
 		}
-	}
+    }
 
 	@Override
 	public <T> void showRecipes(IRecipeCategory<T> recipeCategory, List<T> recipes, List<IFocus<?>> focuses) {

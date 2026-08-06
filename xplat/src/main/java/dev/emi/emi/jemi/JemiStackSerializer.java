@@ -31,7 +31,7 @@ public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
 			if (type == VanillaTypes.ITEM_STACK || type == JemiUtil.getFluidType()) {
 				continue;
 			}
-			Optional<EmiStack> opt = manager.getTypedIngredientByUid(type, uid).map(JemiUtil::getStack);
+			Optional<EmiStack> opt = manager.getIngredientTypeForUid(uid).map(JemiUtil::getStack); // TODO
 			if (opt.isPresent()) {
 				return opt.get().setAmount(amount);
 			}

@@ -1,6 +1,7 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -13,6 +14,7 @@ import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 
@@ -43,7 +45,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 					inv.setStack(i, stack.getItemStack().copy());
 					CraftingRecipeInput cri = CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks());
 					if (cri.getWidth() <= 3 && cri.getHeight() <= 3) {
-						ItemStack remainder = recipe.getRemainder(cri).get((i / 3 * cri.getWidth()) + (i % 3));
+						ItemStack remainder = recipe.getRecipeRemainders(cri).get((i / 3 * cri.getWidth()) + (i % 3));
 						if (!remainder.isEmpty()) {
 							stack.setRemainder(EmiStack.of(remainder));
 						}
@@ -64,7 +66,13 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				if (x >= recipe.getWidth() || y >= recipe.getHeight() || i >= recipe.getIngredients().size()) {
 					list.add(EmiStack.EMPTY);
 				} else {
-					list.add(EmiIngredient.of(recipe.getIngredients().get(i++)));
+                    // TODO: is this correct?
+                    Optional<Ingredient> ingredient = recipe.getIngredients().get(i++);
+                    if (ingredient.isPresent()) {
+                        list.add(EmiIngredient.of(ingredient.get()));
+                    } else {
+                        list.add(EmiStack.EMPTY);
+                    }
 				}
 			}
 		}

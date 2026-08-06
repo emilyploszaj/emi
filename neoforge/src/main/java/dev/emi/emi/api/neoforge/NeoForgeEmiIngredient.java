@@ -1,7 +1,12 @@
 package dev.emi.emi.api.neoforge;
 
 import dev.emi.emi.api.stack.EmiIngredient;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.recipe.display.SlotDisplayContexts;
+import net.minecraft.util.context.ContextParameterMap;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
@@ -14,7 +19,9 @@ public final class NeoForgeEmiIngredient {
     }
 
     public static EmiIngredient of(FluidIngredient ingredient) {
-        return EmiIngredient.of(Arrays.stream(ingredient.getStacks()).map(NeoForgeEmiStack::of).toList());
+        return EmiIngredient.of(ingredient.fluids().stream().map((entry) -> {
+            return NeoForgeEmiStack.of(new FluidStack(entry, 1000)); // TODO: review this
+        }).toList());
     }
 
     public static EmiIngredient of(SizedFluidIngredient ingredient) {

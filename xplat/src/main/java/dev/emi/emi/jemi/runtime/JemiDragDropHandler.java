@@ -57,11 +57,11 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 	}
 
 	private <I> List<IGhostIngredientHandler.Target<I>> getTargets(Screen screen, ITypedIngredient<I> typed) {
-		Optional<IGhostIngredientHandler<Screen>> optGhost = JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandler(screen);
-		if (optGhost.isPresent()) {
-			IGhostIngredientHandler<Screen> ghost = optGhost.get();
-			return ghost.getTargetsTyped(screen, typed, false);
-		}
+//		Optional<IGhostIngredientHandler<Screen>> optGhost = JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandler(screen);
+//		if (optGhost.isPresent()) {
+//			IGhostIngredientHandler<Screen> ghost = optGhost.get();
+//			return ghost.getTargetsTyped(screen, typed, false);
+//		} TODO
 		return List.of();
 	}
 }

@@ -43,18 +43,19 @@ public abstract class ConfigEntryWidget extends Entry {
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (group != null) {
-			context.fill(x + 4, y + height / 2 - 1, 6, 2, 0xffffffff);
+			context.fill(x + 4, y + height / 2 - 1, 6, 2, 0xFFFFFFFF);
 			if (endGroup) {
-				context.fill(x + 2, y - 4, 2, height / 2 + 5, 0xffffffff);
+				context.fill(x + 2, y - 4, 2, height / 2 + 5, 0xFFFFFFFF);
 			} else {
-				context.fill(x + 2, y - 4, 2, height + 4, 0xffffffff);
+				context.fill(x + 2, y - 4, 2, height + 4, 0xFFFFFFFF);
 			}
 			x += 10;
 			width -= 10;
 		}
 		update(y, x, width, height);
 		context.fill(x, y, width, height, 0x66000000);
-		context.drawTextWithShadow(this.name, x + 6, y + 10 - parentList.client.textRenderer.fontHeight / 2, 0xFFFFFF);
+        // Color must be in AARRGGBB format
+		context.drawTextWithShadow(this.name, x + 6, y + 10 - parentList.client.textRenderer.fontHeight / 2, 0xFFFFFFFF);
 		for (Element element : children()) {
 			if (element instanceof Drawable drawable) {
 				drawable.render(context.raw(), mouseX, mouseY, delta);

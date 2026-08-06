@@ -16,12 +16,12 @@ class ChessTooltipComponent implements EmiTooltipComponent {
 		this.description = description;
 	}
 
-	@Override
-	public int getHeight() {
-		return 30;
-	}
+    @Override
+    public int getHeight(TextRenderer textRenderer) {
+        return 30;
+    }
 
-	@Override
+    @Override
 	public int getWidth(TextRenderer textRenderer) {
 		return Math.max(textRenderer.getWidth(description), 48);
 	}
@@ -34,7 +34,7 @@ class ChessTooltipComponent implements EmiTooltipComponent {
 
 	@Override
 	public void drawTooltipText(TextRenderData text) {
-		text.draw(description, 0, 4, 0xffffff, true);
-		text.draw("->", 18, 19, 0xffffff, true);
+		text.draw(description, 0, 4, 0xFFFFFFFF, true);
+		text.draw("->", 18, 19, 0xFFFFFFFF, true);
 	}
 }

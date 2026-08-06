@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.component.ComponentChanges;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
@@ -81,14 +83,12 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public class EmiScreenManager {
@@ -681,7 +681,7 @@ public class EmiScreenManager {
 
 	private static void renderWidgets(EmiDrawContext context, int mouseX, int mouseY, float delta, EmiScreenBase base) {
 		context.push();
-		context.matrices().translate(0, 0, 100);
+//		context.matrices().translate(0, 0, 100);
 		emi.render(context.raw(), mouseX, mouseY, delta);
 		tree.render(context.raw(), mouseX, mouseY, delta);
 		search.render(context.raw(), mouseX, mouseY, delta);
@@ -694,17 +694,19 @@ public class EmiScreenManager {
 			if (cur.getRecipeContext() != lastHoveredCraftable.getRecipeContext()) {
 				ScreenSpace space = getHoveredSpace(mouseX, mouseY);
 				if (space != null && (space.getType() == SidebarType.CRAFTABLES || space.getType() == SidebarType.CRAFT_HISTORY)) {
-					Matrix4fStack view = RenderSystem.getModelViewStack();
-					view.pushMatrix();
-					view.translate(0, 0, 200);
-					EmiPort.applyModelViewMatrix();
+                    context.push();
+//					Matrix4fStack view = RenderSystem.getModelViewStack();
+//					view.pushMatrix();
+					context.matrices().translate(0, 0/*, 200*/);
+//					EmiPort.applyModelViewMatrix();
 					int lhx = space.getRawX(lastHoveredCraftableOffset);
 					int lhy = space.getRawY(lastHoveredCraftableOffset);
 					context.fill(lhx, lhy, 18, 18, 0x44AA00FF);
 					lastHoveredCraftable.getStack().render(context.raw(), lhx + 1, lhy + 1, delta,
 							EmiIngredient.RENDER_ICON);
-					view.popMatrix();
-					EmiPort.applyModelViewMatrix();
+//					view.popMatrix();
+//					EmiPort.applyModelViewMatrix();
+                    context.pop();
 				}
 			}
 		}
@@ -727,7 +729,7 @@ public class EmiScreenManager {
 					}
 					if (index >= 0) {
 						context.push();
-						context.matrices().translate(0, 0, 200);
+//						context.matrices().translate(0, 0, 200);
 						int dx = space.getEdgeX(index);
 						int dy = space.getEdgeY(index);
 						context.fill(dx - 1, dy, 2, 18, 0xFF00FFFF);
@@ -736,7 +738,7 @@ public class EmiScreenManager {
 				}
 			}
 			context.push();
-			context.matrices().translate(0, 0, 400);
+//			context.matrices().translate(0, 0, 400);
 			EmiDragDropHandlers.render(base.screen(), draggedStack, context.raw(), mouseX, mouseY, delta);
 			draggedStack.render(context.raw(), mouseX - 8, mouseY - 8, delta, EmiIngredient.RENDER_ICON);
 			context.pop();
@@ -810,7 +812,7 @@ public class EmiScreenManager {
 		if (EmiConfig.devMode) {
 			Screen screen = base.screen();
 			EmiProfiler.swap("dev");
-			int color = 0xFFFFFF;
+			int color = 0xFFFFFFFF;
 			Text title = EmiPort.literal("EMI Dev Mode");
 			int off = -16;
 			int devTextX = getDebugTextX();
@@ -883,14 +885,14 @@ public class EmiScreenManager {
 		}
 		if (base.screen() instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
 			context.push();
-			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
+			context.matrices().translate(hsa.getX(), hsa.getY()/*, 0*/);
 			for (Slot slot : hs.getScreenHandler().slots) {
 				if (!slot.isEnabled()) {
 					continue;
 				}
 				EmiStack stack = EmiStack.of(slot.getStack());
 				context.push();
-				context.matrices().translate(0, 0, 300);
+//				context.matrices().translate(0, 0, 300);
 				if (query != null) {
 					if (!query.test(stack)) {
 						context.fill(slot.x - 1, slot.y - 1, 18, 18, 0x77000000);
@@ -913,28 +915,28 @@ public class EmiScreenManager {
 		}
 		forceRecalculate();
 		if (EmiConfig.centerSearchBar || panels.get(0).space == null || panels.get(1).space == null) {
-			search.x = (screen.width - 160) / 2;
-			search.y = screen.height - 21;
+			search.setX((screen.width - 160) / 2); // Initial position of the text will not be calculated if x is assigned
+			search.setY(screen.height - 21);
 			search.setWidth(160);
 		} else {
 			if (EmiConfig.searchSidebar == SidebarSide.RIGHT) {
-				search.x = panels.get(1).space.tx;
-				search.y = screen.height - 21;
+				search.setX(panels.get(1).space.tx);
+				search.setY(screen.height - 21);
 				search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
 			} else {
-				search.x = panels.get(0).space.tx;
-				search.y = screen.height - 21 - 21;
+				search.setX(panels.get(0).space.tx);
+				search.setY(screen.height - 21 - 21);
 				search.setWidth(panels.get(0).space.tw * ENTRY_SIZE);
 			}
 		}
 		EmiPort.focus(search, false);
 		search.setVisible(EmiConfig.searchSidebar != SidebarSide.NONE);
 
-		emi.x = 2;
-		emi.y = screen.height - 22;
+		emi.setX(2);
+		emi.setY(screen.height - 22);
 
-		tree.x = 24;
-		tree.y = screen.height - 22;
+		tree.setX(24);
+		tree.setY(screen.height - 22);
 
 		updateSidebarButtons();
 	}
@@ -977,52 +979,52 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public static boolean mouseClicked(Click click, boolean doubled) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
 		}
-		if (search.mouseClicked(mouseX, mouseY, button)) {
+		if (search.mouseClicked(click, doubled)) {
 			return true;
-		} else if (emi.mouseClicked(mouseX, mouseY, button)) {
+		} else if (emi.mouseClicked(click, doubled)) {
 			return true;
-		} else if (tree.mouseClicked(mouseX, mouseY, button)) {
+		} else if (tree.mouseClicked(click, doubled)) {
 			return true;
 		}
 		for (SidebarPanel panel : panels) {
-			if (panel.cycle.mouseClicked(mouseX, mouseY, button)) {
+			if (panel.cycle.mouseClicked(click, doubled)) {
 				return true;
-			} else if (panel.pageLeft.mouseClicked(mouseX, mouseY, button)) {
+			} else if (panel.pageLeft.mouseClicked(click, doubled)) {
 				return true;
-			} else if (panel.pageRight.mouseClicked(mouseX, mouseY, button)) {
+			} else if (panel.pageRight.mouseClicked(click, doubled)) {
 				return true;
 			}
 		}
 		if (isDisabled()) {
-			if (EmiConfig.toggleVisibility.matchesMouse(button)) {
+			if (EmiConfig.toggleVisibility.matchesMouse(click.button())) {
 				toggleVisibility(true);
 				return true;
 			}
 			return false;
 		}
 		recalculate();
-		EmiIngredient ingredient = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button)).getStack();
+		EmiIngredient ingredient = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button())).getStack();
 		pressedStack = ingredient;
 		if (!ingredient.isEmpty()) {
 			// Don't cancel the event for extra mouse buttons
-			ingredient = getHoveredStack((int) mouseX, (int) mouseY, false).getStack();
+			ingredient = getHoveredStack((int) click.x(), (int) click.y(), false).getStack();
 			if (!ingredient.isEmpty()) {
 				return true;
 			}
 		} else {
-			if (genericInteraction(bind -> bind.matchesMouse(button))) {
+			if (genericInteraction(bind -> bind.matchesMouse(click.button()))) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public static boolean mouseReleased(Click click) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1031,10 +1033,10 @@ public class EmiScreenManager {
 			if (isDisabled()) {
 				return false;
 			}
-			int mx = (int) mouseX;
-			int my = (int) mouseY;
+			int mx = (int) click.x();
+			int my = (int) click.y();
 			recalculate();
-			if (EmiApi.isCheatMode() && EmiConfig.deleteCursorStack.matchesMouse(button)) {
+			if (EmiApi.isCheatMode() && EmiConfig.deleteCursorStack.matchesMouse(click.button())) {
 				if (deleteCursor(mx, my)) {
 					// Returning false here makes the handled screen do something and removes a bug, oh well.
 					return false;
@@ -1042,14 +1044,14 @@ public class EmiScreenManager {
 			}
 			SidebarPanel panel = getHoveredPanel(mx, my);
 			if (draggedStack == EmiStack.EMPTY && panel != null && panel.getType() == SidebarType.CHESS) {
-				EmiChess.interact(pressedStack, button);
+				EmiChess.interact(pressedStack, click.button());
 				return true;
 			}
 			if (!pressedStack.isEmpty()) {
 				if (!draggedStack.isEmpty()) {
 					if (panel != null) {
 						ScreenSpace space = panel.getHoveredSpace(mx, my);
-						if (space != null && space.getType() == SidebarType.FAVORITES ) {
+						if (space != null && space.getType() == SidebarType.FAVORITES) {
 							int page = panel.page;
 							int pageSize = space.pageSize;
 							int index = Math.min(space.getClosestEdge(mx, my), EmiFavorites.favorites.size());
@@ -1070,12 +1072,12 @@ public class EmiScreenManager {
 						}
 					}
 				} else {
-					EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
-					if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(button))) {
+					EmiStackInteraction hovered = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button()));
+                    if (draggedStack.isEmpty() && stackInteraction(hovered, bind -> bind.matchesMouse(click.button()))) {
 						return true;
 					}
 				}
-				if (genericInteraction(bind -> bind.matchesMouse(button))) {
+				if (genericInteraction(bind -> bind.matchesMouse(click.button()))) {
 					return true;
 				}
 			}
@@ -1086,7 +1088,7 @@ public class EmiScreenManager {
 		}
 	}
 
-	public static boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public static boolean mouseDragged(Click click, double deltaX, double deltaY) {
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1094,14 +1096,14 @@ public class EmiScreenManager {
 		if (isDisabled()) {
 			return false;
 		}
-		if (draggedStack.isEmpty() && button == 0) {
+		if (draggedStack.isEmpty() && click.button() == 0) {
 			if (client.currentScreen instanceof HandledScreen<?> handled) {
 				if (!handled.getScreenHandler().getCursorStack().isEmpty()) {
 					return false;
 				}
 			}
 			recalculate();
-			EmiStackInteraction hovered = getHoveredStack((int) mouseX, (int) mouseY, !isClickClicky(button));
+			EmiStackInteraction hovered = getHoveredStack((int) click.x(), (int) click.y(), !isClickClicky(click.button()));
 			if (hovered.getStack() != pressedStack && !(pressedStack instanceof EmiFavorite.Synthetic)) {
 				draggedStack = pressedStack;
 			}
@@ -1109,7 +1111,10 @@ public class EmiScreenManager {
 		return false;
 	}
 
-	public static boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public static boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
+        int scanCode = input.scancode();
+
 		EmiScreenBase base = EmiScreenBase.getCurrent();
 		if (base.isEmpty()) {
 			return false;
@@ -1121,7 +1126,7 @@ public class EmiScreenManager {
 			}
 			return false;
 		}
-		if (EmiScreenManager.search.keyPressed(keyCode, scanCode, modifiers) || EmiScreenManager.search.isActive()) {
+		if (EmiScreenManager.search.keyPressed(input) || EmiScreenManager.search.isActive()) {
 			return true;
 		}
 		if (hasFocusedTextField(client.currentScreen, 10)) {
@@ -1312,7 +1317,7 @@ public class EmiScreenManager {
 				}
 				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), EmiCraftContext.Type.CRAFTABLE, destination, amount)) {
 					MinecraftClient.getInstance().getSoundManager()
-							.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+							.play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 					return true;
 				}
 			}
@@ -1329,7 +1334,7 @@ public class EmiScreenManager {
 			repopulatePanels(SidebarType.FAVORITES);
 			return true;
 		} else if (function.apply(EmiConfig.copyId)) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.ui(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 			client.keyboard.setClipboard("" + recipe.getId());
 			return true;
 		}
@@ -1500,7 +1505,7 @@ public class EmiScreenManager {
 				if (isVisible()) {
 					EmiProfiler.swap(side.getName());
 					context.push();
-					context.matrices().translate(0, 0, 100);
+//					context.matrices().translate(0, 0, 100);
 					pageLeft.render(context.raw(), mouseX, mouseY, delta);
 					cycle.render(context.raw(), mouseX, mouseY, delta);
 					pageRight.render(context.raw(), mouseX, mouseY, delta);

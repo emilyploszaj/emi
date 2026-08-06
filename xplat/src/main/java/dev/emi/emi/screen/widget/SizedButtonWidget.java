@@ -5,23 +5,21 @@ import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.runtime.EmiDrawContext;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class SizedButtonWidget extends ButtonWidget {
 	private final BooleanSupplier isActive;
 	private final IntSupplier vOffset;
 	protected Identifier texture = EmiRenderHelper.BUTTONS;
-	protected Supplier<List<Text>> text;
+	protected Supplier<List<net.minecraft.text.Text>> text;
 	protected int u, v;
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action) {
@@ -29,7 +27,7 @@ public class SizedButtonWidget extends ButtonWidget {
 	}
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
-			List<Text> text) {
+			List<net.minecraft.text.Text> text) {
 		this(x, y, width, height, u, v, isActive, action, () -> 0, () -> text);
 	}
 
@@ -39,7 +37,7 @@ public class SizedButtonWidget extends ButtonWidget {
 	}
 
 	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
-			IntSupplier vOffset, Supplier<List<Text>> text) {
+			IntSupplier vOffset, Supplier<List<net.minecraft.text.Text>> text) {
 		super(x, y, width, height, EmiPort.literal(""), action, s -> s.get());
 		this.u = u;
 		this.v = v;
@@ -62,9 +60,9 @@ public class SizedButtonWidget extends ButtonWidget {
 		}
 		return v;
 	}
-	
-	@Override
-	public void renderWidget(DrawContext raw, int mouseX, int mouseY, float delta) {
+
+    @Override
+    protected void drawIcon(DrawContext raw, int mouseX, int mouseY, float deltaTicks) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.enableDepthTest();
 		context.drawTexture(texture, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height);
@@ -75,5 +73,5 @@ public class SizedButtonWidget extends ButtonWidget {
 			EmiRenderHelper.drawTooltip(client.currentScreen, context, text.get().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList(), mouseX, mouseY);
 			context.pop();
 		}
-	}
+    }
 }

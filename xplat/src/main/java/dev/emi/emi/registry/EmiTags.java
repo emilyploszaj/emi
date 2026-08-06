@@ -23,11 +23,11 @@ import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.util.InheritanceMap;
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
 
 public class EmiTags {
@@ -144,7 +144,7 @@ public class EmiTags {
 		return (List<EmiTagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.getKey().getValue(), List.of());
 	}
 
-	public static void registerTagModels(ResourceManager manager, Consumer<ModelIdentifier> consumer, String variant) {
+	public static void registerTagModels(ResourceManager manager, Consumer<Identifier> consumer, String variant) {
 		EmiTags.MODELED_TAGS.clear();
 		for (Identifier id : EmiPort.findResources(manager, "models/tag", s -> s.endsWith(".json"))) {
 			String path = id.getPath();
@@ -154,7 +154,7 @@ public class EmiTags {
 				TagKey<?> key = TagKey.of(RegistryKey.ofRegistry(EmiPort.id("minecraft", parts[0])), EmiPort.id(id.getNamespace(), path.substring(1 + parts[0].length())));
 				Identifier mid = EmiPort.id(id.getNamespace(), "tag/" + path);
 				EmiTags.MODELED_TAGS.put(key, mid);
-				consumer.accept(new ModelIdentifier(mid, variant));
+				consumer.accept(mid);
 			}
 		}
 		/*

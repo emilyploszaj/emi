@@ -85,7 +85,7 @@ public class JemiSlotWidget extends SlotWidget {
 			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
 			context.enableBlend();
 			context.push();
-			context.matrices().translate(xOff, yOff, 0);
+			context.matrices().translate(xOff, yOff/*, 0*/);
 			renderer.render(context.raw(), typed.getIngredient());
 			context.pop();
 			return;
@@ -99,7 +99,7 @@ public class JemiSlotWidget extends SlotWidget {
 		if (slot.overlay != null) {
 			context.enableBlend();
 			context.push();
-			context.matrices().translate(0, 0, 200);
+			context.matrices().translate(0, 0/*, 200*/);
 			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
 			context.pop();
 		}
@@ -124,7 +124,7 @@ public class JemiSlotWidget extends SlotWidget {
 			} catch (Exception e) {
 				EmiLog.error("Error initializing JEI TooltipBuilder", e);
 			}
-		} else if (slot.tooltipCallback != null) {
+		}/* else if (slot.tooltipCallback != null) {
 			try {
 				List<Text> event = Lists.newArrayList();
 				List<Text> original = stack.getEmiStacks().get(0).getTooltipText();
@@ -138,7 +138,7 @@ public class JemiSlotWidget extends SlotWidget {
 			} catch (Exception e) {
 				EmiLog.error("Error initializing JEI tooltip", e);
 			}
-		}
+		}*/ // TODO
 	}
 
 	@Override

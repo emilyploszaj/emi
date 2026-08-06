@@ -1,7 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.fabricmc.loom.task.RemapJarTask
-import net.fabricmc.loom.task.RemapSourcesJarTask
-
 buildscript {
 	repositories {
 		mavenCentral()
@@ -15,7 +11,7 @@ buildscript {
 
 plugins {
 	id "dev.architectury.loom"
-	id "com.github.johnrengelman.shadow" version "7.1.2"
+	id "com.gradleup.shadow" version "8.3.6"
 }
 if (System.getenv("MODRINTH_TOKEN")) {
 	apply plugin: "com.modrinth.minotaur"
@@ -42,11 +38,18 @@ loom {
 }
 
 configurations {
-	common
-	shadowCommon
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
 	compileClasspath.extendsFrom common
 	runtimeClasspath.extendsFrom common
 	developmentFabric.extendsFrom common
+
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
 }
 
 repositories {
@@ -62,8 +65,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 	modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-	common(project(path: ":xplat", configuration: "namedElements")) { transitive false }
-	shadowCommon(project(path: ":xplat", configuration: "transformProductionFabric")) { transitive false }
+	common(project(path: ":xplat", configuration: "namedElements")) { transitive = false }
+    shadowBundle(project(path: ":xplat", configuration: "transformProductionFabric"))
 
 	modCompileOnly("mezz.jei:${rootProject.jei_version}") {
 		transitive = false
@@ -79,41 +82,35 @@ processResources {
 	}
 }
 
-def shadowJar = tasks.named('shadowJar', ShadowJar)
-
-shadowJar.configure { ShadowJar jar ->
-	jar.exclude "architectury.common.json"
-
-	jar.configurations = [project.configurations.shadowCommon]
-	jar.archiveClassifier = "dev-shadow"
+shadowJar {
+    exclude "architectury.common.json"
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
 }
 
-def remapJar = tasks.named('remapJar', RemapJarTask)
-
-remapJar.configure { RemapJarTask jar ->
-	dependsOn shadowJar
-	jar.inputFile.convention(shadowJar.flatMap {it.archiveFile })
-	jar.injectAccessWidener = true
+remapJar {
+    dependsOn shadowJar
+    inputFile.convention(shadowJar.archiveFile)
+    injectAccessWidener = true
 }
 
-tasks.named('sourcesJar', Jar).configure { Jar jar ->
-	def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
+sourcesJar {
+    def commonSources = project(":xplat").tasks.named("sourcesJar", Jar)
 	dependsOn commonSources
-	jar.from zipTree(commonSources.flatMap { it.archiveFile })
+	from zipTree(commonSources.flatMap { it.archiveFile })
 }
 
 def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
-	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
-	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
+	dependsOn tasks.remapSourcesJar
+	from zipTree(tasks.remapSourcesJar.archiveFile)
 	exclude 'dev/emi/emi/jemi/**'
 })
 
 def apiJar = tasks.register('apiJar', Jar, {
 	archiveClassifier = 'api'
-	dependsOn remapJar
-	from zipTree(remapJar.flatMap { it.archiveFile })
+	dependsOn tasks.remapJar
+	from zipTree(remapJar.archiveFile)
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
 	include 'emi-fabric.mixins.json'
@@ -127,7 +124,7 @@ def apiJar = tasks.register('apiJar', Jar, {
 	exclude 'dev/emi/emi/api/stack/ListEmiIngredient**'
 })
 
-tasks.named("build").configure {
+build {
 	dependsOn(filteredSourcesJar, apiJar)
 }
 

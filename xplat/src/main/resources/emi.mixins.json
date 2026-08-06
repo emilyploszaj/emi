@@ -18,7 +18,7 @@
     "accessor.SmithingTransformRecipeAccessor",
     "accessor.SmithingTrimRecipeAccessor",
     "jei.PluginCallerMixin",
-    "AbstractInventoryScreenMixin",
+    "StatusEffectsDisplayMixin",
     "CraftingResultSlotMixin",
     "DrawContextMixin",
     "GlobalMixin",

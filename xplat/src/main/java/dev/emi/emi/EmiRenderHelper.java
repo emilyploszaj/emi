@@ -3,11 +3,9 @@ package dev.emi.emi;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -34,7 +32,6 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
@@ -85,36 +82,38 @@ public class EmiRenderHelper {
 		context.drawTexture(texture, x + coriw, y + corih, cor,        cor,         u + corcen, v + corcen, cor, cor, 256, 256);
 	}
 
-	public static void drawTintedSprite(MatrixStack matrices, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
+	public static void drawTintedSprite(EmiDrawContext context, Sprite sprite, int color, int x, int y, int xOff, int yOff, int width, int height) {
 		if (sprite == null) {
 			return;
 		}
-		EmiPort.setPositionColorTexShader();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
-		RenderSystem.enableBlend();
-		
-		float r = ((color >> 16) & 255) / 256f;
-		float g = ((color >> 8) & 255) / 256f;
-		float b = (color & 255) / 256f;
-		
-		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-		float xMin = (float) x;
-		float yMin = (float) y;
-		float xMax = xMin + width;
-		float yMax = yMin + height;
-		float uSpan = sprite.getMaxU() - sprite.getMinU();
-		float vSpan = sprite.getMaxV() - sprite.getMinV();
-		float uMin = sprite.getMinU() + uSpan / 16 * xOff;
-		float vMin = sprite.getMinV() + vSpan / 16 * yOff;
-		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
-		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
-		Matrix4f model = matrices.peek().getPositionMatrix();
-		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax);
-		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax);
-		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin);
-		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin);
-		EmiPort.draw(bufferBuilder);
+        context.drawSpriteStretched(sprite, x + xOff, y + yOff, width, height, color);
+
+        //		EmiPort.setPositionColorTexShader();
+//		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+//		RenderSystem.setShaderTexture(0, sprite.getAtlasId());
+//		RenderSystem.enableBlend();
+//
+//		float r = ((color >> 16) & 255) / 256f;
+//		float g = ((color >> 8) & 255) / 256f;
+//		float b = (color & 255) / 256f;
+//
+//		BufferBuilder bufferBuilder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+//		float xMin = (float) x;
+//		float yMin = (float) y;
+//		float xMax = xMin + width;
+//		float yMax = yMin + height;
+//		float uSpan = sprite.getMaxU() - sprite.getMinU();
+//		float vSpan = sprite.getMaxV() - sprite.getMinV();
+//		float uMin = sprite.getMinU() + uSpan / 16 * xOff;
+//		float vMin = sprite.getMinV() + vSpan / 16 * yOff;
+//		float uMax = sprite.getMaxU() - uSpan / 16 * (16 - (width + xOff));
+//		float vMax = sprite.getMaxV() - vSpan / 16 * (16 - (height + yOff));
+//		Matrix4f model = matrices.peek().getPositionMatrix();
+//		bufferBuilder.vertex(model, xMin, yMax, 1).color(r, g, b, 1).texture(uMin, vMax);
+//		bufferBuilder.vertex(model, xMax, yMax, 1).color(r, g, b, 1).texture(uMax, vMax);
+//		bufferBuilder.vertex(model, xMax, yMin, 1).color(r, g, b, 1).texture(uMax, vMin);
+//		bufferBuilder.vertex(model, xMin, yMin, 1).color(r, g, b, 1).texture(uMin, vMin);
+//		EmiPort.draw(bufferBuilder);
 	}
 
 	public static void drawScroll(EmiDrawContext context, int x, int y, int width, int height, int progress, int total, int color) {
@@ -204,19 +203,19 @@ public class EmiRenderHelper {
 				mutable.add(comp);
 			}
 		}
-		context.enableDepthTest();
-		EmiPort.setPositionTexShader();
-		context.resetColor();
-		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner);
+//		context.enableDepthTest();
+//		EmiPort.setPositionTexShader();
+//		context.resetColor();
+		((DrawContextAccessor) context.raw()).invokeDrawTooltip(CLIENT.textRenderer, mutable, x, y, positioner, null, false);
 	}
 
 	public static void drawSlotHightlight(EmiDrawContext context, int x, int y, int w, int h, int z) {
-		context.push();
-		context.matrices().translate(0, 0, z);
-		RenderSystem.colorMask(true, true, true, false);
+//		context.push();
+//		context.matrices().translate(0, 0, z);
+//		RenderSystem.colorMask(true, true, true, false);
 		context.fill(x, y, w, h, -2130706433);
-		RenderSystem.colorMask(true, true, true, true);
-		context.pop();
+//		RenderSystem.colorMask(true, true, true, true);
+//		context.pop();
 	}
 
 	public static Text getAmountText(EmiIngredient stack) {
@@ -257,29 +256,29 @@ public class EmiRenderHelper {
 	}
 
 	public static void renderAmount(EmiDrawContext context, int x, int y, Text amount) {
-		context.push();
-		context.matrices().translate(0, 0, 200);
+//		context.push();
+//		context.matrices().translate(0, 0, 200);
 		int tx = x + 17 - Math.min(14, CLIENT.textRenderer.getWidth(amount));
 		context.drawTextWithShadow(amount, tx, y + 9, -1);
-		context.pop();
+//		context.pop();
 	}
 
 	public static void renderIngredient(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
-		context.enableDepthTest();
-		context.push();
-		context.matrices().translate(0, 0, 200);
-		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
+//		context.enableDepthTest();
+//		context.push();
+//		context.matrices().translate(0, 0, 200);
+//		RenderSystem.setShaderTexture(0, EmiRenderHelper.WIDGETS);
 		context.drawTexture(WIDGETS, x, y, 8, 252, 4, 4);
-		context.pop();
+//		context.pop();
 	}
 
 	public static void renderTag(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
 		if (ingredient.getEmiStacks().size() > 1) {
-			context.enableDepthTest();
-			context.push();
-			context.matrices().translate(0, 0, 200);
+//			context.enableDepthTest();
+//			context.push();
+//			context.matrices().translate(0, 0, 200);
 			context.drawTexture(WIDGETS, x, y + 12, 0, 252, 4, 4);
-			context.pop();
+//			context.pop();
 		}
 	}
 
@@ -290,11 +289,11 @@ public class EmiRenderHelper {
 				if (remainder.equals(ingredient)) {
 					renderCatalyst(ingredient, context, x, y);
 				} else {
-					context.push();
-					context.matrices().translate(0, 0, 200);
-					context.enableDepthTest();
+//					context.push();
+//					context.matrices().translate(0, 0, 200);
+//					context.enableDepthTest();
 					context.drawTexture(WIDGETS, x + 12, y, 4, 252, 4, 4);
-					context.pop();
+//					context.pop();
 				}
 				return;
 			}
@@ -302,20 +301,20 @@ public class EmiRenderHelper {
 	}
 
 	public static void renderCatalyst(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
-		context.enableDepthTest();
-		context.push();
-		context.matrices().translate(0, 0, 200);
+//		context.enableDepthTest();
+//		context.push();
+//		context.matrices().translate(0, 0, 200);
 		context.drawTexture(WIDGETS, x + 12, y, 12, 252, 4, 4);
-		context.pop();
+//		context.pop();
 		return;
 	}
 
 	public static void renderRecipeFavorite(EmiIngredient ingredient, EmiDrawContext context, int x, int y) {
-		context.push();
-		context.matrices().translate(0, 0, 200);
-		context.enableDepthTest();
+//		context.push();
+//		context.matrices().translate(0, 0, 200);
+//		context.enableDepthTest();
 		context.drawTexture(WIDGETS, x + 12, y, 16, 252, 4, 4);
-		context.pop();
+//		context.pop();
 		return;
 	}
 
@@ -347,10 +346,10 @@ public class EmiRenderHelper {
 			};
 
 			context.push();
-			context.matrices().translate(x + 4, y + 4, 0);
+			context.matrices().translate(x + 4, y + 4/*, 0*/);
 
 			recipe.addWidgets(holder);
-			float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+			float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(false);
 			for (Widget widget : widgets) {
 				widget.render(context.raw(), -1000, -1000, delta);
 			}
@@ -371,12 +370,12 @@ public class EmiRenderHelper {
 			context.pop();
 
 			// Force translucency to match that of the recipe background
-			context.disableBlend();
-			RenderSystem.colorMask(false, false, false, true);
-			context.disableDepthTest();
-			renderRecipeBackground(recipe, context, x, y);
-			context.enableDepthTest();
-			RenderSystem.colorMask(true, true, true, true);
+//			context.disableBlend();
+//			RenderSystem.colorMask(false, false, false, true);
+//			context.disableDepthTest();
+//			renderRecipeBackground(recipe, context, x, y);
+//			context.enableDepthTest();
+//			RenderSystem.colorMask(true, true, true, true);
 			// Blend should be off by default
 		} catch (Throwable e) {
 			EmiLog.error("Error rendering recipe", e);

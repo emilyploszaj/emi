@@ -28,7 +28,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 	public EmiCookingRecipe(AbstractCookingRecipe recipe, EmiRecipeCategory category, int fuelMultiplier, boolean infiniBurn) {
 		this.id = EmiPort.getId(recipe);
 		this.category = category;
-		input = EmiIngredient.of(recipe.getIngredients().get(0));
+		input = EmiIngredient.of(recipe.ingredient());
 		output = EmiStack.of(EmiPort.getOutput(recipe));
 		if (input.getEmiStacks().get(0).getItemStack().isOf(Items.WET_SPONGE)) {
 			input.getEmiStacks().get(0).setRemainder(EmiStack.of(Fluids.WATER, FluidUnit.BUCKET));

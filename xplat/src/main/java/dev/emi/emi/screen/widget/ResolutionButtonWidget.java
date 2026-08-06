@@ -30,8 +30,8 @@ public class ResolutionButtonWidget extends ButtonWidget {
 		this.hoveredWidget = hoveredWidget;
 	}
 
-	@Override
-	public void renderWidget(DrawContext raw, int mouseX, int mouseY, float delta) {
+    @Override
+    protected void drawIcon(DrawContext raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int u = 0;
 		if (this.isHovered()) {
@@ -55,5 +55,6 @@ public class ResolutionButtonWidget extends ButtonWidget {
 			), mouseX, mouseY);
 		}
 		stack.render(raw, x + 1, y + 1, delta);
-	}
+    }
+
 }
