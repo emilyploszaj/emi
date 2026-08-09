@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,7 +32,6 @@ import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.ProgressState;
-import dev.emi.emi.bom.TreeCost;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
@@ -51,8 +49,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -79,6 +75,7 @@ public class BoMScreen extends Screen {
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
+	private boolean shouldFullRenderNodes = true;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
@@ -96,6 +93,7 @@ public class BoMScreen extends Screen {
 
 	public void recalculateTree() {
 		help = new Bounds(width - 18, height - 18, 16, 16);
+		shouldFullRenderNodes = true;
 		if (BoM.tree != null) {
 			TreeVolume volume = addNewNodes(BoM.tree.goal, BoM.tree.batches, 1, 0, ChanceState.DEFAULT);
 			nodes = volume.nodes;
@@ -212,6 +210,8 @@ public class BoMScreen extends Screen {
 
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
+		
+		Bounds scaledScreenBounds = new Bounds(-(scaledWidth/2) - (int) offX, -(scaledHeight/2) - (int) offY, scaledWidth, scaledHeight);
 
 		Matrix4fStack view = RenderSystem.getModelViewStack();
 		view.pushMatrix();
@@ -230,8 +230,22 @@ public class BoMScreen extends Screen {
 				cost.render(context);
 			}
 			for (Node node : nodes) {
-				node.render(context, mx, my, delta);
+				if(shouldFullRenderNodes) {
+					node.render(context, mx, my, delta);
+					if(EmiConfig.recipeTreeBoundingBoxes) {
+						node.renderBoundingBox(context);
+					}
+				} else {
+					Bounds nodeBounds = node.getBoundingBox();
+					if(!nodeBounds.overlap(scaledScreenBounds).empty()) {
+						node.render(context, mx, my, delta);
+						if(EmiConfig.recipeTreeBoundingBoxes) {
+							node.renderBoundingBox(context);
+						}
+					}
+				}
 			}
+			shouldFullRenderNodes = false;
 			int color = -1;
 			if (batches.contains(mx, my)) {
 				color = 0xff8099ff;
@@ -730,6 +744,41 @@ public class BoMScreen extends Screen {
 			context.setColor(1f, 1f, 1f, 1f);
 			batcher.render(node.ingredient, context.raw(), x + xo - 8 + midOffset, y - 8, 0);
 			EmiRenderHelper.renderAmount(context, x + xo - 8 + midOffset, y - 8, getAmountText());
+		}
+		
+		public void renderBoundingBox(EmiDrawContext context) {
+			Bounds bounds = getBoundingBox();
+			context.push();
+			
+			context.setColor(0.5f,0.5f,0.5f,0.2f);
+			drawLine(context, bounds.x(), bounds.y(), this.x, this.y);
+			if(parent != null) {
+				drawLine(context, ((parent.x - this.x)/2 + this.x) - 2, ((parent.y - this.y)/2 + this.y) - 2, ((parent.x - this.x)/2 + this.x) + 2, ((parent.y - this.y)/2 + this.y) + 2);
+			}
+			
+			context.setColor(1, 0, 0);
+			drawLine(context, bounds.x(), bounds.y(), (bounds.right()), bounds.y());
+			drawLine(context, bounds.x(), bounds.y(), bounds.x(), (bounds.bottom()));
+			drawLine(context, (bounds.right()), bounds.y(), (bounds.right()), (bounds.bottom()));
+			drawLine(context, bounds.x(), (bounds.bottom()), (bounds.right()), (bounds.bottom()));
+			
+			context.pop();
+		}
+		
+		public Bounds getBoundingBox() {
+			
+			if(parent != null) {
+				int bw = this.width + 10 + (Math.abs(parent.x - this.x));
+				int bh = NODE_VERTICAL_SPACING + 10 + (Math.abs(parent.y - this.y));
+				int bx = ((parent.x - this.x)/2 + this.x) - bw/2;
+				int by = ((parent.y - this.y)/2 + this.y) - bh/2;
+				return new Bounds(bx, by, bw, bh);
+			}
+			int bw = this.width + 10;
+			int bh = NODE_VERTICAL_SPACING + 10;
+			int bx = x - bw/2;
+			int by = y - bh/2;
+			return new Bounds(bx, by, bw, bh);
 		}
 
 		public void setColor(EmiDrawContext context, MaterialNode node, boolean chanced, boolean hovered) {
