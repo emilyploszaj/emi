@@ -144,6 +144,10 @@ public class EmiConfig {
 	@ConfigValue("ui.recipe-tree-button-visibility")
 	public static ButtonVisibility recipeTreeButtonVisibility = ButtonVisibility.AUTO;
 
+	@Comment("Whether the shared recipe should be visible in chat.")
+	@ConfigValue("ui.recipe-share-chat-message-visibility")
+	public static boolean recipeShareChatMessageVisibility = true;
+
 	@ConfigGroup("ui.recipe-screen")
 	@Comment("The maximum height the recipe screen will grow to be if space is available in pixels.")
 	@ConfigValue("ui.maximum-recipe-screen-height")
@@ -184,6 +188,10 @@ public class EmiConfig {
 	@Comment("Whether recipes should have a button to fill the ingredients in a handler.")
 	@ConfigValue("ui.recipe-fill-button")
 	public static boolean recipeFillButton = true;
+
+	@Comment("Whether recipes should have a button to share current recipe to other players.")
+	@ConfigValue("ui.recipe-share-button")
+	public static boolean recipeShareButton = false;
 
 	@Comment("Whether recipes should have a button to take a screenshot of the recipe.")
 	@ConfigValue("ui.recipe-screenshot-button")
@@ -382,6 +390,10 @@ public class EmiConfig {
 	@Comment("Favorite the item to display on the side of the screen opposite of recipies for quick access.")
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
+
+	@Comment("Share the recipe in chat to other players for quick access.")
+	@ConfigValue("binds.share")
+	public static EmiBind share = new EmiBind("key.emi.share", GLFW.GLFW_KEY_T);
 
 	@Comment("Set the default recipe for a given stack in the output of a recipe to that recipe.")
 	@ConfigValue("binds.default-stack")

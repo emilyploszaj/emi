@@ -20,6 +20,7 @@ import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
+import dev.emi.emi.runtime.EmiShareRecipe;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
@@ -246,6 +247,9 @@ public class SlotWidget extends Widget {
 				}
 			} else if (EmiConfig.favorite.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiFavorites.canFavorite(getStack(), getRecipe())) {
 				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.favorite_recipe", EmiConfig.favorite.getBindText()))));
+			}
+			if (EmiConfig.share.isBound() && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiShareRecipe.isSupportedRecipe(recipe)) {
+				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.resolve.share", EmiConfig.share.getBindText()))));
 			}
 			if (EmiConfig.showCostPerBatch && recipe.supportsRecipeTree() && !(recipe instanceof EmiResolutionRecipe)) {
 				RecipeCostTooltipComponent rctc = new RecipeCostTooltipComponent(recipe);

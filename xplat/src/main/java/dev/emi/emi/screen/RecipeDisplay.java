@@ -17,6 +17,7 @@ import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
+import dev.emi.emi.widget.RecipeShareButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -48,6 +49,9 @@ public class RecipeDisplay {
 		}
 		if (EmiConfig.recipeScreenshotButton) {
 			leftButtons.add(ButtonType.SCREENSHOT);
+		}
+		if (EmiConfig.recipeShareButton) {
+			leftButtons.add(ButtonType.SHARE);
 		}
 		rows = Math.max(1, (height + DISPLAY_PADDING + 2) / 14);
 		leftWidth = Math.max(0, (leftButtons.size() + rows - 1) / rows * 14 - 1);
@@ -119,6 +123,7 @@ public class RecipeDisplay {
 					case TREE -> new RecipeTreeButtonWidget(bx, by, recipe);
 					case DEFAULT -> new RecipeDefaultButtonWidget(bx, by, recipe);
 					case SCREENSHOT -> new RecipeScreenshotButtonWidget(bx, by, recipe);
+					case SHARE -> new RecipeShareButtonWidget(bx, by, recipe);
 				});
 				yOff += 14;
 			}
@@ -147,6 +152,7 @@ public class RecipeDisplay {
 		FILL,
 		TREE,
 		DEFAULT,
-		SCREENSHOT
+		SCREENSHOT,
+		SHARE;
 	}
 }

@@ -11,6 +11,7 @@ public enum SidebarType implements ConfigEnum {
 	FAVORITES("favorites", 32, 146),
 	LOOKUP_HISTORY("lookup-history", 80, 146),
 	CRAFT_HISTORY("craft-history", 64, 146),
+	SHARE_HISTORY("share", 112, 146),
 	EMPTY("empty", 96, 146),
 	CHESS("chess", 48, 146),
 	;

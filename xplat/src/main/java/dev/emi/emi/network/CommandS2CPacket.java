@@ -5,6 +5,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.registry.EmiCommands;
+import dev.emi.emi.runtime.EmiShareRecipe;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
@@ -13,16 +14,28 @@ import net.minecraft.util.Identifier;
 public class CommandS2CPacket implements EmiPacket {
 	private final byte type;
 	private final Identifier id;
+	private String extraInfo;
 
 	public CommandS2CPacket(byte type, Identifier id) {
 		this.type = type;
 		this.id = id;
 	}
 
+	public CommandS2CPacket(byte type, Identifier id, String extraInfo) {
+		this.type = type;
+		this.id = id;
+		this.extraInfo = extraInfo;
+
+	}
+
 	public CommandS2CPacket(PacketByteBuf buf) {
 		type = buf.readByte();
 		if (type == EmiCommands.VIEW_RECIPE || type == EmiCommands.TREE_GOAL || type == EmiCommands.TREE_RESOLUTION) {
 			id = buf.readIdentifier();
+		} else if (type == EmiCommands.SHARE_RECIPE) {
+			id = buf.readIdentifier();
+			extraInfo = buf.readString();
+
 		} else {
 			id = null;
 		}
@@ -33,6 +46,9 @@ public class CommandS2CPacket implements EmiPacket {
 		buf.writeByte(type);
 		if (type == EmiCommands.VIEW_RECIPE || type == EmiCommands.TREE_GOAL || type == EmiCommands.TREE_RESOLUTION) {
 			buf.writeIdentifier(id);
+		} else if (type == EmiCommands.SHARE_RECIPE) {
+			buf.writeIdentifier(id);
+			buf.writeString(this.extraInfo);
 		}
 	}
 
@@ -57,6 +73,8 @@ public class CommandS2CPacket implements EmiPacket {
 					BoM.tree.addResolution(stack, recipe);
 				}
 			}
+		} else if (type == EmiCommands.SHARE_RECIPE) {
+			EmiShareRecipe.receiveMessage(player, id, extraInfo);
 		}
 	}
 
