@@ -23,22 +23,22 @@ Here are common dependency setups for different loaders and build systems.
 ```gradle
 dependencies {
 	// Fabric
-	modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
-	modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
+	modCompileOnly "dev.emi:emi-fabric:${emi_version}+${minecraft_version}:api"
+	modLocalRuntime "dev.emi:emi-fabric:${emi_version}+${minecraft_version}"
 
 	// Forge (see below block as well if you use Forge Gradle)
-	compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}:api")
-	runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}") 
+	compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}+${minecraft_version}:api")
+	runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}+${minecraft_version}") 
 
 	// NeoForge
-	compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-	runtimeOnly "dev.emi:emi-neoforge:${emi_version}" 
+	compileOnly "dev.emi:emi-neoforge:${emi_version}+${minecraft_version}:api"
+	runtimeOnly "dev.emi:emi-neoforge:${emi_version}+${minecraft_version}" 
 
 	// Architectury
-	modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
+	modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}+${minecraft_version}:api"
 
 	// MultiLoader Template/VanillaGradle
-	compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}:api"
+	compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}+${minecraft_version}:api"
 }
 ```
 
