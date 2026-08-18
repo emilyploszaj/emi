@@ -10,8 +10,6 @@ import dev.emi.emi.screen.widget.config.ListWidget.Entry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 public class GroupNameWidget extends Entry {
@@ -55,7 +53,7 @@ public class GroupNameWidget extends Entry {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (isMouseOver(mouseX, mouseY)) {
 			collapsed = !collapsed;
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			EmiPort.playClickSound();
 			return true;
 		}
 		return false;

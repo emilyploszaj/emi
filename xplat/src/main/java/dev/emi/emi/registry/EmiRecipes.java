@@ -31,17 +31,14 @@ import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import dev.emi.emi.runtime.dev.EmiDev;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeManager;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
@@ -56,8 +53,6 @@ public class EmiRecipes {
 
 	public static Map<EmiStack, List<EmiRecipe>> byWorkstation = Maps.newHashMap();
 	public static List<EmiRecipeDecorator> decorators = Lists.newArrayList();
-
-	public static Map<Recipe<?>, Identifier> recipeIds = Map.of();
 	
 	public static void clear() {
 		setWorker(null);
@@ -69,16 +64,7 @@ public class EmiRecipes {
 		byWorkstation.clear();
 		decorators.clear();
 		manager = Manager.EMPTY;
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world != null) {
-			RecipeManager manager = client.world.getRecipeManager();
-			recipeIds = new Reference2ObjectOpenHashMap<>();
-			if (manager != null) {
-				for (RecipeEntry<?> entry : manager.values()) {
-					recipeIds.put(entry.value(), entry.id());
-				}
-			}
-		}
+		ProxyRecipeManager.bakeIds();
 	}
 
 	public static void bake() {
@@ -181,7 +167,7 @@ public class EmiRecipes {
 						byId.put(id, recipe);
 					}
 
-					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !recipeIds.containsValue(id)) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !ProxyRecipeManager.hasId(id)) {
 						incorrectIds.add(id);
 					}
 				}

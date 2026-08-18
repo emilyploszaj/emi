@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadManager;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 
@@ -27,8 +28,7 @@ public class MinecraftClientMixin {
 		CompletableFuture<Void> future = info.getReturnValue();
 		if (future != null) {
 			future.thenRunAsync(() -> {
-				MinecraftClient client = MinecraftClient.getInstance();
-				if (client.world != null && client.world.getRecipeManager() != null) {
+				if (ProxyRecipeManager.isAvailable()) {
 					EmiReloadManager.reload();
 				}
 			}, Executors.newFixedThreadPool(1));

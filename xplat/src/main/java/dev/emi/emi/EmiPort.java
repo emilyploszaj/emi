@@ -7,21 +7,13 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BannerPatternsComponent;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.registry.RegistryKeys;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.stack.Comparison;
-import dev.emi.emi.registry.EmiRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.TallFlowerBlock;
-import net.minecraft.block.entity.BannerPattern;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -32,19 +24,24 @@ import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BannerPatternsComponent;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
@@ -194,21 +191,6 @@ public final class EmiPort {
 		return getItemRegistry().stream().filter(i -> !i.isEnabled(fs));
 	}
 
-	public static Identifier getId(Recipe<?> recipe) {
-		return EmiRecipes.recipeIds.get(recipe);
-	}
-
-	public static @Nullable RecipeEntry<?> getRecipe(Identifier id) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world != null && id != null) {
-			RecipeManager manager = client.world.getRecipeManager();
-			if (manager != null) {
-				return manager.get(id).orElse(null);
-			}
-		}
-		return null;
-	}
-
 	public static Comparison compareStrict() {
 		return Comparison.compareComponents();
 	}
@@ -232,5 +214,9 @@ public final class EmiPort {
 
 	public static void applyModelViewMatrix() {
 		RenderSystem.applyModelViewMatrix();
+	}
+
+	public static void playClickSound() {
+		MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 	}
 }

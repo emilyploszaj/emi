@@ -43,7 +43,7 @@ public abstract class HandledScreenMixin extends Screen {
 		}
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.push();
-		context.matrices().translate(-x, -y, 0.0);
+		context.translate(-x, -y);
 		EmiPort.setPositionTexShader();
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);

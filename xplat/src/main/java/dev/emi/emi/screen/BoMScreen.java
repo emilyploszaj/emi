@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,7 +32,6 @@ import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.ProgressState;
-import dev.emi.emi.bom.TreeCost;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
@@ -50,10 +48,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -478,13 +472,13 @@ public class BoMScreen extends Screen {
 				}
 			}
 		} else if (mode.contains(mx, my)) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			EmiPort.playClickSound();
 			BoM.craftingMode = !BoM.craftingMode;
 			recalculateTree();
 		} else if (batches.contains(mx, my) && BoM.tree != null) {
 			long ideal = BoM.tree.cost.getIdealBatch(BoM.tree.goal, 1, 1);
 			if (ideal != BoM.tree.batches) {
-				MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+				EmiPort.playClickSound();
 				BoM.tree.batches = ideal;
 				recalculateTree();
 			}

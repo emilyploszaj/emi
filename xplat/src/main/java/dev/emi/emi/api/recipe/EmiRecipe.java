@@ -8,6 +8,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
@@ -100,6 +101,6 @@ public interface EmiRecipe {
 	 *  By default, uses the result of {@link EmiRecipe#getId()} to look up in the RecipeManager.
 	 */
 	default @Nullable RecipeEntry<?> getBackingRecipe() {
-		return EmiPort.getRecipe(getId());
+		return ProxyRecipeManager.getRecipeEntry(getId());
 	}
 }

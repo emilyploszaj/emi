@@ -73,7 +73,7 @@ public class EmiClientForge {
 		if (base != null) {
 			MinecraftClient client = MinecraftClient.getInstance();
 			context.push();
-			context.matrices().translate(-screen.getGuiLeft(), -screen.getGuiTop(), 0.0);
+			context.translate(-screen.getGuiLeft(), -screen.getGuiTop());
 			EmiPort.setPositionTexShader();
 			EmiScreenManager.render(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());
 			EmiScreenManager.drawForeground(context, event.getMouseX(), event.getMouseY(), client.getTickDelta());

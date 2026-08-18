@@ -39,6 +39,10 @@ public class EmiDrawContext {
 		matrices().pop();
 	}
 
+	public void translate(float x, float y) {
+		matrices().translate(x, y, 0);
+	}
+
 	public void drawTexture(Identifier texture, int x, int y, int u, int v, int width, int height) {
 		drawTexture(texture, x, y, width, height, u, v, width, height, 256, 256);
 	}

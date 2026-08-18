@@ -149,7 +149,7 @@ public class EmiReloadManager {
 					if (client.world == null) {
 						EmiReloadLog.warn("World is null");
 						break;
-					} else if (client.world.getRecipeManager() == null) {
+					} else if (!ProxyRecipeManager.isAvailable()) {
 						EmiReloadLog.warn("Recipe Manager is null");
 						break;
 					}
