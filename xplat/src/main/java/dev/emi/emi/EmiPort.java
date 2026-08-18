@@ -65,7 +65,13 @@ public final class EmiPort {
 	}
 
 	public static MutableText literal(String s, Formatting... formatting) {
-		return Text.literal(s).formatted(formatting);
+		MutableText text = Text.literal(s);
+		for (Formatting f : formatting) {
+			if (f != null) {
+				text = text.formatted(f);
+			}
+		}
+		return text;
 	}
 
 	public static MutableText literal(String s, Style style) {
