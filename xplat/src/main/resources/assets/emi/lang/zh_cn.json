@@ -9,6 +9,9 @@
   "config.emi.tooltip.binds.focus_search": "聚焦至EMI搜索栏",
   "key.emi.clear_search": "清空搜索栏",
   "config.emi.tooltip.binds.clear_search": "清空EMI搜索栏",
+  "key.emi.display_all_recipes": "显示全部配方",
+  "config.emi.tooltip.binds.display_all_recipes": "显示游戏中所有可用的配方",
+
   "key.emi.view_recipes": "查看配方",
   "config.emi.tooltip.binds.view_recipes": "查看选中物品的配方",
   "key.emi.view_uses": "查看用途",
@@ -299,7 +302,7 @@
   "emi.reloading": "EMI重载中...",
   "emi.reloading.waiting": "EMI正等待服务器发送配方信息...",
   "emi.reloading.error": "§cEMI重载时出现严重错误，请查看日志",
-  "emi.reloading.worry": "§c延迟较大，网络还正常吗？",
+  "emi.reloading.worry": "§c遇到延迟，一切都还顺利吗？",
   "emi.reloading.still_baking_recipes": "§d正在处理配方...",
   "emi.search": "搜索EMI...",
   "emi.search_config": "搜索设置项...",

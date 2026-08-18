@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -220,7 +219,7 @@ public class RecipeScreen extends Screen {
 			int mx = mouseX - group.x();
 			int my = mouseY - group.y();
 			context.push();
-			context.matrices().translate(group.x(), group.y(), 0);
+			context.translate(group.x(), group.y());
 			EmiPort.applyModelViewMatrix();
 			try {
 				for (Widget widget : group.widgets) {
@@ -414,7 +413,7 @@ public class RecipeScreen extends Screen {
 		pressedSlot = null;
 		if (mouseX >= x + 19 + buttonOff && mouseY >= y + 5 && mouseX < x + minimumWidth + buttonOff - 19 && mouseY <= y + 5 + 12) {
 			EmiApi.displayAllRecipes();
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			EmiPort.playClickSound();
 			return true;
 		}
 		for (WidgetGroup group : currentPage) {
@@ -449,7 +448,7 @@ public class RecipeScreen extends Screen {
 		}
 		RecipeTab rTab = getTabAt(mx, my);
 		if (rTab != null) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			EmiPort.playClickSound();
 			focusCategory(rTab.category);
 			return true;
 		}

@@ -1,5 +1,7 @@
 package dev.emi.emi.search;
 
+import net.minecraft.item.BlockItem;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +17,7 @@ public class TagQuery extends Query {
 	public TagQuery(String name) {
 		String lowerName = name.toLowerCase();
 		valid = Stream.<EmiTagKey<?>>concat(
-			EmiTagKey.fromRegistry(EmiPort.getItemRegistry()),
+			EmiTags.TAGS.stream(),
 			EmiTagKey.fromRegistry(EmiPort.getBlockRegistry())
 		).filter(t -> {
 			if (t.hasTranslation()) {
@@ -32,6 +34,9 @@ public class TagQuery extends Query {
 
 	@Override
 	public boolean matches(EmiStack stack) {
+		if (stack.getKey() instanceof BlockItem bi && valid.contains(bi.getBlock())) {
+			return true;
+		}
 		return valid.contains(stack.getKey());
 	}
 }

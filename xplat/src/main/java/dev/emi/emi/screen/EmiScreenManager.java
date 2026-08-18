@@ -43,7 +43,6 @@ import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.config.SidebarTheme;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.input.EmiBind;
-import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.network.CreateItemC2SPacket;
 import dev.emi.emi.network.EmiNetwork;
@@ -77,12 +76,11 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.command.argument.ItemStackArgument;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -880,7 +878,7 @@ public class EmiScreenManager {
 		}
 		if (base.screen() instanceof HandledScreen<?> hs && hs instanceof HandledScreenAccessor hsa) {
 			context.push();
-			context.matrices().translate(hsa.getX(), hsa.getY(), 0);
+			context.translate(hsa.getX(), hsa.getY());
 			for (Slot slot : hs.getScreenHandler().slots) {
 				if (!slot.isEnabled()) {
 					continue;
@@ -1129,7 +1127,7 @@ public class EmiScreenManager {
 				return true;
 			}
 		}
-		if (EmiInput.isControlDown() && keyCode == GLFW.GLFW_KEY_Y) {
+		if (EmiConfig.displayAllRecipes.matchesKey(keyCode, scanCode)) {
 			EmiApi.displayAllRecipes();
 			return true;
 		} else {
@@ -1308,8 +1306,7 @@ public class EmiScreenManager {
 					amount = Math.min(amount, batches);
 				}
 				if (EmiRecipeFiller.performFill(context, EmiApi.getHandledScreen(), EmiCraftContext.Type.CRAFTABLE, destination, amount)) {
-					MinecraftClient.getInstance().getSoundManager()
-							.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+					EmiPort.playClickSound();
 					return true;
 				}
 			}
@@ -1326,7 +1323,7 @@ public class EmiScreenManager {
 			repopulatePanels(SidebarType.FAVORITES);
 			return true;
 		} else if (function.apply(EmiConfig.copyId)) {
-			MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+			EmiPort.playClickSound();
 			client.keyboard.setClipboard("" + recipe.getId());
 			return true;
 		}

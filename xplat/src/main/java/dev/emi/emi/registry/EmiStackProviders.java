@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiStackProvider;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -14,7 +13,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import dev.emi.emi.mixin.accessor.CraftingResultSlotAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
-import net.minecraft.client.MinecraftClient;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -58,11 +57,9 @@ public class EmiStackProviders {
 						// Emi be making assumptions
 						try {
 							CraftingInventory inv = ((CraftingResultSlotAccessor) craf).getInput();
-							MinecraftClient client = MinecraftClient.getInstance();
-							List<CraftingRecipe> list
-								= client.world.getRecipeManager().getAllMatches(RecipeType.CRAFTING, inv, client.world);
-							if (!list.isEmpty()) {
-								Identifier id = EmiPort.getId(list.get(0));
+							CraftingRecipe crafting = ProxyRecipeManager.getFirst(RecipeType.CRAFTING, inv);
+							if (crafting != null) {
+								Identifier id = ProxyRecipeManager.getId(crafting);
 								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 								if (recipe != null) {
 									return new EmiStackInteraction(EmiStack.of(stack), recipe, false);

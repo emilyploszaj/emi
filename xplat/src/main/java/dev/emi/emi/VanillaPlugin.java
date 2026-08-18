@@ -93,6 +93,7 @@ import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
 import dev.emi.emi.runtime.EmiTagKey;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ListEmiIngredientSerializer;
@@ -335,7 +336,7 @@ public class VanillaPlugin implements EmiPlugin {
 		List<Item> dyeableItems = EmiPort.getItemRegistry().stream().filter(i -> i instanceof DyeableItem).collect(Collectors.toList());
 
 		for (CraftingRecipe recipe : getRecipes(registry, RecipeType.CRAFTING)) {
-			Identifier id = EmiPort.getId(recipe);
+			Identifier id = ProxyRecipeManager.getId(recipe);
 			if (recipe instanceof MapExtendingRecipe map) {
 				EmiStack paper = EmiStack.of(Items.PAPER);
 				addRecipeSafe(registry, () -> new EmiCraftingRecipe(List.of(
@@ -835,7 +836,7 @@ public class VanillaPlugin implements EmiPlugin {
 		try {
 			registry.addRecipe(supplier.get());
 		} catch (Throwable e) {
-			EmiReloadLog.warn("Exception thrown when parsing vanilla recipe " + EmiPort.getId(recipe), e);
+			EmiReloadLog.warn("Exception thrown when parsing vanilla recipe " + ProxyRecipeManager.getId(recipe), e);
 		}
 	}
 
