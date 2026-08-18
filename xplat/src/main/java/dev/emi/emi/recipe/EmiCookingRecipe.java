@@ -10,6 +10,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.config.FluidUnit;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
@@ -26,7 +27,7 @@ public class EmiCookingRecipe implements EmiRecipe {
 	private final boolean infiniBurn;
 	
 	public EmiCookingRecipe(AbstractCookingRecipe recipe, EmiRecipeCategory category, int fuelMultiplier, boolean infiniBurn) {
-		this.id = EmiPort.getId(recipe);
+		this.id = ProxyRecipeManager.getId(recipe);
 		this.category = category;
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
 		output = EmiStack.of(EmiPort.getOutput(recipe));

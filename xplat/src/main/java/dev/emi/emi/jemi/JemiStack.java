@@ -53,7 +53,7 @@ public class JemiStack<T> extends EmiStack {
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
 		context.push();
-		context.matrices().translate(x + xOff, y + yOff, 0);
+		context.translate(x + xOff, y + yOff);
 		renderer.render(context.raw(), ingredient);
 		context.pop();
 	}

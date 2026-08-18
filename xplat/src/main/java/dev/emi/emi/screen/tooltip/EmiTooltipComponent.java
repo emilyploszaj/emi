@@ -26,7 +26,7 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	default void drawItems(TextRenderer textRenderer, int x, int y, DrawContext raw) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.push();
-		context.matrices().translate(x, y, 0);
+		context.translate(x, y);
 		MinecraftClient client = MinecraftClient.getInstance();
 		drawTooltip(context, new TooltipRenderData(textRenderer, client.getItemRenderer(), x, y));
 		context.pop();

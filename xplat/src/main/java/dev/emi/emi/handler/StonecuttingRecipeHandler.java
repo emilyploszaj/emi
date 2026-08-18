@@ -6,11 +6,11 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -19,6 +19,7 @@ import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class StonecuttingRecipeHandler implements StandardRecipeHandler<StonecutterScreenHandler> {
@@ -53,11 +54,11 @@ public class StonecuttingRecipeHandler implements StandardRecipeHandler<Stonecut
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<StonecutterScreenHandler> context) {
 		boolean action = StandardRecipeHandler.super.craft(recipe, context);
 		MinecraftClient client = MinecraftClient.getInstance();
-		World world = client.world;
 		Inventory inv = new SimpleInventory(recipe.getInputs().get(0).getEmiStacks().get(0).getItemStack());
-		List<StonecuttingRecipe> recipes = world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, inv, world);
+		List<StonecuttingRecipe> recipes = ProxyRecipeManager.getMatches(RecipeType.STONECUTTING, inv);
 		for (int i = 0; i < recipes.size(); i++) {
-			if (EmiPort.getId(recipes.get(i)) != null && EmiPort.getId(recipes.get(i)).equals(recipe.getId())) {
+			Identifier id = ProxyRecipeManager.getId(recipes.get(i));
+			if (id != null && id.equals(recipe.getId())) {
 				StonecutterScreenHandler sh = context.getScreenHandler();
 				client.interactionManager.clickButton(sh.syncId, i);
 				if (context.getDestination() == EmiCraftContext.Destination.CURSOR) {

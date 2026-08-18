@@ -10,6 +10,7 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.recipe.StonecuttingRecipe;
 import net.minecraft.util.Identifier;
 
@@ -19,7 +20,7 @@ public class EmiStonecuttingRecipe implements EmiRecipe {
 	private final EmiStack output;
 	
 	public EmiStonecuttingRecipe(StonecuttingRecipe recipe) {
-		this.id = EmiPort.getId(recipe);
+		this.id = ProxyRecipeManager.getId(recipe);
 		input = EmiIngredient.of(recipe.getIngredients().get(0));
 		output = EmiStack.of(EmiPort.getOutput(recipe));
 	}

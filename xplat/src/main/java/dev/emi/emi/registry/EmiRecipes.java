@@ -31,13 +31,14 @@ import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.runtime.EmiHidden;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadLog;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import dev.emi.emi.runtime.dev.EmiDev;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.util.Identifier;
 
 public class EmiRecipes {
@@ -63,6 +64,7 @@ public class EmiRecipes {
 		byWorkstation.clear();
 		decorators.clear();
 		manager = Manager.EMPTY;
+		ProxyRecipeManager.bakeIds();
 	}
 
 	public static void bake() {
@@ -165,8 +167,7 @@ public class EmiRecipes {
 						byId.put(id, recipe);
 					}
 
-					MinecraftClient client = MinecraftClient.getInstance();
-					if (EmiConfig.devMode && !id.getPath().startsWith("/") && client.world != null && client.world.getRecipeManager().get(id).isEmpty()) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !ProxyRecipeManager.hasId(id)) {
 						incorrectIds.add(id);
 					}
 				}

@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.runtime.EmiSidebars;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
@@ -32,9 +32,9 @@ public class CraftingResultSlotMixin {
 	private void onCrafted(ItemStack stack, CallbackInfo info) {
 		World world = player.getWorld();
 		if (world.isClient) {
-			Optional<CraftingRecipe> opt = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world);
-			if (opt.isPresent()) {
-				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.getId(opt.get()));
+			CraftingRecipe crafting = ProxyRecipeManager.getFirst(RecipeType.CRAFTING, input);
+			if (crafting != null) {
+				EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(ProxyRecipeManager.getId(crafting));
 				if (recipe != null) {
 					EmiSidebars.craft(recipe);
 				}

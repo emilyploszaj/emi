@@ -2,7 +2,6 @@ package dev.emi.emi.recipe.special;
 
 import java.util.Random;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.render.EmiTooltipComponents;
@@ -10,6 +9,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.recipe.EmiSmithingRecipe;
+import dev.emi.emi.runtime.ProxyRecipeManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -21,7 +21,7 @@ public class EmiSmithingTrimRecipe extends EmiSmithingRecipe {
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
 	public EmiSmithingTrimRecipe(EmiIngredient template, EmiIngredient input, EmiIngredient addition, EmiStack output, SmithingRecipe recipe) {
-		super(template, input, addition, output, EmiPort.getId(recipe));
+		super(template, input, addition, output, ProxyRecipeManager.getId(recipe));
 		this.recipe = recipe;
 	}
 

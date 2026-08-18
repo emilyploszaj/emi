@@ -348,7 +348,7 @@ public class EmiRenderHelper {
 			};
 
 			context.push();
-			context.matrices().translate(x + 4, y + 4, 0);
+			context.translate(x + 4, y + 4);
 
 			recipe.addWidgets(holder);
 			float delta = MinecraftClient.getInstance().getTickDelta();
