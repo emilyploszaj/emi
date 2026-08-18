@@ -162,6 +162,18 @@ public interface EmiRegistry {
 	void addGenericStackProvider(EmiStackProvider<Screen> provider);
 
 	/**
+	 * Adds an EmiStackPuller to screens of a given class.
+	 * Stack pullers take items from the currently open container and move them into the player's inventory.
+	 */
+	<T extends ScreenHandler> void addStackPuller(Class<T> clazz, EmiStackPuller<T> puller);
+
+	/**
+	 * Adds an EmiStackProvider to every screen.
+	 * Stack pullers take items from the currently open container and move them into the player's inventory.
+	 */
+	void addGenericStackPuller(EmiStackPuller<ScreenHandler> puller);
+
+	/**
 	 * Adds a default compraison method for a stack key.
 	 * @param key A stack key such as an item or fluid.
 	 * @param comparison A function to mutate the current comprison method.

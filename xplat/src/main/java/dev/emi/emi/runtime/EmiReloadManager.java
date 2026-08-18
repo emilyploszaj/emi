@@ -25,6 +25,7 @@ import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiRegistryImpl;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.registry.EmiStackProviders;
+import dev.emi.emi.registry.EmiStackPullers;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -136,6 +137,7 @@ public class EmiReloadManager {
 					EmiExclusionAreas.clear();
 					EmiDragDropHandlers.clear();
 					EmiStackProviders.clear();
+					EmiStackPullers.clear();
 					EmiRecipeFiller.clear();
 					EmiHidden.clear();
 					EmiTags.ADAPTERS_BY_CLASS.map().clear();

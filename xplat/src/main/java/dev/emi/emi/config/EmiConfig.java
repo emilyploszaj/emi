@@ -227,7 +227,7 @@ public class EmiConfig {
 	@Comment("Whether to render the header buttons and page count for the left sidebar")
 	@ConfigValue("ui.left-sidebar-header")
 	public static HeaderType leftSidebarHeader = HeaderType.VISIBLE;
-	
+
 	@ConfigGroupEnd
 	@Comment("Which theme to use for the left sidebar")
 	@ConfigValue("ui.left-sidebar-theme")
@@ -382,6 +382,10 @@ public class EmiConfig {
 	@Comment("Favorite the item to display on the side of the screen opposite of recipies for quick access.")
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
+
+	@Comment("Pull the stack from any currently open inventory that contains it.")
+	@ConfigValue("binds.pull-item")
+	public static EmiBind pullItem = new EmiBind("key.emi.pull_item", GLFW.GLFW_KEY_V);
 
 	@Comment("Set the default recipe for a given stack in the output of a recipe to that recipe.")
 	@ConfigValue("binds.default-stack")

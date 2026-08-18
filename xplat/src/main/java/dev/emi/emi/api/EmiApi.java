@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -25,6 +26,7 @@ import dev.emi.emi.recipe.EmiSyntheticIngredientRecipe;
 import dev.emi.emi.recipe.EmiTagRecipe;
 import dev.emi.emi.registry.EmiRecipes;
 import dev.emi.emi.registry.EmiStackList;
+import dev.emi.emi.registry.EmiStackPullers;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.runtime.EmiSidebars;
@@ -35,6 +37,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 
 public class EmiApi {
 	private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -168,6 +176,88 @@ public class EmiApi {
 						EmiRecipes.byWorkstation.getOrDefault(zero, List.of()).stream()).distinct().toList());
 			setPages(map, stack);
 		}
+	}
+
+	/**
+	 * Looks inside the currently open container and attempts to pull a matching item
+	 * into the player's inventory.
+	 * @param stack The item to search for and pull
+	 */
+	public static void pullItem(EmiIngredient stack) {
+		if (stack.isEmpty() || !(stack instanceof EmiFavorite)) return;
+
+		long toPull = stack.getAmount();
+		if (stack instanceof EmiFavorite.Synthetic synthetic) {
+			toPull = synthetic.amount;
+		}
+
+		MinecraftClient client = MinecraftClient.getInstance();
+		ClientPlayerInteractionManager manager = client.interactionManager;
+		PlayerEntity player = client.player;
+		ScreenHandler screenHandler = player.currentScreenHandler;
+
+		List<EmiStack> searchStacks = stack.getEmiStacks();
+
+		// Attempt to pull using any registered custom pullers, and stop on a successful pull
+		if (EmiStackPullers.attemptPull(screenHandler, searchStacks, toPull)) return;
+
+		for (EmiStack searchStack : searchStacks) {
+
+			// Sweep through all the non-player inventory slots
+			for (Slot inventorySlot : screenHandler.slots) {
+				if (inventorySlot.inventory instanceof PlayerInventory || !inventorySlot.hasStack() || !inventorySlot.canTakeItems(player)) continue;
+				
+				EmiStack fromStack = EmiStack.of(inventorySlot.getStack());
+				if (!searchStack.isEqual(fromStack)) continue;
+
+				long remaining = fromStack.getAmount();
+
+				// And attempt to smoosh it into the player inventory
+				for (Slot playerSlot : getQuickMoveDestinationSlots(screenHandler.slots, fromStack)) {
+					if (playerSlot.hasStack() && !EmiStack.of(playerSlot.getStack()).isEqual(searchStack, EmiPort.compareStrict())) continue;
+
+					EmiStack playerStack = EmiStack.of(playerSlot.getStack());
+
+					long maxTransfer = fromStack.getItemStack().getMaxCount() - playerStack.getAmount();
+					long amountToTransfer = Math.min(maxTransfer, toPull);
+
+					manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+
+					if (remaining <= amountToTransfer) {
+						manager.clickSlot(screenHandler.syncId, playerSlot.id, 0, SlotActionType.PICKUP, player);
+						toPull -= remaining;
+						remaining = 0;
+					} else {
+						while (amountToTransfer > 0) {
+							manager.clickSlot(screenHandler.syncId, playerSlot.id, 1, SlotActionType.PICKUP, player);
+							toPull--;
+
+							amountToTransfer--;
+							remaining--;
+						}
+
+						// put that thing back where it came from, or so help me...!
+						manager.clickSlot(screenHandler.syncId, inventorySlot.id, 0, SlotActionType.PICKUP, player);
+					}
+
+					if (toPull <= 0) return;
+					if (remaining <= 0) break;
+				}
+			}
+		}
+	}
+
+	private static List<Slot> getQuickMoveDestinationSlots(List<Slot> slots, EmiStack stackToMove) {
+		List<Slot> destinationSlots = Lists.newArrayList();
+		for (Slot candidateSlot : slots) {
+			if (candidateSlot.inventory instanceof PlayerInventory && candidateSlot.canInsert(stackToMove.getItemStack())) {
+				destinationSlots.add(candidateSlot);
+			}
+		}
+
+		// Sort such that we fill existing stacks first where possible
+		destinationSlots.sort((a, b) -> Boolean.compare(b.hasStack(), a.hasStack()));
+		return destinationSlots;
 	}
 
 	public static void viewRecipeTree() {
