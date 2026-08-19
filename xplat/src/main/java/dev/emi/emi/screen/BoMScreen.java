@@ -73,6 +73,7 @@ public class BoMScreen extends Screen {
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
+	private boolean altDown = false;
 
 	public BoMScreen(HandledScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
@@ -261,6 +262,7 @@ public class BoMScreen extends Screen {
 			List<TooltipComponent> list = Lists.newArrayList();
 			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches));
 			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.ideal", EmiBind.LEFT_CLICK.getBindText())));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.amount_format")));
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (BoM.tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
@@ -357,6 +359,16 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
+	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+		if (EmiInput.isAltDown() != altDown) {
+			altDown = EmiInput.isAltDown();
+			recalculateTree();
+		}
+
+		return super.keyReleased(keyCode, scanCode, modifiers);
+	}
+
+	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.close();
@@ -392,6 +404,12 @@ public class BoMScreen extends Screen {
 			BoM.tree = null;
 			init();
 		}
+
+		if (EmiInput.isAltDown() != altDown) {
+			altDown = EmiInput.isAltDown();
+			recalculateTree();
+		}
+
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
@@ -565,15 +583,15 @@ public class BoMScreen extends Screen {
 			long adjusted = cost.getEffectiveAmount();
 			Text totalText;
 			if (cost instanceof ChanceMaterialCost cmc) {
-				totalText = EmiPort.append(EmiPort.literal("≈"), EmiRenderHelper.getAmountText(cost.ingredient, adjusted))
+				totalText = EmiPort.append(EmiPort.literal("≈"), EmiRenderHelper.getAmountText(cost.ingredient, adjusted, altDown))
 					.formatted(Formatting.GOLD);
 			} else {
-				totalText = EmiRenderHelper.getAmountText(cost.ingredient, adjusted);
+				totalText = EmiRenderHelper.getAmountText(cost.ingredient, adjusted, altDown);
 			}
 			if (!remainder && BoM.craftingMode) {
 				long amount = alreadyDone;
 				if (amount < adjusted) {
-					Text amountText = amount == 0 ? EmiPort.literal("0") : (EmiRenderHelper.getAmountText(cost.ingredient, amount));
+					Text amountText = amount == 0 ? EmiPort.literal("0") : (EmiRenderHelper.getAmountText(cost.ingredient, amount, altDown));
 					MutableText text = EmiPort.append(EmiPort.literal("", Formatting.RED), amountText);
 					text = EmiPort.append(text, EmiPort.literal("/"));
 					text = EmiPort.append(text, totalText);
@@ -747,10 +765,10 @@ public class BoMScreen extends Screen {
 				long a = Math.round(amount * chance.chance());
 				a = Math.max(a, node.amount);
 				return EmiPort.append(EmiPort.literal("≈"),
-						EmiRenderHelper.getAmountText(node.ingredient, a))
+						EmiRenderHelper.getAmountText(node.ingredient, a, altDown))
 					.formatted(Formatting.GOLD);
 			} else {
-				return EmiRenderHelper.getAmountText(node.ingredient, amount);
+				return EmiRenderHelper.getAmountText(node.ingredient, amount, altDown);
 			}
 		}
 
