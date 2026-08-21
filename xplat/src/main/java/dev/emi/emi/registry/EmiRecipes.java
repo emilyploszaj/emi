@@ -8,6 +8,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.util.EmiStackListEqualityStrategy;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Iterables;
@@ -67,6 +71,20 @@ public class EmiRecipes {
 		ProxyRecipeManager.bakeIds();
 	}
 
+	private static void deduplicateTagInputs(List<EmiRecipe> recipes) {
+		ObjectOpenCustomHashSet<List<EmiStack>> stackLists = new ObjectOpenCustomHashSet<>(EmiStackListEqualityStrategy.INSTANCE);
+		for (EmiRecipe recipe : recipes) {
+			List<EmiIngredient> recipeInputs = recipe.getInputs();
+			for (EmiIngredient recipeInput : recipeInputs) {
+				if (recipeInput instanceof TagEmiIngredient tagIngredient) {
+					List<EmiStack> stackList = tagIngredient.getEmiStacks();
+					List<EmiStack> canonicalStackList = stackLists.addOrGet(stackList);
+					tagIngredient.setEmiStacks(canonicalStackList);
+				}
+			}
+		}
+	}
+
 	public static void bake() {
 		long start = System.currentTimeMillis();
 		recipes.addAll(EmiData.recipes.stream().map(r -> r.get()).toList());
@@ -90,6 +108,7 @@ public class EmiRecipes {
 			}
 			return true;
 		}).toList();
+		deduplicateTagInputs(filtered);
 		Map<EmiRecipeCategory, List<EmiIngredient>> filteredWorkstations = Maps.newHashMap();
 		for (Map.Entry<EmiRecipeCategory, List<EmiIngredient>> entry : workstations.entrySet()) {
 			List<EmiIngredient> w = entry.getValue().stream().filter(s -> !EmiHidden.isDisabled(s)).toList();
