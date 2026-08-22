@@ -71,11 +71,13 @@ public class ConfigScreen extends Screen {
 	public int lastModifier;
 	public String originalConfig;
 	public ButtonWidget resetButton;
+	private boolean oldSearchAdvancedTooltips;
 
 	public ConfigScreen(Screen last) {
 		super(EmiPort.translatable("screen.emi.config"));
 		this.last = last;
 		originalConfig = EmiConfig.getSavedConfig();
+		oldSearchAdvancedTooltips = EmiConfig.searchAdvancedTooltips;
 	}
 
 	public void setActiveBind(EmiBind bind, int offset) {
@@ -88,6 +90,9 @@ public class ConfigScreen extends Screen {
 	@Override
 	public void close() {
 		EmiConfig.writeConfig();
+		if (EmiConfig.searchAdvancedTooltips != oldSearchAdvancedTooltips) {
+			EmiSearch.bake();
+		}
 		EmiSearch.update();
 		MinecraftClient.getInstance().setScreen(last);
 	}

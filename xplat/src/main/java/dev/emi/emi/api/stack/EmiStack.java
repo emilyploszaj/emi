@@ -130,6 +130,10 @@ public abstract class EmiStack implements EmiIngredient {
 
 	public abstract List<Text> getTooltipText();
 
+	public List<Text> getTooltipText(boolean advanced) {
+		return getTooltipText();
+	}
+
 	public List<TooltipComponent> getTooltip() {
 		List<TooltipComponent> list = Lists.newArrayList();
 		if (!getRemainder().isEmpty()) {

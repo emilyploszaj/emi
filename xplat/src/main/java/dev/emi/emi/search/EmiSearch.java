@@ -71,7 +71,7 @@ public class EmiSearch {
 				if (name != null) {
 					names.add(searchStack, name.getString().toLowerCase());
 				}
-				List<Text> tooltip = stack.getTooltipText();
+				List<Text> tooltip = stack.getTooltipText(EmiConfig.searchAdvancedTooltips);
 				if (tooltip != null) {
 					for (int i = 1; i < tooltip.size(); i++) {
 						Text text = tooltip.get(i);
