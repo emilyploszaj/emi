@@ -143,6 +143,8 @@
   "config.emi.tooltip.ui.effect_location": "Determina onde os status de efeitos devem ser mostrados na tela.",
   "config.emi.ui.center_search_bar": "Centralizar Barra de Busca",
   "config.emi.tooltip.ui.center_search_bar": "Determina se a barra de busca deve ficar no centro da tela, ao invés de ficar na lateral.",
+  "config.emi.ui.top_search_bar": "Barra de Busca no Topo",
+  "config.emi.tooltip.ui.top_search_bar": "Determina se a barra de pesquisa é apresentada na parte superior do ecrã em vez de na parte inferior.",
   "config.emi.ui.show_hover_overlay": "Escurecer ao Passar o Mouse",
   "config.emi.tooltip.ui.show_hover_overlay": "Determina se o ícone de um item será escurecido ao passar o mouse por cima.",
   "config.emi.ui.append_mod_id": "Mostrar ID do Mod",

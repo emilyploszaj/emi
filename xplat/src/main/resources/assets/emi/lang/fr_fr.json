@@ -122,8 +122,11 @@
   "config.emi.ui.move_effects": "Effets de potions",
   "config.emi.tooltip.ui.move_effects": "Change la position de\nla liste des effets de potions\n(à §6gauche§r, ou à §6droite§r)",
 
-  "config.emi.ui.center_search_bar": "Barre de recherche",
+  "config.emi.ui.center_search_bar": "Centre Barre de recherche",
   "config.emi.tooltip.ui.center_search_bar": "Change la position de\nla barre de recherche\n(au §6milieu§r, ou à §6droite§r)",
+
+  "config.emi.ui.top_search_bar": "Barre de recherche en haut",
+  "config.emi.tooltip.ui.top_search_bar": "Place la barre de recherche\nen haut de l'écran",
 
   "config.emi.ui.show_hover_overlay": "Coloration du choix",
   "config.emi.tooltip.ui.show_hover_overlay": "Permet d'afficher du gris\nquand votre souris passe\nau dessus d'un objet",

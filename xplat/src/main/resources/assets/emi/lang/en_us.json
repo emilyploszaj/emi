@@ -118,6 +118,7 @@
 
   "config.emi.ui.effect_location": "Effect Location",
   "config.emi.ui.center_search_bar": "Center Search Bar",
+  "config.emi.ui.top_search_bar": "Top Search Bar",
   "config.emi.ui.show_hover_overlay": "Show Hover Overlay",
   "config.emi.ui.append_mod_id": "Append Mod ID",
   "config.emi.ui.append_item_mod_id": "Append Item Mod ID",
