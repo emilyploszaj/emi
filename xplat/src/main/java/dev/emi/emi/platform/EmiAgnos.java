@@ -8,6 +8,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -160,4 +161,10 @@ public abstract class EmiAgnos {
 	}
 
 	protected abstract boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment);
+	
+	public static Object2FloatMap<Item> getComposterMap() {
+		return delegate.getComposterMapAgnos();
+	}
+	
+	protected abstract Object2FloatMap<Item> getComposterMapAgnos();
 }

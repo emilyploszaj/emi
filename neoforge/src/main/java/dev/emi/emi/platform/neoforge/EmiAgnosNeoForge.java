@@ -8,12 +8,19 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
+import it.unimi.dsi.fastutil.objects.Object2FloatLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.neoforge.registries.datamaps.builtin.Compostable;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import org.apache.commons.lang3.text.WordUtils;
 import org.objectweb.asm.Type;
 
@@ -327,5 +334,16 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 		ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
 		enchantedBook.addEnchantment(RegistryEntry.of(enchantment), enchantment.getMaxLevel());
 		return stack.isBookEnchantable(enchantedBook);
+	}
+
+	@Override
+	protected Object2FloatMap<Item> getComposterMapAgnos() {
+        Registry<Item> registry = Registries.ITEM;
+        Map<RegistryKey<Item>, Compostable> map = registry.getDataMap(NeoForgeDataMaps.COMPOSTABLES);
+		Object2FloatMap<Item> ret = new Object2FloatLinkedOpenHashMap<>();
+		for (Map.Entry<RegistryKey<Item>, Compostable> entry : map.entrySet()) {
+			ret.put(registry.get(entry.getKey()), entry.getValue().chance());
+		}
+		return ret;
 	}
 }

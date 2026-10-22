@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.collect.Lists;
@@ -260,5 +264,15 @@ public class EmiAgnosFabric extends EmiAgnos {
 	@Override
 	protected boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment) {
 		return true;
+	}
+
+	@Override
+	protected Object2FloatMap<Item> getComposterMapAgnos() {
+		Object2FloatMap<Item> ret = new Object2FloatOpenHashMap<>();
+		for (Item item : Registries.ITEM) {
+			float chance = CompostingChanceRegistry.INSTANCE.get(item);
+			ret.put(item, chance);
+		}
+		return ret;
 	}
 }

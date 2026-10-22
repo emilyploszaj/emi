@@ -101,10 +101,10 @@ import dev.emi.emi.stack.serializer.FluidEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ItemEmiStackSerializer;
 import dev.emi.emi.stack.serializer.ListEmiIngredientSerializer;
 import dev.emi.emi.stack.serializer.TagEmiIngredientSerializer;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.Oxidizable;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.TallFlowerBlock;
@@ -772,17 +772,18 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static void addComposting(EmiRegistry registry, Set<Item> hiddenItems) {
-		compressRecipesToTags(ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.keySet().stream()
+		Object2FloatMap<Item> itemToLevelIncreaseChance = EmiAgnos.getComposterMap();
+		compressRecipesToTags(itemToLevelIncreaseChance.keySet().stream()
 			.map(ItemConvertible::asItem).collect(Collectors.toSet()), (a, b) -> {
-				return Float.compare(ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(a), ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(b));
+				return Float.compare(itemToLevelIncreaseChance.getFloat(a), itemToLevelIncreaseChance.getFloat(b));
 			}, tag -> {
 				EmiIngredient stack = EmiIngredient.of(tag.raw());
 				Item item = stack.getEmiStacks().get(0).getItemStack().getItem();
-				float chance = ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(item);
+				float chance = itemToLevelIncreaseChance.getFloat(item);
 				registry.addRecipe(new EmiCompostingRecipe(stack, chance, synthetic("composting/tag", EmiUtil.subId(tag.id()))));
 			}, item -> {
 				if (!hiddenItems.contains(item)) {
-					float chance = ComposterBlock.ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat(item);
+					float chance = itemToLevelIncreaseChance.getFloat(item);
 					registry.addRecipe(new EmiCompostingRecipe(EmiStack.of(item), chance, synthetic("composting/item", EmiUtil.subId(item))));
 				}
 			});
