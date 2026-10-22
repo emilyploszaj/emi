@@ -772,7 +772,7 @@ public class VanillaPlugin implements EmiPlugin {
 	}
 
 	private static void addComposting(EmiRegistry registry, Set<Item> hiddenItems) {
-		Object2FloatMap<Item> itemToLevelIncreaseChance = EmiAgnos.getComposterMap();
+		Object2FloatMap<ItemConvertible> itemToLevelIncreaseChance = EmiAgnos.getComposterMap();
 		compressRecipesToTags(itemToLevelIncreaseChance.keySet().stream()
 			.map(ItemConvertible::asItem).collect(Collectors.toSet()), (a, b) -> {
 				return Float.compare(itemToLevelIncreaseChance.getFloat(a), itemToLevelIncreaseChance.getFloat(b));

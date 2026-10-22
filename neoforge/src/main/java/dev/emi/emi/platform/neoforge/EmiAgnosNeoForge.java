@@ -52,6 +52,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
@@ -337,10 +338,10 @@ public class EmiAgnosNeoForge extends EmiAgnos {
 	}
 
 	@Override
-	protected Object2FloatMap<Item> getComposterMapAgnos() {
+	protected Object2FloatMap<ItemConvertible> getComposterMapAgnos() {
         Registry<Item> registry = Registries.ITEM;
         Map<RegistryKey<Item>, Compostable> map = registry.getDataMap(NeoForgeDataMaps.COMPOSTABLES);
-		Object2FloatMap<Item> ret = new Object2FloatLinkedOpenHashMap<>();
+		Object2FloatMap<ItemConvertible> ret = new Object2FloatLinkedOpenHashMap<>();
 		for (Map.Entry<RegistryKey<Item>, Compostable> entry : map.entrySet()) {
 			ret.put(registry.get(entry.getKey()), entry.getValue().chance());
 		}

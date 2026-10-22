@@ -16,6 +16,7 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -162,9 +163,9 @@ public abstract class EmiAgnos {
 
 	protected abstract boolean isEnchantableAgnos(ItemStack stack, Enchantment enchantment);
 	
-	public static Object2FloatMap<Item> getComposterMap() {
+	public static Object2FloatMap<ItemConvertible> getComposterMap() {
 		return delegate.getComposterMapAgnos();
 	}
 	
-	protected abstract Object2FloatMap<Item> getComposterMapAgnos();
+	protected abstract Object2FloatMap<ItemConvertible> getComposterMapAgnos();
 }
