@@ -7,10 +7,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.collect.Lists;
