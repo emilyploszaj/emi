@@ -142,10 +142,9 @@ allprojects {
 	}
 
 	if (!project.name.contains("xplat")) {
-		sourceSets {
-			main {
-				output.dir(synthMixinDir, builtBy: generateClassLists)
-			}
+		// Shipped as a resource so dev runs that only pick up classes and resources dirs still see it
+		tasks.named("processResources") {
+			from(tasks.named("generateClassLists"))
 		}
 	}
 }
