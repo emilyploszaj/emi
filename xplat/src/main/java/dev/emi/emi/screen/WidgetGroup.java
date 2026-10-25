@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -55,8 +55,8 @@ public class WidgetGroup implements WidgetHolder {
 
 	public void decorateDevMode() {
 		EmiRecipeCategory category = recipe.getCategory();
-		ResourceLocation cid = category == null ? null : category.getId();
-		ResourceLocation id = recipe.getId();
+		Identifier cid = category == null ? null : category.getId();
+		Identifier id = recipe.getId();
 		List<RecipeError> errors = Lists.newArrayList();
 		if (id == null) {
 			errors.add(new RecipeError(RecipeError.Severity.WARNING, EmiTooltip.splitTranslate("emi.dev.null_recipe_id")));

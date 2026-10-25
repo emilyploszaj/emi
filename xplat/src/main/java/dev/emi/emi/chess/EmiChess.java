@@ -198,7 +198,7 @@ public class EmiChess {
 		if (type == -1) {
 			if (EmiScreenManager.hasSidebarAvailable(SidebarType.CHESS)) {
 				chess.pending = uuid;
-				client.player.displayClientMessage(EmiPort.translatable("emi.chess.multiplayer.invited", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.invited", player.getDisplayName()));
 			} else {
 				sendNetwork(uuid, -4, 0, 0);
 			}
@@ -207,18 +207,18 @@ public class EmiChess {
 				sendNetwork(uuid, -3, 0, 0);
 			} else {
 				if (uuid.equals(chess.opponent)) {
-					client.player.displayClientMessage(EmiPort.translatable("emi.chess.multiplayer.accepted", player.getDisplayName()), false);
+					client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.accepted", player.getDisplayName()));
 					chess.generator = new NetworkedMoveGenerator(PieceColor.BLACK);
 				}
 			}
 		} else if (type == -3) {
 			if (uuid.equals(chess.opponent)) {
-				client.player.displayClientMessage(EmiPort.translatable("emi.chess.multiplayer.cancelled", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.cancelled", player.getDisplayName()));
 				restart();
 			}
 		} else if (type == -4) {
 			if (uuid.equals(chess.opponent)) {
-				client.player.displayClientMessage(EmiPort.translatable("emi.chess.multiplayer.unavailable", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.unavailable", player.getDisplayName()));
 			}
 		} else if (chess.generator instanceof NetworkedMoveGenerator nmg && chess.opponent.equals(uuid)) {
 			ChessMove desired = ChessMove.of(start, end, type);

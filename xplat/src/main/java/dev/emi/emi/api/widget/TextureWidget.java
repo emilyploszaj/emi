@@ -2,13 +2,13 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import dev.emi.emi.runtime.EmiDrawContext;
 
 public class TextureWidget extends Widget implements WidgetTooltipHolder<TextureWidget> {
-	protected final ResourceLocation texture;
+	protected final Identifier texture;
 	protected final int x, y;
 	protected final int width, height;
 	protected final int u, v;
@@ -16,7 +16,7 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	protected final int textureWidth, textureHeight;
 	private BiFunction<Integer, Integer, List<ClientTooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
-	public TextureWidget(ResourceLocation texture, int x, int y, int width, int height, int u, int v,
+	public TextureWidget(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
 		this.texture = texture;
 		this.x = x;
@@ -31,7 +31,7 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 		this.textureHeight = textureHeight;
 	}
 
-	public TextureWidget(ResourceLocation texture, int x, int y, int width, int height, int u, int v) {
+	public TextureWidget(Identifier texture, int x, int y, int width, int height, int u, int v) {
 		this(texture, x, y, width, height, u, v, width, height, 256, 256);
 	}
 
@@ -52,7 +52,7 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.resetColor();
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);

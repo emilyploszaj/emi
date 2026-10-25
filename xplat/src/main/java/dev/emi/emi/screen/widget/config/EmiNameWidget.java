@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Style;
 import com.google.common.collect.Lists;
@@ -98,7 +98,7 @@ public class EmiNameWidget implements Renderable {
 		return ret;
 	}
 
-	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		long time = System.currentTimeMillis();
 		long progress = time % 5_000;

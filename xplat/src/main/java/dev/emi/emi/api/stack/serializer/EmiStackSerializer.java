@@ -17,13 +17,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 
 public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSerializer<T> {
 	static final Pattern STACK_REGEX = Pattern.compile("^([\\w_\\-./]+):([\\w_\\-.]+):([\\w_\\-./]+)(\\{.*\\})?$");
 	
-	EmiStack create(ResourceLocation id, DataComponentPatch componentChanges, long amount);
+	EmiStack create(Identifier id, DataComponentPatch componentChanges, long amount);
 
 	private static <T> DynamicOps<T> withRegistryAccess(DynamicOps<T> ops) {
 		Minecraft instance = Minecraft.getInstance();
@@ -37,7 +37,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 
 	@Override
 	default EmiIngredient deserialize(JsonElement element) {
-		ResourceLocation id = null;
+		Identifier id = null;
 		String nbt = null;
 		JsonObject changesJson = null;
 		long amount = 1;
@@ -70,7 +70,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 				if (changesJson != null) {
 					changes = DataComponentPatch.CODEC.decode(withRegistryAccess(JsonOps.INSTANCE), changesJson).getOrThrow().getFirst();
 				} else if (nbt != null) {
-					changes = DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseTag(nbt)).getOrThrow().getFirst();
+					changes = DataComponentPatch.CODEC.decode(withRegistryAccess(NbtOps.INSTANCE), TagParser.parseCompoundFully(nbt)).getOrThrow().getFirst();
 				}
 				EmiStack stack = create(id, changes, amount);
 				if (chance != 1) {
@@ -93,7 +93,7 @@ public interface EmiStackSerializer<T extends EmiStack> extends EmiIngredientSer
 		String nbt = null;
 		DataComponentPatch componentChanges = stack.getComponentChanges();
 		if (componentChanges != DataComponentPatch.EMPTY) {
-			nbt = DataComponentPatch.CODEC.encodeStart(withRegistryAccess(NbtOps.INSTANCE), componentChanges).getOrThrow().getAsString();
+			nbt = DataComponentPatch.CODEC.encodeStart(withRegistryAccess(NbtOps.INSTANCE), componentChanges).getOrThrow().toString();
 		}
 		if (stack.getAmount() == 1 && stack.getChance() == 1 && stack.getRemainder().isEmpty()) {
 			String s = getType() + ":" + stack.getId();

@@ -3,7 +3,7 @@ package dev.emi.emi.bom;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -40,7 +40,7 @@ public class BoM {
 		JsonArray added = new JsonArray();
 		JsonObject addedTags = new JsonObject();
 		JsonObject resolutions = new JsonObject();
-		Set<ResourceLocation> placed = Sets.newHashSet();
+		Set<Identifier> placed = Sets.newHashSet();
 		for (Map.Entry<EmiIngredient, EmiRecipe> entry : addedRecipes.entrySet()) {
 			EmiRecipe recipe = entry.getValue();
 			if (recipe instanceof EmiResolutionRecipe err) {
@@ -91,13 +91,13 @@ public class BoM {
 		disabledRecipes.clear();
 		JsonArray disabled = GsonHelper.getAsJsonArray(object, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
-			ResourceLocation id = EmiPort.id(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			disabledRecipes.add(recipe);
 		}
 		JsonArray added = GsonHelper.getAsJsonArray(object, "added", new JsonArray());
 		for (JsonElement el : added) {
-			ResourceLocation id = EmiPort.id(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && !disabledRecipes.contains(recipe)) {
 				for (EmiStack output : recipe.getOutputs()) {
@@ -107,7 +107,7 @@ public class BoM {
 		}
 		JsonObject resolutions = GsonHelper.getAsJsonObject(object, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			ResourceLocation id = EmiPort.id(key);
+			Identifier id = EmiPort.id(key);
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null && GsonHelper.isArrayNode(resolutions, key)) {
 				JsonArray arr = GsonHelper.getAsJsonArray(resolutions, key);

@@ -1,5 +1,9 @@
 package dev.emi.emi.screen.widget.config;
 
+import net.minecraft.client.input.MouseButtonInfo;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import dev.emi.emi.EmiPort;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -39,13 +43,16 @@ public class ConfigSearch {
 		}
 
 		@Override
-		public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 			if (button == 1 && isMouseOver(mouseX, mouseY)) {
 				this.setValue("");
 				EmiPort.focus(this, true);
 				return true;
 			}
-			return super.mouseClicked(mouseX, mouseY, button);
+			return super.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)), false);
 		}
 	}
 }

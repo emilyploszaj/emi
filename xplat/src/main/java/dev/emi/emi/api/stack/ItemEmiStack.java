@@ -1,46 +1,36 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.Lighting;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
-import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.Internal
-public class ItemEmiStack extends EmiStack implements Batchable {
+public class ItemEmiStack extends EmiStack {
 	private static final Minecraft client = Minecraft.getInstance();
 
 	private final Item item;
 	private final DataComponentPatch componentChanges;
 
-	private boolean unbatchable;
 
 	public ItemEmiStack(ItemStack stack) {
 		this(stack, stack.getCount());
@@ -82,14 +72,8 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public <T> @Nullable T get(DataComponentType<? extends T> type) {
-		// Check the changes first
-		var changedOpt = this.componentChanges.get(type);
-		//noinspection OptionalAssignedToNull
-		if(changedOpt != null) {
-			return changedOpt.orElse(null);
-		}
-		// Check the item's default components
-		return this.item.components().get(type);
+		// Changes take priority over the item's default components
+		return this.componentChanges.get(this.item.components(), type);
 	}
 
 	@Override
@@ -98,18 +82,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return EmiPort.getItemRegistry().getKey(item);
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		ItemStack stack = getItemStack();
 		if ((flags & RENDER_ICON) != 0) {
-			Lighting.setupFor3DItems();
-			draw.renderFakeItem(stack, x, y);
-			draw.renderItemDecorations(client.font, stack, x, y, "");
+			draw.fakeItem(stack, x, y);
+			draw.itemDecorations(client.font, stack, x, y, "");
 		}
 		if ((flags & RENDER_AMOUNT) != 0) {
 			String count = "";
@@ -123,40 +106,6 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 		}
 	}
 	
-	@Override
-	public boolean isSideLit() {
-		return client.getItemRenderer().getModel(getItemStack(), null, null, 0).usesBlockLight();
-	}
-	
-	@Override
-	public boolean isUnbatchable() {
-		ItemStack stack = getItemStack();
-		return unbatchable || stack.hasFoil() || stack.isDamaged() || !EmiAgnos.canBatch(stack)
-			|| client.getItemRenderer().getModel(getItemStack(), null, null, 0).isCustomRenderer();
-	}
-	
-	@Override
-	public void setUnbatchable() {
-		this.unbatchable = true;
-	}
-	
-	@Override
-	public void renderForBatch(MultiBufferSource vcp, GuiGraphics draw, int x, int y, int z, float delta) {
-		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		ItemStack stack = getItemStack();
-		ItemRenderer ir = client.getItemRenderer();
-		BakedModel model = ir.getModel(stack, null, null, 0);
-		context.push();
-		try {
-			context.matrices().translate(x, y, 100.0f + z + (model.isGui3d() ? 50 : 0));
-			context.translate(8, 8);
-			context.matrices().scale(16.0f, -16.0f, 16.0f);
-			ir.render(stack, ItemDisplayContext.GUI, false, context.matrices(), vcp, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, model);
-		} finally {
-			context.pop();
-		}
-	}
-
 	@Override
 	public List<Component> getTooltipText() {
 		if (client.isSameThread()) {

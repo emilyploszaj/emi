@@ -2,9 +2,8 @@ package dev.emi.emi.runtime;
 
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,10 +21,9 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.MicroTextRenderer;
-import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 
-public class EmiFavorite implements EmiIngredient, Batchable {
+public class EmiFavorite implements EmiIngredient {
 	protected final EmiIngredient stack;
 	protected final @Nullable EmiRecipe recipe;
 
@@ -73,7 +71,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (recipe != null) {
 			flags |= EmiIngredient.RENDER_AMOUNT;
@@ -113,30 +111,6 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		return obj instanceof EmiIngredient ingredient && EmiIngredient.areEqual(this, ingredient);
 	}
 
-	@Override
-	public boolean isSideLit() {
-		return stack instanceof Batchable b && b.isSideLit();
-	}
-
-	@Override
-	public boolean isUnbatchable() {
-		return !(stack instanceof Batchable b) || b.isUnbatchable();
-	}
-
-	@Override
-	public void setUnbatchable() {
-		if (stack instanceof Batchable b) {
-			b.setUnbatchable();
-		}
-	}
-
-	@Override
-	public void renderForBatch(MultiBufferSource vcp, GuiGraphics raw, int x, int y, int z, float delta) {
-		if (stack instanceof Batchable b) {
-			b.renderForBatch(vcp, raw, x, y, z, delta);
-		}
-	}
-
 	public static class Craftable extends EmiFavorite {
 
 		public Craftable(EmiRecipe recipe) {
@@ -144,7 +118,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+		public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 			super.render(raw, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
 		}
 	}
@@ -172,7 +146,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+		public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			int color = 0x915900; // Orange
 			if (state == 1) {
@@ -226,11 +200,6 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 				}
 			}
 			return list;
-		}
-
-		@Override
-		public boolean isUnbatchable() {
-			return true;
 		}
 	}
 }

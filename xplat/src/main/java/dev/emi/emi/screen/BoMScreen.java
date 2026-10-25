@@ -1,5 +1,9 @@
 package dev.emi.emi.screen;
 
+import net.minecraft.client.input.KeyEvent;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -8,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -41,14 +45,12 @@ import dev.emi.emi.bom.FoldState;
 import dev.emi.emi.bom.MaterialNode;
 import dev.emi.emi.bom.ProgressState;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.data.EmiRecipeCategoryProperties;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiFavorites;
 import dev.emi.emi.runtime.EmiHistory;
-import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
 
@@ -185,10 +187,10 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.fill(0, 0, width, height, 0xDD000000);
-		this.renderMenuBackground(context.raw());
+		this.extractMenuBackground(context.raw());
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		float scale = getScale();
@@ -211,7 +213,6 @@ public class BoMScreen extends Screen {
 		view.translate(width / 2, height / 2, 0);
 		view.scale(scale, scale, 1);
 		view.translate((float)offX, (float)offY, 0);
-		EmiPort.applyModelViewMatrix();
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
@@ -246,7 +247,6 @@ public class BoMScreen extends Screen {
 		}
 
 		view.popMatrix();
-		EmiPort.applyModelViewMatrix();
 
 		if (help.contains(mouseX, mouseY)) {
 			context.setColor(0.5f, 0.6f, 1f, 1f);
@@ -357,11 +357,14 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.onClose();
 			return true;
-		} else if (this.minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+		} else if (this.minecraft.options.keyInventory.matches(new KeyEvent(keyCode, scanCode, 0))) {
 			this.onClose();
 			return true;
 		}
@@ -392,7 +395,7 @@ public class BoMScreen extends Screen {
 			BoM.tree = null;
 			init();
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	private boolean getAutoResolutions(Hover hover, BiConsumer<EmiIngredient, EmiRecipe> consumer) {
@@ -428,7 +431,10 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		Hover hover = getHoveredStack((int) mouseX, (int) mouseY);
 		float scale = getScale();
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
@@ -460,7 +466,7 @@ public class BoMScreen extends Screen {
 						Minecraft client = Minecraft.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.
-						client.screen.init(client, client.screen.width, client.screen.height);
+						client.screen.init( client.screen.width, client.screen.height);
 						if (hover.node != null) {
 							if (hover.node.recipe != null) {
 								EmiApi.focusRecipe(hover.node.recipe);
@@ -487,7 +493,7 @@ public class BoMScreen extends Screen {
 			EmiHistory.pop();
 			return true;
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
@@ -523,14 +529,17 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (button == 0 || button == 2) {
 			float scale = getScale();
 			offX += deltaX / scale;
 			offY += deltaY / scale;
 			return true;
 		}
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		return super.mouseDragged(event, deltaX, deltaY);
 	}
 
 	@Override
@@ -712,11 +721,7 @@ public class BoMScreen extends Screen {
 				drawLine(context, lx, ly, hx, ly);
 				drawLine(context, lx, hy, hx, hy);
 				EmiRecipeCategory cat = node.recipe.getCategory();
-				if (StackBatcher.isEnabled() && EmiRecipeCategoryProperties.getSimplifiedIcon(cat) instanceof Batchable b) {
-					batcher.render(b, context.raw(), x - 18 + midOffset, y - 8, delta);
-				} else {
-					cat.renderSimplified(context.raw(), x - 18 + midOffset, y - 8, delta);
-				}
+				cat.renderSimplified(context.raw(), x - 18 + midOffset, y - 8, delta);
 				xo = 11;
 				context.pop();
 			}

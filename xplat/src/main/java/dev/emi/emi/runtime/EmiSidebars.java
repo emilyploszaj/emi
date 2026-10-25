@@ -1,14 +1,13 @@
 package dev.emi.emi.runtime;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -106,7 +105,7 @@ public class EmiSidebars {
 			for (JsonElement el : GsonHelper.getAsJsonArray(json, "craft_history")) {
 				if (GsonHelper.isStringValue(el)) {
 					String s = el.getAsString();
-					if (ResourceLocation.tryParse(s) instanceof ResourceLocation id) {
+					if (Identifier.tryParse(s) instanceof Identifier id) {
 						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 						if (recipe != null) {
 							craftHistory.add(new EmiFavorite.Craftable(recipe));

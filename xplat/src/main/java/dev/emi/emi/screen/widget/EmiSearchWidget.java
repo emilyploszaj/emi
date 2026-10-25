@@ -1,11 +1,15 @@
 package dev.emi.emi.screen.widget;
 
+import net.minecraft.client.input.KeyEvent;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.MutableComponent;
@@ -44,7 +48,7 @@ public class EmiSearchWidget extends EditBox {
 		this.setTextColor(-1);
 		this.setTextColorUneditable(-1);
 		this.setMaxLength(256);
-		this.setFormatter((string, stringStart) -> {
+		this.addFormatter((string, stringStart) -> {
 			MutableComponent text = null;
 			int s = 0;
 			int last = 0;
@@ -170,12 +174,15 @@ public class EmiSearchWidget extends EditBox {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (!isMouseOver(mouseX, mouseY) || !EmiConfig.enabled) {
 			EmiPort.focus(this, false);
 			return false;
 		} else {
-			boolean b = super.mouseClicked(mouseX, mouseY, button == 1 ? 0 : button);
+			boolean b = super.mouseClicked(event, doubleClick);
 			if (isMouseOver(mouseX, mouseY)) {
 				EmiPort.focus(this, true);
 			}
@@ -197,7 +204,10 @@ public class EmiSearchWidget extends EditBox {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (this.isFocused()) {
 			if (EmiConfig.clearSearch.matchesKey(keyCode, scanCode)) {
 				setValue("");
@@ -219,11 +229,11 @@ public class EmiSearchWidget extends EditBox {
 				}
 			}
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void extractWidgetRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		this.setEditable(EmiConfig.enabled);
 		String lower = getValue().toLowerCase();
@@ -243,7 +253,6 @@ public class EmiSearchWidget extends EditBox {
 			view.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
 			view.rotate(Axis.ZN.rotationDegrees(deg));
 			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
-			EmiPort.applyModelViewMatrix();
 		}
 
 		if (lower.contains("jeb_")) {
@@ -254,7 +263,7 @@ public class EmiSearchWidget extends EditBox {
 		}
 
 		if (EmiConfig.enabled) {
-			super.renderWidget(context.raw(), mouseX, mouseY, delta);
+			super.extractWidgetRenderState(context.raw(), mouseX, mouseY, delta);
 			if (highlight) {
 				int border = 0xffeeee00;
 				context.fill(this.x - 1, this.y - 1, this.width + 2, 1, border);
@@ -265,6 +274,5 @@ public class EmiSearchWidget extends EditBox {
 		}
 		context.resetColor();
 		view.popMatrix();
-		EmiPort.applyModelViewMatrix();
 	}
 }

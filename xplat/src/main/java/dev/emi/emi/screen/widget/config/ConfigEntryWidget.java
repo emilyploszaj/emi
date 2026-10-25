@@ -2,7 +2,7 @@ package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
 import java.util.function.Supplier;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -38,7 +38,7 @@ public abstract class ConfigEntryWidget extends Entry {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (group != null) {
@@ -56,7 +56,7 @@ public abstract class ConfigEntryWidget extends Entry {
 		context.drawTextWithShadow(this.name, x + 6, y + 10 - parentList.client.font.lineHeight / 2, 0xFFFFFF);
 		for (GuiEventListener element : children()) {
 			if (element instanceof Renderable drawable) {
-				drawable.render(context.raw(), mouseX, mouseY, delta);
+				drawable.extractRenderState(context.raw(), mouseX, mouseY, delta);
 			}
 		}
 	}
