@@ -1,8 +1,10 @@
 package dev.emi.emi.screen.widget.config;
 
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
@@ -24,7 +26,7 @@ public class GroupNameWidget extends Entry {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.drawCenteredTextWithShadow(text, x + width / 2, y + 3, -1);
@@ -49,7 +51,10 @@ public class GroupNameWidget extends Entry {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (isMouseOver(mouseX, mouseY)) {
 			collapsed = !collapsed;
 			EmiPort.playClickSound();

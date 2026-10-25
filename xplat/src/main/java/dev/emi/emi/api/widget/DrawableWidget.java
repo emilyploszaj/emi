@@ -2,7 +2,7 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import dev.emi.emi.runtime.EmiDrawContext;
 
@@ -36,7 +36,7 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.push();
 		context.translate(x, y);
@@ -46,6 +46,6 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 
 	public static interface DrawableWidgetConsumer {
 
-		void render(GuiGraphics draw, int mouseX, int mouseY, float delta);
+		void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta);
 	}
 }

@@ -1,7 +1,7 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -82,7 +82,7 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
 		EmiIngredient current = ingredients.get(item);
 		if ((flags & RENDER_ICON) != 0) {

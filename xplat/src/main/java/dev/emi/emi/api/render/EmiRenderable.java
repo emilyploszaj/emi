@@ -1,11 +1,11 @@
 package dev.emi.emi.api.render;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Provides a method to render something at a position
  */
 public interface EmiRenderable {
 	
-	void render(GuiGraphics draw, int x, int y, float delta);
+	void render(GuiGraphicsExtractor draw, int x, int y, float delta);
 }

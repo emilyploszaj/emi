@@ -1,5 +1,9 @@
 package dev.emi.emi.screen;
 
+import net.minecraft.client.input.KeyEvent;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +11,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -141,7 +145,7 @@ public class ConfigScreen extends Screen {
 		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", originalConfig));
 			Minecraft client = Minecraft.getInstance();
-			this.init(client, client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
+			this.init( client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
 		});
 		this.addRenderableWidget(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			this.onClose();
@@ -152,7 +156,7 @@ public class ConfigScreen extends Screen {
 		}));
 		this.addRenderableWidget(new SizedButtonWidget(x + w - 20, height - 52, 20, 20, 164, 0, () -> true, widget -> {
 			EmiConfig.setGlobalState(!EmiConfig.useGlobalConfig);
-			ConfigScreen.this.resize(minecraft, width, height);
+			ConfigScreen.this.resize( width, height);
 		}, () -> (EmiConfig.useGlobalConfig ? 40 : 0), () -> {
 			return (List<Component>) (Object) Arrays.stream(I18n.get("tooltip.emi.config.global").split("\n"))
 				.map(s -> minecraft.font.getSplitter().splitLines(FormattedText.of(s), maxWidth, Style.EMPTY))
@@ -362,25 +366,28 @@ public class ConfigScreen extends Screen {
 	}
 	
 	@Override
-	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		super.render(context.raw(), mouseX, mouseY, delta);
-		list.render(context.raw(), mouseX, mouseY, delta);
+		super.extractRenderState(context.raw(), mouseX, mouseY, delta);
+		list.extractRenderState(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() != null) {
 			EmiRenderHelper.drawTooltip(this, context, list.getHoveredEntry().getTooltip(mouseX, mouseY), mouseX, mouseY, Math.min(width / 2 - 16, maxWidth));
 		}
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (activeBind != null) {
 			pushModifier(0);
 			activeBind.setBind(activeBindOffset, new ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(button), activeModifiers));
 			activeBind = null;
 			return true;
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	private void pushModifier(int lastModifier) {
@@ -390,7 +397,10 @@ public class ConfigScreen extends Screen {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (activeBind != null) {
 			if (EmiInput.maskFromCode(keyCode) != 0) {
 				pushModifier(keyCode);
@@ -410,7 +420,7 @@ public class ConfigScreen extends Screen {
 			if (keyCode == GLFW.GLFW_KEY_TAB) {
 				return false;
 			}
-			if (super.keyPressed(keyCode, scanCode, modifiers)) {
+			if (super.keyPressed(event)) {
 				return true;
 			}
 			if (this.getFocused() instanceof EditBox tfw && tfw.isFocused()) {
@@ -422,7 +432,7 @@ public class ConfigScreen extends Screen {
 				if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 					this.onClose();
 					return true;
-				} else if (this.minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+				} else if (this.minecraft.options.keyInventory.matches(new KeyEvent(keyCode, scanCode, 0))) {
 					this.onClose();
 					return true;
 				}
@@ -432,7 +442,10 @@ public class ConfigScreen extends Screen {
 	}
 
 	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+	public boolean keyReleased(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (activeBind != null) {
 			activeModifiers &= ~EmiInput.maskFromCode(keyCode);
 			if (keyCode == lastModifier) {
@@ -441,7 +454,7 @@ public class ConfigScreen extends Screen {
 			}
 			return true;
 		}
-		return super.keyReleased(keyCode, scanCode, modifiers);
+		return super.keyReleased(event);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package dev.emi.emi.screen.widget;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -30,7 +30,7 @@ public class ResolutionButtonWidget extends Button {
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	protected void extractContents(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int u = 0;
 		if (this.isHovered()) {
@@ -46,7 +46,7 @@ public class ResolutionButtonWidget extends Button {
 		context.drawTexture(EmiRenderHelper.WIDGETS, x, y, u, 128, width, height);
 		if (this.isHovered()) {
 			Minecraft client = Minecraft.getInstance();
-			raw.renderComponentTooltip(client.font, List.of(
+			raw.setComponentTooltipForNextFrame(client.font, List.of(
 				EmiPort.translatable("tooltip.emi.resolution"),
 				EmiPort.translatable("tooltip.emi.select_resolution"),
 				EmiPort.translatable("tooltip.emi.default_resolution"),

@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -33,7 +32,7 @@ import dev.emi.emi.screen.tooltip.RecipeCostTooltipComponent;
 public class SlotWidget extends Widget {
 	protected final EmiIngredient stack;
 	protected final int x, y;
-	protected ResourceLocation textureId;
+	protected Identifier textureId;
 	protected int u, v;
 	protected int customWidth, customHeight;
 	protected boolean drawBack = true, output = false, catalyst = false, custom = false;
@@ -124,7 +123,7 @@ public class SlotWidget extends Widget {
 	 * which is set by {@link SlotWidget#large()}.
 	 * {@link SlotWidget#custom()} is an alternative for custom sizing.
 	 */
-	public SlotWidget backgroundTexture(ResourceLocation id, int u, int v) {
+	public SlotWidget backgroundTexture(Identifier id, int u, int v) {
 		this.textureId = id;
 		this.u = u;
 		this.v = v;
@@ -135,7 +134,7 @@ public class SlotWidget extends Widget {
 	 * Sets the slot to use a custom texture and custom sizing
 	 * @param id The texture identifier to use to draw the background
 	 */
-	public SlotWidget customBackground(ResourceLocation id, int u, int v, int width, int height) {
+	public SlotWidget customBackground(Identifier id, int u, int v, int width, int height) {
 		backgroundTexture(id, u, v);
 		this.custom = true;
 		this.customWidth = width;
@@ -155,17 +154,15 @@ public class SlotWidget extends Widget {
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
-		EmiPort.setPositionTexShader();
+	public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		drawBackground(draw, mouseX, mouseY, delta);
 		drawStack(draw, mouseX, mouseY, delta);
-		context.disableDepthTest();
 		drawOverlay(draw, mouseX, mouseY, delta);
 	}
 
-	public void drawBackground(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void drawBackground(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		Bounds bounds = getBounds();
 		int width = bounds.width();
@@ -184,14 +181,14 @@ public class SlotWidget extends Widget {
 		}
 	}
 
-	public void drawStack(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void drawStack(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		Bounds bounds = getBounds();
 		int xOff = (bounds.width() - 16) / 2;
 		int yOff = (bounds.height() - 16) / 2;
 		getStack().render(draw, bounds.x() + xOff, bounds.y() + yOff, delta);
 	}
 
-	public void drawOverlay(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		Bounds bounds = getBounds();
 		int width = bounds.width();
 		int height = bounds.height();
@@ -210,7 +207,7 @@ public class SlotWidget extends Widget {
 		return getBounds().contains(mouseX, mouseY) && EmiConfig.showHoverOverlay;
 	}
 
-	public void drawSlotHighlight(GuiGraphics draw, Bounds bounds) {
+	public void drawSlotHighlight(GuiGraphicsExtractor draw, Bounds bounds) {
 		EmiRenderHelper.drawSlotHightlight(EmiDrawContext.wrap(draw), bounds.x() + 1, bounds.y() + 1, bounds.width() - 2, bounds.height() - 2, 200);
 	}
 	

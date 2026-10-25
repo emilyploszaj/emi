@@ -1,9 +1,11 @@
 package dev.emi.emi.screen;
 
+import net.minecraft.client.input.KeyEvent;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -41,7 +43,7 @@ public class ConfigPresetScreen extends Screen {
 		this.resetButton = EmiPort.newButton(x + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
 			EmiConfig.loadConfig(QDCSS.load("revert", last.originalConfig));
 			Minecraft client = Minecraft.getInstance();
-			this.init(client, client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
+			this.init( client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
 		});
 		this.addRenderableWidget(resetButton);
 		this.addRenderableWidget(EmiPort.newButton(x + w / 2 + 2, height - 30, w / 2 - 2, 20, EmiPort.translatable("gui.done"), button -> {
@@ -70,12 +72,12 @@ public class ConfigPresetScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		list.setScrollAmount(list.getScrollAmount());
-		this.renderMenuBackground(context.raw());
-		list.render(context.raw(), mouseX, mouseY, delta);
-		super.render(context.raw(), mouseX, mouseY, delta);
+		this.extractMenuBackground(context.raw());
+		list.extractRenderState(context.raw(), mouseX, mouseY, delta);
+		super.extractRenderState(context.raw(), mouseX, mouseY, delta);
 		if (list.getHoveredEntry() instanceof PresetWidget widget) {
 			if (widget.button.isHovered()) {
 				EmiRenderHelper.drawTooltip(this, context, widget.tooltip, mouseX, mouseY);
@@ -84,7 +86,7 @@ public class ConfigPresetScreen extends Screen {
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
+	public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
 		// Prevent double background draw
 	}
 
@@ -94,17 +96,20 @@ public class ConfigPresetScreen extends Screen {
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
 			this.onClose();
 			return true;
-		} else if (this.minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+		} else if (this.minecraft.options.keyInventory.matches(new KeyEvent(keyCode, scanCode, 0))) {
 			this.onClose();
 			return true;
 		} else if (keyCode == GLFW.GLFW_KEY_TAB) {
 			return false;
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	public void updateChanges() {
@@ -142,11 +147,11 @@ public class ConfigPresetScreen extends Screen {
 		}
 
 		@Override
-		public void render(GuiGraphics raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+		public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 				boolean hovered, float delta) {
 			button.y = y;
 			button.x = x + width / 2 - button.getWidth() / 2;
-			button.render(raw, mouseX, mouseY, delta);
+			button.extractRenderState(raw, mouseX, mouseY, delta);
 		}
 
 		@Override
@@ -168,7 +173,7 @@ public class ConfigPresetScreen extends Screen {
 		}
 
 		@Override
-		public void render(GuiGraphics raw, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
+		public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			context.drawCenteredTextWithShadow(text, x + width / 2, y + 3, -1);
 		}

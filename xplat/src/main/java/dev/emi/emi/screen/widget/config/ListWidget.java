@@ -1,11 +1,17 @@
 package dev.emi.emi.screen.widget.config;
 
+import net.minecraft.client.input.MouseButtonInfo;
+
+import net.minecraft.client.input.KeyEvent;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
@@ -15,20 +21,14 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.emi.emi.EmiPort;
 
 /**
@@ -36,8 +36,8 @@ import dev.emi.emi.EmiPort;
  * This is the lesser of two evils, at least this way I have vanilla compat.
  */
 public class ListWidget extends AbstractContainerEventHandler implements Renderable, NarratableEntry {
-	private static final ResourceLocation MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/menu_list_background.png");
-	private static final ResourceLocation INWORLD_MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/inworld_menu_list_background.png");
+	private static final Identifier MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/menu_list_background.png");
+	private static final Identifier INWORLD_MENU_LIST_BACKGROUND_TEXTURE = EmiPort.id("minecraft", "textures/gui/inworld_menu_list_background.png");
 
 	protected final Minecraft client;
 	private final List<Entry> children = Lists.newArrayList();
@@ -155,22 +155,17 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		int o;
 		int n;
 		int m;
 		int i = this.getScrollbarPositionX();
 		int j = i + 6;
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		this.hoveredEntry = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
 
 		{	// Render background
-			RenderSystem.enableBlend();
-			ResourceLocation identifier = this.client.level == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
-			draw.blit(identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
-			RenderSystem.disableBlend();
+			Identifier identifier = this.client.level == null ? MENU_LIST_BACKGROUND_TEXTURE : INWORLD_MENU_LIST_BACKGROUND_TEXTURE;
+			draw.blit(RenderPipelines.GUI_TEXTURED, identifier, left, top, right, bottom + (int)scrollAmount, right - left, bottom - top, 32, 32);
 		}
 
 		draw.enableScissor(left, top, right, bottom);
@@ -181,38 +176,23 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 
 
 		{	// Render header & footer separators
-			RenderSystem.enableBlend();
-			ResourceLocation identifier = this.client.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
-			ResourceLocation identifier2 = this.client.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
-			draw.blit(identifier, left, top - 2, 0.0F, 0.0F, width, 2, 32, 2);
-			draw.blit(identifier2, left, bottom, 0.0F, 0.0F, width, 2, 32, 2);
-			RenderSystem.disableBlend();
+			Identifier identifier = this.client.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
+			Identifier identifier2 = this.client.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
+			draw.blit(RenderPipelines.GUI_TEXTURED, identifier, left, top - 2, 0.0F, 0.0F, width, 2, 32, 2);
+			draw.blit(RenderPipelines.GUI_TEXTURED, identifier2, left, bottom, 0.0F, 0.0F, width, 2, 32, 2);
 		}
 
 		if ((o = this.getMaxScroll()) > 0) {
-			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			m = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
 			m = Mth.clamp(m, 32, this.bottom - this.top - 8);
 			n = (int)this.getScrollAmount() * (this.bottom - this.top - m) / o + this.top;
 			if (n < this.top) {
 				n = this.top;
 			}
-			bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-			bufferBuilder.addVertex(i, this.bottom, 0).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(j, this.bottom, 0).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(j, this.top, 0).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(i, this.top, 0).setColor(0, 0, 0, 255);
-			bufferBuilder.addVertex(i, n + m, 0).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(j, n + m, 0).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(j, n, 0).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(i, n, 0).setColor(128, 128, 128, 255);
-			bufferBuilder.addVertex(i, n + m - 1, 0).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(j - 1, n + m - 1, 0).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(j - 1, n, 0).setColor(192, 192, 192, 255);
-			bufferBuilder.addVertex(i, n, 0).setColor(192, 192, 192, 255);
-			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			draw.fill(i, this.top, j, this.bottom, 0xFF000000);
+			draw.fill(i, n, j, n + m, 0xFF808080);
+			draw.fill(i, n, j - 1, n + m - 1, 0xFFC0C0C0);
 		}
-		RenderSystem.disableBlend();
 	}
 
 	public void centerScrollOn(Entry entry) {
@@ -286,7 +266,10 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		this.updateScrollingState(mouseX, mouseY, button);
 		/*
 		for (Entry entry : this.children()) {
@@ -302,7 +285,7 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 		}
 		Entry entry = this.getEntryAtPosition(mouseX, mouseY);
 		if (entry != null) {
-			if (entry.mouseClicked(mouseX, mouseY, button)) {
+			if (entry.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)), false)) {
 				this.setFocused((GuiEventListener)entry);
 				this.setDragging(true);
 				return true;
@@ -312,16 +295,22 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(MouseButtonEvent event) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (this.getFocused() != null) {
-			this.getFocused().mouseReleased(mouseX, mouseY, button);
+			this.getFocused().mouseReleased(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0)));
 		}
 		return false;
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
+		if (super.mouseDragged(event, deltaX, deltaY)) {
 			return true;
 		}
 		if (button != 0 || !this.scrolling) {
@@ -348,8 +337,11 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (super.keyPressed(keyCode, scanCode, modifiers)) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
+		if (super.keyPressed(event)) {
 			return true;
 		}
 		/*
@@ -403,10 +395,8 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 		return mouseY >= (double)this.top && mouseY <= (double)this.bottom && mouseX >= (double)this.left && mouseX <= (double)this.right;
 	}
 
-	protected void renderList(GuiGraphics draw, int x, int y, int mouseX, int mouseY, float delta) {
+	protected void renderList(GuiGraphicsExtractor draw, int x, int y, int mouseX, int mouseY, float delta) {
 		int i = this.getEntryCount();
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 		for (int j = 0; j < i; ++j) {
 			int p;
 			int k = this.getRowTop(j);
@@ -423,21 +413,9 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 			if (this.renderSelection && this.isSelectedEntry(j)) {
 				p = this.left + this.width / 2 - o / 2;
 				int q = this.left + this.width / 2 + o / 2;
-				RenderSystem.setShader(GameRenderer::getPositionShader);
 				float f = this.isFocused() ? 1.0f : 0.5f;
-				RenderSystem.setShaderColor(f, f, f, 1.0f);
-				bufferBuilder.addVertex(p, m + n + 2, 0);
-				bufferBuilder.addVertex(q, m + n + 2, 0);
-				bufferBuilder.addVertex(q, m - 2, 0);
-				bufferBuilder.addVertex(p, m - 2, 0);
-				BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-				RenderSystem.setShaderColor(0.0f, 0.0f, 0.0f, 1.0f);
-				bufferBuilder = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-				bufferBuilder.addVertex(p + 1, m + n + 1, 0);
-				bufferBuilder.addVertex(q - 1, m + n + 1, 0);
-				bufferBuilder.addVertex(q - 1, m - 1, 0);
-				bufferBuilder.addVertex(p + 1, m - 1, 0);
-				BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+				draw.fill(p, m - 2, q, m + n + 2, ARGB.colorFromFloat(1.0f, f, f, f));
+				draw.fill(p + 1, m - 1, q - 1, m + n + 1, 0xFF000000);
 			}
 			p = this.getRowLeft();
 			((Entry)entry).render(draw, j, k, p, o - 3, n, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), delta);
@@ -526,7 +504,7 @@ public class ListWidget extends AbstractContainerEventHandler implements Rendera
 	public static abstract class Entry extends AbstractContainerEventHandler {
 		public ListWidget parentList;
 
-		public abstract void render(GuiGraphics draw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+		public abstract void render(GuiGraphicsExtractor draw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta);
 
 		@Override

@@ -1,6 +1,7 @@
 package dev.emi.emi.screen.widget;
 
 import java.util.List;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
@@ -36,7 +37,7 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 	}
 
 	@Override
-	public void onPress() {
+	public void onPress(InputWithModifiers input) {
 		panel.cycleType(EmiInput.isShiftDown() ? -1 : 1);
 	}
 

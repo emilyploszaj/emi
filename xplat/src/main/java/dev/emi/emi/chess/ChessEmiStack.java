@@ -2,14 +2,13 @@ package dev.emi.emi.chess;
 
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -25,10 +24,9 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		ChessPiece piece = EmiChess.getBoard().get(position);
-		context.enableDepthTest();
 		EmiChess chess = EmiChess.get();
 		if (chess.pendingPromotion != -1) {
 			PieceType type = null;
@@ -44,16 +42,13 @@ class ChessEmiStack extends EmiStack {
 			}
 			if (type != null) {
 				context.push();
-				context.matrices().translate(0, 0, 10);
 				context.fill(x - 1, y - 1, 18, 18, 0x55000000);
-				context.matrices().translate(0, 0, 90);
 				context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, type.u, chess.pendingPromotion > 31 ? 0 : 16, 16, 16, 256, 256);
 				context.pop();
 				return;
 			}
 		}
 		context.push();
-		context.matrices().translate(0, 0, 10);
 		if (chess.isTarget(position)) {
 			context.fill(x - 1, y - 1, 18, 18, 0x5555ff00);
 		}
@@ -68,7 +63,6 @@ class ChessEmiStack extends EmiStack {
 		context.pop();
 		if (piece != null) {
 			context.push();
-			context.matrices().translate(0, 0, 100);
 			context.drawTexture(EmiRenderHelper.PIECES, x, y, 100, piece.type().u, piece.color() == PieceColor.BLACK ? 0 : 16, 16, 16, 256, 256);
 			context.pop();
 		}
@@ -95,7 +89,7 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return EmiPort.id("emi:/chess/" + position);
 	}
 

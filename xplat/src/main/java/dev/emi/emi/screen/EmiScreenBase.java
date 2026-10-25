@@ -11,7 +11,7 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class EmiScreenBase {
@@ -86,8 +86,8 @@ public class EmiScreenBase {
 			AbstractContainerMenu sh = hs.getMenu();
 			if (sh.slots != null && !sh.slots.isEmpty()) {
 				int extra = 0;
-				if (hs instanceof RecipeUpdateListener provider) {
-					if (provider.getRecipeBookComponent().isVisible()) {
+				if (hs instanceof AbstractRecipeBookScreen<?> provider) {
+					if (provider.recipeBookComponent.isVisible()) {
 						extra = 177;
 					}
 				}

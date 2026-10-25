@@ -1,11 +1,11 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.ApiStatus;
@@ -14,7 +14,7 @@ import dev.emi.emi.EmiPort;
 
 @ApiStatus.Internal
 public class EmptyEmiStack extends EmiStack {
-	private static final ResourceLocation ID = EmiPort.id("emi", "empty");
+	private static final Identifier ID = EmiPort.id("emi", "empty");
 
 	@Override
 	public EmiStack getRemainder() {
@@ -65,7 +65,7 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ID;
 	}
 
@@ -75,7 +75,7 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 	}
 
 	@Override

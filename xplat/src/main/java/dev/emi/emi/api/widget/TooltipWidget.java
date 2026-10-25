@@ -2,7 +2,7 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 
 public class TooltipWidget extends Widget {
@@ -25,6 +25,6 @@ public class TooltipWidget extends Widget {
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 	}
 }

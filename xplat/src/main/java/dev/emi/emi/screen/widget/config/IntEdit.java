@@ -17,7 +17,18 @@ public class IntEdit {
 	
 	public IntEdit(int width, IntSupplier getter, IntConsumer setter) {
 		Minecraft client = Minecraft.getInstance();
-		text = new EditBox(client.font, 0, 0, width - 14, 18, EmiPort.literal(""));
+		text = new EditBox(client.font, 0, 0, width - 14, 18, EmiPort.literal("")) {
+
+			@Override
+			public void insertText(String input) {
+				int start = Math.min(getCursorPosition(), highlightPos);
+				int end = Math.max(getCursorPosition(), highlightPos);
+				String value = getValue();
+				if (NUMBER.matcher(value.substring(0, start) + input + value.substring(end)).matches()) {
+					super.insertText(input);
+				}
+			}
+		};
 		text.setValue("" + getter.getAsInt());
 		text.setResponder(string -> {
 			try {
@@ -28,9 +39,6 @@ public class IntEdit {
 				}
 			} catch (Exception e) {
 			}
-		});
-		text.setFilter(s -> {
-			return NUMBER.matcher(s).matches();
 		});
 
 		up = new SizedButtonWidget(150, 0, 12, 10, 232, 48, () -> true, button -> {
@@ -57,8 +65,8 @@ public class IntEdit {
 	}
 
 	public void setPosition(int x, int y) {
-		text.x = x + 1;
-		text.y = y + 1;
+		text.setX(x + 1);
+		text.setY(y + 1);
 		up.x = x + text.getWidth() + 2;
 		up.y = y;
 		down.x = up.x;

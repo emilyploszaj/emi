@@ -7,7 +7,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -34,11 +34,11 @@ public interface WidgetHolder {
 		return add(new TankWidget(stack, x, y, width, height, capacity));
 	}
 
-	default TextureWidget addTexture(ResourceLocation texture, int x, int y, int width, int height, int u, int v) {
+	default TextureWidget addTexture(Identifier texture, int x, int y, int width, int height, int u, int v) {
 		return add(new TextureWidget(texture, x, y, width, height, u, v));
 	}
 
-	default TextureWidget addTexture(ResourceLocation texture, int x, int y, int width, int height, int u, int v,
+	default TextureWidget addTexture(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
 		return add(new TextureWidget(texture, x, y, width, height, u, v,
 			regionWidth, regionHeight, textureWidth, textureHeight));
@@ -67,7 +67,7 @@ public interface WidgetHolder {
 	}
 
 	default ButtonWidget addButton(int x, int y, int width, int height, int u, int v,
-			ResourceLocation texture, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
+			Identifier texture, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
 		return add(new ButtonWidget(x, y, width, height, u, v, texture, isActive, action));
 	}
 
@@ -93,7 +93,7 @@ public interface WidgetHolder {
 	/**
 	 * @param time Animation time, in milliseconds
 	 */
-	default AnimatedTextureWidget addAnimatedTexture(ResourceLocation texture, int x, int y, int width, int height, int u, int v, int time,
+	default AnimatedTextureWidget addAnimatedTexture(Identifier texture, int x, int y, int width, int height, int u, int v, int time,
 			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
 		return add(new AnimatedTextureWidget(texture, x, y, width, height, u, v,
 			time, horizontal, endToStart, fullToEmpty));
@@ -102,7 +102,7 @@ public interface WidgetHolder {
 	/**
 	 * @param time Animation time, in milliseconds
 	 */
-	default AnimatedTextureWidget addAnimatedTexture(ResourceLocation texture, int x, int y, int width, int height, int u, int v,
+	default AnimatedTextureWidget addAnimatedTexture(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight, int time,
 			boolean horizontal, boolean endToStart, boolean fullToEmpty) {
 		return add(new AnimatedTextureWidget(texture, x, y, width, height, u, v,

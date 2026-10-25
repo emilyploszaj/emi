@@ -2,14 +2,13 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
@@ -64,17 +63,16 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return EmiPort.getFluidRegistry().getKey(fluid);
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if ((flags & RENDER_ICON) != 0) {
 			context.push();
-			context.matrices().translate(0, 0, 100);
-			EmiAgnos.renderFluid(this, context.matrices(), x, y, delta);
+			EmiAgnos.renderFluid(this, context.raw(), x, y, delta);
 			context.pop();
 		}
 		if ((flags & RENDER_REMAINDER) != 0) {
