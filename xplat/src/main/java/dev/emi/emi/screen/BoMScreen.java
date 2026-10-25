@@ -13,17 +13,16 @@ import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
@@ -208,11 +207,11 @@ public class BoMScreen extends Screen {
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
 
-		Matrix4fStack view = RenderSystem.getModelViewStack();
+		Matrix3x2fStack view = context.matrices();
 		view.pushMatrix();
-		view.translate(width / 2, height / 2, 0);
-		view.scale(scale, scale, 1);
-		view.translate((float)offX, (float)offY, 0);
+		view.translate(width / 2, height / 2);
+		view.scale(scale, scale);
+		view.translate((float)offX, (float)offY);
 		if (BoM.tree != null) {
 			batcher.begin(0, 0, 0);
 			int cy = nodeHeight * NODE_VERTICAL_SPACING * 2;
