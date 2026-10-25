@@ -270,10 +270,11 @@ public class ConfigScreen extends Screen {
 			EmiLog.error("Error initializing config screen", e);
 		}
 
-		this.addWidget(list);
 		list.setScrollAmount(scroll);
 		search.setText(query);
 		addJumpButtons();
+		// Only the first child under the cursor receives clicks, the list spans the jump buttons
+		this.addWidget(list);
 		updateChanges();
 	}
 
