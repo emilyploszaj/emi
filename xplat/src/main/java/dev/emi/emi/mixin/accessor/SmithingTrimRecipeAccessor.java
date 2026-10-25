@@ -1,10 +1,9 @@
 package dev.emi.emi.mixin.accessor;
 
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.SmithingTrimRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.SmithingTrimRecipe;
 
 @Mixin(SmithingTrimRecipe.class)
 public interface SmithingTrimRecipeAccessor {

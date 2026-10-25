@@ -1,7 +1,8 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.VanillaPlugin;
@@ -12,8 +13,6 @@ import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 
 public class EmiTagRecipe extends EmiIngredientRecipe {
 	private final List<EmiStack> stacks;
@@ -47,7 +46,7 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 	}
 
 	@Override
-	public Identifier getId() {
-		return EmiPort.id("emi", "/tag/" + key.registry().getValue().getPath() + "/" + EmiUtil.subId(key.id()));
+	public ResourceLocation getId() {
+		return EmiPort.id("emi", "/tag/" + key.registry().location().getPath() + "/" + EmiUtil.subId(key.location()));
 	}
 }

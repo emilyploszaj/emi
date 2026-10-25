@@ -16,9 +16,9 @@ import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
 
 public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	public JemiSlotWidget widget;
@@ -45,7 +45,7 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
-	public void drawHighlight(DrawContext raw, int color) {
+	public void drawHighlight(GuiGraphics raw, int color) {
 		widget.slot.drawHighlight(raw, color);
 	}
 
@@ -55,17 +55,17 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
-	public void draw(DrawContext raw) {
+	public void draw(GuiGraphics raw) {
 		// I don't think I will
 	}
 
 	@Override
-	public void drawHoverOverlays(DrawContext raw) {
+	public void drawHoverOverlays(GuiGraphics raw) {
 		// I don't think I will
 	}
 
 	@Override
-	public List<Text> getTooltip() {
+	public List<Component> getTooltip() {
 		// Unimplemented
 		// Mutable because who knows
 		return Lists.newArrayList();

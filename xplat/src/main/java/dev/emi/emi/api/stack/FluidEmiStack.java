@@ -2,10 +2,12 @@ package dev.emi.emi.api.stack;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,27 +19,21 @@ import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 @ApiStatus.Internal
 public class FluidEmiStack extends EmiStack {
 	private final Fluid fluid;
-	private final ComponentChanges componentChanges;
+	private final DataComponentPatch componentChanges;
 
 	public FluidEmiStack(Fluid fluid) {
-		this(fluid, ComponentChanges.EMPTY);
+		this(fluid, DataComponentPatch.EMPTY);
 	}
 
-	public FluidEmiStack(Fluid fluid, ComponentChanges componentChanges) {
+	public FluidEmiStack(Fluid fluid, DataComponentPatch componentChanges) {
 		this(fluid, componentChanges, 0);
 	}
 
-	public FluidEmiStack(Fluid fluid, ComponentChanges componentChanges, long amount) {
+	public FluidEmiStack(Fluid fluid, DataComponentPatch componentChanges, long amount) {
 		this.fluid = fluid;
 		this.componentChanges = componentChanges;
 		this.amount = amount;
@@ -58,7 +54,7 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
+	public DataComponentPatch getComponentChanges() {
 		return componentChanges;
 	}
 
@@ -68,12 +64,12 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public Identifier getId() {
-		return EmiPort.getFluidRegistry().getId(fluid);
+	public ResourceLocation getId() {
+		return EmiPort.getFluidRegistry().getKey(fluid);
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if ((flags & RENDER_ICON) != 0) {
 			context.push();
@@ -87,14 +83,14 @@ public class FluidEmiStack extends EmiStack {
 	}
 
 	@Override
-	public List<Text> getTooltipText() {
+	public List<Component> getTooltipText() {
 		return EmiAgnos.getFluidTooltip(fluid, componentChanges);
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = Lists.newArrayList();
-		List<Text> text = getTooltipText();
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
+		List<Component> text = getTooltipText();
 		if (!text.isEmpty()) {
 			list.add(new EmiTextTooltipWrapper(this, EmiPort.ordered(text.get(0))));
 		}
@@ -102,14 +98,14 @@ public class FluidEmiStack extends EmiStack {
 		if (amount > 1) {
 			list.add(EmiTooltipComponents.getAmount(this));
 		}
-		String namespace = EmiPort.getFluidRegistry().getId(fluid).getNamespace();
+		String namespace = EmiPort.getFluidRegistry().getKey(fluid).getNamespace();
 		EmiTooltipComponents.appendModName(list, namespace);
 		list.addAll(super.getTooltip());
 		return list;
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return EmiAgnos.getFluidName(fluid, componentChanges);
 	}
 

@@ -4,7 +4,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.FireworkExplosion;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
@@ -15,19 +21,11 @@ import dev.emi.emi.api.widget.SlotWidget;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
 
 public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(DyeItem::byColor).toList();
 
-	public EmiFireworkStarFadeRecipe(Identifier id) {
+	public EmiFireworkStarFadeRecipe(ResourceLocation id) {
 		super(List.of(
 			EmiIngredient.of(DYES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
 			EmiStack.of(Items.FIREWORK_STAR)), EmiStack.of(Items.FIREWORK_STAR), id);
@@ -69,7 +67,7 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 
 		int amount = random.nextInt(5);
 
-		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.values()[random.nextInt(FireworkExplosionComponent.Type.values().length)];
+		FireworkExplosion.Shape type = FireworkExplosion.Shape.values()[random.nextInt(FireworkExplosion.Shape.values().length)];
 
 		if (!(amount == 0)) {
 			items++;
@@ -94,7 +92,7 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 		List<DyeItem> dyeItems = getDyes(random, 8 - items);
 		IntList colors = new IntArrayList();
 		for (DyeItem dyeItem : dyeItems) {
-			colors.add(dyeItem.getColor().getFireworkColor());
+			colors.add(dyeItem.getDyeColor().getFireworkColor());
 		}
 
 		IntList fadedColors;
@@ -103,15 +101,15 @@ public class EmiFireworkStarFadeRecipe extends EmiPatternCraftingRecipe {
 			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
 			fadedColors = new IntArrayList();
 			for (DyeItem dyeItem : dyeItemsFaded) {
-				fadedColors.add(dyeItem.getColor().getFireworkColor());
+				fadedColors.add(dyeItem.getDyeColor().getFireworkColor());
 			}
 		} else {
 			fadedColors = IntLists.emptyList();
 		}
 
-		FireworkExplosionComponent component = new FireworkExplosionComponent(type, colors, fadedColors, trail, flicker);
+		FireworkExplosion component = new FireworkExplosion(type, colors, fadedColors, trail, flicker);
 
-		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, component);
+		stack.set(DataComponents.FIREWORK_EXPLOSION, component);
 		return EmiStack.of(stack);
 	}
 }

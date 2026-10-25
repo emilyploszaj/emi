@@ -3,7 +3,12 @@ package dev.emi.emi.api;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeManager;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -13,12 +18,6 @@ import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public interface EmiRegistry {
 
@@ -78,7 +77,7 @@ public interface EmiRegistry {
 	/**
 	 * Adds a predicate to run on all current and future recipes to prevent certain ones with the given identifier from being added.
 	 */
-	default void removeRecipes(Identifier id) {
+	default void removeRecipes(ResourceLocation id) {
 		removeRecipes(r -> id.equals(r.getId()));
 	}
 
@@ -203,13 +202,13 @@ public interface EmiRegistry {
 	 * @param text The alias for the given stack.
 	 */
 	@ApiStatus.Experimental
-	void addAlias(EmiIngredient stack, Text text);
+	void addAlias(EmiIngredient stack, Component text);
 
 	/**
 	 * Adds a recipe handler to a specified type of screen handler.
 	 * Recipe handlers are responsible for filling recipes automatically.
 	 */
-	<T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, dev.emi.emi.api.recipe.handler.EmiRecipeHandler<T> handler);
+	<T extends AbstractContainerMenu> void addRecipeHandler(MenuType<T> type, dev.emi.emi.api.recipe.handler.EmiRecipeHandler<T> handler);
 
 	/**
 	 * Adds a recipe decorator for all recipe categories.

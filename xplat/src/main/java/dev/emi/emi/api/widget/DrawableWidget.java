@@ -2,16 +2,15 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
-
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 public class DrawableWidget extends Widget implements WidgetTooltipHolder<DrawableWidget> {
 	protected final DrawableWidgetConsumer consumer;
 	protected final Bounds bounds;
 	protected final int x, y;
-	protected BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
+	protected BiFunction<Integer, Integer, List<ClientTooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
 	public DrawableWidget(int x, int y, int w, int h, DrawableWidgetConsumer consumer) {
 		this.x = x;
@@ -21,7 +20,7 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 	}
 
 	@Override
-	public DrawableWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
+	public DrawableWidget tooltip(BiFunction<Integer, Integer, List<ClientTooltipComponent>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;
 	}
@@ -32,12 +31,12 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return tooltipSupplier.apply(mouseX, mouseY);
 	}
 
 	@Override
-	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.push();
 		context.translate(x, y);
@@ -47,6 +46,6 @@ public class DrawableWidget extends Widget implements WidgetTooltipHolder<Drawab
 
 	public static interface DrawableWidgetConsumer {
 
-		void render(DrawContext draw, int mouseX, int mouseY, float delta);
+		void render(GuiGraphics draw, int mouseX, int mouseY, float delta);
 	}
 }

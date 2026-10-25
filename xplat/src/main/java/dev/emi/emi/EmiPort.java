@@ -6,113 +6,112 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Button.OnPress;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.TallFlowerBlock;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import net.minecraft.world.level.material.Fluid;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.VertexBuffer;
 import dev.emi.emi.api.stack.Comparison;
-import net.minecraft.block.Block;
-import net.minecraft.block.TallFlowerBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget.PressAction;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BannerPatternsComponent;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 /**
  * Multiversion quarantine, to avoid excessive git pain
  */
 public final class EmiPort {
-	private static final net.minecraft.util.math.random.Random RANDOM = net.minecraft.util.math.random.Random.create();
+	private static final net.minecraft.util.RandomSource RANDOM = net.minecraft.util.RandomSource.create();
 
-	public static MutableText literal(String s) {
-		return Text.literal(s);
+	public static MutableComponent literal(String s) {
+		return Component.literal(s);
 	}
 
-	public static MutableText literal(String s, Formatting formatting) {
-		return Text.literal(s).formatted(formatting);
+	public static MutableComponent literal(String s, ChatFormatting formatting) {
+		return Component.literal(s).withStyle(formatting);
 	}
 
-	public static MutableText literal(String s, Formatting... formatting) {
-		return Text.literal(s).formatted(formatting);
+	public static MutableComponent literal(String s, ChatFormatting... formatting) {
+		return Component.literal(s).withStyle(formatting);
 	}
 
-	public static MutableText literal(String s, Style style) {
-		return Text.literal(s).setStyle(style);
+	public static MutableComponent literal(String s, Style style) {
+		return Component.literal(s).setStyle(style);
 	}
 	
-	public static MutableText translatable(String s) {
-		return Text.translatable(s);
+	public static MutableComponent translatable(String s) {
+		return Component.translatable(s);
 	}
 	
-	public static MutableText translatable(String s, Formatting formatting) {
-		return Text.translatable(s).formatted(formatting);
+	public static MutableComponent translatable(String s, ChatFormatting formatting) {
+		return Component.translatable(s).withStyle(formatting);
 	}
 	
-	public static MutableText translatable(String s, Object... objects) {
-		return Text.translatable(s, objects);
+	public static MutableComponent translatable(String s, Object... objects) {
+		return Component.translatable(s, objects);
 	}
 
-	public static MutableText append(MutableText text, Text appended) {
+	public static MutableComponent append(MutableComponent text, Component appended) {
 		return text.append(appended);
 	}
 
-	public static OrderedText ordered(Text text) {
-		return text.asOrderedText();
+	public static FormattedCharSequence ordered(Component text) {
+		return text.getVisualOrderText();
 	}
 
-	public static Collection<Identifier> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
-		return manager.findResources(prefix, i -> pred.test(i.toString())).keySet();
+	public static Collection<ResourceLocation> findResources(ResourceManager manager, String prefix, Predicate<String> pred) {
+		return manager.listResources(prefix, i -> pred.test(i.toString())).keySet();
 	}
 
 	public static InputStream getInputStream(Resource resource) {
 		try {
-			return resource.getInputStream();
+			return resource.open();
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
-	public static BannerPatternsComponent addRandomBanner(BannerPatternsComponent patterns, Random random) {
-		var bannerRegistry = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.BANNER_PATTERN);
-		return new BannerPatternsComponent.Builder().addAll(patterns).add(bannerRegistry.getEntry(random.nextInt(bannerRegistry.size())).get(),
+	public static BannerPatternLayers addRandomBanner(BannerPatternLayers patterns, Random random) {
+		var bannerRegistry = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.BANNER_PATTERN);
+		return new BannerPatternLayers.Builder().addAll(patterns).add(bannerRegistry.getHolder(random.nextInt(bannerRegistry.size())).get(),
 			DyeColor.values()[random.nextInt(DyeColor.values().length)]).build();
 	}
 
 	public static boolean canTallFlowerDuplicate(TallFlowerBlock tallFlowerBlock) {
 		try {
-			return tallFlowerBlock.isFertilizable(null, null, null) && tallFlowerBlock.canGrow(null, null, null, null);
+			return tallFlowerBlock.isValidBonemealTarget(null, null, null) && tallFlowerBlock.isBonemealSuccess(null, null, null, null);
 		} catch(Exception e) {
 			return false;
 		}
@@ -120,7 +119,7 @@ public final class EmiPort {
 
 	public static void setShader(VertexBuffer buf, Matrix4f mat) {
 		buf.bind();
-		buf.draw(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+		buf.drawWithShader(mat, RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
 	}
 
 	public static List<BakedQuad> getQuads(BakedModel model) {
@@ -128,66 +127,66 @@ public final class EmiPort {
 	}
 
 	public static void draw(BufferBuilder bufferBuilder) {
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 	}
 
-	public static int getGuiScale(MinecraftClient client) {
-		return (int) client.getWindow().getScaleFactor();
+	public static int getGuiScale(Minecraft client) {
+		return (int) client.getWindow().getGuiScale();
 	}
 
 	public static void setPositionTexShader() {
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 	}
 
 	public static void setPositionColorTexShader() {
-		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 	}
 
 	public static Registry<Item> getItemRegistry() {
-		return Registries.ITEM;
+		return BuiltInRegistries.ITEM;
 	}
 
 	public static Registry<Block> getBlockRegistry() {
-		return Registries.BLOCK;
+		return BuiltInRegistries.BLOCK;
 	}
 
 	public static Registry<Fluid> getFluidRegistry() {
-		return Registries.FLUID;
+		return BuiltInRegistries.FLUID;
 	}
 
 	public static Registry<Potion> getPotionRegistry() {
-		return Registries.POTION;
+		return BuiltInRegistries.POTION;
 	}
 
 	public static Registry<Enchantment> getEnchantmentRegistry() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return client.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT);
+		Minecraft client = Minecraft.getInstance();
+		return client.level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
 	}
 
-	public static ButtonWidget newButton(int x, int y, int w, int h, Text name, PressAction action) {
-		return ButtonWidget.builder(name, action).position(x, y).size(w, h).build();
+	public static Button newButton(int x, int y, int w, int h, Component name, OnPress action) {
+		return Button.builder(name, action).pos(x, y).size(w, h).build();
 	}
 
 	public static ItemStack getOutput(Recipe<?> recipe) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return recipe.getResult(client.world.getRegistryManager());
+		Minecraft client = Minecraft.getInstance();
+		return recipe.getResultItem(client.level.registryAccess());
 	}
 
-	public static void focus(TextFieldWidget widget, boolean focused) {
+	public static void focus(EditBox widget, boolean focused) {
 		// Also ensure a current focus-element in the screen is cleared if it changes
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client != null && client.currentScreen != null) {
-			var currentFocus = client.currentScreen.getFocused();
+		Minecraft client = Minecraft.getInstance();
+		if (client != null && client.screen != null) {
+			var currentFocus = client.screen.getFocused();
 			if (!focused && currentFocus == widget || focused && currentFocus != widget) {
-				client.currentScreen.setFocused(null);
+				client.screen.setFocused(null);
 			}
 		}
 		widget.setFocused(focused);
 	}
 
 	public static Stream<Item> getDisabledItems() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		FeatureSet fs = client.world.getEnabledFeatures();
+		Minecraft client = Minecraft.getInstance();
+		FeatureFlagSet fs = client.level.enabledFeatures();
 		return getItemRegistry().stream().filter(i -> !i.isEnabled(fs));
 	}
 
@@ -196,20 +195,20 @@ public final class EmiPort {
 	}
 
 	public static ItemStack setPotion(ItemStack stack, Potion potion) {
-		stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, getPotionRegistry().getEntry(potion), PotionContentsComponent::with);
+		stack.update(DataComponents.POTION_CONTENTS, PotionContents.EMPTY, getPotionRegistry().wrapAsHolder(potion), PotionContents::withPotion);
 		return stack;
 	}
 
-	public static ComponentChanges emptyExtraData() {
-		return ComponentChanges.EMPTY;
+	public static DataComponentPatch emptyExtraData() {
+		return DataComponentPatch.EMPTY;
 	}
 
-	public static Identifier id(String id) {
-		return Identifier.of(id);
+	public static ResourceLocation id(String id) {
+		return ResourceLocation.parse(id);
 	}
 
-	public static Identifier id(String namespace, String path) {
-		return Identifier.of(namespace, path);
+	public static ResourceLocation id(String namespace, String path) {
+		return ResourceLocation.fromNamespaceAndPath(namespace, path);
 	}
 
 	public static void applyModelViewMatrix() {
@@ -217,6 +216,6 @@ public final class EmiPort {
 	}
 
 	public static void playClickSound() {
-		MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
 	}
 }

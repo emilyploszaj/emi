@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum HelpLevel implements ConfigEnum {
 	VERBOSE("verbose"),
@@ -25,7 +25,7 @@ public enum HelpLevel implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.help_level." + name.replace("-", "_"));
 	}
 }

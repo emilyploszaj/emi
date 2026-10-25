@@ -2,7 +2,11 @@ package dev.emi.emi.api.recipe;
 
 import java.util.Comparator;
 import java.util.List;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -13,14 +17,9 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 public class EmiRecipeCategory implements EmiRenderable {
-	public Identifier id;
+	public ResourceLocation id;
 	public EmiRenderable icon, simplified;
 	public Comparator<EmiRecipe> sorter;
 	
@@ -30,53 +29,53 @@ public class EmiRecipeCategory implements EmiRenderable {
 	 * 
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(Identifier id, EmiRenderable icon) {
+	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon) {
 		this(id, icon, icon);
 	}
 
 	/**
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified) {
+	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon, EmiRenderable simplified) {
 		this(id, icon, simplified, EmiRecipeSorting.none());
 	}
 
 	/**
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
+	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
 		this.id = id;
 		this.icon = icon;
 		this.simplified = simplified;
 		this.sorter = sorter;
 	}
 
-	public Text getName() {
+	public Component getName() {
 		return EmiPort.translatable(EmiUtil.translateId("emi.category.", getId()));
 	}
 
-	public Identifier getId() {
+	public ResourceLocation getId() {
 		return id;
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta) {
+	public void render(GuiGraphics draw, int x, int y, float delta) {
 		EmiRecipeCategoryProperties.getIcon(this).render(draw, x, y, delta);
 	}
 
-	public void renderSimplified(DrawContext draw, int x, int y, float delta) {
+	public void renderSimplified(GuiGraphics draw, int x, int y, float delta) {
 		EmiRecipeCategoryProperties.getSimplifiedIcon(this).render(draw, x, y, delta);
 	}
 
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = Lists.newArrayList();
-		list.add(TooltipComponent.of(EmiPort.ordered(getName())));
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
+		list.add(ClientTooltipComponent.create(EmiPort.ordered(getName())));
 		if (EmiUtil.showAdvancedTooltips()) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(id.toString(), Formatting.DARK_GRAY))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(id.toString(), ChatFormatting.DARK_GRAY))));
 		}
 		if (EmiConfig.appendModId) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
-				Formatting.BLUE, Formatting.ITALIC))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
+				ChatFormatting.BLUE, ChatFormatting.ITALIC))));
 		}
 		return list;
 	}

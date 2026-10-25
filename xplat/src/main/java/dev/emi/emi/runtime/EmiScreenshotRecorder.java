@@ -2,23 +2,19 @@ package dev.emi.emi.runtime;
 
 import java.io.File;
 import java.util.function.Consumer;
-
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import org.joml.Matrix4f;
-
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
-
+import com.mojang.blaze3d.vertex.VertexSorting;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.SimpleFramebuffer;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import org.joml.Matrix4fStack;
 
 public class EmiScreenshotRecorder {
@@ -50,7 +46,7 @@ public class EmiScreenshotRecorder {
 	}
 
 	private static void saveScreenshotInner(String path, int width, int height, Runnable renderer) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
 		int scale;
 		if (EmiConfig.recipeScreenshotScale < 1) {
@@ -59,11 +55,11 @@ public class EmiScreenshotRecorder {
 			scale = EmiConfig.recipeScreenshotScale;
 		}
 
-		Framebuffer framebuffer = new SimpleFramebuffer(width * scale, height * scale, true, MinecraftClient.IS_SYSTEM_MAC);
+		RenderTarget framebuffer = new TextureTarget(width * scale, height * scale, true, Minecraft.ON_OSX);
 		framebuffer.setClearColor(0f, 0f, 0f, 0f);
-		framebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+		framebuffer.clear(Minecraft.ON_OSX);
 
-		framebuffer.beginWrite(true);
+		framebuffer.bindWrite(true);
 
 		Matrix4fStack view = RenderSystem.getModelViewStack();
 		view.pushMatrix();
@@ -74,22 +70,22 @@ public class EmiScreenshotRecorder {
 		EmiPort.applyModelViewMatrix();
 
 		Matrix4f backupProj = RenderSystem.getProjectionMatrix();
-		RenderSystem.setProjectionMatrix(new Matrix4f().identity(), VertexSorter.BY_Z);
+		RenderSystem.setProjectionMatrix(new Matrix4f().identity(), VertexSorting.ORTHOGRAPHIC_Z);
 
 		renderer.run();
 
-		RenderSystem.setProjectionMatrix(backupProj, VertexSorter.BY_Z);
+		RenderSystem.setProjectionMatrix(backupProj, VertexSorting.ORTHOGRAPHIC_Z);
 		view.popMatrix();
 		EmiPort.applyModelViewMatrix();
 
-		framebuffer.endWrite();
-		client.getFramebuffer().beginWrite(true);
+		framebuffer.unbindWrite();
+		client.getMainRenderTarget().bindWrite(true);
 
-		saveScreenshotInner(client.runDirectory, path, framebuffer,
-			message -> client.execute(() -> client.inGameHud.getChatHud().addMessage(message)));
+		saveScreenshotInner(client.gameDirectory, path, framebuffer,
+			message -> client.execute(() -> client.gui.getChat().addMessage(message)));
 	}
 
-	private static void saveScreenshotInner(File gameDirectory, String suggestedPath, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
+	private static void saveScreenshotInner(File gameDirectory, String suggestedPath, RenderTarget framebuffer, Consumer<Component> messageReceiver) {
 		NativeImage nativeImage = takeScreenshot(framebuffer);
 
 		File screenshots = new File(gameDirectory, SCREENSHOTS_DIRNAME);
@@ -103,12 +99,12 @@ public class EmiScreenshotRecorder {
 		File parent = file.getParentFile();
 		parent.mkdirs();
 
-		Util.getIoWorkerExecutor().execute(() -> {
+		Util.ioPool().execute(() -> {
 			try {
-				nativeImage.writeTo(file);
+				nativeImage.writeToFile(file);
 
-				Text text = EmiPort.literal(filename,
-					Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
+				Component text = EmiPort.literal(filename,
+					Style.EMPTY.withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
 				messageReceiver.accept(EmiPort.translatable("screenshot.success", text));
 			} catch (Throwable e) {
 				EmiLog.error("Failed to write screenshot", e);
@@ -119,13 +115,13 @@ public class EmiScreenshotRecorder {
 		});
 	}
 
-	private static NativeImage takeScreenshot(Framebuffer framebuffer) {
-		int i = framebuffer.textureWidth;
-		int j = framebuffer.textureHeight;
+	private static NativeImage takeScreenshot(RenderTarget framebuffer) {
+		int i = framebuffer.width;
+		int j = framebuffer.height;
 		NativeImage nativeImage = new NativeImage(i, j, false);
-		RenderSystem.bindTexture(framebuffer.getColorAttachment());
-		nativeImage.loadFromTextureImage(0, false);
-		nativeImage.mirrorVertically();
+		RenderSystem.bindTexture(framebuffer.getColorTextureId());
+		nativeImage.downloadTexture(0, false);
+		nativeImage.flipY();
 		return nativeImage;
 	}
 

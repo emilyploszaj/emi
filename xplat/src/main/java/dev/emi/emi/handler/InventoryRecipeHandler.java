@@ -1,7 +1,12 @@
 package dev.emi.emi.handler;
 
 import java.util.List;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -12,18 +17,12 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
 
-public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScreenHandler> {
-	public static final Text TOO_SMALL = EmiPort.translatable("emi.too_small");
+public class InventoryRecipeHandler implements StandardRecipeHandler<InventoryMenu> {
+	public static final Component TOO_SMALL = EmiPort.translatable("emi.too_small");
 
 	@Override
-	public List<Slot> getInputSources(PlayerScreenHandler handler) {
+	public List<Slot> getInputSources(InventoryMenu handler) {
 		List<Slot> list = Lists.newArrayList();
 		for (int i = 1; i < 5; i++) { 
 			list.add(handler.getSlot(i));
@@ -36,7 +35,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	}
 	
 	@Override
-	public List<Slot> getCraftingSlots(PlayerScreenHandler handler) {
+	public List<Slot> getCraftingSlots(InventoryMenu handler) {
 		List<Slot> list = Lists.newArrayList();
 		// This is like, bad, right? There has to be a better way to do this
 		list.add(handler.getSlot(1));
@@ -52,7 +51,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	}
 
 	@Override
-	public List<Slot> getCraftingSlots(EmiRecipe recipe, PlayerScreenHandler handler) {
+	public List<Slot> getCraftingSlots(EmiRecipe recipe, InventoryMenu handler) {
 		if (recipe instanceof EmiCraftingRecipe craf && craf.shapeless) {
 			List<Slot> list = Lists.newArrayList();
 			list.add(handler.getSlot(1));
@@ -65,7 +64,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	}
 
 	@Override
-	public @Nullable Slot getOutputSlot(PlayerScreenHandler handler) {
+	public @Nullable Slot getOutputSlot(InventoryMenu handler) {
 		return handler.slots.get(0);
 	}
 
@@ -81,11 +80,11 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	}
 
 	@Override
-	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
-		ScreenHandler sh = context.getScreenHandler();
-		if (sh instanceof AbstractRecipeScreenHandler<?, ?> arsh) {
+	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<InventoryMenu> context) {
+		AbstractContainerMenu sh = context.getScreenHandler();
+		if (sh instanceof RecipeBookMenu<?, ?> arsh) {
 			if (recipe instanceof EmiCraftingRecipe crafting) {
-				return crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())
+				return crafting.canFit(arsh.getGridWidth(), arsh.getGridHeight())
 					&& StandardRecipeHandler.super.canCraft(recipe, context);
 			}
 		}
@@ -93,13 +92,13 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<PlayerScree
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<PlayerScreenHandler> context) {
+	public List<ClientTooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<InventoryMenu> context) {
 		if (!canCraft(recipe, context)) {
-			ScreenHandler sh = context.getScreenHandler();
-			if (sh instanceof AbstractRecipeScreenHandler<?, ?> arsh) {
+			AbstractContainerMenu sh = context.getScreenHandler();
+			if (sh instanceof RecipeBookMenu<?, ?> arsh) {
 				if (recipe instanceof EmiCraftingRecipe crafting) {
-					if (!crafting.canFit(arsh.getCraftingWidth(), arsh.getCraftingHeight())) {
-						return List.of(TooltipComponent.of(EmiPort.ordered(TOO_SMALL)));
+					if (!crafting.canFit(arsh.getGridWidth(), arsh.getGridHeight())) {
+						return List.of(ClientTooltipComponent.create(EmiPort.ordered(TOO_SMALL)));
 					}
 				}
 			}

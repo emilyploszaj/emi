@@ -60,10 +60,7 @@ configurations {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-	mappings loom.layered {
-		it.mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
-		it.mappings("dev.architectury:yarn-mappings-patch-neoforge:${project.neoforge_yarn_patch}")
-	}
+	mappings loom.officialMojangMappings()
 
 	neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 

@@ -4,7 +4,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.FireworkExplosion;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
@@ -14,15 +21,6 @@ import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
 
 
 public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
@@ -32,7 +30,7 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 
 	private static final List<Item> EFFECTS = List.of(Items.DIAMOND, Items.GLOWSTONE_DUST);
 
-	public EmiFireworkStarRecipe(Identifier id) {
+	public EmiFireworkStarRecipe(ResourceLocation id) {
 		super(List.of(
 				EmiIngredient.of(DYES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
 						EmiIngredient.of(SHAPES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
@@ -92,7 +90,7 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 	private EmiStack getFireworkStar(Random random) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_STAR);
 		List<Item> items = getItems(random);
-		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.SMALL_BALL;
+		FireworkExplosion.Shape type = FireworkExplosion.Shape.SMALL_BALL;
 		IntList colors = new IntArrayList();
 
 		boolean flicker = false, trail = false;
@@ -103,20 +101,20 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 			} else if (Items.DIAMOND.equals(item)) {
 				trail = true;
 			} else if (Items.FIRE_CHARGE.equals(item)) {
-				type = FireworkExplosionComponent.Type.LARGE_BALL;
+				type = FireworkExplosion.Shape.LARGE_BALL;
 			} else if (Items.GOLD_NUGGET.equals(item)) {
-				type = FireworkExplosionComponent.Type.STAR;
+				type = FireworkExplosion.Shape.STAR;
 			} else if (Items.FEATHER.equals(item)) {
-				type = FireworkExplosionComponent.Type.BURST;
+				type = FireworkExplosion.Shape.BURST;
 			} else if (SHAPES.contains(item)) {
-				type = FireworkExplosionComponent.Type.CREEPER;
+				type = FireworkExplosion.Shape.CREEPER;
 			} else {
 				DyeItem dyeItem = (DyeItem) item;
-				colors.add(dyeItem.getColor().getFireworkColor());
+				colors.add(dyeItem.getDyeColor().getFireworkColor());
 			}
 		}
 
-		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(type, colors, IntList.of(), trail, flicker));
+		stack.set(DataComponents.FIREWORK_EXPLOSION, new FireworkExplosion(type, colors, IntList.of(), trail, flicker));
 		return EmiStack.of(stack);
 	}
 }

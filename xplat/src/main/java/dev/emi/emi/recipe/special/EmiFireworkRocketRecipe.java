@@ -4,7 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.FireworkExplosion;
+import net.minecraft.world.item.component.Fireworks;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
@@ -14,22 +21,12 @@ import dev.emi.emi.api.widget.SlotWidget;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
-import net.minecraft.component.type.FireworksComponent;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
 
 
 public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(DyeItem::byColor).toList();
 
-	public EmiFireworkRocketRecipe(Identifier id) {
+	public EmiFireworkRocketRecipe(ResourceLocation id) {
 		super(List.of(
 				EmiStack.of(Items.PAPER),
 						EmiStack.of(Items.FIREWORK_STAR),
@@ -60,19 +57,19 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 
 	private EmiStack getFireworkRocket(Random random) {
 		ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
-		List<FireworkExplosionComponent> explosions = new ArrayList<>();
+		List<FireworkExplosion> explosions = new ArrayList<>();
 
 		List<EmiStack> items = getItems(random);
 		int gunpowder = 0;
 		for (EmiStack item : items) {
 			if (item.getId() == EmiStack.of(Items.FIREWORK_STAR).getId()){
-				explosions.add(item.getOrDefault(DataComponentTypes.FIREWORK_EXPLOSION, FireworkExplosionComponent.DEFAULT));
+				explosions.add(item.getOrDefault(DataComponents.FIREWORK_EXPLOSION, FireworkExplosion.DEFAULT));
 			} else if (item.isEqual(EmiStack.of(Items.GUNPOWDER))) {
 				gunpowder++;
 			}
 		}
 
-		stack.set(DataComponentTypes.FIREWORKS, new FireworksComponent(gunpowder, explosions));
+		stack.set(DataComponents.FIREWORKS, new Fireworks(gunpowder, explosions));
 		return EmiStack.of(stack, 3);
 	}
 
@@ -105,7 +102,7 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 
 		int amount = random.nextInt(5);
 
-		FireworkExplosionComponent.Type type = FireworkExplosionComponent.Type.values()[random.nextInt(FireworkExplosionComponent.Type.values().length)];
+		FireworkExplosion.Shape type = FireworkExplosion.Shape.values()[random.nextInt(FireworkExplosion.Shape.values().length)];
 
 		if (!(amount == 0)) {
 			items++;
@@ -130,7 +127,7 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 		List<DyeItem> dyeItems = getDyes(random, 8 - items);
 		IntList colors = new IntArrayList();
 		for (DyeItem dyeItem : dyeItems) {
-			colors.add(dyeItem.getColor().getFireworkColor());
+			colors.add(dyeItem.getDyeColor().getFireworkColor());
 		}
 
 		amount = random.nextInt(2);
@@ -141,15 +138,15 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
 			fadedColors = new IntArrayList();
 			for (DyeItem dyeItem : dyeItemsFaded) {
-				fadedColors.add(dyeItem.getColor().getFireworkColor());
+				fadedColors.add(dyeItem.getDyeColor().getFireworkColor());
 			}
 		} else {
 			fadedColors = IntLists.emptyList();
 		}
 
-		FireworkExplosionComponent component = new FireworkExplosionComponent(type, colors, fadedColors, trail, flicker);
+		FireworkExplosion component = new FireworkExplosion(type, colors, fadedColors, trail, flicker);
 
-		stack.set(DataComponentTypes.FIREWORK_EXPLOSION, component);
+		stack.set(DataComponents.FIREWORK_EXPLOSION, component);
 		return EmiStack.of(stack);
 	}
 }

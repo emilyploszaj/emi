@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum SidebarSide implements ConfigEnum {
 	NONE("none"),
@@ -23,7 +23,7 @@ public enum SidebarSide implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.sidebar." + name);
 	}
 }

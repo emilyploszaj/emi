@@ -9,8 +9,8 @@ import dev.emi.emi.api.widget.TankWidget;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 
 public class JemiTankWidget extends TankWidget {
 	private final JemiRecipeSlot slot;
@@ -28,7 +28,7 @@ public class JemiTankWidget extends TankWidget {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.background != null) {
 			slot.background.drawable().draw(context.raw(), x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
@@ -37,7 +37,7 @@ public class JemiTankWidget extends TankWidget {
 	}
 
 	@Override
-	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
 			context.enableBlend();
@@ -50,7 +50,7 @@ public class JemiTankWidget extends TankWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return jsw.getTooltip(mouseX, mouseY);
 	}
 }

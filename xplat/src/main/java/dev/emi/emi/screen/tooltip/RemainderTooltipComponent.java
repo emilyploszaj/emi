@@ -2,7 +2,10 @@ package dev.emi.emi.screen.tooltip;
 
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -10,10 +13,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class RemainderTooltipComponent implements EmiTooltipComponent {
 	public List<Remainder> remainders = Lists.newArrayList();
@@ -48,7 +47,7 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getWidth(TextRenderer var1) {
+	public int getWidth(Font var1) {
 		return 18 * 3;
 	}
 
@@ -63,11 +62,11 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 			} else {
 				context.drawStack(input, 18 * 2, 18 * i, EmiIngredient.RENDER_ICON | EmiIngredient.RENDER_AMOUNT);
 				ItemStack is = input.getEmiStacks().get(0).getItemStack().copy();
-				is.setDamage(is.getDamage() - remainder.damage);
-				context.raw().drawItemInSlot(render.text, is, 18 * 2, 18 * i, "");
+				is.setDamageValue(is.getDamageValue() - remainder.damage);
+				context.raw().renderItemDecorations(render.text, is, 18 * 2, 18 * i, "");
 				context.drawStack(input, 18 * 2, 18 * i, -1 ^ (EmiIngredient.RENDER_ICON | EmiIngredient.RENDER_AMOUNT | EmiIngredient.RENDER_REMAINDER));
-				Text t = remainder.damage > 0 ? EmiPort.literal("+" + remainder.damage, Formatting.GREEN) : EmiPort.literal("" + remainder.damage, Formatting.RED);
-				int width = render.text.getWidth(t);
+				Component t = remainder.damage > 0 ? EmiPort.literal("+" + remainder.damage, ChatFormatting.GREEN) : EmiPort.literal("" + remainder.damage, ChatFormatting.RED);
+				int width = render.text.width(t);
 				context.push();
 				context.matrices().translate(0, 0, 200);
 				context.drawText(t, 42 - width, i * 18);
@@ -83,16 +82,16 @@ public class RemainderTooltipComponent implements EmiTooltipComponent {
 			boolean chanced = remainder.chance != 1;
 			text.draw(EmiPort.literal("->"), 20, 5 + i * 18 - (chanced ? 4 : 0), 0xffffff, true);
 			if (chanced) {
-				Text t = EmiPort.literal(EmiTooltip.TEXT_FORMAT.format(remainder.chance * 100) + "%");
-				int tx = text.renderer.getWidth(t);
-				text.draw(t, 27 - tx / 2, 9 + i * 18, Formatting.GOLD.getColorValue(), false);
+				Component t = EmiPort.literal(EmiTooltip.TEXT_FORMAT.format(remainder.chance * 100) + "%");
+				int tx = text.renderer.width(t);
+				text.draw(t, 27 - tx / 2, 9 + i * 18, ChatFormatting.GOLD.getColor(), false);
 			}
 		}
 	}
 
 	private int getDamageDelta(EmiStack stack, EmiStack remainder) {
 		if (remainder.isEqual(stack)) {
-			return stack.getItemStack().getDamage() - remainder.getItemStack().getDamage();
+			return stack.getItemStack().getDamageValue() - remainder.getItemStack().getDamageValue();
 		}
 		return 0;
 	}

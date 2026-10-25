@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum IndexSource implements ConfigEnum {
 	CREATIVE("creative"),
@@ -21,7 +21,7 @@ public enum IndexSource implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.index_source." + name.replace("-", "_"));
 	}
 }

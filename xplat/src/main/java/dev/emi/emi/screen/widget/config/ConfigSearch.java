@@ -1,47 +1,47 @@
 package dev.emi.emi.screen.widget.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 
 public class ConfigSearch {
 	public final ConfigSearchWidgetField field;
 
 	public ConfigSearch(int x, int y, int width, int height) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
-		field = new ConfigSearchWidgetField(client.textRenderer, x, y, width, height, EmiPort.literal(""));
-		field.setChangedListener(s -> {
+		field = new ConfigSearchWidgetField(client.font, x, y, width, height, EmiPort.literal(""));
+		field.setResponder(s -> {
 			if (s.length() > 0) {
 				field.setSuggestion("");
 			} else {
-				field.setSuggestion(I18n.translate("emi.search_config"));
+				field.setSuggestion(I18n.get("emi.search_config"));
 			}
 		});
-		field.setSuggestion(I18n.translate("emi.search_config"));
+		field.setSuggestion(I18n.get("emi.search_config"));
 	}
 
 	public void setText(String query) {
-		field.setText(query);
+		field.setValue(query);
 	}
 
 	public String getSearch() {
-		return field.getText();
+		return field.getValue();
 	}
 	
-	private class ConfigSearchWidgetField extends TextFieldWidget {
+	private class ConfigSearchWidgetField extends EditBox {
 
-		public ConfigSearchWidgetField(TextRenderer textRenderer, int x, int y, int width, int height, Text text) {
+		public ConfigSearchWidgetField(Font textRenderer, int x, int y, int width, int height, Component text) {
 			super(textRenderer, x, y, width, height, text);
 		}
 
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
 			if (button == 1 && isMouseOver(mouseX, mouseY)) {
-				this.setText("");
+				this.setValue("");
 				EmiPort.focus(this, true);
 				return true;
 			}

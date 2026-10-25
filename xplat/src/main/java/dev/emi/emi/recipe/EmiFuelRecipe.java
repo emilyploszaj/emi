@@ -1,7 +1,8 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
@@ -13,15 +14,13 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
 
 public class EmiFuelRecipe implements EmiRecipe {
 	private final EmiIngredient stack;
 	private final int time;
-	private final Identifier id;
+	private final ResourceLocation id;
 
-	public EmiFuelRecipe(EmiIngredient stack, int time, Identifier id) {
+	public EmiFuelRecipe(EmiIngredient stack, int time, ResourceLocation id) {
 		this.stack = stack;
 		this.time = time;
 		this.id = id;
@@ -36,7 +35,7 @@ public class EmiFuelRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable Identifier getId() {
+	public @Nullable ResourceLocation getId() {
 		return id;
 	}
 

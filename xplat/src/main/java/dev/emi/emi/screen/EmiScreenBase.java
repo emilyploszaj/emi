@@ -4,16 +4,15 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.api.EmiScreenBoundsProvider;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
-import net.minecraft.screen.ScreenHandler;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class EmiScreenBase {
 
@@ -43,8 +42,8 @@ public class EmiScreenBase {
 	}
 	
 	public static EmiScreenBase getCurrent() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		return of(client.currentScreen);
+		Minecraft client = Minecraft.getInstance();
+		return of(client.screen);
 	}
 
 	public static <T extends Screen> void addScreenBoundsProvider(Class<T> clazz, EmiScreenBoundsProvider<T> provider) {
@@ -82,13 +81,13 @@ public class EmiScreenBase {
 				return new EmiScreenBase(screen, bounds);
 			}
 		}
-		if (screen instanceof HandledScreen hs) {
+		if (screen instanceof AbstractContainerScreen hs) {
 			HandledScreenAccessor hsa = (HandledScreenAccessor) hs;
-			ScreenHandler sh = hs.getScreenHandler();
+			AbstractContainerMenu sh = hs.getMenu();
 			if (sh.slots != null && !sh.slots.isEmpty()) {
 				int extra = 0;
-				if (hs instanceof RecipeBookProvider provider) {
-					if (provider.getRecipeBookWidget().isOpen()) {
+				if (hs instanceof RecipeUpdateListener provider) {
+					if (provider.getRecipeBookComponent().isVisible()) {
 						extra = 177;
 					}
 				}

@@ -4,11 +4,8 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.serializer.EmiStackSerializer;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.resources.ResourceLocation;
 
 public class FluidEmiStackSerializer implements EmiStackSerializer<FluidEmiStack> {
 
@@ -18,7 +15,7 @@ public class FluidEmiStackSerializer implements EmiStackSerializer<FluidEmiStack
 	}
 
 	@Override
-	public EmiStack create(Identifier id, ComponentChanges componentChanges, long amount) {
+	public EmiStack create(ResourceLocation id, DataComponentPatch componentChanges, long amount) {
 		return EmiStack.of(EmiPort.getFluidRegistry().get(id), componentChanges, amount);
 	}
 }

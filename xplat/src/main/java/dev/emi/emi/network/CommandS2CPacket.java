@@ -5,39 +5,39 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.bom.BoM;
 import dev.emi.emi.registry.EmiCommands;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 
 public class CommandS2CPacket implements EmiPacket {
 	private final byte type;
-	private final Identifier id;
+	private final ResourceLocation id;
 
-	public CommandS2CPacket(byte type, Identifier id) {
+	public CommandS2CPacket(byte type, ResourceLocation id) {
 		this.type = type;
 		this.id = id;
 	}
 
-	public CommandS2CPacket(PacketByteBuf buf) {
+	public CommandS2CPacket(FriendlyByteBuf buf) {
 		type = buf.readByte();
 		if (type == EmiCommands.VIEW_RECIPE || type == EmiCommands.TREE_GOAL || type == EmiCommands.TREE_RESOLUTION) {
-			id = buf.readIdentifier();
+			id = buf.readResourceLocation();
 		} else {
 			id = null;
 		}
 	}
 
 	@Override
-	public void write(RegistryByteBuf buf) {
+	public void write(RegistryFriendlyByteBuf buf) {
 		buf.writeByte(type);
 		if (type == EmiCommands.VIEW_RECIPE || type == EmiCommands.TREE_GOAL || type == EmiCommands.TREE_RESOLUTION) {
-			buf.writeIdentifier(id);
+			buf.writeResourceLocation(id);
 		}
 	}
 
 	@Override
-	public void apply(PlayerEntity player) {
+	public void apply(Player player) {
 		if (type == EmiCommands.VIEW_RECIPE) {
 			EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 			if (recipe != null) {
@@ -61,7 +61,7 @@ public class CommandS2CPacket implements EmiPacket {
 	}
 
 	@Override
-	public Id<CommandS2CPacket> getId() {
+	public Type<CommandS2CPacket> type() {
 		return EmiNetwork.COMMAND;
 	}
 }
