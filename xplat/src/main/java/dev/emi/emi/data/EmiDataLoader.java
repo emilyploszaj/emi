@@ -3,7 +3,7 @@ package dev.emi.emi.data;
 import java.io.InputStreamReader;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -18,13 +18,13 @@ import dev.emi.emi.runtime.EmiLog;
 public class EmiDataLoader<T> extends SimplePreparableReloadListener<T>
 		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final String path;
 	private final Supplier<T> baseSupplier;
 	private final DataConsumer<T> prepare;
 	private final Consumer<T> apply;
 
-	public EmiDataLoader(ResourceLocation id, String path, Supplier<T> baseSupplier,
+	public EmiDataLoader(Identifier id, String path, Supplier<T> baseSupplier,
 			DataConsumer<T> prepare, Consumer<T> apply) {
 		this.id = id;
 		this.path = path;
@@ -36,7 +36,7 @@ public class EmiDataLoader<T> extends SimplePreparableReloadListener<T>
 	@Override
 	public T prepare(ResourceManager manager, ProfilerFiller profiler) {
 		T t = baseSupplier.get();
-		for (ResourceLocation id : EmiPort.findResources(manager, path, i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, path, i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
@@ -59,11 +59,11 @@ public class EmiDataLoader<T> extends SimplePreparableReloadListener<T>
 	}
 
 	@Override
-	public ResourceLocation getEmiId() {
+	public Identifier getEmiId() {
 		return id;
 	}
 
 	public static interface DataConsumer<T> {
-		void accept(T t, JsonObject json, ResourceLocation id);
+		void accept(T t, JsonObject json, Identifier id);
 	}
 }

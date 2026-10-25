@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -196,7 +196,7 @@ public class EmiData {
 				EmiPort.id("emi:recipe_additions"), "recipe/additions", Lists::newArrayList,
 				(list, json, oid) -> {
 					String s = GsonHelper.getAsString(json, "type", "");
-					ResourceLocation id = EmiPort.id("emi:/generated/" + oid.getPath());
+					Identifier id = EmiPort.id("emi:/generated/" + oid.getPath());
 					if (s.equals("emi:info")) {
 						list.add(() -> new EmiInfoRecipe(getArrayOrSingleton(json, "stacks").map(EmiIngredientSerializer::getDeserialized).toList(),
 							getArrayOrSingleton(json, "text").map(t -> (Component) EmiPort.translatable(t.getAsString())).toList(),
