@@ -33,7 +33,6 @@ public abstract class HandledScreenMixin extends Screen {
 		context.push();
 		context.translate(-leftPos, -topPos);
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
-		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
 		context.pop();
 	}
 }
