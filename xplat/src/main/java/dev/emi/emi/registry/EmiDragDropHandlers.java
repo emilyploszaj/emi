@@ -2,7 +2,7 @@ package dev.emi.emi.registry;
 
 import java.util.List;
 import java.util.Map;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -20,7 +20,7 @@ public class EmiDragDropHandlers {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static void render(Screen screen, EmiIngredient stack, GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	public static void render(Screen screen, EmiIngredient stack, GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		if (fromClass.containsKey(screen.getClass())) {
 			for (EmiDragDropHandler handler : fromClass.get(screen.getClass())) {
 				handler.render(screen, stack, draw, mouseX, mouseY, delta);

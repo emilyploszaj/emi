@@ -26,7 +26,7 @@ import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.ints.IntList;
 import joptsimple.internal.Strings;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;

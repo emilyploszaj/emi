@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,7 +32,7 @@ import dev.emi.emi.registry.EmiRecipeFiller;
 public class EmiUtil {
 	public static final Random RANDOM = new Random();
 
-	public static String subId(ResourceLocation id) {
+	public static String subId(Identifier id) {
 		return id.getNamespace() + "/" + id.getPath();
 	}
 
@@ -53,7 +53,7 @@ public class EmiUtil {
 		return client.options.advancedItemTooltips;
 	}
 
-	public static String translateId(String prefix, ResourceLocation id) {
+	public static String translateId(String prefix, Identifier id) {
 		return prefix + id.getNamespace() + "." + id.getPath().replace('/', '.');
 	}
 

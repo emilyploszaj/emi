@@ -7,7 +7,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -31,7 +31,7 @@ public interface EmiDragDropHandler<T extends Screen> {
 	/**
 	 * Called when a stack is being dragged.
 	 */
-	default void render(T screen, EmiIngredient dragged, GuiGraphics draw, int mouseX, int mouseY, float delta) {
+	default void render(T screen, EmiIngredient dragged, GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 	}
 
 	/**
@@ -66,7 +66,7 @@ public interface EmiDragDropHandler<T extends Screen> {
 		}
 
 		@Override
-		public void render(T screen, EmiIngredient dragged, GuiGraphics draw, int mouseX, int mouseY, float delta) {
+		public void render(T screen, EmiIngredient dragged, GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			for (Bounds b : bounds.apply(screen).keySet()) {
 				context.fill(b.x(), b.y(), b.width(), b.height(), 0x8822BB33);
