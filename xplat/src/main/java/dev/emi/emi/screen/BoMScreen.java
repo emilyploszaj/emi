@@ -188,8 +188,6 @@ public class BoMScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		context.fill(0, 0, width, height, 0xDD000000);
-		this.extractMenuBackground(context.raw());
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		float scale = getScale();
