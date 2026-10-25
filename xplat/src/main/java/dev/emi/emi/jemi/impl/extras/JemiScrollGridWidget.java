@@ -1,5 +1,8 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import mezz.jei.api.gui.widgets.ScrollbarVisibility;
+import mezz.jei.api.gui.placement.VerticalAlignment;
+import mezz.jei.api.gui.placement.HorizontalAlignment;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +48,11 @@ public class JemiScrollGridWidget implements IScrollGridWidget {
 	}
 
 	@Override
+	public IScrollGridWidget setPosition(int areaX, int areaY, int areaWidth, int areaHeight, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment) {
+		return setPosition(areaX + horizontalAlignment.getXPos(areaWidth, getWidth()), areaY + verticalAlignment.getYPos(areaHeight, getHeight()));
+	}
+
+	@Override
 	public int getWidth() {
 		return width;
 	}
@@ -57,5 +65,17 @@ public class JemiScrollGridWidget implements IScrollGridWidget {
 	@Override
 	public ScreenRectangle getScreenRectangle() {
 		return new ScreenRectangle(getPosition(), getWidth(), getHeight());
+	}
+
+	@Override
+	public IScrollGridWidget setScrollbarVisibility(ScrollbarVisibility visibility) {
+		// EMI always shows scrollbars
+		return this;
+	}
+
+	@Override
+	public IScrollGridWidget setSlots(List<IRecipeSlotDrawable> slots) {
+		this.slots = slots;
+		return this;
 	}
 }

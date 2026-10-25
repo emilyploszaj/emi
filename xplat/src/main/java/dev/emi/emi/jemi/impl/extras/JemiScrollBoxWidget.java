@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import mezz.jei.api.gui.widgets.ScrollbarVisibility;
 import java.util.List;
 
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -52,4 +53,10 @@ public class JemiScrollBoxWidget implements IScrollBoxWidget {
 		return this;
 	}
 	
+
+	@Override
+	public IScrollBoxWidget setScrollbarVisibility(ScrollbarVisibility visibility) {
+		// EMI always shows scrollbars
+		return this;
+	}
 }

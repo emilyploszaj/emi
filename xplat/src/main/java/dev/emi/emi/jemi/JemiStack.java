@@ -17,11 +17,11 @@ import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.TooltipFlag;
 
 public class JemiStack<T> extends EmiStack {
@@ -39,16 +39,16 @@ public class JemiStack<T> extends EmiStack {
 		if (type instanceof IIngredientTypeWithSubtypes<?, T> iitws) {
 			base = iitws.getBase(ingredient);
 		} else {
-			base = helper.getUniqueId(ingredient, UidContext.Recipe);
+			base = helper.getUid(ingredient, UidContext.Recipe).toString();
 		}
 	}
 
 	public String getJeiUid() {
-		return helper.getUniqueId(ingredient, UidContext.Ingredient);
+		return helper.getUid(ingredient, UidContext.Ingredient).toString();
 	}
 
 	@Override
-	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
@@ -79,7 +79,7 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return helper.getResourceLocation(ingredient);
 	}
 
@@ -94,9 +94,9 @@ public class JemiStack<T> extends EmiStack {
 		Minecraft client = Minecraft.getInstance();
 		JemiTooltipBuilder builder = new JemiTooltipBuilder();
 		renderer.getTooltip(builder, ingredient, client.options.advancedItemTooltips ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
-		list.addAll(builder.tooltip);
+		list.addAll(builder.getTooltip());
 
-		ResourceLocation id = getId();
+		Identifier id = getId();
 		if (EmiConfig.appendModId && id != null) {
 			String mod = EmiUtil.getModName(id.getNamespace());
 			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(mod, ChatFormatting.BLUE, ChatFormatting.ITALIC))));
