@@ -10,18 +10,16 @@ import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
-import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -247,12 +245,12 @@ public class EmiSearchWidget extends EditBox {
 		}
 		lastRender = System.currentTimeMillis();
 		long deg = accumulatedSpin * -180 / 500;
-		Matrix4fStack view = RenderSystem.getModelViewStack();
+		Matrix3x2fStack view = context.matrices();
 		view.pushMatrix();
 		if (deg != 0) {
-			view.translate(this.x + this.width / 2, this.y + this.height / 2, 0);
-			view.rotate(Axis.ZN.rotationDegrees(deg));
-			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2), 0);
+			view.translate(this.x + this.width / 2, this.y + this.height / 2);
+			view.rotate((float) Math.toRadians(-deg));
+			view.translate(-(this.x + this.width / 2), -(this.y + this.height / 2));
 		}
 
 		if (lower.contains("jeb_")) {
