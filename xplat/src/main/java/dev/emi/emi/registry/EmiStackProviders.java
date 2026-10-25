@@ -3,7 +3,7 @@ package dev.emi.emi.registry;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
@@ -60,7 +60,7 @@ public class EmiStackProviders {
 							CraftingInput input = CraftingInput.of(inv.getWidth(), inv.getHeight(), inv.getItems());
 							CraftingRecipe crafting = ProxyRecipeManager.getFirst(RecipeType.CRAFTING, input);
 							if (crafting != null) {
-								ResourceLocation id = ProxyRecipeManager.getId(crafting);
+								Identifier id = ProxyRecipeManager.getId(crafting);
 								EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);
 								if (recipe != null) {
 									return new EmiStackInteraction(EmiStack.of(stack), recipe, false);

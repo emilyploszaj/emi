@@ -1,6 +1,6 @@
 package dev.emi.emi.registry;
 
-import static net.minecraft.commands.arguments.ResourceLocationArgument.id;
+import static net.minecraft.commands.arguments.IdentifierArgument.id;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -12,7 +12,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.EmiNetwork;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.commands.Commands;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 public class EmiCommands {
@@ -23,7 +24,7 @@ public class EmiCommands {
 	
 	public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(literal("emi")
-			.requires(source -> source.hasPermission(2))
+			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 			.then(
 				literal("view")
 				.then(
@@ -31,7 +32,7 @@ public class EmiCommands {
 					.then(
 						argument("id", id())
 						.executes(context -> {
-							send(context.getSource().getPlayer(), VIEW_RECIPE, context.getArgument("id", ResourceLocation.class));
+							send(context.getSource().getPlayer(), VIEW_RECIPE, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
 						})
 					)
@@ -51,7 +52,7 @@ public class EmiCommands {
 					.then(
 						argument("id", id())
 						.executes(context -> {
-							send(context.getSource().getPlayer(), TREE_GOAL, context.getArgument("id", ResourceLocation.class));
+							send(context.getSource().getPlayer(), TREE_GOAL, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
 						})
 					)
@@ -61,7 +62,7 @@ public class EmiCommands {
 					.then(
 						argument("id", id())
 						.executes(context -> {
-							send(context.getSource().getPlayer(), TREE_RESOLUTION, context.getArgument("id", ResourceLocation.class));
+							send(context.getSource().getPlayer(), TREE_RESOLUTION, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
 						})
 					)
@@ -70,7 +71,7 @@ public class EmiCommands {
 		);
 	}
 
-	private static void send(ServerPlayer player, byte type, @Nullable ResourceLocation id) {
+	private static void send(ServerPlayer player, byte type, @Nullable Identifier id) {
 		EmiNetwork.sendToClient(player, new CommandS2CPacket(type, id));
 	}
 }

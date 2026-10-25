@@ -5,7 +5,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.api.stack.serializer.EmiStackSerializer;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> {
@@ -16,8 +16,8 @@ public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> 
 	}
 
 	@Override
-	public EmiStack create(ResourceLocation id, DataComponentPatch componentChanges, long amount) {
-		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().getHolder(id).orElseThrow(), 1, componentChanges);
+	public EmiStack create(Identifier id, DataComponentPatch componentChanges, long amount) {
+		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().get(id).orElseThrow(), 1, componentChanges);
 		return EmiStack.of(stack, amount);
 	}
 }
