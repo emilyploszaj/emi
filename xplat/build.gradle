@@ -1,7 +1,4 @@
-import net.fabricmc.loom.task.RemapJarTask
-import net.fabricmc.loom.task.RemapSourcesJarTask
-
-apply plugin: "dev.architectury.loom"
+apply plugin: "dev.architectury.loom-no-remap"
 
 architectury {
 	common(rootProject.enabled_platforms.split(","))
@@ -13,11 +10,10 @@ loom {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-	mappings loom.officialMojangMappings()
 
-	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+	implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-	modCompileOnly("mezz.jei:${rootProject.jei_version}") {
+	compileOnly("mezz.jei:jei-${rootProject.minecraft_version}-fabric:${rootProject.jei_version}") {
 		transitive = false
 	}
 }
@@ -30,23 +26,19 @@ processResources {
 	}
 }
 
-afterEvaluate {
-	configurations.default.extendsFrom = [configurations.namedElements]
-}
-
 def filteredSourcesJar = tasks.register('filteredSourcesJar', Jar, {
 	archiveClassifier = 'filtered-sources'
-	def remapSourcesJar = tasks.named('remapSourcesJar', RemapSourcesJarTask)
-	dependsOn remapSourcesJar
-	from zipTree(remapSourcesJar.flatMap { it.archiveFile })
+	def sourcesJarTask = tasks.named('sourcesJar', Jar)
+	dependsOn sourcesJarTask
+	from zipTree(sourcesJarTask.flatMap { it.archiveFile })
 	exclude 'dev/emi/emi/jemi/**'
 })
 
 def apiJar = tasks.register('apiJar', Jar, {
 	archiveClassifier = "api"
-	def remapJar = tasks.named('remapJar', RemapJarTask)
-	dependsOn remapJar
-	from zipTree(remapJar.flatMap { it.archiveFile })
+	def jarTask = tasks.named('jar', Jar)
+	dependsOn jarTask
+	from zipTree(jarTask.flatMap { it.archiveFile })
 	include 'fabric.mod.json'
 	include 'emi.mixins.json'
 	include 'emi.accesswidener'
@@ -66,10 +58,10 @@ tasks.named("build").configure {
 publishing {
 	publications {
 		register('maven', MavenPublication) {
-			artifactId = "${rootProject.name}-xplat-intermediary"
+			artifactId = "${rootProject.name}-xplat"
 			version = project.ext.mavenVersion
-			artifact(remapJar) {
-				builtBy remapJar
+			artifact(tasks.named('jar', Jar)) {
+				builtBy tasks.named('jar', Jar)
 				classifier = null
 			}
 			artifact(filteredSourcesJar) {
