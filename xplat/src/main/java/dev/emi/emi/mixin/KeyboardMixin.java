@@ -13,46 +13,38 @@ import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 
 @Mixin(KeyboardHandler.class)
 public class KeyboardMixin {
 	@Shadow @Final
 	private Minecraft minecraft;
-	
+
 	@Inject(at = @At(value = "INVOKE", target =
-			"net/minecraft/client/gui/screens/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
-		method = "keyPress(JIIII)V", cancellable = true)
-	public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
+			"net/minecraft/client/gui/screens/Screen.keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z"),
+		method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V", cancellable = true)
+	public void onKey(long window, int action, KeyEvent event, CallbackInfo info) {
 		try {
 			Screen screen = minecraft.screen;
 			if (screen instanceof AbstractContainerScreen<?> hs) {
-				if (action == 1 || action == 2) {
-					if (EmiScreenManager.keyPressed(key, scancode, modifiers)) {
-						info.cancel();
-					}
+				if (EmiScreenManager.keyPressed(event.key(), event.scancode(), event.modifiers())) {
+					info.cancel();
 				}
 			}
 		} catch (Exception e) {
 			EmiLog.error("Error while handling key press", e);
 		}
 	}
-	
+
 	@Inject(at = @At("HEAD"),
-		method = "charTyped(JII)V", cancellable = true)
-	public void onChar(long window, int codePoint, int modifiers, CallbackInfo info) {
+		method = "charTyped(JLnet/minecraft/client/input/CharacterEvent;)V", cancellable = true)
+	public void onChar(long window, CharacterEvent event, CallbackInfo info) {
 		try {
-			if (window == minecraft.getWindow().getWindow()) {
+			if (window == minecraft.getWindow().handle()) {
 				Screen screen = minecraft.screen;
 				if (screen instanceof AbstractContainerScreen<?> hs && this.minecraft.getOverlay() == null) {
-					boolean consume = false;
-					if (Character.charCount(codePoint) == 1) {
-						consume = EmiScreenManager.search.charTyped((char) codePoint, modifiers) || consume;
-					} else {
-						for (char c : Character.toChars(codePoint)) {
-							consume = EmiScreenManager.search.charTyped(c, modifiers) || consume;
-						}
-					}
-					if (consume) {
+					if (EmiScreenManager.search.charTyped(event)) {
 						info.cancel();
 					}
 				}
