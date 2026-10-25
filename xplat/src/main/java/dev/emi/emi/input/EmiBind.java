@@ -92,7 +92,7 @@ public class EmiBind {
 		for (ModifiedKey boundKey : boundKeys) {
 			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
 				if (boundKey.key.getType() == InputConstants.Type.KEYSYM && boundKey.key.getValue() != -1) {
-					if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), boundKey.key.getValue())) {
+					if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), boundKey.key.getValue())) {
 						return true;
 					}
 				}
