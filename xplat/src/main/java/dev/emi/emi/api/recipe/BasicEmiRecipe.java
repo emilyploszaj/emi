@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -17,10 +17,10 @@ public abstract class BasicEmiRecipe implements EmiRecipe {
 	protected List<EmiIngredient> catalysts = Lists.newArrayList();
 	protected List<EmiStack> outputs = Lists.newArrayList();
 	protected EmiRecipeCategory category;
-	protected ResourceLocation id;
+	protected Identifier id;
 	protected int width, height;
 
-	public BasicEmiRecipe(EmiRecipeCategory category, ResourceLocation id, int width, int height) {
+	public BasicEmiRecipe(EmiRecipeCategory category, Identifier id, int width, int height) {
 		this.category = category;
 		this.id = id;
 		this.width = width;
@@ -33,7 +33,7 @@ public abstract class BasicEmiRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 

@@ -2,7 +2,7 @@ package dev.emi.emi.recipe.special;
 
 import java.util.List;
 import java.util.Random;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,12 +19,12 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
-	private static final ResourceLocation BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	private final Item tool;
-	private final ResourceLocation id;
+	private final Identifier id;
 
-	public EmiGrindstoneDisenchantingRecipe(Item tool, ResourceLocation id) {
+	public EmiGrindstoneDisenchantingRecipe(Item tool, Identifier id) {
 		this.tool = tool;
 		this.id = id;
 	}
@@ -35,7 +35,7 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 

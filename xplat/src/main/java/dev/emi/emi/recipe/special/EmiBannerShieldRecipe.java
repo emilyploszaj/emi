@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,7 +28,7 @@ public class EmiBannerShieldRecipe extends EmiPatternCraftingRecipe {
 	public static final EmiStack SHIELD = EmiStack.of(Items.SHIELD);
 
 	@SuppressWarnings("unchecked")
-	public EmiBannerShieldRecipe(ResourceLocation id) {
+	public EmiBannerShieldRecipe(Identifier id) {
 		super((List<EmiIngredient>) (List<?>) Stream.concat(Stream.of(SHIELD), EMI_BANNERS.stream()).toList(), EmiStack.of(Items.SHIELD), id);
 	}
 

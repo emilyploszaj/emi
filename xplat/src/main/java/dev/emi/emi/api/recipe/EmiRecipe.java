@@ -1,11 +1,10 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
@@ -28,7 +27,7 @@ public interface EmiRecipe {
 	 * Commonly, synthetic IDs will be formatted "mymod:/my_process/unique_name".
 	 * @return The unique ID of the recipe, or null. If null, the recipe cannot be serialized.
 	 */
-	@Nullable ResourceLocation getId();
+	@Nullable Identifier getId();
 	
 	/**
 	 * @return A list of ingredients required for the recipe.

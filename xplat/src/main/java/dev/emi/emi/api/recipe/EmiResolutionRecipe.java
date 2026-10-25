@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.VanillaPlugin;
@@ -25,7 +25,7 @@ public class EmiResolutionRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return null;
 	}
 

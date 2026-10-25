@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,7 +82,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<InventoryMe
 	@Override
 	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<InventoryMenu> context) {
 		AbstractContainerMenu sh = context.getScreenHandler();
-		if (sh instanceof RecipeBookMenu<?, ?> arsh) {
+		if (sh instanceof AbstractCraftingMenu arsh) {
 			if (recipe instanceof EmiCraftingRecipe crafting) {
 				return crafting.canFit(arsh.getGridWidth(), arsh.getGridHeight())
 					&& StandardRecipeHandler.super.canCraft(recipe, context);
@@ -95,7 +95,7 @@ public class InventoryRecipeHandler implements StandardRecipeHandler<InventoryMe
 	public List<ClientTooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<InventoryMenu> context) {
 		if (!canCraft(recipe, context)) {
 			AbstractContainerMenu sh = context.getScreenHandler();
-			if (sh instanceof RecipeBookMenu<?, ?> arsh) {
+			if (sh instanceof AbstractCraftingMenu arsh) {
 				if (recipe instanceof EmiCraftingRecipe crafting) {
 					if (!crafting.canFit(arsh.getGridWidth(), arsh.getGridHeight())) {
 						return List.of(ClientTooltipComponent.create(EmiPort.ordered(TOO_SMALL)));

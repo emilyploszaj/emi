@@ -2,7 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,13 +15,13 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 
 public class EmiBrewingRecipe implements EmiRecipe {
-	private static final ResourceLocation BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/brewing_stand.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/brewing_stand.png");
 	private static final EmiStack BLAZE_POWDER = EmiStack.of(Items.BLAZE_POWDER);
 	private final EmiIngredient input, ingredient;
 	private final EmiStack output, input3, output3;
-	private final ResourceLocation id;
+	private final Identifier id;
 
-	public EmiBrewingRecipe(EmiStack input, EmiIngredient ingredient, EmiStack output, ResourceLocation id) {
+	public EmiBrewingRecipe(EmiStack input, EmiIngredient ingredient, EmiStack output, Identifier id) {
 		this.input = input;
 		this.ingredient = ingredient;
 		this.output = output;
@@ -36,7 +36,7 @@ public class EmiBrewingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 

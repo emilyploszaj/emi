@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe.handler;
 
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
@@ -64,6 +64,6 @@ public interface EmiRecipeHandler<T extends AbstractContainerMenu> {
 	 * Render feedback about the status of the current fill.
 	 * Common use is to render an overlay on missing ingredients
 	 */
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphics draw) {
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphicsExtractor draw) {
 	}
 }

@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -9,16 +9,16 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 
 public class EmiCraftingRecipe implements EmiRecipe {
-	protected final ResourceLocation id;
+	protected final Identifier id;
 	protected final List<EmiIngredient> input;
 	protected final EmiStack output;
 	public final boolean shapeless;
 
-	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id) {
+	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
 		this(input, output, id, true);
 	}
 
-	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id, boolean shapeless) {
+	public EmiCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
 		this.input = input;
 		this.output = output;
 		this.id = id;
@@ -31,7 +31,7 @@ public class EmiCraftingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 

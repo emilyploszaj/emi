@@ -2,7 +2,7 @@ package dev.emi.emi.recipe.special;
 
 import java.util.List;
 import java.util.Random;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import com.google.common.collect.Lists;
@@ -18,10 +18,10 @@ import dev.emi.emi.api.widget.WidgetHolder;
 
 public class EmiAnvilRepairItemRecipe implements EmiRecipe {
 	private final Item tool;
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 
-	public EmiAnvilRepairItemRecipe(Item tool, ResourceLocation id) {
+	public EmiAnvilRepairItemRecipe(Item tool, Identifier id) {
 		this.tool = tool;
 		this.id = id;
 	}
@@ -32,7 +32,7 @@ public class EmiAnvilRepairItemRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 

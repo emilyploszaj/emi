@@ -2,7 +2,7 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 import java.util.Random;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -16,10 +16,10 @@ import dev.emi.emi.api.widget.WidgetHolder;
 public class EmiAnvilRecipe implements EmiRecipe {
 	private final EmiStack tool;
 	private final EmiIngredient resource;
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	
-	public EmiAnvilRecipe(EmiStack tool, EmiIngredient resource, ResourceLocation id) {
+	public EmiAnvilRecipe(EmiStack tool, EmiIngredient resource, Identifier id) {
 		this.tool = tool;
 		this.resource = resource;
 		this.id = id;
@@ -31,7 +31,7 @@ public class EmiAnvilRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 

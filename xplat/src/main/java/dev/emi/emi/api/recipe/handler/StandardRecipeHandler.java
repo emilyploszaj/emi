@@ -4,7 +4,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -85,14 +84,13 @@ public interface StandardRecipeHandler<T extends AbstractContainerMenu> extends 
 	}
 
 	@Override
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphics draw) {
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphicsExtractor draw) {
 		renderMissing(recipe, context.getInventory(), widgets, draw);
 	}
 
 	@ApiStatus.Internal
-	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, GuiGraphics draw) {
+	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, GuiGraphicsExtractor draw) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		context.enableDepthTest();
 		Map<EmiIngredient, Boolean> availableForCrafting = getAvailable(recipe, inv);
 		for (Widget w : widgets) {
 			if (w instanceof SlotWidget sw) {
