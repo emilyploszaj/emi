@@ -2,13 +2,11 @@ package dev.emi.emi.platform.fabric;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
@@ -18,32 +16,27 @@ import dev.emi.emi.api.FabricEmiStack;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
-import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.mixin.accessor.BrewingRecipeRegistryAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.recipe.EmiBrewingRecipe;
 import dev.emi.emi.registry.EmiPluginContainer;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.FakeScreen;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PotionItem;
@@ -139,14 +132,14 @@ public class EmiAgnosFabric extends EmiAgnos {
 		PotionBrewing brewingRegistry = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.potionBrewing() : PotionBrewing.EMPTY;
 		BrewingRecipeRegistryAccessor brewingRegistryAccess = (BrewingRecipeRegistryAccessor)brewingRegistry;
 		for (Ingredient ingredient : brewingRegistryAccess.getPotionTypes()) {
-			for (ItemStack stack : ingredient.getItems()) {
+			for (ItemStack stack : ingredient.items().map(ItemStack::new).toList()) {
 				String pid = EmiUtil.subId(stack.getItem());
 				for (PotionBrewing.Mix<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
 						Ingredient recipeIngredient = recipe.ingredient();
-						if (recipeIngredient.getItems().length > 0) {
-							ResourceLocation id = EmiPort.id("emi", "/brewing/" + pid
-								+ "/" + EmiUtil.subId(recipeIngredient.getItems()[0].getItem())
+						if (!recipeIngredient.isEmpty()) {
+							Identifier id = EmiPort.id("emi", "/brewing/" + pid
+								+ "/" + EmiUtil.subId(recipeIngredient.items().findFirst().get().value())
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getKey(recipe.from().value()))
 								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getKey(recipe.to().value())));
 							registry.addRecipe(new EmiBrewingRecipe(
@@ -163,21 +156,21 @@ public class EmiAgnosFabric extends EmiAgnos {
 		for (PotionBrewing.Mix<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
 			try {
 				Ingredient recipeIngredient = recipe.ingredient();
-				if (recipeIngredient.getItems().length > 0) {
-					String gid = EmiUtil.subId(recipeIngredient.getItems()[0].getItem());
+				if (!recipeIngredient.isEmpty()) {
+					String gid = EmiUtil.subId(recipeIngredient.items().findFirst().get().value());
 					String iid = EmiUtil.subId(recipe.from().value());
 					String oid = EmiUtil.subId(recipe.to().value());
 					Consumer<Holder<Potion>> potionRecipeGen = entry -> {
 						if (brewingRegistry.isBrewablePotion(entry)) {
-							ResourceLocation id = EmiPort.id("emi", "/brewing/item/"
-								+ EmiUtil.subId(entry.unwrapKey().get().location()) + "/" + gid + "/" + iid + "/" + oid);
+							Identifier id = EmiPort.id("emi", "/brewing/item/"
+								+ EmiUtil.subId(entry.unwrapKey().get().identifier()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), entry.value())), EmiIngredient.of(recipeIngredient),
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.to().value()), entry.value())), id));
 						}
 					};
 					if (recipe.from().value() instanceof PotionItem) {
-						EmiPort.getPotionRegistry().holders().forEach(potionRecipeGen);
+						EmiPort.getPotionRegistry().listElements().forEach(potionRecipeGen);
 					} else {
 						potionRecipeGen.accept(Potions.AWKWARD);
 					}
@@ -210,16 +203,12 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+	protected void renderFluidAgnos(FluidEmiStack stack, GuiGraphicsExtractor draw, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
-		TextureAtlasSprite[] sprites = FluidVariantRendering.getSprites(fluid);
-		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
-			return;
-		}
-		TextureAtlasSprite sprite = sprites[0];
+		TextureAtlasSprite sprite = EmiAgnos.getStillFluidSprite(fluid.getFluid());
 		int color = FluidVariantRendering.getColor(fluid);
 		
-		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
+		EmiRenderHelper.drawTintedSprite(draw, sprite, color, x, y, xOff, yOff, width, height);
 	}
 
 	@Override
@@ -228,31 +217,6 @@ public class EmiAgnosFabric extends EmiAgnos {
 			return FabricEmiStack.of(fluid.getFluidVariant(), fluid.getAmount());
 		}
 		return EmiStack.EMPTY;
-	}
-
-	@Override
-	protected boolean canBatchAgnos(ItemStack stack) {
-		return ColorProviderRegistry.ITEM.get(stack.getItem()) == null;
-	}
-
-	@Override
-	protected Map<Item, Integer> getFuelMapAgnos() {
-		Object2IntMap<Item> fuelMap = new Object2IntOpenHashMap<>();
-		for (Item item : EmiPort.getItemRegistry()) {
-			if (FuelRegistry.INSTANCE.get(item) == null) {
-				continue;
-			}
-			int time = FuelRegistry.INSTANCE.get(item);
-			if (time > 0) {
-				fuelMap.put(item, time);
-			}
-		}
-		return fuelMap;
-	}
-
-	@Override
-	protected BakedModel getBakedTagModelAgnos(ResourceLocation id) {
-		return Minecraft.getInstance().getModelManager().getModel(id);
 	}
 
 	@Override

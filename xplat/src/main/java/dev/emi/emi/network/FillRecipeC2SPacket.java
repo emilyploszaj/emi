@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -153,9 +153,9 @@ public class FillRecipeC2SPacket implements EmiPacket {
 				}
 				if (output != null) {
 					if (action == 1) {
-						handler.clicked(output.getContainerSlot(), 0, ClickType.PICKUP, player);
+						handler.clicked(output.getContainerSlot(), 0, ContainerInput.PICKUP, player);
 					} else if (action == 2) {
-						handler.clicked(output.getContainerSlot(), 0, ClickType.QUICK_MOVE, player);
+						handler.clicked(output.getContainerSlot(), 0, ContainerInput.QUICK_MOVE, player);
 					}
 				}
 			} finally {

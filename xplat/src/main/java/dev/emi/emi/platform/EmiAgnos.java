@@ -1,18 +1,22 @@
 package dev.emi.emi.platform;
 
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.renderer.block.FluidModel;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.world.level.block.entity.FuelValues;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.Minecraft;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.material.Fluid;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
@@ -120,15 +124,15 @@ public abstract class EmiAgnos {
 
 	protected abstract boolean isFloatyFluidAgnos(FluidEmiStack stack);
 
-	public static void renderFluid(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta) {
-		renderFluid(stack, matrices, x, y, delta, 0, 0, 16, 16);
+	public static void renderFluid(FluidEmiStack stack, GuiGraphicsExtractor draw, int x, int y, float delta) {
+		renderFluid(stack, draw, x, y, delta, 0, 0, 16, 16);
 	}
 
-	public static void renderFluid(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
-		delegate.renderFluidAgnos(stack, matrices, x, y, delta, xOff, yOff, width, height);
+	public static void renderFluid(FluidEmiStack stack, GuiGraphicsExtractor draw, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+		delegate.renderFluidAgnos(stack, draw, x, y, delta, xOff, yOff, width, height);
 	}
 
-	protected abstract void renderFluidAgnos(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, GuiGraphicsExtractor draw, int x, int y, float delta, int xOff, int yOff, int width, int height);
 
 	public static EmiStack createFluidStack(Object object) {
 		return delegate.createFluidStackAgnos(object);
@@ -136,23 +140,30 @@ public abstract class EmiAgnos {
 
 	protected abstract EmiStack createFluidStackAgnos(Object object);
 
-	public static boolean canBatch(ItemStack stack) {
-		return delegate.canBatchAgnos(stack);
-	}
-	
-	protected abstract boolean canBatchAgnos(ItemStack stack);
-
 	public static Map<Item, Integer> getFuelMap() {
 		return delegate.getFuelMapAgnos();
 	}
 
-	protected abstract Map<Item, Integer> getFuelMapAgnos();
-
-	public static BakedModel getBakedTagModel(ResourceLocation id) {
-		return delegate.getBakedTagModelAgnos(id);
+	protected Map<Item, Integer> getFuelMapAgnos() {
+		Map<Item, Integer> fuelMap = new Object2IntOpenHashMap<>();
+		FuelValues fuels = Minecraft.getInstance().level.fuelValues();
+		for (Item item : fuels.fuelItems()) {
+			int time = fuels.burnDuration(item.getDefaultInstance());
+			if (time > 0) {
+				fuelMap.put(item, time);
+			}
+		}
+		return fuelMap;
 	}
 
-	protected abstract BakedModel getBakedTagModelAgnos(ResourceLocation id);
+	public static TextureAtlasSprite getStillFluidSprite(Fluid fluid) {
+		return Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState()).stillMaterial().sprite();
+	}
+
+	public static int getFluidTint(Fluid fluid) {
+		FluidModel model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
+		return model.tintSource() == null ? -1 : model.tintSource().color(Blocks.AIR.defaultBlockState());
+	}
 
 	public static boolean isEnchantable(ItemStack stack, Enchantment enchantment) {
 		return delegate.isEnchantableAgnos(stack, enchantment);
