@@ -46,6 +46,8 @@ public class RecipeTooltipComponent implements EmiTooltipComponent {
 
 	@Override
 	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
+		// Elements within a stratum are sorted by texture, keep the recipe above the tooltip background
+		context.raw().nextStratum();
 		EmiRenderHelper.renderRecipe(recipe, context, 0, 0, showMissing, overlayColor);
 	}
 }
