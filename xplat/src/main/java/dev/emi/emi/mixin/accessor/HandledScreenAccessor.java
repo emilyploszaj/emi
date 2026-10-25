@@ -24,6 +24,6 @@ public interface HandledScreenAccessor {
 	@Accessor("imageHeight")
 	int getBackgroundHeight();
 
-	@Invoker("findSlot")
+	@Invoker("getHoveredSlot")
 	Slot invokeGetSlotAt(double x, double y);
 }

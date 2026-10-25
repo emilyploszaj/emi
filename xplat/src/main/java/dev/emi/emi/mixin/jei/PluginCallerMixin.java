@@ -16,13 +16,13 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.library.load.PluginCaller;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @Pseudo
 @Mixin(PluginCaller.class)
 public class PluginCallerMixin {
 	@Unique
-	private static final Set<ResourceLocation> SKIPPED = Sets.newHashSet(
+	private static final Set<Identifier> SKIPPED = Sets.newHashSet(
 		EmiPort.id("jei", "minecraft"), EmiPort.id("jei", "gui"), EmiPort.id("jei", "fabric_gui"), EmiPort.id("jei", "forge_gui"), EmiPort.id("jei", "neoforge_gui")
 	);
 	@Unique
@@ -32,7 +32,7 @@ public class PluginCallerMixin {
 		method = "callOnPlugins", remap = false)
 	private static void callOnPlugins(Consumer<IModPlugin> target, Object value, String title, List<IModPlugin> plugins, Consumer<IModPlugin> func) {
 		IModPlugin plugin = (IModPlugin) value;
-		ResourceLocation uid = plugin.getPluginUid();
+		Identifier uid = plugin.getPluginUid();
 		if (SKIPPED.contains(uid)) {
 			switch (title) {
 				case "Registering categories" -> {}
