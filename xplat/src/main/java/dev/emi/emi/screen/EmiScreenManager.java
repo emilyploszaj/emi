@@ -899,17 +899,17 @@ public class EmiScreenManager {
 		}
 		forceRecalculate();
 		if (EmiConfig.centerSearchBar || panels.get(0).space == null || panels.get(1).space == null) {
-			search.x = (screen.width - 160) / 2;
-			search.y = screen.height - 21;
+			search.setX((screen.width - 160) / 2);
+			search.setY(screen.height - 21);
 			search.setWidth(160);
 		} else {
 			if (EmiConfig.searchSidebar == SidebarSide.RIGHT) {
-				search.x = panels.get(1).space.tx;
-				search.y = screen.height - 21;
+				search.setX(panels.get(1).space.tx);
+				search.setY(screen.height - 21);
 				search.setWidth(panels.get(1).space.tw * ENTRY_SIZE);
 			} else {
-				search.x = panels.get(0).space.tx;
-				search.y = screen.height - 21 - 21;
+				search.setX(panels.get(0).space.tx);
+				search.setY(screen.height - 21 - 21);
 				search.setWidth(panels.get(0).space.tw * ENTRY_SIZE);
 			}
 		}
