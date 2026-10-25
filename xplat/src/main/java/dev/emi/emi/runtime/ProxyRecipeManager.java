@@ -87,9 +87,11 @@ public class ProxyRecipeManager {
 		if (raw == null) {
 			return;
 		}
-		recipeIds = new Reference2ObjectOpenHashMap<>();
+		// Built locally, a disconnect can clear the ids from another thread mid bake
+		Map<Recipe<?>, Identifier> ids = new Reference2ObjectOpenHashMap<>();
 		for (RecipeHolder<?> entry : raw.values()) {
-			recipeIds.put(entry.value(), entry.id().identifier());
+			ids.put(entry.value(), entry.id().identifier());
 		}
+		recipeIds = ids;
 	}
 }
