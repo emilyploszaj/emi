@@ -1,7 +1,7 @@
 package dev.emi.emi.data;
 
 import java.io.InputStreamReader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -20,12 +20,12 @@ import dev.emi.emi.runtime.EmiLog;
 public class RecipeDefaultLoader extends SimplePreparableReloadListener<RecipeDefaults>
 		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
-	public static final ResourceLocation ID = EmiPort.id("emi:recipe_defaults");
+	public static final Identifier ID = EmiPort.id("emi:recipe_defaults");
 
 	@Override
 	protected RecipeDefaults prepare(ResourceManager manager, ProfilerFiller profiler) {
 		RecipeDefaults defaults = new RecipeDefaults();
-		for (ResourceLocation id : EmiPort.findResources(manager, "recipe/defaults", i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "recipe/defaults", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
@@ -48,7 +48,7 @@ public class RecipeDefaultLoader extends SimplePreparableReloadListener<RecipeDe
 	}
 	
 	@Override
-	public ResourceLocation getEmiId() {
+	public Identifier getEmiId() {
 		return ID;
 	}
 
@@ -58,7 +58,7 @@ public class RecipeDefaultLoader extends SimplePreparableReloadListener<RecipeDe
 		}
 		JsonArray disabled = GsonHelper.getAsJsonArray(json, "disabled", new JsonArray());
 		for (JsonElement el : disabled) {
-			ResourceLocation id = EmiPort.id(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			defaults.remove(id);
 		}
 		JsonArray added = GsonHelper.getAsJsonArray(json, "added", new JsonArray());
@@ -66,12 +66,12 @@ public class RecipeDefaultLoader extends SimplePreparableReloadListener<RecipeDe
 			added.addAll(GsonHelper.getAsJsonArray(json, "recipes"));
 		}
 		for (JsonElement el : added) {
-			ResourceLocation id = EmiPort.id(el.getAsString());
+			Identifier id = EmiPort.id(el.getAsString());
 			defaults.add(id);
 		}
 		JsonObject resolutions = GsonHelper.getAsJsonObject(json, "resolutions", new JsonObject());
 		for (String key : resolutions.keySet()) {
-			ResourceLocation id = EmiPort.id(key);
+			Identifier id = EmiPort.id(key);
 			if (GsonHelper.isArrayNode(resolutions, key)) {
 				defaults.add(id, GsonHelper.getAsJsonArray(resolutions, key));
 			}

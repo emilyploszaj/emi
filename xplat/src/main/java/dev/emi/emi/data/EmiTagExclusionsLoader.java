@@ -1,7 +1,7 @@
 package dev.emi.emi.data;
 
 import java.io.InputStreamReader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -19,12 +19,12 @@ import dev.emi.emi.runtime.EmiLog;
 public class EmiTagExclusionsLoader extends SimplePreparableReloadListener<TagExclusions>
 		implements EmiResourceReloadListener {
 	private static final Gson GSON = new Gson();
-	private static final ResourceLocation ID = EmiPort.id("emi:tag_exclusions");
+	private static final Identifier ID = EmiPort.id("emi:tag_exclusions");
 
 	@Override
 	public TagExclusions prepare(ResourceManager manager, ProfilerFiller profiler) {
 		TagExclusions exclusions = new TagExclusions();
-		for (ResourceLocation id : EmiPort.findResources(manager, "tag/exclusions", i -> i.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "tag/exclusions", i -> i.endsWith(".json"))) {
 			if (!id.getNamespace().equals("emi")) {
 				continue;
 			}
@@ -37,11 +37,11 @@ public class EmiTagExclusionsLoader extends SimplePreparableReloadListener<TagEx
 							exclusions.clear();
 						}
 						for (String key : json.keySet()) {
-							ResourceLocation type = EmiPort.id(key);
+							Identifier type = EmiPort.id(key);
 							if (GsonHelper.isArrayNode(json, key)) {
 								JsonArray arr = GsonHelper.getAsJsonArray(json, key);
 								for (JsonElement el : arr) {
-									ResourceLocation eid = EmiPort.id(el.getAsString());
+									Identifier eid = EmiPort.id(el.getAsString());
 									if (key.equals("exclusions")) {
 										exclusions.add(eid);
 										if (eid.getNamespace().equals("c")) {
@@ -73,7 +73,7 @@ public class EmiTagExclusionsLoader extends SimplePreparableReloadListener<TagEx
 	}
 
 	@Override
-	public ResourceLocation getEmiId() {
+	public Identifier getEmiId() {
 		return ID;
 	}
 }

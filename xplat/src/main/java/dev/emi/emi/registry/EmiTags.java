@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -32,11 +31,11 @@ import dev.emi.emi.util.InheritanceMap;
 public class EmiTags {
 	public static final InheritanceMap<EmiRegistryAdapter<?>> ADAPTERS_BY_CLASS = new InheritanceMap<>(Maps.newHashMap());
 	public static final Map<Registry<?>, EmiRegistryAdapter<?>> ADAPTERS_BY_REGISTRY = Maps.newHashMap();
-	public static final ResourceLocation HIDDEN_FROM_RECIPE_VIEWERS = EmiPort.id("c", "hidden_from_recipe_viewers");
-	public static final Map<TagKey<?>, ResourceLocation> MODELED_TAGS = Maps.newHashMap();
+	public static final Identifier HIDDEN_FROM_RECIPE_VIEWERS = EmiPort.id("c", "hidden_from_recipe_viewers");
+	public static final Map<TagKey<?>, Identifier> MODELED_TAGS = Maps.newHashMap();
 	private static final Map<Set<?>, List<EmiTagKey<?>>> CACHED_TAGS = Maps.newHashMap();
 	private static final Map<EmiTagKey<?>, List<?>> TAG_VALUES = Maps.newHashMap();
-	private static final Map<ResourceLocation, List<EmiTagKey<?>>> SORTED_TAGS = Maps.newHashMap();
+	private static final Map<Identifier, List<EmiTagKey<?>>> SORTED_TAGS = Maps.newHashMap();
 	public static final List<EmiTagKey<?>> TAGS = Lists.newArrayList();
 	public static TagExclusions exclusions = new TagExclusions();
 
@@ -140,20 +139,20 @@ public class EmiTags {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <T> List<EmiTagKey<T>> getTags(Registry<T> registry) {
-		return (List<EmiTagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.key().location(), List.of());
+		return (List<EmiTagKey<T>>) (List) SORTED_TAGS.getOrDefault(registry.key().identifier(), List.of());
 	}
 
-	public static void registerTagModels(ResourceManager manager, Consumer<ModelResourceLocation> consumer, String variant) {
+	public static void registerTagModels(ResourceManager manager, Consumer<Identifier> consumer) {
 		EmiTags.MODELED_TAGS.clear();
-		for (ResourceLocation id : EmiPort.findResources(manager, "models/tag", s -> s.endsWith(".json"))) {
+		for (Identifier id : EmiPort.findResources(manager, "models/tag", s -> s.endsWith(".json"))) {
 			String path = id.getPath();
 			path = path.substring(11, path.length() - 5);
 			String[] parts = path.split("/");
 			if (parts.length > 1) {
 				TagKey<?> key = TagKey.create(ResourceKey.createRegistryKey(EmiPort.id("minecraft", parts[0])), EmiPort.id(id.getNamespace(), path.substring(1 + parts[0].length())));
-				ResourceLocation mid = EmiPort.id(id.getNamespace(), "tag/" + path);
+				Identifier mid = EmiPort.id(id.getNamespace(), "tag/" + path);
 				EmiTags.MODELED_TAGS.put(key, mid);
-				consumer.accept(new ModelResourceLocation(mid, variant));
+				consumer.accept(mid);
 			}
 		}
 		/*
@@ -185,7 +184,7 @@ public class EmiTags {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static <T> void reloadTags(Registry<T> registry) {
 		Set<T> hidden = EmiTagKey.of(registry, HIDDEN_FROM_RECIPE_VIEWERS).getSet();
-		ResourceLocation rid = registry.key().location();
+		Identifier rid = registry.key().identifier();
 		List<EmiTagKey<T>> tags = EmiTagKey.fromRegistry(registry)
 			.filter(key -> !exclusions.contains(rid, key.id()) && !hidden.containsAll(key.getList()))
 			.toList();
@@ -203,7 +202,7 @@ public class EmiTags {
 		tags = tags.stream()
 			.sorted((a, b) -> Long.compare(b.stream().count(), a.stream().count()))
 			.toList();
-		EmiTags.SORTED_TAGS.put(registry.key().location(), (List) tags);
+		EmiTags.SORTED_TAGS.put(registry.key().identifier(), (List) tags);
 	}
 
 	@SuppressWarnings("unchecked")
