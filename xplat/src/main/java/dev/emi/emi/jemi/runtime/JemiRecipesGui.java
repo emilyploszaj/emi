@@ -16,8 +16,8 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.runtime.IRecipesGui;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 
 public class JemiRecipesGui implements IRecipesGui {
 
@@ -54,8 +54,8 @@ public class JemiRecipesGui implements IRecipesGui {
 
 	@Override
 	public <T> Optional<T> getIngredientUnderMouse(IIngredientType<T> ingredientType) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.currentScreen instanceof RecipeScreen screen) {
+		Minecraft client = Minecraft.getInstance();
+		if (client.screen instanceof RecipeScreen screen) {
 			EmiIngredient stack = screen.getHoveredStack();
 			if (!stack.isEmpty()) {
 				Optional<ITypedIngredient<?>> opt = JemiUtil.getTyped(stack.getEmiStacks().get(0));

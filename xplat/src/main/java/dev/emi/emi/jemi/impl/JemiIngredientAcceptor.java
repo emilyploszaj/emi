@@ -22,10 +22,10 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.material.Fluid;
 
 public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredientAcceptor> {
 	public static final Pattern FLUID_END = Pattern.compile("(^|\\s)([\\d,]+)\\s*mB$");
@@ -44,9 +44,9 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 		for (EmiStack stack : stacks) {
 			ITypedIngredient typed = JemiUtil.getTyped(stack).orElse(null);
 			if (typed != null && (stack instanceof JemiStack || stack.getKey() instanceof Fluid)) {
-				List<Text> base = Lists.newArrayList();
+				List<Component> base = Lists.newArrayList();
 				if (renderers != null && renderers.containsKey(typed.getType())) {
-					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipType.BASIC));
+					base.addAll(((IngredientRenderer) renderers.get(typed.getType())).renderer().getTooltip(typed.getIngredient(), TooltipFlag.NORMAL));
 				}
 				if (base == null || base.isEmpty()) {
 					if (tooltipCallback == null) {
@@ -60,7 +60,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 					tooltipCallback.onTooltip(jsr, base);
 				}
 				for (int i = 0; i < 2 && i < base.size(); i++) {
-					Text t = base.get(i);
+					Component t = base.get(i);
 					if (t != null) {
 						Matcher m = FLUID_END.matcher(t.getString());
 						if (m.find()) {
@@ -119,7 +119,7 @@ public class JemiIngredientAcceptor implements IIngredientAcceptor<JemiIngredien
 	}
 	
 	@Override
-	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, ComponentChanges componentChanges) {
+	public JemiIngredientAcceptor addFluidStack(Fluid fluid, long amount, DataComponentPatch componentChanges) {
 		addStack(EmiStack.of(fluid, componentChanges, amount));
 		return this;
 	}

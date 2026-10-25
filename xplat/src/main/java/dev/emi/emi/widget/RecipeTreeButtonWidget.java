@@ -1,12 +1,11 @@
 package dev.emi.emi.widget;
 
 import java.util.List;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.bom.BoM;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 
@@ -24,8 +23,8 @@ public class RecipeTreeButtonWidget extends RecipeButtonWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.view_tree"))));
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
+		return List.of(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.view_tree"))));
 	}
 
 	@Override

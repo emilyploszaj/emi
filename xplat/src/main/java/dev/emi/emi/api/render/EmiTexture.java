@@ -2,8 +2,8 @@ package dev.emi.emi.api.render;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public class EmiTexture implements EmiRenderable {
 	public static final EmiTexture SLOT = new EmiTexture(EmiRenderHelper.WIDGETS, 0, 0, 18, 18);
@@ -15,14 +15,14 @@ public class EmiTexture implements EmiRenderable {
 	public static final EmiTexture PLUS = new EmiTexture(EmiRenderHelper.WIDGETS, 82, 0, 13, 13);
 	public static final EmiTexture SHAPELESS = new EmiTexture(EmiRenderHelper.WIDGETS, 95, 0, 16, 13);
 
-	public final Identifier texture;
+	public final ResourceLocation texture;
 	public final int u, v, width, height;
 	public final int regionWidth, regionHeight, textureWidth, textureHeight;
 
-	public EmiTexture(Identifier texture, int u, int v, int width, int height) {
+	public EmiTexture(ResourceLocation texture, int u, int v, int width, int height) {
 		this(texture, u, v, width, height, width, height, 256, 256);
 	}
-	public EmiTexture(Identifier texture, int u, int v, int width, int height,
+	public EmiTexture(ResourceLocation texture, int u, int v, int width, int height,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
 		this.texture = texture;
 		this.u = u;
@@ -36,7 +36,7 @@ public class EmiTexture implements EmiRenderable {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta) {
+	public void render(GuiGraphics draw, int x, int y, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}

@@ -10,9 +10,9 @@ import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.Rect2i;
 
 public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 
@@ -28,7 +28,7 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void render(Screen screen, EmiIngredient dragged, DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(Screen screen, EmiIngredient dragged, GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		try {
 			this.<Object>render(screen, EmiDrawContext.wrap(raw), (Optional<ITypedIngredient<Object>>) (Optional) JemiUtil.getTyped(dragged.getEmiStacks().get(0)));
 		} catch (Exception e) {

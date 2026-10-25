@@ -1,9 +1,9 @@
 package dev.emi.emi.runtime;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class EmiProfiler {
-	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+	private static final Minecraft CLIENT = Minecraft.getInstance();
 
 	public static void push(String name) {
 		CLIENT.getProfiler().push(name);
@@ -14,6 +14,6 @@ public class EmiProfiler {
 	}
 
 	public static void swap(String name) {
-		CLIENT.getProfiler().swap(name);
+		CLIENT.getProfiler().popPush(name);
 	}
 }

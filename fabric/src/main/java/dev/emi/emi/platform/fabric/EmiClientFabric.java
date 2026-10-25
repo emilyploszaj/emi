@@ -24,15 +24,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketDecoder;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamDecoder;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 public class EmiClientFabric implements ClientModInitializer {
 
@@ -40,11 +38,11 @@ public class EmiClientFabric implements ClientModInitializer {
 	public void onInitializeClient() {
 		EmiClient.init();
 		EmiData.init(reloader -> {
-			ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
+			ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
 
 				@Override
-				public CompletableFuture<Void> reload(Synchronizer var1, ResourceManager var2, Profiler var3,
-						Profiler var4, Executor var5, Executor var6) {
+				public CompletableFuture<Void> reload(PreparationBarrier var1, ResourceManager var2, ProfilerFiller var3,
+						ProfilerFiller var4, Executor var5, Executor var6) {
 					return reloader.reload(var1, var2, var3, var4, var5, var6);
 				}
 
@@ -54,15 +52,15 @@ public class EmiClientFabric implements ClientModInitializer {
 				}
 
 				@Override
-				public Identifier getFabricId() {
+				public ResourceLocation getFabricId() {
 					return reloader.getEmiId();
 				}
 			});
 		});
 
-		PreparableModelLoadingPlugin.<List<Identifier>>register((manager, executor) -> {
+		PreparableModelLoadingPlugin.<List<ResourceLocation>>register((manager, executor) -> {
 			return CompletableFuture.supplyAsync(() -> {
-				List<Identifier> ids = Lists.newArrayList();
+				List<ResourceLocation> ids = Lists.newArrayList();
 				EmiTags.registerTagModels(manager, id -> ids.add(id.id()), "");
 				return ids;
 			}, executor);
@@ -71,7 +69,7 @@ public class EmiClientFabric implements ClientModInitializer {
 		});
 
 		EmiNetwork.initClient(packet -> {
-			if (ClientPlayNetworking.canSend(packet.getId())) {
+			if (ClientPlayNetworking.canSend(packet.type())) {
 				ClientPlayNetworking.send(packet);
 			}
 		});
@@ -81,7 +79,7 @@ public class EmiClientFabric implements ClientModInitializer {
 		registerPacketReader(EmiNetwork.CHESS, EmiChessPacket.S2C::new);
 	}
 
-	private <T extends EmiPacket> void registerPacketReader(CustomPayload.Id<T> id, PacketDecoder<RegistryByteBuf, T> decode) {
+	private <T extends EmiPacket> void registerPacketReader(CustomPacketPayload.Type<T> id, StreamDecoder<RegistryFriendlyByteBuf, T> decode) {
 		ClientPlayNetworking.registerGlobalReceiver(id, (payload, context) -> {
 			context.client().execute(() -> {
 				payload.apply(context.client().player);

@@ -9,23 +9,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
-@Mixin(Keyboard.class)
+@Mixin(KeyboardHandler.class)
 public class KeyboardMixin {
 	@Shadow @Final
-	private MinecraftClient client;
+	private Minecraft minecraft;
 	
 	@Inject(at = @At(value = "INVOKE", target =
-			"net/minecraft/client/gui/screen/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
-		method = "onKey(JIIII)V", cancellable = true)
+			"net/minecraft/client/gui/screens/Screen.wrapScreenError(Ljava/lang/Runnable;Ljava/lang/String;Ljava/lang/String;)V"),
+		method = "keyPress(JIIII)V", cancellable = true)
 	public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
 		try {
-			Screen screen = client.currentScreen;
-			if (screen instanceof HandledScreen<?> hs) {
+			Screen screen = minecraft.screen;
+			if (screen instanceof AbstractContainerScreen<?> hs) {
 				if (action == 1 || action == 2) {
 					if (EmiScreenManager.keyPressed(key, scancode, modifiers)) {
 						info.cancel();
@@ -38,12 +38,12 @@ public class KeyboardMixin {
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "onChar(JII)V", cancellable = true)
+		method = "charTyped(JII)V", cancellable = true)
 	public void onChar(long window, int codePoint, int modifiers, CallbackInfo info) {
 		try {
-			if (window == client.getWindow().getHandle()) {
-				Screen screen = client.currentScreen;
-				if (screen instanceof HandledScreen<?> hs && this.client.getOverlay() == null) {
+			if (window == minecraft.getWindow().getWindow()) {
+				Screen screen = minecraft.screen;
+				if (screen instanceof AbstractContainerScreen<?> hs && this.minecraft.getOverlay() == null) {
 					boolean consume = false;
 					if (Character.charCount(codePoint) == 1) {
 						consume = EmiScreenManager.search.charTyped((char) codePoint, modifiers) || consume;

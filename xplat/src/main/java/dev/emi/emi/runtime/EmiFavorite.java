@@ -1,7 +1,11 @@
 package dev.emi.emi.runtime;
 
 import java.util.List;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -20,11 +24,6 @@ import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.screen.MicroTextRenderer;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class EmiFavorite implements EmiIngredient, Batchable {
 	protected final EmiIngredient stack;
@@ -74,7 +73,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (recipe != null) {
 			flags |= EmiIngredient.RENDER_AMOUNT;
@@ -86,8 +85,8 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
 		list.addAll(stack.getTooltip());
 		if (recipe != null) {
 			list.add(new RecipeTooltipComponent(recipe, true));
@@ -132,7 +131,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 	}
 
 	@Override
-	public void renderForBatch(VertexConsumerProvider vcp, DrawContext raw, int x, int y, int z, float delta) {
+	public void renderForBatch(MultiBufferSource vcp, GuiGraphics raw, int x, int y, int z, float delta) {
 		if (stack instanceof Batchable b) {
 			b.renderForBatch(vcp, raw, x, y, z, delta);
 		}
@@ -145,7 +144,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
 			super.render(raw, x, y, delta, flags & (~EmiIngredient.RENDER_INGREDIENT));
 		}
 	}
@@ -173,7 +172,7 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public void render(DrawContext raw, int x, int y, float delta, int flags) {
+		public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
 			EmiDrawContext context = EmiDrawContext.wrap(raw);
 			int color = 0x915900; // Orange
 			if (state == 1) {
@@ -189,22 +188,22 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 		}
 
 		@Override
-		public List<TooltipComponent> getTooltip() {
-			List<TooltipComponent> list = Lists.newArrayList();
+		public List<ClientTooltipComponent> getTooltip() {
+			List<ClientTooltipComponent> list = Lists.newArrayList();
 			list.addAll(super.getTooltip());
 
 			long diff = total - amount;
-			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.remaining", EmiRenderHelper.getAmountText(stack, amount)).formatted(Formatting.GRAY)));
-			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.obtained", EmiRenderHelper.getAmountText(stack, diff), EmiRenderHelper.getAmountText(stack, total)).formatted(Formatting.GRAY)));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.remaining", EmiRenderHelper.getAmountText(stack, amount)).withStyle(ChatFormatting.GRAY)));
+			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.obtained", EmiRenderHelper.getAmountText(stack, diff), EmiRenderHelper.getAmountText(stack, total)).withStyle(ChatFormatting.GRAY)));
 			if (batches != amount) {
-				list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.batches_remaining", batches).formatted(Formatting.GRAY)));
+				list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.synfav.batches_remaining", batches).withStyle(ChatFormatting.GRAY)));
 			}
 
 			if (state == -1) {
 				return list;
 			}
 			
-			Text craftKey = null;
+			Component craftKey = null;
 
 			if (EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiRecipeFiller.getFirstValidHandler(recipe, EmiApi.getHandledScreen()) != null) {
 				if (EmiConfig.craftAllToInventory.isBound()) {
@@ -214,16 +213,16 @@ public class EmiFavorite implements EmiIngredient, Batchable {
 				}
 			}
 			if (state == 0) {
-				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.uncraftable").asOrderedText()));
+				list.add(ClientTooltipComponent.create(EmiPort.translatable("tooltip.emi.synfav.uncraftable").getVisualOrderText()));
 			} else if (state == 1) {
-				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.partially_craftable").asOrderedText()));
+				list.add(ClientTooltipComponent.create(EmiPort.translatable("tooltip.emi.synfav.partially_craftable").getVisualOrderText()));
 				if (craftKey != null) {
-					list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.craft_some", craftKey).asOrderedText()));
+					list.add(ClientTooltipComponent.create(EmiPort.translatable("tooltip.emi.synfav.craft_some", craftKey).getVisualOrderText()));
 				}
 			} else if (state == 2) {
-				list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.fully_craftable", batches).asOrderedText()));
+				list.add(ClientTooltipComponent.create(EmiPort.translatable("tooltip.emi.synfav.fully_craftable", batches).getVisualOrderText()));
 				if (craftKey != null) {
-					list.add(TooltipComponent.of(EmiPort.translatable("tooltip.emi.synfav.craft_all", craftKey, batches).asOrderedText()));
+					list.add(ClientTooltipComponent.create(EmiPort.translatable("tooltip.emi.synfav.craft_all", craftKey, batches).getVisualOrderText()));
 				}
 			}
 			return list;

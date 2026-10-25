@@ -3,21 +3,20 @@ package dev.emi.emi.platform;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.material.Fluid;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.registry.EmiPluginContainer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public abstract class EmiAgnos {
 	public static EmiAgnos delegate;
@@ -97,23 +96,23 @@ public abstract class EmiAgnos {
 
 	protected abstract void addBrewingRecipesAgnos(EmiRegistry registry);
 
-	public static List<TooltipComponent> getItemTooltip(ItemStack stack) {
+	public static List<ClientTooltipComponent> getItemTooltip(ItemStack stack) {
 		return delegate.getItemTooltipAgnos(stack);
 	}
 
-	protected abstract List<TooltipComponent> getItemTooltipAgnos(ItemStack stack);
+	protected abstract List<ClientTooltipComponent> getItemTooltipAgnos(ItemStack stack);
 
-	public static Text getFluidName(Fluid fluid, ComponentChanges componentChanges) {
+	public static Component getFluidName(Fluid fluid, DataComponentPatch componentChanges) {
 		return delegate.getFluidNameAgnos(fluid, componentChanges);
 	}
 
-	protected abstract Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges);
+	protected abstract Component getFluidNameAgnos(Fluid fluid, DataComponentPatch componentChanges);
 
-	public static List<Text> getFluidTooltip(Fluid fluid, ComponentChanges componentChanges) {
+	public static List<Component> getFluidTooltip(Fluid fluid, DataComponentPatch componentChanges) {
 		return delegate.getFluidTooltipAgnos(fluid, componentChanges);
 	}
 
-	protected abstract List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges);
+	protected abstract List<Component> getFluidTooltipAgnos(Fluid fluid, DataComponentPatch componentChanges);
 
 	public static boolean isFloatyFluid(FluidEmiStack stack) {
 		return delegate.isFloatyFluidAgnos(stack);
@@ -121,15 +120,15 @@ public abstract class EmiAgnos {
 
 	protected abstract boolean isFloatyFluidAgnos(FluidEmiStack stack);
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta) {
+	public static void renderFluid(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta) {
 		renderFluid(stack, matrices, x, y, delta, 0, 0, 16, 16);
 	}
 
-	public static void renderFluid(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+	public static void renderFluid(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		delegate.renderFluidAgnos(stack, matrices, x, y, delta, xOff, yOff, width, height);
 	}
 
-	protected abstract void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
+	protected abstract void renderFluidAgnos(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height);
 
 	public static EmiStack createFluidStack(Object object) {
 		return delegate.createFluidStackAgnos(object);
@@ -149,11 +148,11 @@ public abstract class EmiAgnos {
 
 	protected abstract Map<Item, Integer> getFuelMapAgnos();
 
-	public static BakedModel getBakedTagModel(Identifier id) {
+	public static BakedModel getBakedTagModel(ResourceLocation id) {
 		return delegate.getBakedTagModelAgnos(id);
 	}
 
-	protected abstract BakedModel getBakedTagModelAgnos(Identifier id);
+	protected abstract BakedModel getBakedTagModelAgnos(ResourceLocation id);
 
 	public static boolean isEnchantable(ItemStack stack, Enchantment enchantment) {
 		return delegate.isEnchantableAgnos(stack, enchantment);

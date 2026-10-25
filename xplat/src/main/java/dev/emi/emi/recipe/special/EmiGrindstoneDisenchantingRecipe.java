@@ -2,7 +2,11 @@ package dev.emi.emi.recipe.special;
 
 import java.util.List;
 import java.util.Random;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -13,19 +17,14 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.util.Identifier;
 
 public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
-	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
+	private static final ResourceLocation BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final int uniq = EmiUtil.RANDOM.nextInt();
 	private final Item tool;
-	private final Identifier id;
+	private final ResourceLocation id;
 
-	public EmiGrindstoneDisenchantingRecipe(Item tool, Identifier id) {
+	public EmiGrindstoneDisenchantingRecipe(Item tool, ResourceLocation id) {
 		this.tool = tool;
 		this.id = id;
 	}
@@ -36,7 +35,7 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public Identifier getId() {
+	public ResourceLocation getId() {
 		return id;
 	}
 
@@ -93,23 +92,23 @@ public class EmiGrindstoneDisenchantingRecipe implements EmiRecipe {
 			}
 			
 			for (Enchantment e : list) {
-				if (e == enchantment || !Enchantment.canBeCombined(EmiPort.getEnchantmentRegistry().getEntry(e), EmiPort.getEnchantmentRegistry().getEntry(enchantment))) {
+				if (e == enchantment || !Enchantment.areCompatible(EmiPort.getEnchantmentRegistry().wrapAsHolder(e), EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment))) {
 					continue outer;
 				}
 			}
 			list.add(enchantment);
 
-			if (EmiPort.getEnchantmentRegistry().getEntry(enchantment).isIn(EnchantmentTags.CURSE)) {
-				itemStack.addEnchantment(EmiPort.getEnchantmentRegistry().getEntry(enchantment), lvl);
+			if (EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment).is(EnchantmentTags.CURSE)) {
+				itemStack.enchant(EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment), lvl);
 			} else if (enchanted) {
-				itemStack.addEnchantment(EmiPort.getEnchantmentRegistry().getEntry(enchantment), lvl);
+				itemStack.enchant(EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment), lvl);
 			}
 		}
 		return EmiStack.of(itemStack);
 	}
 
 	private Enchantment getEnchantment(Random random){
-		List<Enchantment> enchantments = EmiPort.getEnchantmentRegistry().stream().filter(i -> i.isAcceptableItem(tool.getDefaultStack())).toList();
+		List<Enchantment> enchantments = EmiPort.getEnchantmentRegistry().stream().filter(i -> i.canEnchant(tool.getDefaultInstance())).toList();
 		int enchantment = random.nextInt(enchantments.size());
 		return enchantments.get(enchantment);
 	}

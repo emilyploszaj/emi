@@ -1,7 +1,7 @@
 package dev.emi.emi.jemi;
 
 import com.google.common.collect.Lists;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -31,11 +31,10 @@ import mezz.jei.api.gui.inputs.IJeiUserInput;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.library.focus.FocusGroup;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -46,7 +45,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 	public List<EmiIngredient> catalysts = Lists.newArrayList();
 	public List<EmiStack> outputs = Lists.newArrayList();
 	public EmiRecipeCategory recipeCategory;
-	public Identifier originalId, id;
+	public ResourceLocation originalId, id;
 	public IRecipeCategory<T> category;
 	public T recipe;
 	public boolean allowTree = true;
@@ -85,12 +84,12 @@ public class JemiRecipe<T> implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable RecipeEntry<?> getBackingRecipe() {
+	public @Nullable RecipeHolder<?> getBackingRecipe() {
 		return ProxyRecipeManager.getRecipeEntry(originalId);
 	}
 
 	@Override
-	public @Nullable Identifier getId() {
+	public @Nullable ResourceLocation getId() {
 		return id;
 	}
 
@@ -174,7 +173,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		}
 
 		@Override
-		public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+		public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			context.push();
 			context.translate(x, y);
@@ -188,7 +187,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		}
 
 		@Override
-		public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+		public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 			JemiTooltipBuilder builder = new JemiTooltipBuilder();
 			category.getTooltip(builder, recipe, recipeLayoutDrawable.getRecipeSlotsView(), mouseX, mouseY);
 			return builder.tooltip;
@@ -196,12 +195,12 @@ public class JemiRecipe<T> implements EmiRecipe {
 
 		@Override
 		public boolean mouseClicked(int mouseX, int mouseY, int button) {
-			return category.handleInput(recipe, mouseX, mouseY, InputUtil.Type.MOUSE.createFromCode(button));
+			return category.handleInput(recipe, mouseX, mouseY, InputConstants.Type.MOUSE.getOrCreate(button));
 		}
 
 		@Override
 		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-			return category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputUtil.fromKeyCode(keyCode, scanCode));
+			return category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputConstants.getKey(keyCode, scanCode));
 		}
 	}
 }

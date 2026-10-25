@@ -1,14 +1,13 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.util.Identifier;
 
 /**
  * A convenience type for easy implementation of {@link EmiRecipe}
@@ -18,10 +17,10 @@ public abstract class BasicEmiRecipe implements EmiRecipe {
 	protected List<EmiIngredient> catalysts = Lists.newArrayList();
 	protected List<EmiStack> outputs = Lists.newArrayList();
 	protected EmiRecipeCategory category;
-	protected Identifier id;
+	protected ResourceLocation id;
 	protected int width, height;
 
-	public BasicEmiRecipe(EmiRecipeCategory category, Identifier id, int width, int height) {
+	public BasicEmiRecipe(EmiRecipeCategory category, ResourceLocation id, int width, int height) {
 		this.category = category;
 		this.id = id;
 		this.width = width;
@@ -34,7 +33,7 @@ public abstract class BasicEmiRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable Identifier getId() {
+	public @Nullable ResourceLocation getId() {
 		return id;
 	}
 

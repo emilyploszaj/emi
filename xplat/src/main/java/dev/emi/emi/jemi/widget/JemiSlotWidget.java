@@ -22,9 +22,9 @@ import dev.emi.emi.runtime.EmiLog;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 
 public class JemiSlotWidget extends SlotWidget {
 	public final JemiRecipeSlot slot;
@@ -66,7 +66,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		if (slot.background != null) {
 			slot.background.drawable().draw(raw, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
 		}
@@ -75,7 +75,7 @@ public class JemiSlotWidget extends SlotWidget {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void drawStack(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void drawStack(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		IIngredientRenderer renderer = getRenderer();
 		if (renderer != null) {
@@ -94,7 +94,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
 			context.enableBlend();
@@ -107,7 +107,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void addTooltip(List<TooltipComponent> list, JemiRecipeSlot slot, EmiIngredient stack, IIngredientRenderer<?> renderer) {
+	public static void addTooltip(List<ClientTooltipComponent> list, JemiRecipeSlot slot, EmiIngredient stack, IIngredientRenderer<?> renderer) {
 		if (renderer != null) {
 			if (stack.getEmiStacks().size() == 1 && stack.getEmiStacks().get(0) instanceof JemiStack js) {
 				js = js.copy();
@@ -126,14 +126,14 @@ public class JemiSlotWidget extends SlotWidget {
 			}
 		} else if (slot.tooltipCallback != null) {
 			try {
-				List<Text> event = Lists.newArrayList();
-				List<Text> original = stack.getEmiStacks().get(0).getTooltipText();
-				Set<Text> toRemove = original.stream().collect(Collectors.toSet());
+				List<Component> event = Lists.newArrayList();
+				List<Component> original = stack.getEmiStacks().get(0).getTooltipText();
+				Set<Component> toRemove = original.stream().collect(Collectors.toSet());
 				event.addAll(stack.getEmiStacks().get(0).getTooltipText());
 				slot.tooltipCallback.onTooltip(slot, event);
 				int index = Math.min(list.size(), 1);
 				if (!event.isEmpty()) {
-					list.addAll(index, event.stream().filter(t -> !toRemove.contains(t) && !JemiIngredientAcceptor.FLUID_END.matcher(t.getString()).find()).map(t -> TooltipComponent.of(t.asOrderedText())).toList());
+					list.addAll(index, event.stream().filter(t -> !toRemove.contains(t) && !JemiIngredientAcceptor.FLUID_END.matcher(t.getString()).find()).map(t -> ClientTooltipComponent.create(t.getVisualOrderText())).toList());
 				}
 			} catch (Exception e) {
 				EmiLog.error("Error initializing JEI tooltip", e);
@@ -142,8 +142,8 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		List<TooltipComponent> list = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
 		if (getStack().isEmpty()) {
 			return List.of();
 		}

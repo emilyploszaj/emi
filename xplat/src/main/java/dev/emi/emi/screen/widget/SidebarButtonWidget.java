@@ -1,7 +1,8 @@
 package dev.emi.emi.screen.widget;
 
 import java.util.List;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -11,8 +12,6 @@ import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
 import dev.emi.emi.screen.EmiScreenManager.SidebarPanel;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class SidebarButtonWidget extends SizedButtonWidget {
 	private final SidebarPanel panel;
@@ -21,14 +20,14 @@ public class SidebarButtonWidget extends SizedButtonWidget {
 		super(x, y, width, height, 0, 0, () -> {
 			return panel.pages.pages.size() > 0;
 		}, null, () -> 0, () -> {
-			List<Text> list = Lists.newArrayList();
+			List<Component> list = Lists.newArrayList();
 			list.add(panel.getType().getText());
 			list.add(panel.getType().getDescription());
 			if (panel.getType() == SidebarType.FAVORITES && EmiConfig.favorite.isBound()) {
-				list.add(EmiPort.translatable("emi.sidebar.favorite_stack", EmiConfig.favorite.getBindText()).formatted(Formatting.GRAY));
+				list.add(EmiPort.translatable("emi.sidebar.favorite_stack", EmiConfig.favorite.getBindText()).withStyle(ChatFormatting.GRAY));
 			}
 			if (panel.pages.pages.size() > 1) {
-				list.add(EmiPort.translatable("emi.sidebar.cycle", EmiBind.LEFT_CLICK.getBindText()).formatted(Formatting.GRAY));
+				list.add(EmiPort.translatable("emi.sidebar.cycle", EmiBind.LEFT_CLICK.getBindText()).withStyle(ChatFormatting.GRAY));
 			}
 			return list;
 		});

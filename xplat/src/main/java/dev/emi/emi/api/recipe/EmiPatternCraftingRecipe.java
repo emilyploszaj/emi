@@ -1,23 +1,22 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.ResourceLocation;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.util.Identifier;
 
 public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	protected final int unique = EmiUtil.RANDOM.nextInt();
 	
-	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id) {
 		super(input, output, id);
 	}
 	
-	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id, boolean shapeless) {
 		super(input, output, id, shapeless);
 	}
 

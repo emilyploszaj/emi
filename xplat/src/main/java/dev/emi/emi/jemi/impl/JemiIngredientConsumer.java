@@ -14,8 +14,8 @@ import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.gui.builder.IIngredientConsumer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.level.material.Fluid;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class JemiIngredientConsumer implements IIngredientConsumer {
@@ -69,11 +69,11 @@ public class JemiIngredientConsumer implements IIngredientConsumer {
 
 	@Override
 	public IIngredientConsumer addFluidStack(Fluid fluid, long amount) {
-		return addFluidStack(fluid, amount, ComponentChanges.EMPTY);
+		return addFluidStack(fluid, amount, DataComponentPatch.EMPTY);
 	}
 
 	@Override
-	public IIngredientConsumer addFluidStack(Fluid fluid, long amount, ComponentChanges component) {
+	public IIngredientConsumer addFluidStack(Fluid fluid, long amount, DataComponentPatch component) {
 		stacks.add(EmiStack.of(fluid, component, amount));
 		return this;
 	}

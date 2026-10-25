@@ -4,7 +4,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.widget.Bounds;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 @ApiStatus.Experimental
 public interface EmiScreenBoundsProvider<T extends Screen> {

@@ -17,7 +17,7 @@ import mezz.jei.api.gui.widgets.IScrollBoxWidget;
 import mezz.jei.api.gui.widgets.IScrollGridWidget;
 import mezz.jei.api.gui.widgets.ISlottedRecipeWidget;
 import mezz.jei.api.gui.widgets.ITextWidget;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.network.chat.FormattedText;
 
 public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 	public IRecipeSlotDrawablesView slots;
@@ -105,7 +105,7 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 	}
 
 	@Override
-	public ITextWidget addText(List<StringVisitable> text, int maxWidth, int maxHeight) {
+	public ITextWidget addText(List<FormattedText> text, int maxWidth, int maxHeight) {
 		return new JemiTextWidget(text, maxWidth, maxHeight);
 	}
 

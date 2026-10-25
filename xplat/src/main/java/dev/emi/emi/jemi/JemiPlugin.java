@@ -65,18 +65,18 @@ import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.library.ingredients.subtypes.SubtypeInterpreters;
 import mezz.jei.library.load.registration.SubtypeRegistration;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.material.Fluid;
 
 @JeiPlugin
 public class JemiPlugin implements IModPlugin, EmiPlugin {
@@ -86,7 +86,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 	public static BiPredicate<IIngredientTypeWithSubtypes<? extends Object, ? extends Object>, Object> hasSubtype = (a, b) -> true;
 
 	@Override
-	public Identifier getPluginUid() {
+	public ResourceLocation getPluginUid() {
 		return EmiPort.id("emi:jemi");
 	}
 
@@ -187,7 +187,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		safely("subtype comparison", () -> parseSubtypes(registry));
 
 		EmiReloadManager.step(EmiPort.literal("Processing JEI recipes..."), 5_000);
-		Set<Identifier> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
+		Set<ResourceLocation> existingCategories = EmiRecipes.categories.stream().map(EmiRecipeCategory::getId).collect(Collectors.toSet());
 		Map<RecipeType, EmiRecipeCategory> categoryMap = Maps.newHashMap();
 		categoryMap.put(RecipeTypes.CRAFTING, VanillaEmiRecipeCategories.CRAFTING);
 		categoryMap.put(RecipeTypes.SMELTING, VanillaEmiRecipeCategories.SMELTING);
@@ -211,7 +211,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			EmiReloadManager.step(EmiPort.literal("Loading JEI data for ").append(c.getTitle()), 5_000);
 			try {
 				RecipeType type = c.getRecipeType();
-				Identifier id = type.getUid();
+				ResourceLocation id = type.getUid();
 				List<EmiStack> catalysts = runtime.getRecipeManager().createRecipeCatalystLookup(type).includeHidden().get().map(JemiUtil::getStack).toList();
 				if (categoryMap.containsKey(type)) {
 					EmiRecipeCategory category = categoryMap.get(type);
@@ -224,7 +224,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					if (type == RecipeTypes.INFORMATION) {
 						addInfoRecipes(registry, (IRecipeCategory<IJeiIngredientInfoRecipe>) c);
 					} else if (type == RecipeTypes.CRAFTING) {
-						addCraftingRecipes(registry, (IRecipeCategory<RecipeEntry<CraftingRecipe>>) c);
+						addCraftingRecipes(registry, (IRecipeCategory<RecipeHolder<CraftingRecipe>>) c);
 					}
 					continue;
 				}
@@ -264,12 +264,12 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		for (IJeiIngredientInfoRecipe recipe : recipes) {
 			grouped.computeIfAbsent(recipe.getIngredients().stream().map(JemiUtil::getStack).toList(), k -> Lists.newArrayList()).add(recipe);
 		}
-		Map<Text, List<EmiStack>> identical = Maps.newHashMap();
+		Map<Component, List<EmiStack>> identical = Maps.newHashMap();
 		for (Map.Entry<List<EmiStack>, List<IJeiIngredientInfoRecipe>> group : grouped.entrySet()) {
-			MutableText text = EmiPort.literal("");
+			MutableComponent text = EmiPort.literal("");
 			for (IJeiIngredientInfoRecipe recipe : group.getValue()) {
-				for (StringVisitable sv : recipe.getDescription()) {
-					MutableText current = EmiPort.literal("");
+				for (FormattedText sv : recipe.getDescription()) {
+					MutableComponent current = EmiPort.literal("");
 					sv.visit((style, string) -> {
 						current.append(EmiPort.literal(string, style));
 						return Optional.empty();
@@ -285,20 +285,20 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			identical.computeIfAbsent(text, k -> Lists.newArrayList()).addAll(group.getKey());
 		}
 		
-		for (Text text : identical.keySet()) {
+		for (Component text : identical.keySet()) {
 			registry.addRecipe(new EmiInfoRecipe(identical.get(text).stream().map(s -> (EmiIngredient) s).toList(), List.of(text), null));
 		}
 	}
 
-	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<RecipeEntry<CraftingRecipe>> category) {
-		Set<Identifier> replaced = Sets.newHashSet();
+	private void addCraftingRecipes(EmiRegistry registry, IRecipeCategory<RecipeHolder<CraftingRecipe>> category) {
+		Set<ResourceLocation> replaced = Sets.newHashSet();
 		Set<EmiRecipe> replacements = Sets.newHashSet();
-		List<RecipeEntry<CraftingRecipe>> recipes = Stream.concat(
+		List<RecipeHolder<CraftingRecipe>> recipes = Stream.concat(
 			runtime.getRecipeManager().createRecipeLookup(category.getRecipeType()).includeHidden().get(),
-			registry.getRecipeManager().listAllOfType(net.minecraft.recipe.RecipeType.CRAFTING).stream()
-				.filter(r -> r.value() instanceof SpecialCraftingRecipe)
+			registry.getRecipeManager().getAllRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING).stream()
+				.filter(r -> r.value() instanceof CustomRecipe)
 		).distinct().toList();
-		for (RecipeEntry<CraftingRecipe> recipe : recipes) {
+		for (RecipeHolder<CraftingRecipe> recipe : recipes) {
 			try {
 				if (category.isHandled(recipe)) {
 					JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
@@ -363,7 +363,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			IIngredientManager im = runtime.getIngredientManager();
 			List<IIngredientType<?>> types = Lists.newArrayList(im.getRegisteredIngredientTypes());
 			for (Item item : EmiPort.getItemRegistry()) {
-				if (hasSubtype.test(VanillaTypes.ITEM_STACK, item.getDefaultStack())) {
+				if (hasSubtype.test(VanillaTypes.ITEM_STACK, item.getDefaultInstance())) {
 					registry.setDefaultComparison(item, Comparison.compareData(stack -> {
 						return subtypeManager.getSubtypeInfo(stack.getItemStack(), UidContext.Recipe);
 					}));
@@ -371,7 +371,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 			}
 			for (Fluid fluid : EmiPort.getFluidRegistry()) {
 				IIngredientTypeWithSubtypes<Object, Object> type = (IIngredientTypeWithSubtypes<Object, Object>) JemiUtil.getFluidType();
-				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid.getRegistryEntry(), 1000))) {
+				if (hasSubtype.test(type, JemiUtil.getFluidHelper().create(fluid.builtInRegistryHolder(), 1000))) {
 					registry.setDefaultComparison(fluid, Comparison.compareData(stack -> {
 						ITypedIngredient<?> typed = JemiUtil.getTyped(stack).orElse(null);
 						if (typed != null) {
@@ -406,7 +406,7 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 		}
 	}
 
-	private static EmiRecipeHandler<?> getRecipeHandler(ScreenHandler handler, EmiRecipe recipe) {
+	private static EmiRecipeHandler<?> getRecipeHandler(AbstractContainerMenu handler, EmiRecipe recipe) {
 		IRecipeCategory<?> category = CATEGORY_MAP.getOrDefault(recipe.getCategory(), null);
 		if (category != null) {
 			return runtime.getRecipeTransferManager().getRecipeTransferHandler(handler, category).map(JemiRecipeHandler::new).orElse(null);

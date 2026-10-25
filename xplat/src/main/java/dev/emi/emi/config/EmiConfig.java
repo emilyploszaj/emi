@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.emi.emi.com.unascribed.qdcss.QDCSS;
 import dev.emi.emi.input.EmiBind;
 import dev.emi.emi.input.EmiInput;
@@ -26,11 +26,10 @@ import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiLog;
 import it.unimi.dsi.fastutil.ints.IntList;
 import joptsimple.internal.Strings;
-import net.minecraft.client.font.TextHandler;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 
 public class EmiConfig {
 	private static final Map<Class<?>, Setter> SETTERS = Maps.newHashMap();
@@ -361,7 +360,7 @@ public class EmiConfig {
 
 	@Comment("Clears the search bar.")
 	@ConfigValue("binds.clear-search")
-	public static EmiBind clearSearch = new EmiBind("key.emi.clear_search", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind clearSearch = new EmiBind("key.emi.clear_search", InputConstants.UNKNOWN.getValue());
 
 	@Comment("Display all recipes in the game.")
 	@ConfigValue("binds.display-all-recipes")
@@ -370,14 +369,14 @@ public class EmiConfig {
 	@Comment("Display the recipes for creating a stack.")
 	@ConfigValue("binds.view-recipes")
 	public static EmiBind viewRecipes = new EmiBind("key.emi.view_recipes",
-		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_R), 0),
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
+		new EmiBind.ModifiedKey(InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_R), 0),
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), 0));
 
 	@Comment("Display the recipes that can be created using a stack.")
 	@ConfigValue("binds.view-uses")
 	public static EmiBind viewUses = new EmiBind("key.emi.view_uses",
-		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_U), 0),
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), 0));
+		new EmiBind.ModifiedKey(InputConstants.Type.KEYSYM.getOrCreate(GLFW.GLFW_KEY_U), 0),
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(1), 0));
 
 	@Comment("Favorite the item to display on the side of the screen opposite of recipies for quick access.")
 	@ConfigValue("binds.favorite")
@@ -386,15 +385,15 @@ public class EmiConfig {
 	@Comment("Set the default recipe for a given stack in the output of a recipe to that recipe.")
 	@ConfigValue("binds.default-stack")
 	public static EmiBind defaultStack = new EmiBind("key.emi.default_stack",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.CONTROL_MASK));
 
 	@Comment("Display the recipe tree for a given stack.")
 	@ConfigValue("binds.view-stack-tree")
-	public static EmiBind viewStackTree = new EmiBind("key.emi.view_stack_tree", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind viewStackTree = new EmiBind("key.emi.view_stack_tree", InputConstants.UNKNOWN.getValue());
 
 	@Comment("Display the recipe tree.")
 	@ConfigValue("binds.view-tree")
-	public static EmiBind viewTree = new EmiBind("key.emi.view_tree", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind viewTree = new EmiBind("key.emi.view_tree", InputConstants.UNKNOWN.getValue());
 
 	@Comment("Return to the previous page in EMI.")
 	@ConfigValue("binds.back")
@@ -402,36 +401,36 @@ public class EmiConfig {
 
 	@Comment("Return to the next page in EMI after going back.")
 	@ConfigValue("binds.forward")
-	public static EmiBind forward = new EmiBind("key.emi.forward", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind forward = new EmiBind("key.emi.forward", InputConstants.UNKNOWN.getValue());
 
 	@ConfigGroup("binds.crafts")
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result.")
 	@ConfigValue("binds.craft-one")
 	public static EmiBind craftOne = new EmiBind("key.emi.craft_one",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), 0));
 
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for as many results as possible.")
 	@ConfigValue("binds.craft-all")
 	public static EmiBind craftAll = new EmiBind("key.emi.craft_all", 
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.SHIFT_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.SHIFT_MASK));
 
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result and put in inventory if possible.")
 	@ConfigValue("binds.craft-one-to-inventory")
-	public static EmiBind craftOneToInventory = new EmiBind("key.emi.craft_one_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind craftOneToInventory = new EmiBind("key.emi.craft_one_to_inventory", InputConstants.UNKNOWN.getValue());
 
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for as many results as possible and put in inventory if possible.")
 	@ConfigValue("binds.craft-all-to-inventory")
-	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputConstants.UNKNOWN.getValue());
 
 	@Comment("When on a stack with an associated recipe:\n"
 		+ "Move ingredients for a single result and put in cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.CONTROL_MASK));
 
 	@ConfigGroupEnd
 	@Comment("Display the recipe that will be used to craft on a stack with no recipe context.")
@@ -442,41 +441,41 @@ public class EmiConfig {
 	@Comment("Cheat in one of an item into the inventory.")
 	@ConfigValue("binds.cheat-one-to-inventory")
 	public static EmiBind cheatOneToInventory = new EmiBind("key.emi.cheat_one_to_inventory",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(1), EmiInput.CONTROL_MASK));
 
 	@Comment("Cheat in a stack of an item into the inventory.")
 	@ConfigValue("binds.cheat-stack-to-inventory")
 	public static EmiBind cheatStackToInventory = new EmiBind("key.emi.cheat_stack_to_inventory",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.CONTROL_MASK));
 	
 	@Comment("Cheat in one of an item into the cursor.")
 	@ConfigValue("binds.cheat-one-to-cursor")
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(2), EmiInput.CONTROL_MASK));
 	
 	@Comment("Cheat in a stack of an item into the cursor.")
 	@ConfigValue("binds.cheat-stack-to-cursor")
-	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputConstants.UNKNOWN.getValue());
 	
 	@ConfigGroupEnd
 	@Comment("Delete the stack in the cursor when hovering the index")
 	@ConfigValue("binds.delete-cursor-stack")
 	public static EmiBind deleteCursorStack = new EmiBind("key.emi.delete_cursor_stack",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), 0));
 
 	@Comment("Copies the hovered recipe's ID to the clipboard")
 	@ConfigValue("binds.copy-recipe-id")
-	public static EmiBind copyId = new EmiBind("key.emi.copy_recipe_id", InputUtil.UNKNOWN_KEY.getCode());
+	public static EmiBind copyId = new EmiBind("key.emi.copy_recipe_id", InputConstants.UNKNOWN.getValue());
 
 	@Comment("In edit mode, hide the hovered stack")
 	@ConfigValue("binds.hide-stack")
 	public static EmiBind hideStack = new EmiBind("key.emi.hide_stack",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.CONTROL_MASK));
 
 	@Comment("In edit mode, hide stacks with the hovered stack's id")
 	@ConfigValue("binds.hide-stack-by-id")
 	public static EmiBind hideStackById = new EmiBind("key.emi.hide_stack_by_id",
-		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK | EmiInput.SHIFT_MASK));
+		new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), EmiInput.CONTROL_MASK | EmiInput.SHIFT_MASK));
 	
 	// Dev
 	@Comment("Whether development functions should be enabled. Not recommended for general play.")
@@ -597,7 +596,7 @@ public class EmiConfig {
 
 	public static String getSavedConfig() {
 		Map<String, List<String>> unparsed = Maps.newLinkedHashMap();
-		TextHandler wrapper = new TextHandler((point, style) -> 1);
+		StringSplitter wrapper = new StringSplitter((point, style) -> 1);
 		for (Field field : EmiConfig.class.getFields()) {
 			ConfigValue annot = field.getAnnotation(ConfigValue.class);
 			if (annot != null) {
@@ -608,7 +607,7 @@ public class EmiConfig {
 				String commentText = "";
 				if (comment != null) {
 					commentText += "\t/**\n";
-					for (StringVisitable line : wrapper.wrapLines(comment.value(), 80, Style.EMPTY)) {
+					for (FormattedText line : wrapper.splitLines(comment.value(), 80, Style.EMPTY)) {
 						commentText += "\t * ";
 						commentText += line.getString();
 						commentText += "\n";
@@ -665,7 +664,7 @@ public class EmiConfig {
 	}
 
 	private static File getGlobalFolder() {
-		String s = switch (Util.getOperatingSystem()) {
+		String s = switch (Util.getPlatform()) {
 			case WINDOWS -> System.getenv("APPDATA") + "/.minecraft";
 			case OSX -> System.getProperty("user.home") + "/Library/Application Support/minecraft";
 			default -> System.getProperty("user.home") + "/.minecraft";

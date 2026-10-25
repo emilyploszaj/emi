@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class ScreenAlign {
 	public Horizontal horizontal;
@@ -30,7 +30,7 @@ public class ScreenAlign {
 		}
 
 		@Override
-		public Text getText() {
+		public Component getText() {
 			return EmiPort.translatable("emi.align.horizontal." + name);
 		}
 
@@ -62,7 +62,7 @@ public class ScreenAlign {
 		}
 
 		@Override
-		public Text getText() {
+		public Component getText() {
 			return EmiPort.translatable("emi.align.vertical." + name);
 		}
 

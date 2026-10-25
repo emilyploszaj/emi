@@ -5,7 +5,7 @@ import dev.emi.emi.network.PingS2CPacket;
 import dev.emi.emi.platform.EmiMain;
 import dev.emi.emi.registry.EmiCommands;
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -20,7 +20,7 @@ public class EmiNeoForge {
 		EmiMain.init();
 		modEventBus.addListener(EmiPacketHandler::init);
 		EmiNetwork.initServer((player, packet) -> {
-			if (player.networkHandler.hasChannel(packet)) {
+			if (player.connection.hasChannel(packet)) {
 				PacketDistributor.sendToPlayer(player, EmiPacketHandler.wrap(packet));
 			} else {
 				EmiLog.warn("Can't send EMI packet to " + player + " as they're missing the channel");
@@ -35,7 +35,7 @@ public class EmiNeoForge {
 	}
 
 	public void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
-		if (event.getEntity() instanceof ServerPlayerEntity spe) {
+		if (event.getEntity() instanceof ServerPlayer spe) {
 			EmiNetwork.sendToClient(spe, new PingS2CPacket());
 		}
 	}

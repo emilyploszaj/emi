@@ -1,8 +1,8 @@
 accessWidener v1 named
 
-accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
+accessible class net/minecraft/world/item/alchemy/PotionBrewing$Mix
 
-accessible method net/minecraft/client/gui/screen/Screen addSelectableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
+accessible method net/minecraft/client/gui/screens/Screen addWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
 
-accessible field net/minecraft/client/gui/widget/ClickableWidget x I
-accessible field net/minecraft/client/gui/widget/ClickableWidget y I
+accessible field net/minecraft/client/gui/components/AbstractWidget x I
+accessible field net/minecraft/client/gui/components/AbstractWidget y I

@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import net.minecraft.enchantment.Enchantment;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.collect.Lists;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
@@ -38,23 +36,23 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PotionItem;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.BrewingRecipeRegistry;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.material.Fluid;
 
 public class EmiAgnosFabric extends EmiAgnos {
 	static {
@@ -138,19 +136,19 @@ public class EmiAgnosFabric extends EmiAgnos {
 
 	@Override
 	protected void addBrewingRecipesAgnos(EmiRegistry registry) {
-		BrewingRecipeRegistry brewingRegistry = MinecraftClient.getInstance().world != null ? MinecraftClient.getInstance().world.getBrewingRecipeRegistry() : BrewingRecipeRegistry.EMPTY;
+		PotionBrewing brewingRegistry = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.potionBrewing() : PotionBrewing.EMPTY;
 		BrewingRecipeRegistryAccessor brewingRegistryAccess = (BrewingRecipeRegistryAccessor)brewingRegistry;
 		for (Ingredient ingredient : brewingRegistryAccess.getPotionTypes()) {
-			for (ItemStack stack : ingredient.getMatchingStacks()) {
+			for (ItemStack stack : ingredient.getItems()) {
 				String pid = EmiUtil.subId(stack.getItem());
-				for (BrewingRecipeRegistry.Recipe<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
+				for (PotionBrewing.Mix<Potion> recipe : brewingRegistryAccess.getPotionRecipes()) {
 					try {
 						Ingredient recipeIngredient = recipe.ingredient();
-						if (recipeIngredient.getMatchingStacks().length > 0) {
-							Identifier id = EmiPort.id("emi", "/brewing/" + pid
-								+ "/" + EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem())
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.from().value()))
-								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getId(recipe.to().value())));
+						if (recipeIngredient.getItems().length > 0) {
+							ResourceLocation id = EmiPort.id("emi", "/brewing/" + pid
+								+ "/" + EmiUtil.subId(recipeIngredient.getItems()[0].getItem())
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getKey(recipe.from().value()))
+								+ "/" + EmiUtil.subId(EmiPort.getPotionRegistry().getKey(recipe.to().value())));
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.from().value())), EmiIngredient.of(recipeIngredient),
 								EmiStack.of(EmiPort.setPotion(stack.copy(), recipe.to().value())), id));
@@ -162,24 +160,24 @@ public class EmiAgnosFabric extends EmiAgnos {
 			}
 		}
 
-		for (BrewingRecipeRegistry.Recipe<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
+		for (PotionBrewing.Mix<Item> recipe : brewingRegistryAccess.getItemRecipes()) {
 			try {
 				Ingredient recipeIngredient = recipe.ingredient();
-				if (recipeIngredient.getMatchingStacks().length > 0) {
-					String gid = EmiUtil.subId(recipeIngredient.getMatchingStacks()[0].getItem());
+				if (recipeIngredient.getItems().length > 0) {
+					String gid = EmiUtil.subId(recipeIngredient.getItems()[0].getItem());
 					String iid = EmiUtil.subId(recipe.from().value());
 					String oid = EmiUtil.subId(recipe.to().value());
-					Consumer<RegistryEntry<Potion>> potionRecipeGen = entry -> {
-						if (brewingRegistry.isBrewable(entry)) {
-							Identifier id = EmiPort.id("emi", "/brewing/item/"
-								+ EmiUtil.subId(entry.getKey().get().getValue()) + "/" + gid + "/" + iid + "/" + oid);
+					Consumer<Holder<Potion>> potionRecipeGen = entry -> {
+						if (brewingRegistry.isBrewablePotion(entry)) {
+							ResourceLocation id = EmiPort.id("emi", "/brewing/item/"
+								+ EmiUtil.subId(entry.unwrapKey().get().location()) + "/" + gid + "/" + iid + "/" + oid);
 							registry.addRecipe(new EmiBrewingRecipe(
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.from().value()), entry.value())), EmiIngredient.of(recipeIngredient),
 								EmiStack.of(EmiPort.setPotion(new ItemStack(recipe.to().value()), entry.value())), id));
 						}
 					};
 					if (recipe.from().value() instanceof PotionItem) {
-						EmiPort.getPotionRegistry().streamEntries().forEach(potionRecipeGen);
+						EmiPort.getPotionRegistry().holders().forEach(potionRecipeGen);
 					} else {
 						potionRecipeGen.accept(Potions.AWKWARD);
 					}
@@ -191,17 +189,17 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected List<TooltipComponent> getItemTooltipAgnos(ItemStack stack) {
+	protected List<ClientTooltipComponent> getItemTooltipAgnos(ItemStack stack) {
 		return FakeScreen.INSTANCE.getTooltipComponentListFromItem(stack);
 	}
 
 	@Override
-	protected Text getFluidNameAgnos(Fluid fluid, ComponentChanges componentChanges) {
+	protected Component getFluidNameAgnos(Fluid fluid, DataComponentPatch componentChanges) {
 		return FluidVariantAttributes.getName(FluidVariant.of(fluid, componentChanges));
 	}
 
 	@Override
-	protected List<Text> getFluidTooltipAgnos(Fluid fluid, ComponentChanges componentChanges) {
+	protected List<Component> getFluidTooltipAgnos(Fluid fluid, DataComponentPatch componentChanges) {
 		return FluidVariantRendering.getTooltip(FluidVariant.of(fluid, componentChanges));
 	}
 
@@ -212,13 +210,13 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected void renderFluidAgnos(FluidEmiStack stack, MatrixStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
+	protected void renderFluidAgnos(FluidEmiStack stack, PoseStack matrices, int x, int y, float delta, int xOff, int yOff, int width, int height) {
 		FluidVariant fluid = FluidVariant.of(stack.getKeyOfType(Fluid.class), stack.getComponentChanges());
-		Sprite[] sprites = FluidVariantRendering.getSprites(fluid);
+		TextureAtlasSprite[] sprites = FluidVariantRendering.getSprites(fluid);
 		if (sprites == null || sprites.length < 1 || sprites[0] == null) {
 			return;
 		}
-		Sprite sprite = sprites[0];
+		TextureAtlasSprite sprite = sprites[0];
 		int color = FluidVariantRendering.getColor(fluid);
 		
 		EmiRenderHelper.drawTintedSprite(matrices, sprite, color, x, y, xOff, yOff, width, height);
@@ -253,8 +251,8 @@ public class EmiAgnosFabric extends EmiAgnos {
 	}
 
 	@Override
-	protected BakedModel getBakedTagModelAgnos(Identifier id) {
-		return MinecraftClient.getInstance().getBakedModelManager().getModel(id);
+	protected BakedModel getBakedTagModelAgnos(ResourceLocation id) {
+		return Minecraft.getInstance().getModelManager().getModel(id);
 	}
 
 	@Override

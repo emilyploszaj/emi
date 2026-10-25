@@ -1,7 +1,13 @@
 package dev.emi.emi.chess;
 
 import java.util.List;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -10,15 +16,6 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 class ChessEmiStack extends EmiStack {
 	public final int position;
@@ -28,7 +25,7 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphics raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		ChessPiece piece = EmiChess.getBoard().get(position);
 		context.enableDepthTest();
@@ -88,8 +85,8 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
-		return ComponentChanges.EMPTY;
+	public DataComponentPatch getComponentChanges() {
+		return DataComponentPatch.EMPTY;
 	}
 
 	@Override
@@ -98,23 +95,23 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public Identifier getId() {
+	public ResourceLocation getId() {
 		return EmiPort.id("emi:/chess/" + position);
 	}
 
 	@Override
-	public List<Text> getTooltipText() {
+	public List<Component> getTooltipText() {
 		return List.of();
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<ClientTooltipComponent> getTooltip() {
 		ChessPiece piece = EmiChess.getBoard().get(position);
 		if (piece != null) {
-			List<TooltipComponent> list = Lists.newArrayList();
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.chess.piece."
+			List<ClientTooltipComponent> list = Lists.newArrayList();
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("emi.chess.piece."
 				+ piece.color().toString().toLowerCase() + "_" + piece.type().toString().toLowerCase()))));
-			MinecraftClient client = MinecraftClient.getInstance();
+			Minecraft client = Minecraft.getInstance();
 			if (!EmiChess.get().started) {
 				if (piece.type() == PieceType.KING) {
 					list.add(new ChessTooltipComponent(
@@ -122,19 +119,19 @@ class ChessEmiStack extends EmiStack {
 						ChessPiece.of(PieceType.KING, PieceColor.BLACK),
 						EmiPort.translatable("emi.chess.tooltip.invite")));
 					if (EmiChess.get().pending != null) {
-						PlayerEntity player = client.world.getPlayerByUuid(EmiChess.get().pending);
+						Player player = client.level.getPlayerByUUID(EmiChess.get().pending);
 						if (player != null) {
 							list.add(new ChessTooltipComponent(
 								ChessPiece.of(PieceType.KING, PieceColor.WHITE),
 								ChessPiece.of(PieceType.KING, PieceColor.BLACK),
 								EmiPort.translatable("emi.chess.tooltip.accept", player.getName())));
-							list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.chess.tooltip.decline", player.getName()))));
+							list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("emi.chess.tooltip.decline", player.getName()))));
 						}
 					}
 				}
 			} else {
 				if (piece.type() == PieceType.KING && piece.color() == PieceColor.WHITE) {
-					list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.chess.tooltip.restart"))));
+					list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("emi.chess.tooltip.restart"))));
 				}
 			}
 			return list;
@@ -143,7 +140,7 @@ class ChessEmiStack extends EmiStack {
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return EmiPort.literal("Chess Piece");
 	}
 }

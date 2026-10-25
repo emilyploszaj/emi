@@ -2,21 +2,20 @@ package dev.emi.emi.network;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import dev.emi.emi.EmiPort;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class EmiNetwork {
-	public static final CustomPayload.Id<FillRecipeC2SPacket> FILL_RECIPE = new CustomPayload.Id<FillRecipeC2SPacket>(EmiPort.id("emi:fill_recipe"));
-	public static final CustomPayload.Id<CreateItemC2SPacket> CREATE_ITEM = new CustomPayload.Id<CreateItemC2SPacket>(EmiPort.id("emi:create_item"));
-	public static final CustomPayload.Id<CommandS2CPacket> COMMAND = new CustomPayload.Id<CommandS2CPacket>(EmiPort.id("emi:command"));
-	public static final CustomPayload.Id<EmiChessPacket> CHESS = new CustomPayload.Id<EmiChessPacket>(EmiPort.id("emi:chess"));
-	public static final CustomPayload.Id<PingS2CPacket> PING = new CustomPayload.Id<PingS2CPacket>(EmiPort.id("emi:ping"));
-	private static BiConsumer<ServerPlayerEntity, EmiPacket> clientSender;
+	public static final CustomPacketPayload.Type<FillRecipeC2SPacket> FILL_RECIPE = new CustomPacketPayload.Type<FillRecipeC2SPacket>(EmiPort.id("emi:fill_recipe"));
+	public static final CustomPacketPayload.Type<CreateItemC2SPacket> CREATE_ITEM = new CustomPacketPayload.Type<CreateItemC2SPacket>(EmiPort.id("emi:create_item"));
+	public static final CustomPacketPayload.Type<CommandS2CPacket> COMMAND = new CustomPacketPayload.Type<CommandS2CPacket>(EmiPort.id("emi:command"));
+	public static final CustomPacketPayload.Type<EmiChessPacket> CHESS = new CustomPacketPayload.Type<EmiChessPacket>(EmiPort.id("emi:chess"));
+	public static final CustomPacketPayload.Type<PingS2CPacket> PING = new CustomPacketPayload.Type<PingS2CPacket>(EmiPort.id("emi:ping"));
+	private static BiConsumer<ServerPlayer, EmiPacket> clientSender;
 	private static Consumer<EmiPacket> serverSender;
 
-	public static void initServer(BiConsumer<ServerPlayerEntity, EmiPacket> sender) {
+	public static void initServer(BiConsumer<ServerPlayer, EmiPacket> sender) {
 		clientSender = sender;
 	}
 
@@ -24,7 +23,7 @@ public class EmiNetwork {
 		serverSender = sender;
 	}
 
-	public static void sendToClient(ServerPlayerEntity player, EmiPacket packet) {
+	public static void sendToClient(ServerPlayer player, EmiPacket packet) {
 		clientSender.accept(player, packet);
 	}
 

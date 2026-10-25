@@ -6,7 +6,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -43,15 +51,6 @@ import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.StackBatcher.Batchable;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.MathHelper;
 
 public class BoMScreen extends Screen {
 	private static final int NODE_WIDTH = 30;
@@ -68,13 +67,13 @@ public class BoMScreen extends Screen {
 	private List<Cost> costs = Lists.newArrayList();
 	private EmiPlayerInventory playerInv;
 	private boolean hasRemainders = false;;
-	public HandledScreen<?> old;
+	public AbstractContainerScreen<?> old;
 	private int nodeWidth = 0;
 	private int nodeHeight = 0;
 	private int lastMouseX, lastMouseY;
 	private double scrollAcc = 0;
 
-	public BoMScreen(HandledScreen<?> old) {
+	public BoMScreen(AbstractContainerScreen<?> old) {
 		super(EmiPort.translatable("screen.emi.recipe_tree"));
 		this.old = old;
 	}
@@ -99,13 +98,13 @@ public class BoMScreen extends Screen {
 			}
 			if (!volume.nodes.isEmpty()) {
 				Node node = volume.nodes.get(0);
-				int width = textRenderer.getWidth("x" + BoM.tree.batches);
+				int width = font.width("x" + BoM.tree.batches);
 				batches = new Bounds(node.x + node.width / 2 + 6, node.y - 10, width + 12, 22);
 			}
 
 			nodeWidth = volume.getMaxRight() - volume.getMinLeft();
 			nodeHeight = getNodeHeight(BoM.tree.goal);
-			playerInv = EmiPlayerInventory.of(client.player);
+			playerInv = EmiPlayerInventory.of(minecraft.player);
 			BoM.tree.calculateProgress(playerInv);
 			Map<EmiIngredient, FlatMaterialCost> progressCosts = BoM.tree.cost.costs.values().stream()
 				.collect(Collectors.toMap(c -> c.ingredient, c -> c));
@@ -151,7 +150,7 @@ public class BoMScreen extends Screen {
 				cost.x -= costOffset;
 			}
 
-			int totalCostWidth = textRenderer.getWidth(EmiPort.translatable("emi.total_cost"));
+			int totalCostWidth = font.width(EmiPort.translatable("emi.total_cost"));
 			mode = new Bounds(totalCostWidth / 2 + 4, cy - 20, 16, 16);
 
 			List<Cost> remainders = Lists.newArrayList();
@@ -186,10 +185,10 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphics raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.fill(0, 0, width, height, 0xDD000000);
-		this.renderDarkening(context.raw());
+		this.renderMenuBackground(context.raw());
 		lastMouseX = mouseX;
 		lastMouseY = mouseY;
 		float scale = getScale();
@@ -201,8 +200,8 @@ public class BoMScreen extends Screen {
 		int xBound = scaledWidth / 2 + contentWidth - 100;
 		int topBound = scaledHeight * 1 / -2 + 20;
 		int bottomBound = contentHeight + scaledHeight / 2 - 20;
-		offX = MathHelper.clamp(offX, -xBound, xBound);
-		offY = MathHelper.clamp(offY, -bottomBound, -topBound);
+		offX = Mth.clamp(offX, -xBound, xBound);
+		offY = Mth.clamp(offY, -bottomBound, -topBound);
 
 		int mx = (int) ((mouseX - width / 2) / scale - offX);
 		int my = (int) ((mouseY - height / 2) / scale - offY);
@@ -259,16 +258,16 @@ public class BoMScreen extends Screen {
 		if (hover != null) {
 			hover.drawTooltip(this, context, mouseX, mouseY);
 		} else if (BoM.tree != null && batches.contains(mx, my)) {
-			List<TooltipComponent> list = Lists.newArrayList();
+			List<ClientTooltipComponent> list = Lists.newArrayList();
 			list.addAll(EmiTooltip.splitTranslate("tooltip.emi.bom.batch_size", BoM.tree.batches));
 			list.add(EmiTooltipComponents.of(EmiPort.translatable("tooltip.emi.bom.batch_size.ideal", EmiBind.LEFT_CLICK.getBindText())));
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (BoM.tree != null && mode.contains(mx, my)) {
 			String key = BoM.craftingMode ? "tooltip.emi.bom.mode.craft" : "tooltip.emi.bom.mode.view";
-			List<TooltipComponent> list = EmiTooltip.splitTranslate(key, BoM.tree.batches);
+			List<ClientTooltipComponent> list = EmiTooltip.splitTranslate(key, BoM.tree.batches);
 			EmiRenderHelper.drawTooltip(this, context, list, mouseX, mouseY);
 		} else if (help.contains(mouseX, mouseY)) {
-			List<TooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
+			List<ClientTooltipComponent> list =  EmiTooltip.splitTranslate("tooltip.emi.bom.help");
 			EmiRenderHelper.drawTooltip(this, context, list, width - 18, height - 18, width);
 		}
 	}
@@ -347,8 +346,8 @@ public class BoMScreen extends Screen {
 	}
 
 	public float getScale() {
-		zoom = MathHelper.clamp(zoom, -6, 4);
-		int scale = (int) this.client.getWindow().getScaleFactor();
+		zoom = Mth.clamp(zoom, -6, 4);
+		int scale = (int) this.minecraft.getWindow().getGuiScale();
 		int desired = scale + zoom;
 		if (desired < 1) {
 			zoom -= desired - 1;
@@ -360,10 +359,10 @@ public class BoMScreen extends Screen {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			this.close();
+			this.onClose();
 			return true;
-		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
-			this.close();
+		} else if (this.minecraft.options.keyInventory.matches(keyCode, scanCode)) {
+			this.onClose();
 			return true;
 		}
 		Function<EmiBind, Boolean> function = bind -> bind.matchesKey(keyCode, scanCode);
@@ -458,10 +457,10 @@ public class BoMScreen extends Screen {
 					if (button == 0) {
 						EmiApi.displayRecipes(hover.stack);
 						RecipeScreen.resolve = hover.stack;
-						MinecraftClient client = MinecraftClient.getInstance();
+						Minecraft client = Minecraft.getInstance();
 						// The first init doesn't realize a resolution exists so we do it again. What
 						// could go wrong.
-						client.currentScreen.init(client, client.currentScreen.width, client.currentScreen.height);
+						client.screen.init(client, client.screen.width, client.screen.height);
 						if (hover.node != null) {
 							if (hover.node.recipe != null) {
 								EmiApi.focusRecipe(hover.node.recipe);
@@ -535,13 +534,13 @@ public class BoMScreen extends Screen {
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 
 	@Override
-	public void close() {
-		MinecraftClient.getInstance().setScreen(old);
+	public void onClose() {
+		Minecraft.getInstance().setScreen(old);
 	}
 
 	private class Cost {
@@ -562,20 +561,20 @@ public class BoMScreen extends Screen {
 			EmiRenderHelper.renderAmount(context, x, y, getAmountText());
 		}
 
-		public Text getAmountText() {
+		public Component getAmountText() {
 			long adjusted = cost.getEffectiveAmount();
-			Text totalText;
+			Component totalText;
 			if (cost instanceof ChanceMaterialCost cmc) {
 				totalText = EmiPort.append(EmiPort.literal("≈"), EmiRenderHelper.getAmountText(cost.ingredient, adjusted))
-					.formatted(Formatting.GOLD);
+					.withStyle(ChatFormatting.GOLD);
 			} else {
 				totalText = EmiRenderHelper.getAmountText(cost.ingredient, adjusted);
 			}
 			if (!remainder && BoM.craftingMode) {
 				long amount = alreadyDone;
 				if (amount < adjusted) {
-					Text amountText = amount == 0 ? EmiPort.literal("0") : (EmiRenderHelper.getAmountText(cost.ingredient, amount));
-					MutableText text = EmiPort.append(EmiPort.literal("", Formatting.RED), amountText);
+					Component amountText = amount == 0 ? EmiPort.literal("0") : (EmiRenderHelper.getAmountText(cost.ingredient, amount));
+					MutableComponent text = EmiPort.append(EmiPort.literal("", ChatFormatting.RED), amountText);
 					text = EmiPort.append(text, EmiPort.literal("/"));
 					text = EmiPort.append(text, totalText);
 					return text;
@@ -611,7 +610,7 @@ public class BoMScreen extends Screen {
 
 		public boolean drawTooltip(Screen screen, EmiDrawContext context, int mouseX, int mouseY) {
 			if (stack != null) {
-				List<TooltipComponent> list = Lists.newArrayList();
+				List<ClientTooltipComponent> list = Lists.newArrayList();
 				list.addAll(stack.getTooltip());
 				if (EmiInput.isShiftDown()) {
 					getAutoResolutions(this, (stack, recipe) -> {
@@ -743,13 +742,13 @@ public class BoMScreen extends Screen {
 			}
 		}
 
-		public Text getAmountText() {
+		public Component getAmountText() {
 			if (chance.chanced()) {
 				long a = Math.round(amount * chance.chance());
 				a = Math.max(a, node.amount);
 				return EmiPort.append(EmiPort.literal("≈"),
 						EmiRenderHelper.getAmountText(node.ingredient, a))
-					.formatted(Formatting.GOLD);
+					.withStyle(ChatFormatting.GOLD);
 			} else {
 				return EmiRenderHelper.getAmountText(node.ingredient, amount);
 			}

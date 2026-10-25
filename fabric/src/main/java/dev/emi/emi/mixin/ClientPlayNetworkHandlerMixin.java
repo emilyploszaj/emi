@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 
 /**
  * This entire mixin assumes that no one will modify how recipes and tags are synced.
@@ -18,23 +18,23 @@ import net.minecraft.network.packet.s2c.play.SynchronizeRecipesS2CPacket;
  * This waits for both, then reloads.
  * If only one comes, no reload will occur, which would be weird behavior.
  */
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public class ClientPlayNetworkHandlerMixin {
 	@Unique
 	private int infoMask = 0;
 
-	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/recipe/RecipeManager.setRecipes(Ljava/lang/Iterable;)V",
-		shift = Shift.AFTER), method = "onSynchronizeRecipes")
-	private void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet, CallbackInfo info) {
+	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/world/item/crafting/RecipeManager.replaceRecipes(Ljava/lang/Iterable;)V",
+		shift = Shift.AFTER), method = "handleUpdateRecipes")
+	private void onSynchronizeRecipes(ClientboundUpdateRecipesPacket packet, CallbackInfo info) {
 		EmiReloadManager.reloadRecipes();
 	}
 
-	@Inject(at = @At("RETURN"), method = "onSynchronizeTags")
+	@Inject(at = @At("RETURN"), method = "handleUpdateTags")
 	private void refreshTagBasedData(CallbackInfo info) {
 		EmiReloadManager.reloadTags();
 	}
 
-	@Inject(at = @At("RETURN"), method = "onGameJoin")
+	@Inject(at = @At("RETURN"), method = "handleLogin")
 	private void onGameJoin(CallbackInfo info) {
 		EmiLog.info("Joining server, EMI waiting for data from server...");
 	}

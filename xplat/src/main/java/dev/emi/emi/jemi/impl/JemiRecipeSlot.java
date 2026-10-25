@@ -20,7 +20,7 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 @SuppressWarnings("unchecked")
 public class JemiRecipeSlot implements IRecipeSlotView {
@@ -114,7 +114,7 @@ public class JemiRecipeSlot implements IRecipeSlotView {
 	}
 
 	@Override
-	public void drawHighlight(DrawContext raw, int color) {
+	public void drawHighlight(GuiGraphics raw, int color) {
 		this.highlight = color;
 	}
 
