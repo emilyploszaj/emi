@@ -322,9 +322,6 @@ public class EmiRenderHelper {
 
 			context.pop();
 
-			// Force translucency to match that of the recipe background
-			renderRecipeBackground(recipe, context, x, y);
-			// Blend should be off by default
 		} catch (Throwable e) {
 			EmiLog.error("Error rendering recipe", e);
 		}
