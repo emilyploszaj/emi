@@ -9,3 +9,4 @@ accessible field net/minecraft/client/gui/components/AbstractWidget y I
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor blitSprite (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;IIIIIIIII)V
 accessible field net/minecraft/client/gui/screens/inventory/AbstractRecipeBookScreen recipeBookComponent Lnet/minecraft/client/gui/screens/recipebook/RecipeBookComponent;
 accessible field net/minecraft/client/gui/components/EditBox highlightPos I
+accessible field net/minecraft/world/item/crafting/BannerDuplicateRecipe banner Lnet/minecraft/world/item/crafting/Ingredient;
