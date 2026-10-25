@@ -383,9 +383,11 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof FireworkRocketRecipe rocket) {
 				addRecipeSafe(registry, () -> new EmiFireworkRocketRecipe(id), recipe);
 			} else if (recipe instanceof BannerDuplicateRecipe banner) {
-				for (Item i : EmiBannerDuplicateRecipe.BANNERS) {
+				List<Item> banners = banner.banner.items().map(Holder::value).toList();
+				for (Item i : banners) {
 					if (!hiddenItems.contains(i)) {
-						addRecipeSafe(registry, () -> new EmiBannerDuplicateRecipe(i, synthetic("crafting/banner_copying", EmiUtil.subId(i))), recipe);
+						Identifier bid = banners.size() == 1 ? id : synthetic("crafting/banner_copying", EmiUtil.subId(i));
+						addRecipeSafe(registry, () -> new EmiBannerDuplicateRecipe(i, bid), recipe);
 					}
 				}
 			} else if (recipe instanceof RepairItemRecipe tool) {
@@ -535,10 +537,6 @@ public class VanillaPlugin implements EmiPlugin {
 						synthetic("world/flower_duping", EmiUtil.subId(i)), false));
 			}
 		}
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.ELYTRA), EmiStack.of(Items.PHANTOM_MEMBRANE),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.ELYTRA) + "/" + EmiUtil.subId(Items.PHANTOM_MEMBRANE))));
-		addRecipeSafe(registry, () -> new EmiAnvilRecipe(EmiStack.of(Items.SHIELD), EmiIngredient.of(ItemTags.PLANKS),
-			synthetic("anvil/repairing/material", EmiUtil.subId(Items.SHIELD) + "/" + EmiUtil.subId(Items.OAK_PLANKS))));
 
 		for (Enchantment e : EmiPort.getEnchantmentRegistry().stream().toList()) {
 			if (!EmiPort.getEnchantmentRegistry().wrapAsHolder(e).is(EnchantmentTags.CURSE)) {
