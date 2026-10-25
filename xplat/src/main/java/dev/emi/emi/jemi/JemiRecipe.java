@@ -1,7 +1,6 @@
 package dev.emi.emi.jemi;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.InputConstants;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -23,17 +22,13 @@ import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.ProxyRecipeManager;
-import dev.emi.emi.screen.EmiScreenManager;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
-import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.inputs.IJeiUserInput;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.library.focus.FocusGroup;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +40,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 	public List<EmiIngredient> catalysts = Lists.newArrayList();
 	public List<EmiStack> outputs = Lists.newArrayList();
 	public EmiRecipeCategory recipeCategory;
-	public ResourceLocation originalId, id;
+	public Identifier originalId, id;
 	public IRecipeCategory<T> category;
 	public T recipe;
 	public boolean allowTree = true;
@@ -61,13 +56,13 @@ public class JemiRecipe<T> implements EmiRecipe {
 		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
-			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+			jrsb.acceptor.coerceStacks(jrsb.richTooltipCallback, jrsb.renderers);
 		}
 		for (JemiIngredientAcceptor acceptor : builder.ingredients) {
 			EmiIngredient stack = acceptor.build();
 			if (acceptor.role == RecipeIngredientRole.INPUT) {
 				inputs.add(stack);
-			} else if (acceptor.role == RecipeIngredientRole.CATALYST) {
+			} else if (acceptor.role == RecipeIngredientRole.CRAFTING_STATION) {
 				catalysts.add(stack);
 			} else if (acceptor.role == RecipeIngredientRole.OUTPUT) {
 				if (stack.getEmiStacks().size() > 1) {
@@ -89,7 +84,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 
@@ -130,7 +125,7 @@ public class JemiRecipe<T> implements EmiRecipe {
 		JemiRecipeLayoutBuilder builder = new JemiRecipeLayoutBuilder();
 		category.setRecipe(builder, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
-			jrsb.acceptor.coerceStacks(jrsb.tooltipCallback, jrsb.renderers);
+			jrsb.acceptor.coerceStacks(jrsb.richTooltipCallback, jrsb.renderers);
 		}
 		if (opt.isPresent()) {
 			widgets.add(new JemiWidget(0, 0, getDisplayWidth(), getDisplayHeight(), opt.get()));
@@ -173,14 +168,10 @@ public class JemiRecipe<T> implements EmiRecipe {
 		}
 
 		@Override
-		public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+		public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			context.push();
 			context.translate(x, y);
-			IDrawable background = category.getBackground();
-			if (background != null) {
-				background.draw(context.raw());
-			}
 			category.draw(recipe, recipeLayoutDrawable.getRecipeSlotsView(), context.raw(), mouseX, mouseY);
 			context.resetColor();
 			context.pop();
@@ -190,17 +181,8 @@ public class JemiRecipe<T> implements EmiRecipe {
 		public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 			JemiTooltipBuilder builder = new JemiTooltipBuilder();
 			category.getTooltip(builder, recipe, recipeLayoutDrawable.getRecipeSlotsView(), mouseX, mouseY);
-			return builder.tooltip;
+			return builder.getTooltip();
 		}
 
-		@Override
-		public boolean mouseClicked(int mouseX, int mouseY, int button) {
-			return category.handleInput(recipe, mouseX, mouseY, InputConstants.Type.MOUSE.getOrCreate(button));
-		}
-
-		@Override
-		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-			return category.handleInput(recipe, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, InputConstants.getKey(keyCode, scanCode));
-		}
 	}
 }

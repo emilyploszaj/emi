@@ -26,17 +26,17 @@ import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class JemiRecipeHandler<T extends AbstractContainerMenu, R> implements EmiRecipeHandler<T> {
-	private final RecipeType<R> type;
+	private final IRecipeType<R> type;
 	//private IRecipeCategory<R> category;
 	public IRecipeTransferHandler<T, R> handler;
 
@@ -83,7 +83,7 @@ public class JemiRecipeHandler<T extends AbstractContainerMenu, R> implements Em
 	}
 
 	@Override
-	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphics raw) {
+	public void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphicsExtractor raw) {
 		EmiDrawContext draw = EmiDrawContext.wrap(raw);
 		R rawRecipe = getRawRecipe(recipe);
 		JemiRecipeSlotsView view = createSlotsView(recipe, rawRecipe, type, widgets);
@@ -104,8 +104,8 @@ public class JemiRecipeHandler<T extends AbstractContainerMenu, R> implements Em
 					}
 				});
 				draw.push();
-				draw.matrices().translate(-100000, -100000, -100000);
-				draw.matrices().scale(0, 0, 0);
+				draw.matrices().translate(-100000, -100000);
+				draw.matrices().scale(0, 0);
 				err.showError(raw, EmiScreenManager.lastMouseX, EmiScreenManager.lastMouseY, view, 0, 0);
 				draw.pop();
 				view.getSlotViews().forEach(v -> {
@@ -138,7 +138,7 @@ public class JemiRecipeHandler<T extends AbstractContainerMenu, R> implements Em
 		return () -> IRecipeTransferError.Type.INTERNAL;
 	}
 
-	public static <R> JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, RecipeType<R> type, List<Widget> widgets) {
+	public static <R> JemiRecipeSlotsView createSlotsView(EmiRecipe recipe, R rawRecipe, IRecipeType<R> type, List<Widget> widgets) {
 		JemiRecipeLayoutBuilder builder = null;
 		if (rawRecipe != null) {
 			/*
@@ -195,7 +195,7 @@ public class JemiRecipeHandler<T extends AbstractContainerMenu, R> implements Em
 					addIngredients(builder, slotWidgets, List.of(EmiStack.EMPTY), RecipeIngredientRole.INPUT);
 				}
 			}
-			addIngredients(builder, slotWidgets, recipe.getCatalysts(), RecipeIngredientRole.CATALYST);
+			addIngredients(builder, slotWidgets, recipe.getCatalysts(), RecipeIngredientRole.CRAFTING_STATION);
 		}
 
 		return new JemiRecipeSlotsView(builder.slots.stream().map(JemiRecipeSlot::new).toList());

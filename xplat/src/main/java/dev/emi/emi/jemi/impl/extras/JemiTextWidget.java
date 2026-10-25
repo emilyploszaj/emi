@@ -1,5 +1,8 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import mezz.jei.api.gui.widgets.IRecipeWidgetTooltipCallback;
+import java.util.Collection;
 import java.util.List;
 
 import mezz.jei.api.gui.placement.HorizontalAlignment;
@@ -57,4 +60,24 @@ public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextW
 		return this;
 	}
 	
+
+	@Override
+	public ITextWidget setTooltip(FormattedText tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(Collection<? extends FormattedText> tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(TooltipComponent tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(IRecipeWidgetTooltipCallback tooltipCallback) {
+		return this;
+	}
 }

@@ -1,5 +1,7 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import mezz.jei.api.gui.placement.VerticalAlignment;
+import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.placement.IPlaceable;
 
 public class JemiPlaceable<T extends IPlaceable<T>> implements IPlaceable<T> {
@@ -16,6 +18,11 @@ public class JemiPlaceable<T extends IPlaceable<T>> implements IPlaceable<T> {
 		this.x = xPos;
 		this.y = yPos;
 		return (T) this;
+	}
+
+	@Override
+	public T setPosition(int areaX, int areaY, int areaWidth, int areaHeight, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment) {
+		return setPosition(areaX + horizontalAlignment.getXPos(areaWidth, getWidth()), areaY + verticalAlignment.getYPos(areaHeight, getHeight()));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi.runtime;
 
+import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,7 @@ import dev.emi.emi.jemi.JemiUtil;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 
@@ -28,7 +29,7 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void render(Screen screen, EmiIngredient dragged, GuiGraphics raw, int mouseX, int mouseY, float delta) {
+	public void render(Screen screen, EmiIngredient dragged, GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		try {
 			this.<Object>render(screen, EmiDrawContext.wrap(raw), (Optional<ITypedIngredient<Object>>) (Optional) JemiUtil.getTyped(dragged.getEmiStacks().get(0)));
 		} catch (Exception e) {
@@ -57,11 +58,10 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 	}
 
 	private <I> List<IGhostIngredientHandler.Target<I>> getTargets(Screen screen, ITypedIngredient<I> typed) {
-		Optional<IGhostIngredientHandler<Screen>> optGhost = JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandler(screen);
-		if (optGhost.isPresent()) {
-			IGhostIngredientHandler<Screen> ghost = optGhost.get();
-			return ghost.getTargetsTyped(screen, typed, false);
+		List<IGhostIngredientHandler.Target<I>> targets = Lists.newArrayList();
+		for (IGhostIngredientHandler<Screen> ghost : JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandlers(screen)) {
+			targets.addAll(ghost.getTargetsTyped(screen, typed, false));
 		}
-		return List.of();
+		return targets;
 	}
 }

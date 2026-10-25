@@ -1,5 +1,7 @@
 package dev.emi.emi.jemi;
 
+import mezz.jei.api.ingredients.IIngredientHelper;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import java.util.Optional;
 
 import com.google.gson.JsonElement;
@@ -31,12 +33,22 @@ public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
 			if (type == VanillaTypes.ITEM_STACK || type == JemiUtil.getFluidType()) {
 				continue;
 			}
-			Optional<EmiStack> opt = manager.getTypedIngredientByUid(type, uid).map(JemiUtil::getStack);
+			Optional<EmiStack> opt = findByUid(type, uid);
 			if (opt.isPresent()) {
 				return opt.get().setAmount(amount);
 			}
 		}
 		return EmiStack.EMPTY;
+	}
+
+	private <T> Optional<EmiStack> findByUid(IIngredientType<T> type, String uid) {
+		IIngredientHelper<T> helper = manager.getIngredientHelper(type);
+		for (T ingredient : manager.getAllIngredients(type)) {
+			if (uid.equals(helper.getUid(ingredient, UidContext.Ingredient).toString())) {
+				return Optional.of(JemiUtil.getStack(type, ingredient));
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
