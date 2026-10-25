@@ -1,6 +1,7 @@
 package dev.emi.emi.mixin;
 
 import dev.emi.emi.runtime.EmiDrawContext;
+import dev.emi.emi.platform.EmiAgnos;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,6 +30,15 @@ public class ScreenMixin {
 		Minecraft client = Minecraft.getInstance();
 		if ((Object) this instanceof AbstractContainerScreen hs && client.screen == hs) {
 			EmiScreenManager.addWidgets(hs);
+		}
+	}
+
+	// Dragged stacks and tooltips go above everything the screen draws, including deferred tooltips
+	@Inject(at = @At("RETURN"), method = "extractRenderStateWithTooltipAndSubtitles")
+	private void extractForeground(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta, CallbackInfo info) {
+		if ((Object) this instanceof AbstractContainerScreen && !EmiAgnos.isForge()) {
+			raw.nextStratum();
+			EmiScreenManager.drawForeground(EmiDrawContext.wrap(raw), mouseX, mouseY, delta);
 		}
 	}
 
