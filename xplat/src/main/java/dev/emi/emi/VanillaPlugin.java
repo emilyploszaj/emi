@@ -75,6 +75,8 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.item.crafting.ShieldDecorationRecipe;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.SmithingRecipe;
+import net.minecraft.world.item.crafting.SmithingTrimRecipe;
+import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 import net.minecraft.world.item.crafting.SmokingRecipe;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -124,8 +126,6 @@ import dev.emi.emi.mixin.accessor.AxeItemAccessor;
 import dev.emi.emi.mixin.accessor.HandledScreenAccessor;
 import dev.emi.emi.mixin.accessor.HoeItemAccessor;
 import dev.emi.emi.mixin.accessor.ShovelItemAccessor;
-import dev.emi.emi.mixin.accessor.SmithingTransformRecipeAccessor;
-import dev.emi.emi.mixin.accessor.SmithingTrimRecipeAccessor;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.recipe.EmiAnvilRecipe;
@@ -444,12 +444,12 @@ public class VanillaPlugin implements EmiPlugin {
 		for (SmithingRecipe recipe : getRecipes(registry, RecipeType.SMITHING)) {
 			//addRecipeSafe(registry, () -> new EmiSmithingRecipe(recipe), recipe);
 			Minecraft client = Minecraft.getInstance();
-			if (recipe instanceof SmithingTransformRecipeAccessor stra) {
-				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), ProxyRecipeManager.getId(recipe)), recipe);
-			} else if (recipe instanceof SmithingTrimRecipeAccessor stra) {
-				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(stra.getTemplate()), EmiIngredient.of(stra.getBase()),
-					EmiIngredient.of(stra.getAddition()), EmiStack.of(EmiPort.getOutput(recipe)), recipe), recipe);
+			if (recipe instanceof SmithingTransformRecipe str) {
+				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(str.templateIngredient().orElse(null)), EmiIngredient.of(str.baseIngredient()),
+					EmiIngredient.of(str.additionIngredient().orElse(null)), EmiStack.of(EmiPort.getOutput(recipe)), ProxyRecipeManager.getId(recipe)), recipe);
+			} else if (recipe instanceof SmithingTrimRecipe str) {
+				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(str.templateIngredient().orElse(null)), EmiIngredient.of(str.baseIngredient()),
+					EmiIngredient.of(str.additionIngredient().orElse(null)), EmiStack.of(EmiPort.getOutput(recipe)), recipe), recipe);
 			}
 		}
 		for (StonecutterRecipe recipe : getRecipes(registry, RecipeType.STONECUTTING)) {
