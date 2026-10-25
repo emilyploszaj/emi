@@ -2,6 +2,7 @@ package dev.emi.emi.network;
 
 import dev.emi.emi.runtime.EmiLog;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -26,7 +27,7 @@ public class CreateItemC2SPacket implements EmiPacket {
 
 	@Override
 	public void apply(Player player) {
-		if ((player.hasPermissions(2) || player.isCreative()) && player.containerMenu != null) {
+		if ((player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || player.isCreative()) && player.containerMenu != null) {
 			if (stack.isEmpty()) {
 				if (mode == 1 && !player.containerMenu.getCarried().isEmpty()) {
 					EmiLog.info(player.getName() + " deleted " + player.containerMenu.getCarried());

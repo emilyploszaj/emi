@@ -1,5 +1,7 @@
 package dev.emi.emi.platform.neoforge;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.PingS2CPacket;
 import dev.emi.emi.platform.EmiMain;
@@ -28,10 +30,16 @@ public class EmiNeoForge {
 		});
 		NeoForge.EVENT_BUS.addListener(this::registerCommands);
 		NeoForge.EVENT_BUS.addListener(this::playerConnect);
+		NeoForge.EVENT_BUS.addListener(this::syncRecipes);
 	}
 
 	public void registerCommands(RegisterCommandsEvent event) {
 		EmiCommands.registerCommands(event.getDispatcher());
+	}
+
+	// Vanilla no longer sends recipes to clients, so EMI requests all of them
+	public void syncRecipes(OnDatapackSyncEvent event) {
+		event.sendRecipes(BuiltInRegistries.RECIPE_TYPE);
 	}
 
 	public void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
