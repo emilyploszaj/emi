@@ -44,7 +44,7 @@ public class EmiSmithingTrimRecipe extends EmiSmithingRecipe {
 		return new EmiStack[] {
 			input,
 			addition,
-			EmiStack.of(recipe.assemble(inv, client.level.registryAccess()))
+			EmiStack.of(recipe.assemble(inv))
 		}[i];
 	}
 }

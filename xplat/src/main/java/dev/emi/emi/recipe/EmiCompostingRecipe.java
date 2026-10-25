@@ -1,7 +1,7 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,9 +20,9 @@ public class EmiCompostingRecipe implements EmiRecipe {
 	private static final EmiStack BONE_MEAL = EmiStack.of(Items.BONE_MEAL);
 	private final EmiIngredient stack;
 	private final float chance;
-	private final ResourceLocation id;
+	private final Identifier id;
 
-	public EmiCompostingRecipe(EmiIngredient stack, float chance, ResourceLocation id) {
+	public EmiCompostingRecipe(EmiIngredient stack, float chance, Identifier id) {
 		this.stack = stack;
 		this.chance = chance;
 		this.id = id;
@@ -34,7 +34,7 @@ public class EmiCompostingRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 

@@ -59,8 +59,8 @@ public class EmiPlayerInventory {
 		}
 
 		Inventory pInv = entity.getInventory();
-		for (int i = 0; i < pInv.items.size(); i++) {
-			addStack(pInv.items.get(i));
+		for (int i = 0; i < pInv.getNonEquipmentItems().size(); i++) {
+			addStack(pInv.getNonEquipmentItems().get(i));
 		}
 	}
 

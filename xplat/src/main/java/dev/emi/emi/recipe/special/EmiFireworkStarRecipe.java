@@ -3,10 +3,8 @@ package dev.emi.emi.recipe.special;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.DyeColor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.FireworkExplosion;
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -24,13 +23,13 @@ import it.unimi.dsi.fastutil.ints.IntList;
 
 
 public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
-	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(DyeItem::byColor).toList();
+	private static final List<Item> DYES = EmiPort.getDyeItems();
 
 	private static final List<Item> SHAPES = List.of(Items.FIRE_CHARGE, Items.FEATHER, Items.GOLD_NUGGET, Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, Items.CREEPER_HEAD, Items.PLAYER_HEAD, Items.DRAGON_HEAD, Items.ZOMBIE_HEAD);
 
 	private static final List<Item> EFFECTS = List.of(Items.DIAMOND, Items.GLOWSTONE_DUST);
 
-	public EmiFireworkStarRecipe(ResourceLocation id) {
+	public EmiFireworkStarRecipe(Identifier id) {
 		super(List.of(
 				EmiIngredient.of(DYES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
 						EmiIngredient.of(SHAPES.stream().map(i -> (EmiIngredient) EmiStack.of(i)).collect(Collectors.toList())),
@@ -59,8 +58,8 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 	public SlotWidget getOutputWidget(int x, int y) {
 		return new GeneratedSlotWidget(this::getFireworkStar, unique, x, y);
 	}
-	private List<DyeItem> getDyes(Random random, int max) {
-		List<DyeItem> dyes = Lists.newArrayList();
+	private List<Item> getDyes(Random random, int max) {
+		List<Item> dyes = Lists.newArrayList();
 		int amount = 1 + random.nextInt(max);
 		for (int i = 0; i < amount; i++) {
 			dyes.add(DYES.get(random.nextInt(DYES.size())));
@@ -109,8 +108,8 @@ public class EmiFireworkStarRecipe extends EmiPatternCraftingRecipe {
 			} else if (SHAPES.contains(item)) {
 				type = FireworkExplosion.Shape.CREEPER;
 			} else {
-				DyeItem dyeItem = (DyeItem) item;
-				colors.add(dyeItem.getDyeColor().getFireworkColor());
+				Item dyeItem = (DyeItem) item;
+				colors.add(EmiPort.getDyeColor(dyeItem).getFireworkColor());
 			}
 		}
 

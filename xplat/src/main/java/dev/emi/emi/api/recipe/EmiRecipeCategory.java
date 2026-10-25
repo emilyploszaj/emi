@@ -3,10 +3,10 @@ package dev.emi.emi.api.recipe;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -19,7 +19,7 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.data.EmiRecipeCategoryProperties;
 
 public class EmiRecipeCategory implements EmiRenderable {
-	public ResourceLocation id;
+	public Identifier id;
 	public EmiRenderable icon, simplified;
 	public Comparator<EmiRecipe> sorter;
 	
@@ -29,21 +29,21 @@ public class EmiRecipeCategory implements EmiRenderable {
 	 * 
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon) {
+	public EmiRecipeCategory(Identifier id, EmiRenderable icon) {
 		this(id, icon, icon);
 	}
 
 	/**
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon, EmiRenderable simplified) {
+	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified) {
 		this(id, icon, simplified, EmiRecipeSorting.none());
 	}
 
 	/**
 	 * {@link EmiStack} instances can be passed as {@link EmiRenderable}
 	 */
-	public EmiRecipeCategory(ResourceLocation id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
+	public EmiRecipeCategory(Identifier id, EmiRenderable icon, EmiRenderable simplified, Comparator<EmiRecipe> sorter) {
 		this.id = id;
 		this.icon = icon;
 		this.simplified = simplified;
@@ -54,16 +54,16 @@ public class EmiRecipeCategory implements EmiRenderable {
 		return EmiPort.translatable(EmiUtil.translateId("emi.category.", getId()));
 	}
 
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 
 	@Override
-	public void render(GuiGraphics draw, int x, int y, float delta) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta) {
 		EmiRecipeCategoryProperties.getIcon(this).render(draw, x, y, delta);
 	}
 
-	public void renderSimplified(GuiGraphics draw, int x, int y, float delta) {
+	public void renderSimplified(GuiGraphicsExtractor draw, int x, int y, float delta) {
 		EmiRecipeCategoryProperties.getSimplifiedIcon(this).render(draw, x, y, delta);
 	}
 

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -293,7 +293,7 @@ public class EmiRecipeFiller {
 			List<Slot> clear = handler.getCraftingSlots(screenHandler);
 			for (Slot slot : clear) {
 				if (slot != null) {
-					manager.handleInventoryMouseClick(screenHandler.containerId, slot.index, 0, ClickType.QUICK_MOVE, player);
+					manager.handleContainerInput(screenHandler.containerId, slot.index, 0, ContainerInput.QUICK_MOVE, player);
 				}
 			}
 			List<Slot> inputs = handler.getInputSources(screenHandler);
@@ -318,16 +318,16 @@ public class EmiRecipeFiller {
 					}
 					ItemStack is = input.getItem().copy();
 					if (ItemStack.isSameItemSameComponents(is, stack)) {
-						manager.handleInventoryMouseClick(screenHandler.containerId, input.index, 0, ClickType.PICKUP, player);
+						manager.handleContainerInput(screenHandler.containerId, input.index, 0, ContainerInput.PICKUP, player);
 						if (is.getCount() <= needed) {
 							needed -= is.getCount();
-							manager.handleInventoryMouseClick(screenHandler.containerId, crafting.index, 0, ClickType.PICKUP, player);
+							manager.handleContainerInput(screenHandler.containerId, crafting.index, 0, ContainerInput.PICKUP, player);
 						} else {
 							while (needed > 0) {
-								manager.handleInventoryMouseClick(screenHandler.containerId, crafting.index, 1, ClickType.PICKUP, player);
+								manager.handleContainerInput(screenHandler.containerId, crafting.index, 1, ContainerInput.PICKUP, player);
 								needed--;
 							}
-							manager.handleInventoryMouseClick(screenHandler.containerId, input.index, 0, ClickType.PICKUP, player);
+							manager.handleContainerInput(screenHandler.containerId, input.index, 0, ContainerInput.PICKUP, player);
 						}
 					}
 					if (needed == 0) {
@@ -339,9 +339,9 @@ public class EmiRecipeFiller {
 			Slot slot = handler.getOutputSlot(screenHandler);
 			if (slot != null) {
 				if (destination == EmiCraftContext.Destination.CURSOR) {
-					manager.handleInventoryMouseClick(screenHandler.containerId, slot.index, 0, ClickType.PICKUP, player);
+					manager.handleContainerInput(screenHandler.containerId, slot.index, 0, ContainerInput.PICKUP, player);
 				} else if (destination == EmiCraftContext.Destination.INVENTORY) {
-					manager.handleInventoryMouseClick(screenHandler.containerId, slot.index, 0, ClickType.QUICK_MOVE, player);
+					manager.handleContainerInput(screenHandler.containerId, slot.index, 0, ContainerInput.QUICK_MOVE, player);
 				}
 			}
 			return true;

@@ -64,7 +64,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				if (x >= recipe.getWidth() || y >= recipe.getHeight() || i >= recipe.getIngredients().size()) {
 					list.add(EmiStack.EMPTY);
 				} else {
-					list.add(EmiIngredient.of(recipe.getIngredients().get(i++)));
+					list.add(EmiIngredient.of(recipe.getIngredients().get(i++).orElse(null)));
 				}
 			}
 		}

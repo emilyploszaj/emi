@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -12,11 +12,11 @@ import dev.emi.emi.api.widget.WidgetHolder;
 public abstract class EmiPatternCraftingRecipe extends EmiCraftingRecipe {
 	protected final int unique = EmiUtil.RANDOM.nextInt();
 	
-	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id) {
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id) {
 		super(input, output, id);
 	}
 	
-	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, ResourceLocation id, boolean shapeless) {
+	public EmiPatternCraftingRecipe(List<EmiIngredient> input, EmiStack output, Identifier id, boolean shapeless) {
 		super(input, output, id, shapeless);
 	}
 

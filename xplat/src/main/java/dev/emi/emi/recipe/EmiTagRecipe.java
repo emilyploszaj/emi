@@ -1,7 +1,7 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiUtil;
@@ -46,7 +46,7 @@ public class EmiTagRecipe extends EmiIngredientRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
-		return EmiPort.id("emi", "/tag/" + key.registry().location().getPath() + "/" + EmiUtil.subId(key.location()));
+	public Identifier getId() {
+		return EmiPort.id("emi", "/tag/" + key.registry().identifier().getPath() + "/" + EmiUtil.subId(key.location()));
 	}
 }

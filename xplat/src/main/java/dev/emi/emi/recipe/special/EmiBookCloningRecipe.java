@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -52,7 +52,7 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 	private static final EmiStack BOOK_AND_QUILL = EmiStack.of(Items.WRITABLE_BOOK);
 	private static final EmiStack WRITTEN_BOOK = EmiStack.of(Items.WRITTEN_BOOK);
 
-	public EmiBookCloningRecipe(ResourceLocation id) {
+	public EmiBookCloningRecipe(Identifier id) {
 		super(List.of(WRITTEN_BOOK, BOOK_AND_QUILL), WRITTEN_BOOK.copy().setAmount(2), id);
 	}
 

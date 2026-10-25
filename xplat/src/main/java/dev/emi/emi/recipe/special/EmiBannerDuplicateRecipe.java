@@ -3,7 +3,7 @@ package dev.emi.emi.recipe.special;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,7 +25,7 @@ public class EmiBannerDuplicateRecipe extends EmiPatternCraftingRecipe {
 
 	private final Item banner;
 
-	public EmiBannerDuplicateRecipe(Item banner, ResourceLocation id) {
+	public EmiBannerDuplicateRecipe(Item banner, Identifier id) {
 		super(List.of(
 				EmiStack.of(banner),
 				EmiStack.of(banner).setRemainder(EmiStack.of(banner))),

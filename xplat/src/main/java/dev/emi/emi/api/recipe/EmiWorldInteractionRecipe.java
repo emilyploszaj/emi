@@ -3,7 +3,7 @@ package dev.emi.emi.api.recipe;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -15,7 +15,7 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 
 public class EmiWorldInteractionRecipe implements EmiRecipe {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final List<WorldIngredient> left, right, outputIngredients;
 	private final List<EmiIngredient> inputs, catalysts;
 	private final List<EmiStack> outputs;
@@ -89,7 +89,7 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 
@@ -159,7 +159,7 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 		private final List<WorldIngredient> right = Lists.newArrayList();
 		private final List<WorldIngredient> output = Lists.newArrayList();
 		private boolean supportsRecipeTree = true;
-		private ResourceLocation id = null;
+		private Identifier id = null;
 
 		private Builder() {
 		}
@@ -180,7 +180,7 @@ public class EmiWorldInteractionRecipe implements EmiRecipe {
 		 * Assigns an identifier to the recipe.
 		 * If not called, the id will be null.
 		 */
-		public Builder id(ResourceLocation id) {
+		public Builder id(Identifier id) {
 			this.id = id;
 			return this;
 		}

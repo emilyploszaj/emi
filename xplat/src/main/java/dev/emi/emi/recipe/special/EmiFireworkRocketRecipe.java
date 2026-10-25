@@ -3,17 +3,16 @@ package dev.emi.emi.recipe.special;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.FireworkExplosion;
 import net.minecraft.world.item.component.Fireworks;
 import com.google.common.collect.Lists;
 
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
@@ -24,9 +23,9 @@ import it.unimi.dsi.fastutil.ints.IntLists;
 
 
 public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
-	private static final List<DyeItem> DYES = Stream.of(DyeColor.values()).map(DyeItem::byColor).toList();
+	private static final List<Item> DYES = EmiPort.getDyeItems();
 
-	public EmiFireworkRocketRecipe(ResourceLocation id) {
+	public EmiFireworkRocketRecipe(Identifier id) {
 		super(List.of(
 				EmiStack.of(Items.PAPER),
 						EmiStack.of(Items.FIREWORK_STAR),
@@ -87,8 +86,8 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 		return items;
 	}
 
-	private List<DyeItem> getDyes(Random random, int max) {
-		List<DyeItem> dyes = Lists.newArrayList();
+	private List<Item> getDyes(Random random, int max) {
+		List<Item> dyes = Lists.newArrayList();
 		int amount = 1 + random.nextInt(max);
 		for (int i = 0; i < amount; i++) {
 			dyes.add(DYES.get(random.nextInt(DYES.size())));
@@ -124,10 +123,10 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 			items = items + 2;
 		}
 
-		List<DyeItem> dyeItems = getDyes(random, 8 - items);
+		List<Item> dyeItems = getDyes(random, 8 - items);
 		IntList colors = new IntArrayList();
-		for (DyeItem dyeItem : dyeItems) {
-			colors.add(dyeItem.getDyeColor().getFireworkColor());
+		for (Item dyeItem : dyeItems) {
+			colors.add(EmiPort.getDyeColor(dyeItem).getFireworkColor());
 		}
 
 		amount = random.nextInt(2);
@@ -135,10 +134,10 @@ public class EmiFireworkRocketRecipe extends EmiPatternCraftingRecipe {
 		IntList fadedColors;
 
 		if (amount == 1) {
-			List<DyeItem> dyeItemsFaded = getDyes(random, 8);
+			List<Item> dyeItemsFaded = getDyes(random, 8);
 			fadedColors = new IntArrayList();
-			for (DyeItem dyeItem : dyeItemsFaded) {
-				fadedColors.add(dyeItem.getDyeColor().getFireworkColor());
+			for (Item dyeItem : dyeItemsFaded) {
+				fadedColors.add(EmiPort.getDyeColor(dyeItem).getFireworkColor());
 			}
 		} else {
 			fadedColors = IntLists.emptyList();

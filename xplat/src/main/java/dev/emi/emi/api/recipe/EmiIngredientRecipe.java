@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
@@ -126,14 +126,14 @@ public abstract class EmiIngredientRecipe implements EmiRecipe {
 		}
 
 		@Override
-		public void render(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+		public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 			if (!getStack().isEmpty()) {
 				super.render(draw, mouseX, mouseY, delta);
 			}
 		}
 		
 		@Override
-		public void drawBackground(GuiGraphics draw, int mouseX, int mouseY, float delta) {
+		public void drawBackground(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 			super.drawBackground(draw, mouseX, mouseY, delta);
 			EmiDrawContext context = EmiDrawContext.wrap(draw);
 			if (BoM.getRecipe(getIngredient()) instanceof EmiResolutionRecipe err && err.stack.equals(getStack())) {

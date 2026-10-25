@@ -3,7 +3,7 @@ package dev.emi.emi.api.recipe;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,9 +18,9 @@ public class EmiInfoRecipe implements EmiRecipe {
 	private static final Minecraft CLIENT = Minecraft.getInstance();
 	private final List<EmiIngredient> stacks;
 	private final List<FormattedCharSequence> text;
-	private final ResourceLocation id;
+	private final Identifier id;
 
-	public EmiInfoRecipe(List<EmiIngredient> stacks, List<Component> text, @Nullable ResourceLocation id) {
+	public EmiInfoRecipe(List<EmiIngredient> stacks, List<Component> text, @Nullable Identifier id) {
 		this.stacks = stacks;
 		this.text = text.stream().flatMap(t -> CLIENT.font.split(t, getDisplayWidth() - 4).stream()).toList();
 		this.id = id;
@@ -32,7 +32,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public @Nullable ResourceLocation getId() {
+	public @Nullable Identifier getId() {
 		return id;
 	}
 

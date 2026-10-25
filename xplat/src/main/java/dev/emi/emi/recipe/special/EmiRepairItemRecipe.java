@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import com.google.common.collect.Lists;
@@ -20,7 +20,7 @@ public class EmiRepairItemRecipe extends EmiPatternCraftingRecipe {
 			.filter(i -> i.components().getOrDefault(DataComponents.MAX_DAMAGE, 0) > 0).collect(Collectors.toList());
 	private final Item tool;
 
-	public EmiRepairItemRecipe(Item tool, ResourceLocation id) {
+	public EmiRepairItemRecipe(Item tool, Identifier id) {
 		super(List.of(
 				EmiStack.of(tool),
 				EmiStack.of(tool)),

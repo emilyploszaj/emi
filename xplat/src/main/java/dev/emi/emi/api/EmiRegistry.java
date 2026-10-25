@@ -5,10 +5,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -49,9 +49,10 @@ public interface EmiRegistry {
 	boolean isStackDisabled(EmiIngredient stack);
 
 	/**
-	 * @return The vanilla recipe manager, for iterating recipe types.
+	 * @return The recipes synchronized to the client, for iterating recipe types.
+	 *  Empty when the server does not synchronize recipes.
 	 */
-	RecipeManager getRecipeManager();
+	RecipeMap getRecipeMap();
 	
 	/**
 	 * Adds a recipe category.
@@ -77,7 +78,7 @@ public interface EmiRegistry {
 	/**
 	 * Adds a predicate to run on all current and future recipes to prevent certain ones with the given identifier from being added.
 	 */
-	default void removeRecipes(ResourceLocation id) {
+	default void removeRecipes(Identifier id) {
 		removeRecipes(r -> id.equals(r.getId()));
 	}
 

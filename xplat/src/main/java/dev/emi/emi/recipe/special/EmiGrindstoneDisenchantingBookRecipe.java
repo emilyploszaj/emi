@@ -10,21 +10,20 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.api.widget.TextWidget.Alignment;
 import java.util.List;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
-import net.minecraft.world.item.enchantment.ItemEnchantments.Mutable;
 
 public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
-	private static final ResourceLocation BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
+	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
 	private final Enchantment enchantment;
 	private final int level;
-	private final ResourceLocation id;
+	private final Identifier id;
 
-	public EmiGrindstoneDisenchantingBookRecipe(Enchantment enchantment, int level, ResourceLocation id) {
+	public EmiGrindstoneDisenchantingBookRecipe(Enchantment enchantment, int level, Identifier id) {
 		this.enchantment = enchantment;
 		this.level = level;
 		this.id = id;
@@ -36,7 +35,7 @@ public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 
