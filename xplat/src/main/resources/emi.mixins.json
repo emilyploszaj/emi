@@ -12,8 +12,6 @@
     "accessor.HoeItemAccessor",
     "accessor.OrderedTextTooltipComponentAccessor",
     "accessor.ShovelItemAccessor",
-    "accessor.SmithingTransformRecipeAccessor",
-    "accessor.SmithingTrimRecipeAccessor",
     "jei.PluginCallerMixin",
     "AbstractInventoryScreenMixin",
     "ClientItemInfoLoaderMixin",
