@@ -3,11 +3,15 @@ package dev.emi.emi.api.recipe.handler;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -19,14 +23,8 @@ import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.registry.EmiRecipeFiller;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
 
-public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecipeHandler<T> {
+public interface StandardRecipeHandler<T extends AbstractContainerMenu> extends EmiRecipeHandler<T> {
 	
 	/**
 	 * @return The slots for the recipe handler to source ingredients from.
@@ -55,8 +53,8 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 	}
 
 	@Override
-	default EmiPlayerInventory getInventory(HandledScreen<T> screen) {
-		return new EmiPlayerInventory(getInputSources(screen.getScreenHandler()).stream().map(Slot::getStack).map(EmiStack::of).toList());
+	default EmiPlayerInventory getInventory(AbstractContainerScreen<T> screen) {
+		return new EmiPlayerInventory(getInputSources(screen.getMenu()).stream().map(Slot::getItem).map(EmiStack::of).toList());
 	}
 
 	@Override
@@ -69,11 +67,11 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 		List<ItemStack> stacks = EmiRecipeFiller.getStacks(this, recipe, context.getScreen(), context.getAmount());
 		if (stacks != null) {
 			if (stacks != null) {
-				MinecraftClient.getInstance().setScreen(context.getScreen());
+				Minecraft.getInstance().setScreen(context.getScreen());
 				if (!EmiClient.onServer) {
 					return EmiRecipeFiller.clientFill(this, recipe, context.getScreen(), stacks, context.getDestination());
 				} else {
-					EmiClient.sendFillRecipe(this, context.getScreen(), context.getScreenHandler().syncId, switch(context.getDestination()) {
+					EmiClient.sendFillRecipe(this, context.getScreen(), context.getScreenHandler().containerId, switch(context.getDestination()) {
 						case NONE -> 0;
 						case CURSOR -> 1;
 						case INVENTORY -> 2;
@@ -86,14 +84,13 @@ public interface StandardRecipeHandler<T extends ScreenHandler> extends EmiRecip
 	}
 
 	@Override
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext draw) {
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphicsExtractor draw) {
 		renderMissing(recipe, context.getInventory(), widgets, draw);
 	}
 
 	@ApiStatus.Internal
-	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, DrawContext draw) {
+	public static void renderMissing(EmiRecipe recipe, EmiPlayerInventory inv, List<Widget> widgets, GuiGraphicsExtractor draw) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		context.enableDepthTest();
 		Map<EmiIngredient, Boolean> availableForCrafting = getAvailable(recipe, inv);
 		for (Widget w : widgets) {
 			if (w instanceof SlotWidget sw) {

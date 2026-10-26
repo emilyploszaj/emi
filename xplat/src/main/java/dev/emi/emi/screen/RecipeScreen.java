@@ -1,8 +1,19 @@
 package dev.emi.emi.screen;
 
+import net.minecraft.client.input.CharacterEvent;
+
+import net.minecraft.client.input.KeyEvent;
+
+import net.minecraft.client.input.MouseButtonEvent;
+
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -32,18 +43,12 @@ import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
 	public static @Nullable EmiIngredient resolve = null;
 	private Map<EmiRecipeCategory, List<EmiRecipe>> recipes;
-	public HandledScreen<?> old;
+	public AbstractContainerScreen<?> old;
 	private List<RecipeTab> tabs = Lists.newArrayList();
 	private int tabPageSize = 6;
 	private int tabPage = 0, tab = 0, page = 0;
@@ -59,7 +64,7 @@ public class RecipeScreen extends Screen {
 	int x = (this.width - backgroundWidth) / 2;
 	int y = (this.height - backgroundHeight) / 2;
 
-	public RecipeScreen(HandledScreen<?> old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
+	public RecipeScreen(AbstractContainerScreen<?> old, Map<EmiRecipeCategory, List<EmiRecipe>> recipes) {
 		super(EmiPort.translatable("screen.emi.recipe"));
 		this.old = old;
 		arrows = List.of(
@@ -91,12 +96,12 @@ public class RecipeScreen extends Screen {
 		this.tabPageSize = (minimumWidth - 32) / 24;
 		
 		for (SizedButtonWidget widget : arrows) {
-			addDrawableChild(widget);
+			addRenderableWidget(widget);
 		}
 		EmiScreenManager.addWidgets(this);
 		if (resolve != null) {
 			resolutionButton = new ResolutionButtonWidget(x - 18, y + 10, 18, 18, resolve, () -> hoveredWidget);
-			this.addDrawableChild(resolutionButton);
+			this.addRenderableWidget(resolutionButton);
 		}
 		if (recipes != null) {
 			EmiRecipe current = null;
@@ -162,9 +167,9 @@ public class RecipeScreen extends Screen {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void extractRenderState(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		this.renderInGameBackground(context.raw());
+		this.extractTransparentBackground(context.raw());
 		context.resetColor();
 		EmiRenderHelper.drawNinePatch(context, TEXTURE, x, y, backgroundWidth, backgroundHeight, 0, 0, 4, 1);
 
@@ -187,10 +192,10 @@ public class RecipeScreen extends Screen {
 		int categoryNameColor = categoryHovered ? 0x22ffff : 0xffffff;
 
 		RecipeTab tab = tabs.get(this.tab);
-		Text text = tab.category.getName();
-		if (client.textRenderer.getWidth(text) > minimumWidth - 40) {
-			int extraWidth = client.textRenderer.getWidth("...");
-			text = EmiPort.literal(client.textRenderer.trimToWidth(text, (minimumWidth - 40) - extraWidth).getString() + "...");
+		Component text = tab.category.getName();
+		if (minecraft.font.width(text) > minimumWidth - 40) {
+			int extraWidth = minecraft.font.width("...");
+			text = EmiPort.literal(minecraft.font.substrByWidth(text, (minimumWidth - 40) - extraWidth).getString() + "...");
 		}
 		context.drawCenteredTextWithShadow(text, x + backgroundWidth / 2, y + 7, categoryNameColor);
 		context.drawCenteredTextWithShadow(EmiRenderHelper.getPageText(this.page + 1, tab.getPageCount(), minimumWidth - 40),
@@ -217,7 +222,6 @@ public class RecipeScreen extends Screen {
 			int my = mouseY - group.y();
 			context.push();
 			context.translate(group.x(), group.y());
-			EmiPort.applyModelViewMatrix();
 			try {
 				for (Widget widget : group.widgets) {
 					widget.render(context.raw(), mx, my, delta);
@@ -229,7 +233,7 @@ public class RecipeScreen extends Screen {
 			for (Widget widget : group.widgets) {
 				if (widget instanceof RecipeFillButtonWidget) {
 					if (widget.getBounds().contains(mx, my)) {
-						HandledScreen hs = EmiApi.getHandledScreen();
+						AbstractContainerScreen hs = EmiApi.getHandledScreen();
 						EmiRecipeHandler handler = EmiRecipeFiller.getFirstValidHandler(group.recipe, hs);
 						if (handler != null) {
 							handler.render(group.recipe, new EmiCraftContext(hs, handler.getInventory(hs), EmiCraftContext.Type.FILL_BUTTON), group.widgets, context.raw());
@@ -241,14 +245,13 @@ public class RecipeScreen extends Screen {
 				}
 			}
 			context.pop();
-			EmiPort.applyModelViewMatrix();
 		}
 		EmiScreenManager.drawBackground(context, mouseX, mouseY, delta);
 		EmiScreenManager.render(context, mouseX, mouseY, delta);
 		EmiScreenManager.drawForeground(context, mouseX, mouseY, delta);
-		super.render(context.raw(), mouseX, mouseY, delta);
+		super.extractRenderState(context.raw(), mouseX, mouseY, delta);
 		if (categoryHovered) {
-			context.raw().drawTooltip(client.textRenderer, List.of(
+			context.raw().setComponentTooltipForNextFrame(minecraft.font, List.of(
 				tab.category.getName(),
 				EmiPort.translatable("emi.view_all_recipes")
 			), mouseX, mouseY);
@@ -261,7 +264,7 @@ public class RecipeScreen extends Screen {
 				int my = mouseY - group.y();
 				for (Widget widget : group.widgets) {
 					if (widget.getBounds().contains(mx, my)) {
-						List<TooltipComponent> tooltip = widget.getTooltip(mx, my);
+						List<ClientTooltipComponent> tooltip = widget.getTooltip(mx, my);
 						if (!tooltip.isEmpty()) {
 							EmiRenderHelper.drawTooltip(this, context, tooltip, mouseX, mouseY);
 							hoveredWidget = widget;
@@ -282,7 +285,7 @@ public class RecipeScreen extends Screen {
 	}
 
 	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+	public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
 		// Prevent double background draw
 	}
 
@@ -409,7 +412,10 @@ public class RecipeScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		int mx = (int) mouseX;
 		int my = (int) mouseY;
 		pressedSlot = null;
@@ -454,11 +460,14 @@ public class RecipeScreen extends Screen {
 			focusCategory(rTab.category);
 			return true;
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(MouseButtonEvent event) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (EmiScreenManager.mouseReleased(mouseX, mouseY, button)) {
 			return true;
 		}
@@ -480,11 +489,14 @@ public class RecipeScreen extends Screen {
 			}
 			pressedSlot = null;
 		}
-		return super.mouseReleased(mouseX, mouseY, button);
+		return super.mouseReleased(event);
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+	public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		if (EmiScreenManager.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
 			return true;
 		}
@@ -504,7 +516,7 @@ public class RecipeScreen extends Screen {
 				}
 			}
 		}
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		return super.mouseDragged(event, deltaX, deltaY);
 	}
 
 	@Override
@@ -525,22 +537,27 @@ public class RecipeScreen extends Screen {
 	}
 
 	@Override
-	public boolean charTyped(char chr, int modifiers) {
-		if (EmiScreenManager.search.charTyped(chr, modifiers)) {
+	public boolean charTyped(CharacterEvent event) {
+		char chr = (char) event.codepoint();
+		int modifiers = 0;
+		if (EmiScreenManager.search.charTyped(new CharacterEvent(chr))) {
 			return true;
 		}
-		return super.charTyped(chr, modifiers);
+		return super.charTyped(event);
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int keyCode = event.key();
+		int scanCode = event.scancode();
+		int modifiers = event.modifiers();
 		if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-			this.close();
+			this.onClose();
 			return true;
 		} else if (EmiScreenManager.keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
-		} else if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
-			this.close();
+		} else if (this.minecraft.options.keyInventory.matches(new KeyEvent(keyCode, scanCode, 0))) {
+			this.onClose();
 			return true;
 		}
 
@@ -570,7 +587,7 @@ public class RecipeScreen extends Screen {
 		} else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
 			setPage(tabPage, tab + 1, 0);
 		}
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	public WidgetGroup getGroup(Widget widget) {
@@ -583,12 +600,12 @@ public class RecipeScreen extends Screen {
 	}
 
 	@Override
-	public void close() {
+	public void onClose() {
 		EmiHistory.popUntil(s -> !(s instanceof RecipeScreen), old);
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 

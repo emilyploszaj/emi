@@ -4,42 +4,40 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-public class SizedButtonWidget extends ButtonWidget {
+public class SizedButtonWidget extends Button {
 	private final BooleanSupplier isActive;
 	private final IntSupplier vOffset;
 	protected Identifier texture = EmiRenderHelper.BUTTONS;
-	protected Supplier<List<Text>> text;
+	protected Supplier<List<Component>> text;
 	protected int u, v;
 
-	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action) {
+	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, OnPress action) {
 		this(x, y, width, height, u, v, isActive, action, () -> 0);
 	}
 
-	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
-			List<Text> text) {
+	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, OnPress action,
+			List<Component> text) {
 		this(x, y, width, height, u, v, isActive, action, () -> 0, () -> text);
 	}
 
-	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
+	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, OnPress action,
 			IntSupplier vOffset) {
 		this(x, y, width, height, u, v, isActive, action, vOffset, null);
 	}
 
-	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, PressAction action,
-			IntSupplier vOffset, Supplier<List<Text>> text) {
+	public SizedButtonWidget(int x, int y, int width, int height, int u, int v, BooleanSupplier isActive, OnPress action,
+			IntSupplier vOffset, Supplier<List<Component>> text) {
 		super(x, y, width, height, EmiPort.literal(""), action, s -> s.get());
 		this.u = u;
 		this.v = v;
@@ -64,15 +62,13 @@ public class SizedButtonWidget extends ButtonWidget {
 	}
 	
 	@Override
-	public void renderWidget(DrawContext raw, int mouseX, int mouseY, float delta) {
+	protected void extractContents(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
-		context.enableDepthTest();
 		context.drawTexture(texture, this.x, this.y, getU(mouseX, mouseY), getV(mouseX, mouseY), this.width, this.height);
 		if (this.isMouseOver(mouseX, mouseY) && text != null && this.active) {
 			context.push();
-			context.disableDepthTest();
-			MinecraftClient client = MinecraftClient.getInstance();
-			EmiRenderHelper.drawTooltip(client.currentScreen, context, text.get().stream().map(EmiPort::ordered).map(TooltipComponent::of).toList(), mouseX, mouseY);
+			Minecraft client = Minecraft.getInstance();
+			EmiRenderHelper.drawTooltip(client.screen, context, text.get().stream().map(EmiPort::ordered).map(ClientTooltipComponent::create).toList(), mouseX, mouseY);
 			context.pop();
 		}
 	}

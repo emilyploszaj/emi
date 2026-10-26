@@ -9,7 +9,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.runtime.EmiDrawContext;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class JemiCategory extends EmiRecipeCategory {
 	public IRecipeCategory<?> category;
@@ -36,7 +36,7 @@ public class JemiCategory extends EmiRecipeCategory {
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return category.getTitle();
 	}
 }

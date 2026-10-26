@@ -15,14 +15,14 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
 import mezz.jei.api.ingredients.subtypes.UidContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.TooltipFlag;
 
 public class JemiStack<T> extends EmiStack {
 	private final IIngredientType<T> type;
@@ -39,16 +39,16 @@ public class JemiStack<T> extends EmiStack {
 		if (type instanceof IIngredientTypeWithSubtypes<?, T> iitws) {
 			base = iitws.getBase(ingredient);
 		} else {
-			base = helper.getUniqueId(ingredient, UidContext.Recipe);
+			base = helper.getUid(ingredient, UidContext.Recipe).toString();
 		}
 	}
 
 	public String getJeiUid() {
-		return helper.getUniqueId(ingredient, UidContext.Ingredient);
+		return helper.getUid(ingredient, UidContext.Ingredient).toString();
 	}
 
 	@Override
-	public void render(DrawContext raw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor raw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		int xOff = (16 - renderer.getWidth()) / 2;
 		int yOff = (16 - renderer.getHeight()) / 2;
@@ -69,8 +69,8 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
-		return ComponentChanges.EMPTY;
+	public DataComponentPatch getComponentChanges() {
+		return DataComponentPatch.EMPTY;
 	}
 
 	@Override
@@ -84,22 +84,22 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public List<Text> getTooltipText() {
-		return renderer.getTooltip(ingredient, TooltipType.BASIC);
+	public List<Component> getTooltipText() {
+		return renderer.getTooltip(ingredient, TooltipFlag.NORMAL);
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = Lists.newArrayList();
-		MinecraftClient client = MinecraftClient.getInstance();
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
+		Minecraft client = Minecraft.getInstance();
 		JemiTooltipBuilder builder = new JemiTooltipBuilder();
-		renderer.getTooltip(builder, ingredient, client.options.advancedItemTooltips ? TooltipType.ADVANCED : TooltipType.BASIC);
-		list.addAll(builder.tooltip);
+		renderer.getTooltip(builder, ingredient, client.options.advancedItemTooltips ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+		list.addAll(builder.getTooltip());
 
 		Identifier id = getId();
 		if (EmiConfig.appendModId && id != null) {
 			String mod = EmiUtil.getModName(id.getNamespace());
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(mod, ChatFormatting.BLUE, ChatFormatting.ITALIC))));
 		}
 
 		list.addAll(super.getTooltip());
@@ -107,7 +107,7 @@ public class JemiStack<T> extends EmiStack {
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return EmiPort.literal(helper.getDisplayName(ingredient));
 	}
 }

@@ -1,18 +1,22 @@
 package dev.emi.emi.api.widget;
 
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-
-public abstract class Widget implements Drawable {
+public abstract class Widget implements Renderable {
 
 	public abstract Bounds getBounds();
 	
-	public abstract void render(DrawContext draw, int mouseX, int mouseY, float delta);
+	public abstract void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta);
 
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	@Override
+	public void extractRenderState(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
+		render(draw, mouseX, mouseY, delta);
+	}
+
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return List.of();
 	}
 	

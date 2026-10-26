@@ -2,7 +2,9 @@ package dev.emi.emi.chess;
 
 import java.util.List;
 import java.util.UUID;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.player.Player;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -15,9 +17,6 @@ import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.screen.EmiScreenManager;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
 
 // Yes, this is a thing that exists
 public class EmiChess {
@@ -175,12 +174,12 @@ public class EmiChess {
 	}
 
 	private static void invitePlayer() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		String name = EmiScreenManager.search.getText();
-		for (AbstractClientPlayerEntity player : client.world.getPlayers()) {
+		Minecraft client = Minecraft.getInstance();
+		String name = EmiScreenManager.search.getValue();
+		for (AbstractClientPlayer player : client.level.players()) {
 			if (player.getName().getString().equals(name)) {
-				get().opponent = player.getUuid();
-				sendNetwork(player.getUuid(), -1, 0, 0);
+				get().opponent = player.getUUID();
+				sendNetwork(player.getUUID(), -1, 0, 0);
 			}
 		}
 	}
@@ -190,8 +189,8 @@ public class EmiChess {
 	}
 
 	public static void receiveNetwork(UUID uuid, int type, int start, int end) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		PlayerEntity player = client.world.getPlayerByUuid(uuid);
+		Minecraft client = Minecraft.getInstance();
+		Player player = client.level.getPlayerByUUID(uuid);
 		if (player == null) {
 			return;
 		}
@@ -199,7 +198,7 @@ public class EmiChess {
 		if (type == -1) {
 			if (EmiScreenManager.hasSidebarAvailable(SidebarType.CHESS)) {
 				chess.pending = uuid;
-				client.player.sendMessage(EmiPort.translatable("emi.chess.multiplayer.invited", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.invited", player.getDisplayName()));
 			} else {
 				sendNetwork(uuid, -4, 0, 0);
 			}
@@ -208,18 +207,18 @@ public class EmiChess {
 				sendNetwork(uuid, -3, 0, 0);
 			} else {
 				if (uuid.equals(chess.opponent)) {
-					client.player.sendMessage(EmiPort.translatable("emi.chess.multiplayer.accepted", player.getDisplayName()), false);
+					client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.accepted", player.getDisplayName()));
 					chess.generator = new NetworkedMoveGenerator(PieceColor.BLACK);
 				}
 			}
 		} else if (type == -3) {
 			if (uuid.equals(chess.opponent)) {
-				client.player.sendMessage(EmiPort.translatable("emi.chess.multiplayer.cancelled", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.cancelled", player.getDisplayName()));
 				restart();
 			}
 		} else if (type == -4) {
 			if (uuid.equals(chess.opponent)) {
-				client.player.sendMessage(EmiPort.translatable("emi.chess.multiplayer.unavailable", player.getDisplayName()), false);
+				client.player.sendSystemMessage(EmiPort.translatable("emi.chess.multiplayer.unavailable", player.getDisplayName()));
 			}
 		} else if (chess.generator instanceof NetworkedMoveGenerator nmg && chess.opponent.equals(uuid)) {
 			ChessMove desired = ChessMove.of(start, end, type);

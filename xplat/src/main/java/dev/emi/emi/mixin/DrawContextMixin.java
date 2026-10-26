@@ -6,15 +6,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(DrawContext.class)
+@Mixin(GuiGraphicsExtractor.class)
 public class DrawContextMixin {
 
-	@Inject(at = @At("HEAD"), method = "drawItemTooltip(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;II)V")
-	private void drawItemTooltip(TextRenderer text, ItemStack stack, int x, int y, CallbackInfo info) {
+	@Inject(at = @At("HEAD"), method = "setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V")
+	private void drawItemTooltip(Font text, ItemStack stack, int x, int y, CallbackInfo info) {
 		EmiScreenManager.lastStackTooltipRendered = stack;
 	}
 }

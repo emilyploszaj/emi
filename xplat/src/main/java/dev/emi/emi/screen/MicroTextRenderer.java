@@ -1,8 +1,7 @@
 package dev.emi.emi.screen;
 
 import java.util.List;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.resources.Identifier;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.EmiConfig;
@@ -10,7 +9,6 @@ import dev.emi.emi.config.FluidUnit;
 import dev.emi.emi.runtime.EmiDrawContext;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-import net.minecraft.util.Identifier;
 
 public class MicroTextRenderer {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/microfont.png");
@@ -100,8 +98,6 @@ public class MicroTextRenderer {
 		float g = (((color & 0x0000FF00) >>  8) & 0xFF) / 255f;
 		float b = (((color & 0x000000FF) >>  0) & 0xFF) / 255f;
 		context.push();
-		context.matrices().translate(0, 0, 300);
-		context.disableBlend();
 		for (int i = 0; i < string.length(); i++) {
 			MicroChar c = MICRO_CHARS.get(string.charAt(i));
 			if (c == null) {

@@ -1,7 +1,7 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
 import dev.emi.emi.VanillaPlugin;
 import dev.emi.emi.api.recipe.EmiIngredientRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -9,7 +9,6 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.util.Identifier;
 
 public class EmiSyntheticIngredientRecipe extends EmiIngredientRecipe {
 	private final EmiIngredient ingredient;

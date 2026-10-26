@@ -1,16 +1,14 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.runtime.ProxyRecipeManager;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
 
 public interface EmiRecipe {
 
@@ -97,10 +95,10 @@ public interface EmiRecipe {
 	}
 
 	/**
-	 * @return The vanilla {@link RecipeEntry} this recipe represents, if any.
+	 * @return The vanilla {@link RecipeHolder} this recipe represents, if any.
 	 *  By default, uses the result of {@link EmiRecipe#getId()} to look up in the RecipeManager.
 	 */
-	default @Nullable RecipeEntry<?> getBackingRecipe() {
+	default @Nullable RecipeHolder<?> getBackingRecipe() {
 		return ProxyRecipeManager.getRecipeEntry(getId());
 	}
 }

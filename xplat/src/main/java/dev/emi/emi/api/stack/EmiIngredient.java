@@ -1,17 +1,14 @@
 package dev.emi.emi.api.stack;
 
-import java.util.Arrays;
 import java.util.List;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiTagKey;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.tag.TagKey;
 
 public interface EmiIngredient extends EmiRenderable {
 	public static final int RENDER_ICON = 1;
@@ -45,13 +42,13 @@ public interface EmiIngredient extends EmiRenderable {
 	EmiIngredient setChance(float chance);
 
 	@Override
-	default void render(DrawContext draw, int x, int y, float delta) {
+	default void render(GuiGraphicsExtractor draw, int x, int y, float delta) {
 		render(draw, x, y, delta, -1);
 	}
 
-	void render(DrawContext draw, int x, int y, float delta, int flags);
+	void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags);
 
-	List<TooltipComponent> getTooltip();
+	List<ClientTooltipComponent> getTooltip();
 
 	public static boolean areEqual(EmiIngredient a, EmiIngredient b) {
 		List<EmiStack> as = a.getEmiStacks();
@@ -79,25 +76,14 @@ public interface EmiIngredient extends EmiRenderable {
 		if (ingredient == null || ingredient.isEmpty()) {
 			return EmiStack.EMPTY;
 		}
-		ItemStack[] stacks = ingredient.getMatchingStacks();
-		int amount = 1;
-		if (stacks.length != 0) {
-			amount = stacks[0].getCount();
-			for (int i = 1; i < stacks.length; i++) {
-				if (stacks[i].getCount() != amount) {
-					amount = 1;
-					break;
-				}
-			}
-		}
-		return of(ingredient, amount);
+		return of(ingredient, 1);
 	}
 
 	public static EmiIngredient of(Ingredient ingredient, long amount) {
 		if (ingredient == null || ingredient.isEmpty()) {
 			return EmiStack.EMPTY;
 		}
-		return EmiTags.getIngredient(Item.class, Arrays.stream(ingredient.getMatchingStacks()).map(EmiStack::of).toList(), amount);
+		return EmiTags.getIngredient(Item.class, ingredient.items().map(i -> EmiStack.of(i.value())).toList(), amount);
 	}
 
 	public static EmiIngredient of(List<? extends EmiIngredient> list) {

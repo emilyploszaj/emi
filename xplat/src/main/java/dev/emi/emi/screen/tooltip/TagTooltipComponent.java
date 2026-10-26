@@ -1,13 +1,12 @@
 package dev.emi.emi.screen.tooltip;
 
 import java.util.List;
-
+import net.minecraft.client.gui.Font;
+import net.minecraft.resources.Identifier;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.util.Identifier;
 
 public class TagTooltipComponent implements EmiTooltipComponent {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/widgets.png");
@@ -38,7 +37,7 @@ public class TagTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getWidth(TextRenderer textRenderer) {
+	public int getWidth(Font textRenderer) {
 		return 18 * getStackWidth();
 	}
 

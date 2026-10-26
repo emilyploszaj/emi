@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -31,13 +34,9 @@ import dev.emi.emi.runtime.EmiSidebars;
 import dev.emi.emi.screen.BoMScreen;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.screen.RecipeScreen;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 
 public class EmiApi {
-	private static final MinecraftClient client = MinecraftClient.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
 
 	public static List<EmiStack> getIndexStacks() {
 		return EmiStackList.stacks;
@@ -50,7 +49,7 @@ public class EmiApi {
 	public static boolean isCheatMode() {
 		return switch (EmiConfig.cheatMode) {
 			case TRUE -> true;
-			case CREATIVE -> client.player == null || client.player.isInCreativeMode();
+			case CREATIVE -> client.player == null || client.player.hasInfiniteMaterials();
 			case FALSE -> false;
 		};
 	}
@@ -59,14 +58,14 @@ public class EmiApi {
 	 * @return Current search text
 	 */
 	public static String getSearchText() {
-		return EmiScreenManager.search.getText();
+		return EmiScreenManager.search.getValue();
 	}
 
 	/**
 	 * Sets the current search to the provided query
 	 */
 	public static void setSearchText(String text) {
-		EmiScreenManager.search.setText(text);
+		EmiScreenManager.search.setValue(text);
 	}
 
 	public static boolean isSearchFocused() {
@@ -103,9 +102,9 @@ public class EmiApi {
 		return null;
 	}
 
-	public static HandledScreen<?> getHandledScreen() {
-		Screen s = client.currentScreen;
-		if (s instanceof HandledScreen<?> hs) {
+	public static AbstractContainerScreen<?> getHandledScreen() {
+		Screen s = client.screen;
+		if (s instanceof AbstractContainerScreen<?> hs) {
 			return hs;
 		} else if (s instanceof RecipeScreen rs) {
 			return rs.old;
@@ -171,11 +170,11 @@ public class EmiApi {
 	}
 
 	public static void viewRecipeTree() {
-		if (client.currentScreen == null) {
+		if (client.screen == null) {
 			client.setScreen(new InventoryScreen(client.player));
 		}
-		Screen s = client.currentScreen;
-		if (s instanceof HandledScreen<?> hs) {
+		Screen s = client.screen;
+		if (s instanceof AbstractContainerScreen<?> hs) {
 			push();
 			client.setScreen(new BoMScreen(hs));
 		} else if (s instanceof RecipeScreen rs) {
@@ -185,19 +184,19 @@ public class EmiApi {
 	}
 
 	public static void focusRecipe(EmiRecipe recipe) {
-		if (client.currentScreen instanceof RecipeScreen rs) {
+		if (client.screen instanceof RecipeScreen rs) {
 			rs.focusRecipe(recipe);
 		}
 	}
 
 	private static void push() {
-		if (client.currentScreen instanceof RecipeScreen rs) {
+		if (client.screen instanceof RecipeScreen rs) {
 			EmiHistory.push(rs);
-		} else if (client.currentScreen instanceof BoMScreen bs) {
+		} else if (client.screen instanceof BoMScreen bs) {
 			EmiHistory.push(bs);
 		} else {
 			EmiHistory.clear();
-			EmiHistory.push(client.currentScreen);
+			EmiHistory.push(client.screen);
 		}
 	}
 
@@ -257,13 +256,13 @@ public class EmiApi {
 			if (getHandledScreen() == null) {
 				client.setScreen(new InventoryScreen(client.player));
 			}
-			if (client.currentScreen instanceof HandledScreen<?> hs) {
+			if (client.screen instanceof AbstractContainerScreen<?> hs) {
 				push();
 				client.setScreen(new RecipeScreen(hs, recipes));
-			} else if (client.currentScreen instanceof BoMScreen bs) {
+			} else if (client.screen instanceof BoMScreen bs) {
 				push();
 				client.setScreen(new RecipeScreen(bs.old, recipes));
-			} else if (client.currentScreen instanceof RecipeScreen rs) {
+			} else if (client.screen instanceof RecipeScreen rs) {
 				push();
 				RecipeScreen n = new RecipeScreen(rs.old, recipes);
 				client.setScreen(n);

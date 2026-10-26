@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import mezz.jei.api.gui.widgets.IDrawableWidget;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -17,7 +18,7 @@ import mezz.jei.api.gui.widgets.IScrollBoxWidget;
 import mezz.jei.api.gui.widgets.IScrollGridWidget;
 import mezz.jei.api.gui.widgets.ISlottedRecipeWidget;
 import mezz.jei.api.gui.widgets.ITextWidget;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.network.chat.FormattedText;
 
 public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 	public IRecipeSlotDrawablesView slots;
@@ -41,6 +42,11 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 
 	@Override
 	public IPlaceable<?> addDrawable(IDrawable drawable) {
+		return addDrawableWidget(drawable);
+	}
+
+	@Override
+	public IDrawableWidget addDrawableWidget(IDrawable drawable) {
 		return addEmi(new JemiWidgetBuilder(drawable.getWidth(), drawable.getHeight(), (self, holder) -> {
 			holder.addDrawable(self.x, self.y, drawable.getWidth(), drawable.getHeight(), (raw, mouseX, mouseY, delta) -> {
 				drawable.draw(raw);
@@ -105,24 +111,50 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 	}
 
 	@Override
-	public ITextWidget addText(List<StringVisitable> text, int maxWidth, int maxHeight) {
+	public IDrawableWidget addTooltipArea(int xPos, int yPos, int width, int height) {
+		return addEmi(new JemiWidgetBuilder(width, height, (self, holder) -> {
+		})).setPosition(xPos, yPos);
+	}
+
+	@Override
+	public IDrawableWidget addRecipeArrowWidget() {
+		return addEmiTexture(EmiTexture.EMPTY_ARROW);
+	}
+
+	@Override
+	public IDrawableWidget addRecipePlusSignWidget() {
+		return addEmiTexture(EmiTexture.PLUS);
+	}
+
+	@Override
+	public IDrawableWidget addAnimatedRecipeArrowWidget(int ticksPerCycle) {
+		return addAnimatedEmiTexture(EmiTexture.EMPTY_ARROW, EmiTexture.FULL_ARROW, ticksPerCycle * 1000 / 20, true, false, false);
+	}
+
+	@Override
+	public IDrawableWidget addAnimatedRecipeFlameWidget(int cookTime) {
+		return addAnimatedEmiTexture(EmiTexture.EMPTY_FLAME, EmiTexture.FULL_FLAME, cookTime * 1000 / 20, false, true, true);
+	}
+
+	@Override
+	public ITextWidget addText(List<FormattedText> text, int maxWidth, int maxHeight) {
 		return new JemiTextWidget(text, maxWidth, maxHeight);
 	}
 
-	private IPlaceable<?> addEmiTexture(EmiTexture texture) {
+	private JemiWidgetBuilder addEmiTexture(EmiTexture texture) {
 		return addEmi(new JemiWidgetBuilder(texture.width, texture.height, (self, holder) -> {
 			holder.addTexture(texture, self.x, self.y);
 		}));
 	}
 
-	private IPlaceable<?> addAnimatedEmiTexture(EmiTexture texture, EmiTexture animated, int time, boolean horizontal, boolean endToStart, boolean fullToEmpty) {
+	private JemiWidgetBuilder addAnimatedEmiTexture(EmiTexture texture, EmiTexture animated, int time, boolean horizontal, boolean endToStart, boolean fullToEmpty) {
 		return addEmi(new JemiWidgetBuilder(texture.width, texture.height, (self, holder) -> {
 			holder.addTexture(texture, self.x, self.y);
 			holder.addAnimatedTexture(animated, self.x, self.y, time, horizontal, endToStart, fullToEmpty);
 		}));
 	}
 
-	private IPlaceable<?> addEmi(JemiWidgetBuilder builder) {
+	private JemiWidgetBuilder addEmi(JemiWidgetBuilder builder) {
 		widgets.add(builder);
 		return builder;
 	}

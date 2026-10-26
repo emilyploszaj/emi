@@ -1,7 +1,8 @@
 package dev.emi.emi.screen;
 
 import java.util.List;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -18,8 +19,6 @@ import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.widget.RecipeDefaultButtonWidget;
 import dev.emi.emi.widget.RecipeScreenshotButtonWidget;
 import dev.emi.emi.widget.RecipeTreeButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class RecipeDisplay {
 	public static final int DISPLAY_PADDING = 8;
@@ -86,17 +85,17 @@ public class RecipeDisplay {
 				EmiLog.error("Error constructing recipe widgets", t);
 				widgets = new WidgetGroup(recipe, wx, wy, wWidth, wHeight);
 				widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.render")),
-					wWidth / 2, wHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));
+					wWidth / 2, wHeight / 2 - 5, ChatFormatting.RED.getColor(), true).horizontalAlign(Alignment.CENTER));
 				if (exception != null) {
-					List<Text> text = EmiUtil.getStackTrace(exception).stream().map(s -> (Text) EmiPort.literal(s)).toList();
+					List<Component> text = EmiUtil.getStackTrace(exception).stream().map(s -> (Component) EmiPort.literal(s)).toList();
 					widgets.addTooltipText(text, 0, 0, wWidth, wHeight);
 				}
 			}
 		} else {
 			widgets.add(new TextWidget(EmiPort.ordered(EmiPort.translatable("emi.error.recipe.initialize")),
-				wWidth / 2, wHeight / 2 - 5, Formatting.RED.getColorValue(), true).horizontalAlign(Alignment.CENTER));
+				wWidth / 2, wHeight / 2 - 5, ChatFormatting.RED.getColor(), true).horizontalAlign(Alignment.CENTER));
 			if (exception != null) {
-				List<Text> text = EmiUtil.getStackTrace(exception).stream().map(s -> (Text) EmiPort.literal(s)).toList();
+				List<Component> text = EmiUtil.getStackTrace(exception).stream().map(s -> (Component) EmiPort.literal(s)).toList();
 				widgets.addTooltipText(text, 0, 0, wWidth, wHeight);
 			}
 		}

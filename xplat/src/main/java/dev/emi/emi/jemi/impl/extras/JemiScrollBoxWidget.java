@@ -1,12 +1,13 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import mezz.jei.api.gui.widgets.ScrollbarVisibility;
 import java.util.List;
 
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IScrollBoxWidget;
-import net.minecraft.client.gui.ScreenPos;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.gui.navigation.ScreenPosition;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.network.chat.FormattedText;
 
 public class JemiScrollBoxWidget implements IScrollBoxWidget {
 	private static final int SCROLL_BAR_WIDTH = 18;
@@ -21,13 +22,13 @@ public class JemiScrollBoxWidget implements IScrollBoxWidget {
 	}
 
 	@Override
-	public ScreenPos getPosition() {
-		return new ScreenPos(x, y);
+	public ScreenPosition getPosition() {
+		return new ScreenPosition(x, y);
 	}
 
 	@Override
-	public ScreenRect getArea() {
-		return new ScreenRect(getPosition(), width, height);
+	public ScreenRectangle getArea() {
+		return new ScreenRectangle(getPosition(), width, height);
 	}
 
 	@Override
@@ -47,9 +48,15 @@ public class JemiScrollBoxWidget implements IScrollBoxWidget {
 	}
 
 	@Override
-	public IScrollBoxWidget setContents(List<StringVisitable> text) {
+	public IScrollBoxWidget setContents(List<FormattedText> text) {
 		// Unimplemented
 		return this;
 	}
 	
+
+	@Override
+	public IScrollBoxWidget setScrollbarVisibility(ScrollbarVisibility visibility) {
+		// EMI always shows scrollbars
+		return this;
+	}
 }

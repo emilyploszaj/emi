@@ -1,7 +1,8 @@
 package dev.emi.emi.handler;
 
 import java.util.List;
-
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.Slot;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Nullable;
@@ -9,13 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.slot.Slot;
 
-public class CraftingRecipeHandler implements StandardRecipeHandler<CraftingScreenHandler> {
+public class CraftingRecipeHandler implements StandardRecipeHandler<CraftingMenu> {
 
 	@Override
-	public List<Slot> getInputSources(CraftingScreenHandler handler) {
+	public List<Slot> getInputSources(CraftingMenu handler) {
 		List<Slot> list = Lists.newArrayList();
 		for (int i = 1; i < 10; i++) { 
 			list.add(handler.getSlot(i));
@@ -28,7 +27,7 @@ public class CraftingRecipeHandler implements StandardRecipeHandler<CraftingScre
 	}
 	
 	@Override
-	public List<Slot> getCraftingSlots(CraftingScreenHandler handler) {
+	public List<Slot> getCraftingSlots(CraftingMenu handler) {
 		List<Slot> list = Lists.newArrayList();
 		for (int i = 1; i < 10; i++) { 
 			list.add(handler.getSlot(i));
@@ -37,7 +36,7 @@ public class CraftingRecipeHandler implements StandardRecipeHandler<CraftingScre
 	}
 
 	@Override
-	public @Nullable Slot getOutputSlot(CraftingScreenHandler handler) {
+	public @Nullable Slot getOutputSlot(CraftingMenu handler) {
 		return handler.slots.get(0);
 	}
 

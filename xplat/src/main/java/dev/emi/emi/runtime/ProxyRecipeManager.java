@@ -3,33 +3,43 @@ package dev.emi.emi.runtime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
+/**
+ * Recipes are no longer sent to the client by vanilla, platforms provide them through their recipe sync
+ */
 public class ProxyRecipeManager {
-	private static final MinecraftClient client = MinecraftClient.getInstance();
+	private static final Minecraft client = Minecraft.getInstance();
+	private static @Nullable RecipeMap recipes;
 	private static Map<Recipe<?>, Identifier> recipeIds = Map.of();
-	
+
+	public static void setRecipes(@Nullable RecipeMap recipes) {
+		ProxyRecipeManager.recipes = recipes;
+		if (recipes == null) {
+			recipeIds = Map.of();
+		}
+	}
+
 	public static boolean isAvailable() {
 		return getRaw() != null;
 	}
 
-	public static RecipeManager getRaw() {
-		World world = client.world;
-		if (world == null) {
+	public static @Nullable RecipeMap getRaw() {
+		if (client.level == null) {
 			return null;
 		}
-		return world.getRecipeManager();
+		return recipes;
 	}
 
 	public static Identifier getId(Recipe<?> recipe) {
@@ -41,27 +51,27 @@ public class ProxyRecipeManager {
 	}
 
 	public static @Nullable Recipe<?> getRecipe(Identifier id) {
-		RecipeEntry<?> entry = getRecipeEntry(id);
+		RecipeHolder<?> entry = getRecipeEntry(id);
 		if (entry == null) {
 			return null;
 		}
 		return entry.value();
 	}
 
-	public static @Nullable RecipeEntry<?> getRecipeEntry(Identifier id) {
-		RecipeManager raw = getRaw();
+	public static @Nullable RecipeHolder<?> getRecipeEntry(Identifier id) {
+		RecipeMap raw = getRaw();
 		if (raw == null || id == null) {
 			return null;
 		}
-		return raw.get(id).orElse(null);
+		return raw.byKey(ResourceKey.create(Registries.RECIPE, id));
 	}
 
 	public static <I extends RecipeInput, T extends Recipe<I>> Stream<T> streamMatches(RecipeType<T> type, I inventory) {
-		RecipeManager raw = getRaw();
+		RecipeMap raw = getRaw();
 		if (raw == null) {
 			return Stream.empty();
 		}
-		return raw.getAllMatches(type, inventory, client.world).stream().map(e -> e.value());
+		return raw.getRecipesFor(type, inventory, client.level).map(e -> e.value());
 	}
 
 	public static <I extends RecipeInput, T extends Recipe<I>> List<T> getMatches(RecipeType<T> type, I inventory) {
@@ -69,21 +79,19 @@ public class ProxyRecipeManager {
 	}
 
 	public static <I extends RecipeInput, T extends Recipe<I>> @Nullable T getFirst(RecipeType<T> type, I inventory) {
-		RecipeManager raw = getRaw();
-		if (raw == null) {
-			return null;
-		}
-		return raw.getFirstMatch(type, inventory, client.world).map(e -> e.value()).orElse(null);
+		return streamMatches(type, inventory).findFirst().orElse(null);
 	}
 
 	public static void bakeIds() {
-		RecipeManager raw = getRaw();
+		RecipeMap raw = getRaw();
 		if (raw == null) {
 			return;
 		}
-		recipeIds = new Reference2ObjectOpenHashMap<>();
-		for (RecipeEntry<?> entry : raw.values()) {
-			recipeIds.put(entry.value(), entry.id());
+		// Built locally, a disconnect can clear the ids from another thread mid bake
+		Map<Recipe<?>, Identifier> ids = new Reference2ObjectOpenHashMap<>();
+		for (RecipeHolder<?> entry : raw.values()) {
+			ids.put(entry.value(), entry.id().identifier());
 		}
+		recipeIds = ids;
 	}
 }

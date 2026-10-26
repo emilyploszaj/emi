@@ -1,8 +1,8 @@
 package dev.emi.emi.registry;
 
-import static net.minecraft.command.argument.IdentifierArgumentType.identifier;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.arguments.IdentifierArgument.id;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -11,9 +11,10 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import dev.emi.emi.network.CommandS2CPacket;
 import dev.emi.emi.network.EmiNetwork;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 
 public class EmiCommands {
 	public static final byte VIEW_RECIPE = 0x01;
@@ -21,15 +22,15 @@ public class EmiCommands {
 	public static final byte TREE_GOAL = 0x11;
 	public static final byte TREE_RESOLUTION = 0x12;
 	
-	public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+	public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(literal("emi")
-			.requires(source -> source.hasPermissionLevel(2))
+			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 			.then(
 				literal("view")
 				.then(
 					literal("recipe")
 					.then(
-						argument("id", identifier())
+						argument("id", id())
 						.executes(context -> {
 							send(context.getSource().getPlayer(), VIEW_RECIPE, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
@@ -49,7 +50,7 @@ public class EmiCommands {
 				.then(
 					literal("goal")
 					.then(
-						argument("id", identifier())
+						argument("id", id())
 						.executes(context -> {
 							send(context.getSource().getPlayer(), TREE_GOAL, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
@@ -59,7 +60,7 @@ public class EmiCommands {
 				.then(
 					literal("resolution")
 					.then(
-						argument("id", identifier())
+						argument("id", id())
 						.executes(context -> {
 							send(context.getSource().getPlayer(), TREE_RESOLUTION, context.getArgument("id", Identifier.class));
 							return Command.SINGLE_SUCCESS;
@@ -70,7 +71,7 @@ public class EmiCommands {
 		);
 	}
 
-	private static void send(ServerPlayerEntity player, byte type, @Nullable Identifier id) {
+	private static void send(ServerPlayer player, byte type, @Nullable Identifier id) {
 		EmiNetwork.sendToClient(player, new CommandS2CPacket(type, id));
 	}
 }

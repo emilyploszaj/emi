@@ -1,7 +1,9 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
@@ -11,9 +13,6 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
 
 public class EmiBrewingRecipe implements EmiRecipe {
 	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/brewing_stand.png");
@@ -65,7 +64,7 @@ public class EmiBrewingRecipe implements EmiRecipe {
 	public void addWidgets(WidgetHolder widgets) {
 		widgets.addTexture(BACKGROUND, 0, 0, 103, 61, 16, 14);
 		widgets.addAnimatedTexture(BACKGROUND, 81, 2, 9, 28, 176, 0, 1000 * 20, false, false, false).tooltip((mx, my) -> {
-			return List.of(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("emi.cooking.time", 20))));
+			return List.of(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("emi.cooking.time", 20))));
 		});
 		widgets.addAnimatedTexture(BACKGROUND, 47, 0, 12, 29, 185, 0, 700, false, true, false);
 		widgets.addTexture(BACKGROUND, 44, 30, 18, 4, 176, 29);

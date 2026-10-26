@@ -2,11 +2,9 @@ package dev.emi.emi.data;
 
 import java.util.Map;
 import java.util.Set;
-
+import net.minecraft.resources.Identifier;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import net.minecraft.util.Identifier;
 
 public class TagExclusions {
 	public final Set<Identifier> globalExclusions = Sets.newHashSet();

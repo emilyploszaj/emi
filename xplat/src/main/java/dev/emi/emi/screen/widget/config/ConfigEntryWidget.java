@@ -2,36 +2,35 @@ package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
 import java.util.function.Supplier;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.config.EmiConfig.ConfigGroup;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.widget.config.ListWidget.Entry;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.Text;
 
 public abstract class ConfigEntryWidget extends Entry {
-	private final Text name;
-	private final List<TooltipComponent> tooltip;
+	private final Component name;
+	private final List<ClientTooltipComponent> tooltip;
 	protected final Supplier<String> search;
 	private final int height;
 	public ConfigGroup group;
 	public boolean endGroup = false;
-	private List<? extends Element> children = List.of();
+	private List<? extends GuiEventListener> children = List.of();
 	public List<GroupNameWidget> parentGroups = Lists.newArrayList();
 	
-	public ConfigEntryWidget(Text name, List<TooltipComponent> tooltip, Supplier<String> search, int height) {
+	public ConfigEntryWidget(Component name, List<ClientTooltipComponent> tooltip, Supplier<String> search, int height) {
 		this.name = name;
 		this.tooltip = tooltip;
 		this.search = search;
 		this.height = height;
 	}
 
-	public void setChildren(List<? extends Element> children) {
+	public void setChildren(List<? extends GuiEventListener> children) {
 		this.children = children;
 	}
 
@@ -39,7 +38,7 @@ public abstract class ConfigEntryWidget extends Entry {
 	}
 
 	@Override
-	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (group != null) {
@@ -54,16 +53,16 @@ public abstract class ConfigEntryWidget extends Entry {
 		}
 		update(y, x, width, height);
 		context.fill(x, y, width, height, 0x66000000);
-		context.drawTextWithShadow(this.name, x + 6, y + 10 - parentList.client.textRenderer.fontHeight / 2, 0xFFFFFF);
-		for (Element element : children()) {
-			if (element instanceof Drawable drawable) {
-				drawable.render(context.raw(), mouseX, mouseY, delta);
+		context.drawTextWithShadow(this.name, x + 6, y + 10 - parentList.client.font.lineHeight / 2, 0xFFFFFF);
+		for (GuiEventListener element : children()) {
+			if (element instanceof Renderable drawable) {
+				drawable.extractRenderState(context.raw(), mouseX, mouseY, delta);
 			}
 		}
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return tooltip;
 	}
 
@@ -102,7 +101,7 @@ public abstract class ConfigEntryWidget extends Entry {
 	}
 
 	@Override
-	public List<? extends Element> children() {
+	public List<? extends GuiEventListener> children() {
 		return children;
 	}
 }

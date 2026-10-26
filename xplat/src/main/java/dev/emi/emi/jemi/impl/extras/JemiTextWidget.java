@@ -1,12 +1,15 @@
 package dev.emi.emi.jemi.impl.extras;
 
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import mezz.jei.api.gui.widgets.IRecipeWidgetTooltipCallback;
+import java.util.Collection;
 import java.util.List;
 
 import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.placement.VerticalAlignment;
 import mezz.jei.api.gui.widgets.ITextWidget;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.FormattedText;
 
 public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextWidget {
 	public int color = 0xffffffff;
@@ -14,15 +17,15 @@ public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextW
 	public int spacing = 0;
 	public HorizontalAlignment horizontal = HorizontalAlignment.LEFT;
 	public VerticalAlignment vertical = VerticalAlignment.TOP;
-	public List<StringVisitable> text;
+	public List<FormattedText> text;
 
-	public JemiTextWidget(List<StringVisitable> text, int width, int height) {
+	public JemiTextWidget(List<FormattedText> text, int width, int height) {
 		super(width, height);
 		this.text = text;
 	}
 
 	@Override
-	public ITextWidget setFont(TextRenderer font) {
+	public ITextWidget setFont(Font font) {
 		// Unimplemented
 		return this;
 	}
@@ -57,4 +60,24 @@ public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextW
 		return this;
 	}
 	
+
+	@Override
+	public ITextWidget setTooltip(FormattedText tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(Collection<? extends FormattedText> tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(TooltipComponent tooltip) {
+		return this;
+	}
+
+	@Override
+	public ITextWidget setTooltip(IRecipeWidgetTooltipCallback tooltipCallback) {
+		return this;
+	}
 }

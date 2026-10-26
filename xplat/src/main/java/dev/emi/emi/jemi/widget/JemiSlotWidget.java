@@ -2,11 +2,8 @@ package dev.emi.emi.jemi.widget;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -14,7 +11,6 @@ import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.jemi.JemiStack;
 import dev.emi.emi.jemi.JemiUtil;
-import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -22,9 +18,8 @@ import dev.emi.emi.runtime.EmiLog;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 
 public class JemiSlotWidget extends SlotWidget {
 	public final JemiRecipeSlot slot;
@@ -66,7 +61,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		if (slot.background != null) {
 			slot.background.drawable().draw(raw, x + 1 + slot.background.xOff(), y + 1 + slot.background.yOff());
 		}
@@ -75,7 +70,7 @@ public class JemiSlotWidget extends SlotWidget {
 
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void drawStack(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void drawStack(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		IIngredientRenderer renderer = getRenderer();
 		if (renderer != null) {
@@ -83,7 +78,6 @@ public class JemiSlotWidget extends SlotWidget {
 			Bounds bounds = getBounds();
 			int xOff = bounds.x() + (bounds.width() - 16) / 2 + (16 - renderer.getWidth()) / 2;
 			int yOff = bounds.y() + (bounds.height() - 16) / 2 + (16 - renderer.getHeight()) / 2;
-			context.enableBlend();
 			context.push();
 			context.translate(xOff, yOff);
 			renderer.render(context.raw(), typed.getIngredient());
@@ -94,12 +88,10 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@Override
-	public void drawOverlay(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		if (slot.overlay != null) {
-			context.enableBlend();
 			context.push();
-			context.matrices().translate(0, 0, 200);
 			slot.overlay.drawable().draw(context.raw(), x + 1 + slot.overlay.xOff(), y + 1 + slot.overlay.yOff());
 			context.pop();
 		}
@@ -107,7 +99,7 @@ public class JemiSlotWidget extends SlotWidget {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void addTooltip(List<TooltipComponent> list, JemiRecipeSlot slot, EmiIngredient stack, IIngredientRenderer<?> renderer) {
+	public static void addTooltip(List<ClientTooltipComponent> list, JemiRecipeSlot slot, EmiIngredient stack, IIngredientRenderer<?> renderer) {
 		if (renderer != null) {
 			if (stack.getEmiStacks().size() == 1 && stack.getEmiStacks().get(0) instanceof JemiStack js) {
 				js = js.copy();
@@ -120,30 +112,16 @@ public class JemiSlotWidget extends SlotWidget {
 			try {
 				JemiTooltipBuilder tooltipBuilder = new JemiTooltipBuilder();
 				slot.richTooltipCallback.onRichTooltip(slot, tooltipBuilder);
-				list.addAll(tooltipBuilder.tooltip);
+				list.addAll(tooltipBuilder.getTooltip());
 			} catch (Exception e) {
 				EmiLog.error("Error initializing JEI TooltipBuilder", e);
-			}
-		} else if (slot.tooltipCallback != null) {
-			try {
-				List<Text> event = Lists.newArrayList();
-				List<Text> original = stack.getEmiStacks().get(0).getTooltipText();
-				Set<Text> toRemove = original.stream().collect(Collectors.toSet());
-				event.addAll(stack.getEmiStacks().get(0).getTooltipText());
-				slot.tooltipCallback.onTooltip(slot, event);
-				int index = Math.min(list.size(), 1);
-				if (!event.isEmpty()) {
-					list.addAll(index, event.stream().filter(t -> !toRemove.contains(t) && !JemiIngredientAcceptor.FLUID_END.matcher(t.getString()).find()).map(t -> TooltipComponent.of(t.asOrderedText())).toList());
-				}
-			} catch (Exception e) {
-				EmiLog.error("Error initializing JEI tooltip", e);
 			}
 		}
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		List<TooltipComponent> list = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
 		if (getStack().isEmpty()) {
 			return List.of();
 		}
