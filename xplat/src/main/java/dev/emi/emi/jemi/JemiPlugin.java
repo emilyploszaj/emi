@@ -228,6 +228,9 @@ public class JemiPlugin implements IModPlugin, EmiPlugin {
 					}
 					continue;
 				}
+				if (id.getPath().startsWith("tag_recipes/")) {
+					continue;
+				}
 				if (handledNamespaces.contains(id.getNamespace())) {
 					EmiLog.info("[JEMI] Skipping recipe category " + id + " because mod is already handled");
 					continue;
