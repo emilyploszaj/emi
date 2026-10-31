@@ -212,8 +212,11 @@ public class EmiRecipeFiller {
 						maxAmount = Math.min(maxAmount, ui.max);
 					}
 				}
-				maxAmount = Math.min(maxAmount, amount + batchesAlreadyPresent(recipe, handler, screen));
-
+				int batches = batchesAlreadyPresent(recipe, handler, screen);
+				if (amount < Integer.MAX_VALUE - batches) {
+					maxAmount = Math.min(maxAmount, amount + batches);
+				}
+				
 				if (maxAmount == 0) {
 					return null;
 				}
