@@ -56,6 +56,8 @@
   "config.emi.tooltip.binds.hide_stack": "W trybie edycji, ukrywa wybrany przedmiot.",
   "key.emi.hide_stack_by_id": "Ukryj przedmiot wg. ID",
   "config.emi.tooltip.binds.hide_stack_by_id": "W trybie edycji, ukrywa wybrany przedmiot według jego ID.",
+  "key.emi.display_all_recipes": "Pokaż wszystkie receptury",
+  "config.emi.tooltip.binds.display_all_recipes": "Pokazuje wszystkie receptury w grze.",
 
   "emi.index_source.creative": "Menu kreatywne",
   "emi.index_source.registered": "Rejestr",
