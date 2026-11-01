@@ -76,7 +76,7 @@ public class EmiRecipeCategory implements EmiRenderable {
 		}
 		if (EmiConfig.appendModId) {
 			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(EmiUtil.getModName(getId().getNamespace()),
-				Formatting.BLUE, Formatting.ITALIC))));
+				EmiConfig.modIdColor.getFormatting(), EmiConfig.modIdFormat.getFormatting()))));
 		}
 		return list;
 	}
