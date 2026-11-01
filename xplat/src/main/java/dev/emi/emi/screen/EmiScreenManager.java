@@ -1234,6 +1234,9 @@ public class EmiScreenManager {
 			} else if (function.apply(EmiConfig.viewUses)) {
 				EmiApi.displayUses(ingredient);
 				return true;
+			} else if (function.apply(EmiConfig.pullItem)) {
+				EmiApi.pullItem(ingredient);
+				return true;
 			} else if (function.apply(EmiConfig.favorite)) {
 				EmiFavorites.addFavorite(ingredient, stack.getRecipeContext());
 				repopulatePanels(SidebarType.FAVORITES);

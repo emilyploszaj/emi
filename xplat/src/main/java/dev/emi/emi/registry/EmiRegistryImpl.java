@@ -13,6 +13,7 @@ import dev.emi.emi.api.EmiExclusionArea;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.EmiScreenBoundsProvider;
 import dev.emi.emi.api.EmiStackProvider;
+import dev.emi.emi.api.EmiStackPuller;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.EmiRecipeDecorator;
@@ -143,7 +144,17 @@ public class EmiRegistryImpl implements EmiRegistry {
 	public void addGenericStackProvider(EmiStackProvider<Screen> provider) {
 		EmiStackProviders.generic.add(provider);
 	}
-	
+
+	@Override
+	public <T extends ScreenHandler> void addStackPuller(Class<T> clazz, EmiStackPuller<T> puller) {
+		EmiStackPullers.fromClass.put(clazz, puller);
+	}
+
+	@Override
+	public void addGenericStackPuller(EmiStackPuller<ScreenHandler> puller) {
+		EmiStackPullers.generic.add(puller);
+	}
+
 	@Override
 	public <T extends ScreenHandler> void addRecipeHandler(ScreenHandlerType<T> type, EmiRecipeHandler<T> handler) {
 		EmiRecipeFiller.handlers.computeIfAbsent(type, (c) -> Lists.newArrayList()).add(handler);

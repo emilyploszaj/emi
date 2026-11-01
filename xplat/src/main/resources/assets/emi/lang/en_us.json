@@ -10,6 +10,7 @@
 
   "key.emi.view_recipes": "View Recipes",
   "key.emi.view_uses": "View Uses",
+  "key.emi.pull_item": "Pull Item",
   "key.emi.favorite": "Favorite",
   "key.emi.set_default": "Set Default",
   "key.emi.default_stack": "Default Stack",
