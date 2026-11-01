@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.render.EmiRender;
+import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.screen.StackBatcher.Batchable;
@@ -161,11 +162,17 @@ public class ItemEmiStack extends EmiStack implements Batchable {
 
 	@Override
 	public List<Text> getTooltipText() {
+		return getTooltipText(EmiConfig.searchAdvancedTooltips);
+	}
+
+	@Override
+	public List<Text> getTooltipText(boolean advanced) {
+		TooltipType type = advanced ? TooltipType.ADVANCED : TooltipType.BASIC;
 		if (client.isOnThread()) {
-			return getItemStack().getTooltip(Item.TooltipContext.create(client.world), client.player, TooltipType.BASIC);
+			return getItemStack().getTooltip(Item.TooltipContext.create(client.world), client.player, type);
 		} else {
 			// Don't provide world or entity as context, as they are not thread safe
-			return getItemStack().getTooltip(Item.TooltipContext.create(client.world.getRegistryManager()), null, TooltipType.BASIC);
+			return getItemStack().getTooltip(Item.TooltipContext.create(client.world.getRegistryManager()), null, type);
 		}
 	}
 

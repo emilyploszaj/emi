@@ -78,6 +78,11 @@ public class EmiConfig {
 	@ConfigValue("general.search-tags-by-default")
 	public static boolean searchTagsByDefault = false;
 
+	@Comment("Whether tooltip search ($) should include advanced tooltip text " +
+		"(extra information visible with F3+H, such as registry names).")
+	@ConfigValue("general.search-advanced-tooltips")
+	public static boolean searchAdvancedTooltips = false;
+
 	// UI
 	@Comment("Which action should be performed when clicking the recipe book.")
 	@ConfigValue("ui.recipe-book-action")
