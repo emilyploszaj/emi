@@ -138,7 +138,10 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 
 	@Override
 	public ITextWidget addText(List<FormattedText> text, int maxWidth, int maxHeight) {
-		return new JemiTextWidget(text, maxWidth, maxHeight);
+		JemiTextWidget widget = new JemiTextWidget(text, maxWidth, maxHeight);
+		// Placement and styling are set after this returns, the widget reads them when the recipe is built
+		addEmi(new JemiWidgetBuilder(maxWidth, maxHeight, (self, holder) -> widget.addWidgets(holder)));
+		return widget;
 	}
 
 	private JemiWidgetBuilder addEmiTexture(EmiTexture texture) {

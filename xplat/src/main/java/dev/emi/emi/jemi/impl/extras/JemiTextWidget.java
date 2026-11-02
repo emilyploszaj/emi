@@ -5,6 +5,12 @@ import mezz.jei.api.gui.widgets.IRecipeWidgetTooltipCallback;
 import java.util.Collection;
 import java.util.List;
 
+import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
+import dev.emi.emi.runtime.EmiDrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.FormattedCharSequence;
+
 import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.placement.VerticalAlignment;
 import mezz.jei.api.gui.widgets.ITextWidget;
@@ -18,6 +24,7 @@ public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextW
 	public HorizontalAlignment horizontal = HorizontalAlignment.LEFT;
 	public VerticalAlignment vertical = VerticalAlignment.TOP;
 	public List<FormattedText> text;
+	public IRecipeWidgetTooltipCallback tooltip;
 
 	public JemiTextWidget(List<FormattedText> text, int width, int height) {
 		super(width, height);
@@ -63,21 +70,48 @@ public class JemiTextWidget extends JemiPlaceable<ITextWidget> implements ITextW
 
 	@Override
 	public ITextWidget setTooltip(FormattedText tooltip) {
-		return this;
+		return setTooltip(List.of(tooltip));
 	}
 
 	@Override
 	public ITextWidget setTooltip(Collection<? extends FormattedText> tooltip) {
-		return this;
+		return setTooltip(builder -> builder.addAll(tooltip));
 	}
 
 	@Override
 	public ITextWidget setTooltip(TooltipComponent tooltip) {
-		return this;
+		return setTooltip(builder -> builder.add(tooltip));
 	}
 
 	@Override
 	public ITextWidget setTooltip(IRecipeWidgetTooltipCallback tooltipCallback) {
+		this.tooltip = tooltipCallback;
 		return this;
+	}
+
+	public void addWidgets(WidgetHolder holder) {
+		Font font = Minecraft.getInstance().font;
+		List<FormattedCharSequence> lines = text.stream().flatMap(t -> font.split(t, width).stream()).toList();
+		int lineHeight = font.lineHeight + spacing;
+		int maxLines = Math.max(1, (height + spacing) / lineHeight);
+		List<FormattedCharSequence> shown = lines.size() > maxLines ? lines.subList(0, maxLines) : lines;
+		int textHeight = shown.size() * lineHeight - spacing;
+		int top = vertical.getYPos(height, textHeight);
+		holder.addDrawable(x, y, width, height, (raw, mouseX, mouseY, delta) -> {
+			int ly = top;
+			for (FormattedCharSequence line : shown) {
+				int lx = horizontal.getXPos(width, font.width(line));
+				raw.text(font, line, lx, ly, EmiDrawContext.textColor(color), shadow);
+				ly += lineHeight;
+			}
+		});
+		if (tooltip != null) {
+			IRecipeWidgetTooltipCallback callback = tooltip;
+			holder.addTooltip((mx, my) -> {
+				JemiTooltipBuilder builder = new JemiTooltipBuilder();
+				callback.onTooltip(builder);
+				return builder.getTooltip();
+			}, x, y, width, height);
+		}
 	}
 }
