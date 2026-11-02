@@ -452,8 +452,9 @@ public class VanillaPlugin implements EmiPlugin {
 			} else if (recipe instanceof SmithingTrimRecipe str) {
 				addRecipeSafe(registry, () -> new EmiSmithingTrimRecipe(EmiIngredient.of(str.templateIngredient().orElse(null)), EmiIngredient.of(str.baseIngredient()),
 					EmiIngredient.of(str.additionIngredient().orElse(null)), EmiStack.of(EmiPort.getOutput(recipe)), recipe), recipe);
-			} else {
-				// Modded smithing recipes still expose their slots through the interface
+			} else if (!recipe.display().isEmpty()) {
+				// Modded smithing recipes still expose their slots through the interface,
+				// ones without a display have no fixed result and often accept nearly any item
 				addRecipeSafe(registry, () -> new EmiSmithingRecipe(EmiIngredient.of(recipe.templateIngredient().orElse(null)), EmiIngredient.of(recipe.baseIngredient()),
 					EmiIngredient.of(recipe.additionIngredient().orElse(null)), EmiStack.of(EmiPort.getOutput(recipe)), ProxyRecipeManager.getId(recipe)), recipe);
 			}
