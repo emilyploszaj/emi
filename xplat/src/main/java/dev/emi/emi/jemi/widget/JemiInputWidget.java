@@ -2,6 +2,8 @@ package dev.emi.emi.jemi.widget;
 
 import java.util.List;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.input.EmiInput;
@@ -76,6 +78,45 @@ public class JemiInputWidget extends Widget {
 			}
 		} catch (Throwable t) {
 			EmiLog.error("Exception forwarding key press to JEI recipe", t);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean mouseScrolled(int mouseX, int mouseY, double amount) {
+		try {
+			for (IJeiInputHandler handler : inputHandlers) {
+				if (contains(handler.getArea(), mouseX, mouseY) && handler.handleMouseScrolled(mouseX, mouseY, 0, amount)) {
+					return true;
+				}
+			}
+			for (IJeiGuiEventListener listener : eventListeners) {
+				if (contains(listener.getArea(), mouseX, mouseY) && listener.mouseScrolled(mouseX, mouseY, 0, amount)) {
+					return true;
+				}
+			}
+		} catch (Throwable t) {
+			EmiLog.error("Exception forwarding scroll to JEI recipe", t);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean mouseDragged(int mouseX, int mouseY, int button, double deltaX, double deltaY) {
+		try {
+			InputConstants.Key key = InputConstants.Type.MOUSE.getOrCreate(button);
+			for (IJeiInputHandler handler : inputHandlers) {
+				if (contains(handler.getArea(), mouseX, mouseY) && handler.handleMouseDragged(mouseX, mouseY, key, deltaX, deltaY)) {
+					return true;
+				}
+			}
+			for (IJeiGuiEventListener listener : eventListeners) {
+				if (contains(listener.getArea(), mouseX, mouseY) && listener.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+					return true;
+				}
+			}
+		} catch (Throwable t) {
+			EmiLog.error("Exception forwarding drag to JEI recipe", t);
 		}
 		return false;
 	}

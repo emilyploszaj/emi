@@ -25,6 +25,7 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 	public List<IJeiInputHandler> inputHandlers = Lists.newArrayList();
 	public List<IJeiGuiEventListener> eventListeners = Lists.newArrayList();
 	public List<JemiWidgetBuilder> widgets = Lists.newArrayList();
+	public boolean hasSlottedWidgets = false;
 
 	public JemiRecipeExtrasBuilder(IRecipeSlotDrawablesView slots) {
 		this.slots = slots;
@@ -66,7 +67,8 @@ public class JemiRecipeExtrasBuilder implements IRecipeExtrasBuilder {
 
 	@Override
 	public void addSlottedWidget(ISlottedRecipeWidget widget, List<IRecipeSlotDrawable> slots) {
-		// EMI's understanding of slots doesn't mesh with this
+		// EMI's understanding of slots doesn't mesh with this, such recipes are drawn by JEI's own layout
+		hasSlottedWidgets = true;
 		addWidget(widget);
 	}
 

@@ -27,4 +27,12 @@ public abstract class Widget implements Renderable {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		return false;
 	}
+
+	public boolean mouseScrolled(int mouseX, int mouseY, double amount) {
+		return false;
+	}
+
+	public boolean mouseDragged(int mouseX, int mouseY, int button, double deltaX, double deltaY) {
+		return false;
+	}
 }

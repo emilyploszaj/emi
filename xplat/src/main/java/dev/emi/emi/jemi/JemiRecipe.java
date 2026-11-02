@@ -14,10 +14,12 @@ import dev.emi.emi.jemi.impl.JemiIngredientAcceptor;
 import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import dev.emi.emi.jemi.impl.JemiRecipeSlot;
 import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeSlotDrawablesView;
 import dev.emi.emi.jemi.impl.JemiTooltipBuilder;
 import dev.emi.emi.jemi.impl.extras.JemiRecipeExtrasBuilder;
 import dev.emi.emi.jemi.impl.extras.JemiWidgetBuilder;
 import dev.emi.emi.jemi.widget.JemiInputWidget;
+import dev.emi.emi.jemi.widget.JemiLayoutWidget;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
 import dev.emi.emi.jemi.widget.JemiTankWidget;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -128,6 +130,22 @@ public class JemiRecipe<T> implements EmiRecipe {
 		for (JemiRecipeSlotBuilder jrsb : builder.slots) {
 			jrsb.acceptor.coerceStacks(jrsb.richTooltipCallback, jrsb.renderers);
 		}
+		JemiRecipeExtrasBuilder extras = null;
+		try {
+			extras = new JemiRecipeExtrasBuilder(new JemiRecipeSlotDrawablesView());
+			category.createRecipeExtras(extras, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+		} catch(Throwable t) {
+			EmiLog.error("Exception adding JEMI extras", t);
+		}
+		if (opt.isPresent() && extras != null && extras.hasSlottedWidgets) {
+			// EMI draws the recipe background, JEI's would be drawn over it
+			Optional<IRecipeLayoutDrawable<T>> layout = JemiPlugin.runtime.getRecipeManager()
+				.createRecipeLayoutDrawable(category, recipe, FocusGroup.EMPTY, (raw, x, y, w, h) -> {}, 0);
+			if (layout.isPresent()) {
+				widgets.add(new JemiLayoutWidget(getDisplayWidth(), getDisplayHeight(), layout.get()));
+				return;
+			}
+		}
 		if (opt.isPresent()) {
 			widgets.add(new JemiWidget(0, 0, getDisplayWidth(), getDisplayHeight(), opt.get()));
 			for (JemiRecipeSlotBuilder sb : builder.slots) {
@@ -139,17 +157,13 @@ public class JemiRecipe<T> implements EmiRecipe {
 				}
 			}
 		}
-		try {
-			JemiRecipeExtrasBuilder extras = new JemiRecipeExtrasBuilder(null);
-			category.createRecipeExtras(extras, recipe, JemiPlugin.runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup());
+		if (extras != null) {
 			for (JemiWidgetBuilder b : extras.widgets) {
 				b.addWidgets(widgets);
 			}
 			if (!extras.inputHandlers.isEmpty() || !extras.eventListeners.isEmpty()) {
 				widgets.add(new JemiInputWidget(getDisplayWidth(), getDisplayHeight(), extras.inputHandlers, extras.eventListeners));
 			}
-		} catch(Throwable t) {
-			EmiLog.error("Exception adding JEMI extras", t);
 		}
 	}
 

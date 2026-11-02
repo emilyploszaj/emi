@@ -43,6 +43,7 @@ import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.widget.ResolutionButtonWidget;
 import dev.emi.emi.screen.widget.SizedButtonWidget;
+import dev.emi.emi.widget.OverlayingWidget;
 
 public class RecipeScreen extends Screen {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
@@ -264,6 +265,15 @@ public class RecipeScreen extends Screen {
 				int my = mouseY - group.y();
 				for (Widget widget : group.widgets) {
 					if (widget.getBounds().contains(mx, my)) {
+						if (widget instanceof OverlayingWidget overlaying) {
+							context.raw().nextStratum();
+							context.push();
+							context.translate(group.x(), group.y());
+							overlaying.renderOverlay(context.raw(), mx, my);
+							context.pop();
+							hoveredWidget = widget;
+							break outer;
+						}
 						List<ClientTooltipComponent> tooltip = widget.getTooltip(mx, my);
 						if (!tooltip.isEmpty()) {
 							EmiRenderHelper.drawTooltip(this, context, tooltip, mouseX, mouseY);
@@ -500,6 +510,9 @@ public class RecipeScreen extends Screen {
 		if (EmiScreenManager.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
 			return true;
 		}
+		if (pressedSlot == null && widgetInput(mouseX, mouseY, (widget, ox, oy) -> widget.mouseDragged(ox, oy, button, deltaX, deltaY))) {
+			return true;
+		}
 		if (pressedSlot instanceof SlotWidget slot) {
 			WidgetGroup group = getGroup(slot);
 			if (group != null) {
@@ -522,6 +535,8 @@ public class RecipeScreen extends Screen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double amount) {
 		if (EmiScreenManager.mouseScrolled(mouseX, mouseY, amount)) {
+			return true;
+		} else if (widgetInput(mouseX, mouseY, (widget, ox, oy) -> widget.mouseScrolled(ox, oy, amount))) {
 			return true;
 		} else if (mouseX > x && mouseX < x + backgroundWidth && mouseY < x + backgroundHeight) {
 			scrollAcc += amount;
@@ -588,6 +603,28 @@ public class RecipeScreen extends Screen {
 			setPage(tabPage, tab + 1, 0);
 		}
 		return super.keyPressed(event);
+	}
+
+	private boolean widgetInput(double mouseX, double mouseY, WidgetInput input) {
+		for (WidgetGroup group : currentPage) {
+			try {
+				int ox = (int) mouseX - group.x();
+				int oy = (int) mouseY - group.y();
+				for (Widget widget : group.widgets) {
+					if (widget.getBounds().contains(ox, oy) && input.apply(widget, ox, oy)) {
+						return true;
+					}
+				}
+			} catch (Throwable e) {
+				EmiLog.error("Error handling widget input", e);
+				group.error(e);
+			}
+		}
+		return false;
+	}
+
+	private interface WidgetInput {
+		boolean apply(Widget widget, int mouseX, int mouseY);
 	}
 
 	public WidgetGroup getGroup(Widget widget) {

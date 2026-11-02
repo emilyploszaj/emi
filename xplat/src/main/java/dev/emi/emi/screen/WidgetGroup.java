@@ -24,6 +24,7 @@ import dev.emi.emi.runtime.dev.EmiDev;
 import dev.emi.emi.runtime.dev.RecipeError;
 import dev.emi.emi.screen.tooltip.EmiTooltip;
 import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.widget.OverlayingWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.widget.RecipeBackground;
 
@@ -115,6 +116,9 @@ public class WidgetGroup implements WidgetHolder {
 						if (sw.getRecipe() != null) {
 							recipeContexts++;
 						}
+					} else if (widget instanceof OverlayingWidget) {
+						// Draws its own slots
+						recipeContexts++;
 					}
 				}
 				if (recipeContexts == 0) {
