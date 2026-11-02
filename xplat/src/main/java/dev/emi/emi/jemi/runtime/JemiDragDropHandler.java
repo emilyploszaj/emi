@@ -3,6 +3,7 @@ package dev.emi.emi.jemi.runtime;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.collect.Lists;
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.jemi.JemiPlugin;
@@ -57,11 +58,10 @@ public class JemiDragDropHandler implements EmiDragDropHandler<Screen> {
 	}
 
 	private <I> List<IGhostIngredientHandler.Target<I>> getTargets(Screen screen, ITypedIngredient<I> typed) {
-		Optional<IGhostIngredientHandler<Screen>> optGhost = JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandler(screen);
-		if (optGhost.isPresent()) {
-			IGhostIngredientHandler<Screen> ghost = optGhost.get();
-			return ghost.getTargetsTyped(screen, typed, false);
+		List<IGhostIngredientHandler.Target<I>> allTargets = Lists.newArrayList();
+		for (IGhostIngredientHandler<Screen> handler : JemiPlugin.runtime.getScreenHelper().getGhostIngredientHandlers(screen)) {
+			allTargets.addAll(handler.getTargetsTyped(screen, typed, false));
 		}
-		return List.of();
+		return allTargets;
 	}
 }
