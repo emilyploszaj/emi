@@ -1,11 +1,10 @@
 package dev.emi.emi.network;
 
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.permissions.Permissions;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class CreateItemC2SPacket implements EmiPacket {
 	private final int mode;
@@ -16,37 +15,37 @@ public class CreateItemC2SPacket implements EmiPacket {
 		this.stack = stack;
 	}
 
-	public CreateItemC2SPacket(RegistryByteBuf buf) {
-		this(buf.readByte(), ItemStack.OPTIONAL_PACKET_CODEC.decode(buf));
+	public CreateItemC2SPacket(RegistryFriendlyByteBuf buf) {
+		this(buf.readByte(), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
 	}
 
 	@Override
-	public void write(RegistryByteBuf buf) {
+	public void write(RegistryFriendlyByteBuf buf) {
 		buf.writeByte(mode);
-		ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, stack);
+		ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
 	}
 
 	@Override
-	public void apply(PlayerEntity player) {
-		if ((player.hasPermissionLevel(2) || player.isCreative()) && player.currentScreenHandler != null) {
+	public void apply(Player player) {
+		if ((player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER) || player.isCreative()) && player.containerMenu != null) {
 			if (stack.isEmpty()) {
-				if (mode == 1 && !player.currentScreenHandler.getCursorStack().isEmpty()) {
-					EmiLog.info(player.getName() + " deleted " + player.currentScreenHandler.getCursorStack());
-					player.currentScreenHandler.setCursorStack(stack);
+				if (mode == 1 && !player.containerMenu.getCarried().isEmpty()) {
+					EmiLog.info(player.getName() + " deleted " + player.containerMenu.getCarried());
+					player.containerMenu.setCarried(stack);
 				}
 			} else {
 				EmiLog.info(player.getName() + " cheated in " + stack);
 				if (mode == 0) {
-					player.getInventory().offerOrDrop(stack);
+					player.getInventory().placeItemBackInInventory(stack);
 				} else if (mode == 1) {
-					player.currentScreenHandler.setCursorStack(stack);
+					player.containerMenu.setCarried(stack);
 				}
 			}
 		}
 	}
 
 	@Override
-	public Id<CreateItemC2SPacket> getId() {
+	public Type<CreateItemC2SPacket> type() {
 		return EmiNetwork.CREATE_ITEM;
 	}
 }

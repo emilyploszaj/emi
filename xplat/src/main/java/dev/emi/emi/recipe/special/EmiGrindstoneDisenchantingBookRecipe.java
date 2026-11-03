@@ -8,15 +8,14 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.api.widget.TextWidget.Alignment;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.OrderedText;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");
@@ -77,15 +76,15 @@ public class EmiGrindstoneDisenchantingBookRecipe implements EmiRecipe {
 	private EmiStack getBook() {
 		ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
 
-		var enchBuilder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
-		enchBuilder.add(EmiPort.getEnchantmentRegistry().getEntry(enchantment), level);
-		book.set(DataComponentTypes.STORED_ENCHANTMENTS, enchBuilder.build());
+		var enchBuilder = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+		enchBuilder.upgrade(EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment), level);
+		book.set(DataComponents.STORED_ENCHANTMENTS, enchBuilder.toImmutable());
 
 		return EmiStack.of(book);
 	}
 
-	private OrderedText getExp(){
-		int minPower = enchantment.getMinPower(level);
+	private FormattedCharSequence getExp(){
+		int minPower = enchantment.getMinCost(level);
 		int minXP = (int)Math.ceil((double)minPower / 2.0);
 		int maxXP = 2 * minXP - 1;
 		return EmiPort.ordered(EmiPort.translatable("emi.grinding.experience", minXP, maxXP));

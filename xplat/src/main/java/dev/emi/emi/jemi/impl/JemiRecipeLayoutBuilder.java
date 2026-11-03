@@ -1,5 +1,6 @@
 package dev.emi.emi.jemi.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -7,7 +8,6 @@ import com.google.common.collect.Lists;
 import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
-import mezz.jei.api.gui.widgets.ISlottedWidgetFactory;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 
 public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
@@ -54,8 +54,7 @@ public class JemiRecipeLayoutBuilder implements IRecipeLayoutBuilder {
 	}
 
 	@Override
-	public IRecipeSlotBuilder addSlotToWidget(RecipeIngredientRole role, ISlottedWidgetFactory<?> widgetFactory) {
-		// TODO actually implement this factory method of adding slots
-		return addSlot(role, 0, 0);
+	public void createFocusLink(Collection<? extends IIngredientAcceptor<?>> slots) {
 	}
+
 }

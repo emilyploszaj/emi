@@ -1,7 +1,7 @@
 package dev.emi.emi.api.render;
 
 import java.util.List;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -9,7 +9,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import dev.emi.emi.screen.tooltip.RecipeTooltipComponent;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 /**
  * Represents metadata about tooltips that EMI creates.
@@ -45,11 +44,11 @@ public class EmiTooltipMetadata {
 	 * Constructs an {@link EmiTooltipMetadata} object based on a list of tooltip components.
 	 * This can be useful for retrieving otherwised erased information, like the {@link EmiIngredient}, from a tooltip.
 	 */
-	public static EmiTooltipMetadata of(List<TooltipComponent> tooltip) {
+	public static EmiTooltipMetadata of(List<ClientTooltipComponent> tooltip) {
 		if (!tooltip.isEmpty()) {
-			TooltipComponent title = tooltip.get(0);
+			ClientTooltipComponent title = tooltip.get(0);
 			EmiRecipe recipe = null;
-			for (TooltipComponent comp : tooltip) {
+			for (ClientTooltipComponent comp : tooltip) {
 				if (comp instanceof RecipeTooltipComponent rtc) {
 					recipe = rtc.getRecipe();
 					break;

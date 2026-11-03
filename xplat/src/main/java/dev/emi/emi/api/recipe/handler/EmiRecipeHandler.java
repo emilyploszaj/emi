@@ -1,30 +1,29 @@
 package dev.emi.emi.api.recipe.handler;
 
 import java.util.List;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.widget.Widget;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
 
 /**
  * The base recipe handler.
  * In most cases, implementing this is not necessary, and {@link StandardRecipeHandler} can be used instead.
  */
-public interface EmiRecipeHandler<T extends ScreenHandler> {
-	public static final Text NOT_ENOUGH_INGREDIENTS = EmiPort.translatable("emi.not_enough_ingredients");
+public interface EmiRecipeHandler<T extends AbstractContainerMenu> {
+	public static final Component NOT_ENOUGH_INGREDIENTS = EmiPort.translatable("emi.not_enough_ingredients");
 	
 	/**
 	 * @return An inventory with the stacks the player can use for crafting.
 	 *  Craftables can only ever be discovered if the inventory contains one of its ingredients.
 	 * 	A changed inventory indicates that EMI needs to refresh craftables.
 	 */
-	EmiPlayerInventory getInventory(HandledScreen<T> screen);
+	EmiPlayerInventory getInventory(AbstractContainerScreen<T> screen);
 
 	/**
 	 * @return Whether the handler is applicable for the provided recipe.
@@ -53,11 +52,11 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 	/**
 	 * @return The tooltip describing status for crafting the recipe
 	 */
-	default List<TooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<T> context) {
+	default List<ClientTooltipComponent> getTooltip(EmiRecipe recipe, EmiCraftContext<T> context) {
 		if (canCraft(recipe, context)) {
 			return List.of();
 		} else {
-			return List.of(TooltipComponent.of(EmiPort.ordered(NOT_ENOUGH_INGREDIENTS)));
+			return List.of(ClientTooltipComponent.create(EmiPort.ordered(NOT_ENOUGH_INGREDIENTS)));
 		}
 	}
 
@@ -65,6 +64,6 @@ public interface EmiRecipeHandler<T extends ScreenHandler> {
 	 * Render feedback about the status of the current fill.
 	 * Common use is to render an overlay on missing ingredients
 	 */
-	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, DrawContext draw) {
+	default void render(EmiRecipe recipe, EmiCraftContext<T> context, List<Widget> widgets, GuiGraphicsExtractor draw) {
 	}
 }

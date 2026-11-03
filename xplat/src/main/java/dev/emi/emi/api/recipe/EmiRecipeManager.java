@@ -1,12 +1,11 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.util.Identifier;
 
 public interface EmiRecipeManager {
 	

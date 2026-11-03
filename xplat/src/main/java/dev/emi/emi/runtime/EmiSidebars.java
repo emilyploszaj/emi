@@ -1,13 +1,13 @@
 package dev.emi.emi.runtime;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.GsonHelper;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
@@ -17,8 +17,6 @@ import dev.emi.emi.config.EmiConfig;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.registry.EmiStackList;
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 public class EmiSidebars {
 	public static List<EmiIngredient> craftables = List.of();
@@ -93,8 +91,8 @@ public class EmiSidebars {
 
 	public static void load(JsonObject json) {
 		lookupHistory.clear();
-		if (JsonHelper.hasArray(json, "lookup_history")) {
-			for (JsonElement el : JsonHelper.getArray(json, "lookup_history")) {
+		if (GsonHelper.isArrayNode(json, "lookup_history")) {
+			for (JsonElement el : GsonHelper.getAsJsonArray(json, "lookup_history")) {
 				EmiIngredient stack = EmiIngredientSerializer.getDeserialized(el);
 				if (!stack.isEmpty()) {
 					lookupHistory.add(stack);
@@ -103,9 +101,9 @@ public class EmiSidebars {
 		}
 
 		craftHistory.clear();
-		if (JsonHelper.hasArray(json, "craft_history")) {
-			for (JsonElement el : JsonHelper.getArray(json, "craft_history")) {
-				if (JsonHelper.isString(el)) {
+		if (GsonHelper.isArrayNode(json, "craft_history")) {
+			for (JsonElement el : GsonHelper.getAsJsonArray(json, "craft_history")) {
+				if (GsonHelper.isStringValue(el)) {
 					String s = el.getAsString();
 					if (Identifier.tryParse(s) instanceof Identifier id) {
 						EmiRecipe recipe = EmiApi.getRecipeManager().getRecipe(id);

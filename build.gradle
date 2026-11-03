@@ -1,6 +1,7 @@
 plugins {
-	id "architectury-plugin" version "3.4-SNAPSHOT"
-	id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
+	id "architectury-plugin" version "3.5-SNAPSHOT"
+	id "dev.architectury.loom-no-remap" version "1.17-SNAPSHOT" apply false
+	id "com.gradleup.shadow" version "9.6.1" apply false
 }
 
 architectury {
@@ -37,7 +38,7 @@ allprojects {
 
 	tasks.withType(JavaCompile).configureEach({
 		options.encoding = "UTF-8"
-		options.release = 21
+		options.release = 25
 	})
 
 	java {
@@ -141,10 +142,9 @@ allprojects {
 	}
 
 	if (!project.name.contains("xplat")) {
-		sourceSets {
-			main {
-				output.dir(synthMixinDir, builtBy: generateClassLists)
-			}
+		// Shipped as a resource so dev runs that only pick up classes and resources dirs still see it
+		tasks.named("processResources") {
+			from(tasks.named("generateClassLists"))
 		}
 	}
 }

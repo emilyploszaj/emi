@@ -1,7 +1,13 @@
 package dev.emi.emi.recipe.special;
 
 import java.util.List;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -10,13 +16,6 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
 
 public class EmiAnvilEnchantRecipe implements EmiRecipe {
 	private final Item tool;
@@ -76,16 +75,16 @@ public class EmiAnvilEnchantRecipe implements EmiRecipe {
 	}
 
 	private ItemStack getTool() {
-		ItemStack itemStack = tool.getDefaultStack();
-		itemStack.addEnchantment(EmiPort.getEnchantmentRegistry().getEntry(enchantment), level);
+		ItemStack itemStack = tool.getDefaultInstance();
+		itemStack.enchant(EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment), level);
 		return itemStack;
 	}
 
 	private EmiStack getBook() {
 		ItemStack item = new ItemStack(Items.ENCHANTED_BOOK);
-		var enchBuilder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
-		enchBuilder.add(EmiPort.getEnchantmentRegistry().getEntry(enchantment), level);
-		item.set(DataComponentTypes.STORED_ENCHANTMENTS, enchBuilder.build());
+		var enchBuilder = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+		enchBuilder.upgrade(EmiPort.getEnchantmentRegistry().wrapAsHolder(enchantment), level);
+		item.set(DataComponents.STORED_ENCHANTMENTS, enchBuilder.toImmutable());
 		return EmiStack.of(item);
 	}
 }

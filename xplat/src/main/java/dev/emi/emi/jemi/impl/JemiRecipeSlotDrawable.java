@@ -2,6 +2,7 @@ package dev.emi.emi.jemi.impl;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.tags.TagKey;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
@@ -11,18 +12,18 @@ import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.jemi.widget.JemiSlotWidget;
-import mezz.jei.api.gui.builder.IIngredientConsumer;
+import mezz.jei.api.gui.builder.IIngredientAcceptor;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
 
 public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	public JemiSlotWidget widget;
-	public List<IIngredientConsumer> overrides = Lists.newArrayList();
+	public List<JemiIngredientAcceptor> overrides = Lists.newArrayList();
 
 	@Override
 	public Stream<ITypedIngredient<?>> getAllIngredients() {
@@ -40,12 +41,22 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
+	public Stream<ITypedIngredient<?>> getDisplayedIngredients() {
+		return getDisplayedIngredient().stream();
+	}
+
+	@Override
+	public Optional<TagKey<?>> getTagKey() {
+		return widget.slot.getTagKey();
+	}
+
+	@Override
 	public RecipeIngredientRole getRole() {
 		return widget.slot.getRole();
 	}
 
 	@Override
-	public void drawHighlight(DrawContext raw, int color) {
+	public void drawHighlight(GuiGraphicsExtractor raw, int color) {
 		widget.slot.drawHighlight(raw, color);
 	}
 
@@ -55,17 +66,27 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
-	public void draw(DrawContext raw) {
+	public void draw(GuiGraphicsExtractor raw) {
 		// I don't think I will
 	}
 
 	@Override
-	public void drawHoverOverlays(DrawContext raw) {
+	public void draw(GuiGraphicsExtractor raw, boolean hovered) {
 		// I don't think I will
 	}
 
 	@Override
-	public List<Text> getTooltip() {
+	public void drawTooltip(GuiGraphicsExtractor raw, int mouseX, int mouseY) {
+		// EMI draws its own tooltips
+	}
+
+	@Override
+	public void drawHoverOverlays(GuiGraphicsExtractor raw) {
+		// I don't think I will
+	}
+
+	@Override
+	public List<Component> getTooltip() {
 		// Unimplemented
 		// Mutable because who knows
 		return Lists.newArrayList();
@@ -87,9 +108,9 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
-	public IIngredientConsumer createDisplayOverrides() {
+	public IIngredientAcceptor<?> createDisplayOverrides() {
 		// "Implemented" but also just ignored
-		JemiIngredientConsumer consumer = new JemiIngredientConsumer();
+		JemiIngredientAcceptor consumer = new JemiIngredientAcceptor(getRole());
 		overrides.add(consumer);
 		return consumer;
 	}
@@ -100,13 +121,8 @@ public class JemiRecipeSlotDrawable implements IRecipeSlotDrawable {
 	}
 
 	@Override
-	public Rect2i getRect() {
+	public Rect2i getAreaIncludingBackground() {
 		Bounds bounds = widget.getBounds();
 		return new Rect2i(bounds.x(), bounds.y(), bounds.width(), bounds.height());
-	}
-
-	@Override
-	public Rect2i getAreaIncludingBackground() {
-		return getRect();
 	}
 }

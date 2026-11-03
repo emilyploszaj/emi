@@ -2,7 +2,8 @@ package dev.emi.emi.recipe;
 
 import java.util.List;
 import java.util.Random;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -11,8 +12,6 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 public class EmiAnvilRecipe implements EmiRecipe {
 	private final EmiStack tool;
@@ -82,7 +81,7 @@ public class EmiAnvilRecipe implements EmiRecipe {
 				return tool;
 			}
 		}
-		stack.setDamage(d);
+		stack.setDamageValue(d);
 		return EmiStack.of(stack);
 	}
 }

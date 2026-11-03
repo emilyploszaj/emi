@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum SidebarTheme implements ConfigEnum {
 	TRANSPARENT("transparent", 0, 0),
@@ -24,7 +24,7 @@ public enum SidebarTheme implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.sidebar.theme." + name);
 	}
 }

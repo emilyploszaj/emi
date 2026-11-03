@@ -3,7 +3,7 @@ package dev.emi.emi.runtime;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.util.GsonHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
@@ -25,8 +25,6 @@ import dev.emi.emi.bom.FlatMaterialCost;
 import dev.emi.emi.bom.MaterialNode;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 
 public class EmiFavorites {
 	public static List<EmiFavorite> favorites = Lists.newArrayList();
@@ -55,10 +53,10 @@ public class EmiFavorites {
 			if (el.isJsonObject()) {
 				JsonObject json = el.getAsJsonObject();
 				EmiRecipe recipe = null;
-				if (JsonHelper.hasString(json, "recipe")) {
-					recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.id(JsonHelper.getString(json, "recipe")));
+				if (GsonHelper.isStringValue(json, "recipe")) {
+					recipe = EmiApi.getRecipeManager().getRecipe(EmiPort.id(GsonHelper.getAsString(json, "recipe")));
 				}
-				if (JsonHelper.hasElement(json, "stack")) {
+				if (GsonHelper.isValidNode(json, "stack")) {
 					EmiIngredient ingredient = EmiIngredientSerializer.getDeserialized(json.get("stack"));
 					if (ingredient.isEmpty()) {
 						continue;

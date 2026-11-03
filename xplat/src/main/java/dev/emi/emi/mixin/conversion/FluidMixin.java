@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackConvertible;
-import net.minecraft.fluid.Fluid;
+import net.minecraft.world.level.material.Fluid;
 
 @Mixin(Fluid.class)
 public class FluidMixin implements EmiStackConvertible {

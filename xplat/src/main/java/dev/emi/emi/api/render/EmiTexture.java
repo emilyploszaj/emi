@@ -2,8 +2,8 @@ package dev.emi.emi.api.render;
 
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 
 public class EmiTexture implements EmiRenderable {
 	public static final EmiTexture SLOT = new EmiTexture(EmiRenderHelper.WIDGETS, 0, 0, 18, 18);
@@ -36,7 +36,7 @@ public class EmiTexture implements EmiRenderable {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
 	}

@@ -2,18 +2,18 @@ package dev.emi.emi.screen.widget.config;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
 public class SubGroupNameWidget extends GroupNameWidget {
 	public GroupNameWidget parent;
 
-	public SubGroupNameWidget(String id, Text text) {
+	public SubGroupNameWidget(String id, Component text) {
 		super(id, text);
 	}
 
 	@Override
-	public void render(DrawContext raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor raw, int index, int y, int x, int width, int height, int mouseX, int mouseY,
 			boolean hovered, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.drawTextWithShadow(text, x + 20, y + 3);

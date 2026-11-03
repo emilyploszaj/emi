@@ -1,7 +1,11 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.world.inventory.TransientCraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -11,11 +15,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.ProxyRecipeManager;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.input.CraftingRecipeInput;
 
 public class EmiShapedRecipe extends EmiCraftingRecipe {
 
@@ -26,7 +25,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 
 	public static void setRemainders(List<EmiIngredient> input, CraftingRecipe recipe) {
 		try {
-			CraftingInventory inv = EmiUtil.getCraftingInventory();
+			TransientCraftingContainer inv = EmiUtil.getCraftingInventory();
 			for (int i = 0; i < input.size(); i++) {
 				if (input.get(i).isEmpty()) {
 					continue;
@@ -36,21 +35,21 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 						continue;
 					}
 					if (!input.get(j).isEmpty()) {
-						inv.setStack(j, input.get(j).getEmiStacks().get(0).getItemStack().copy());
+						inv.setItem(j, input.get(j).getEmiStacks().get(0).getItemStack().copy());
 					}
 				}
 				List<EmiStack> stacks = input.get(i).getEmiStacks();
 				for (EmiStack stack : stacks) {
-					inv.setStack(i, stack.getItemStack().copy());
-					CraftingRecipeInput cri = CraftingRecipeInput.create(inv.getWidth(), inv.getHeight(), inv.getHeldStacks());
-					if (cri.getWidth() <= 3 && cri.getHeight() <= 3) {
-						ItemStack remainder = recipe.getRemainder(cri).get((i / 3 * cri.getWidth()) + (i % 3));
+					inv.setItem(i, stack.getItemStack().copy());
+					CraftingInput cri = CraftingInput.of(inv.getWidth(), inv.getHeight(), inv.getItems());
+					if (cri.width() <= 3 && cri.height() <= 3) {
+						ItemStack remainder = recipe.getRemainingItems(cri).get((i / 3 * cri.width()) + (i % 3));
 						if (!remainder.isEmpty()) {
 							stack.setRemainder(EmiStack.of(remainder));
 						}
 					}
 				}
-				inv.clear();
+				inv.clearContent();
 			}
 		} catch (Exception e) {
 			EmiLog.error("Exception thrown setting remainders for " + ProxyRecipeManager.getId(recipe), e);
@@ -65,7 +64,7 @@ public class EmiShapedRecipe extends EmiCraftingRecipe {
 				if (x >= recipe.getWidth() || y >= recipe.getHeight() || i >= recipe.getIngredients().size()) {
 					list.add(EmiStack.EMPTY);
 				} else {
-					list.add(EmiIngredient.of(recipe.getIngredients().get(i++)));
+					list.add(EmiIngredient.of(recipe.getIngredients().get(i++).orElse(null)));
 				}
 			}
 		}

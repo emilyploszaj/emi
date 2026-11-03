@@ -2,12 +2,11 @@ package dev.emi.emi.api.widget;
 
 import java.util.Random;
 import java.util.function.Function;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
 
 public class GeneratedSlotWidget extends SlotWidget {
 	private static final int INCREMENT = 1000;
@@ -23,7 +22,7 @@ public class GeneratedSlotWidget extends SlotWidget {
 	}
 	
 	@Override
-	public void drawOverlay(DrawContext draw, int mouseX, int mouseY, float delta) {
+	public void drawOverlay(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		if (!getStack().isEmpty()) {
 			int off = 1;

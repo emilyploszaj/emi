@@ -1,10 +1,8 @@
 package dev.emi.emi.chess;
 
 import java.util.List;
-
+import net.minecraft.util.Mth;
 import com.google.common.collect.Lists;
-
-import net.minecraft.util.math.MathHelper;
 
 class ChessBoard {
 	public ChessPiece[] pieces = new ChessPiece[64];
@@ -52,7 +50,7 @@ class ChessBoard {
 		} else if (move.type() == 2) {
 			int mDiff = move.end() - move.start();
 			int y = move.start() / 8;
-			int rx = MathHelper.clamp(mDiff * 8, 0, 7);
+			int rx = Mth.clamp(mDiff * 8, 0, 7);
 			ChessPiece rook = ChessPiece.of(PieceType.ROOK, piece.color());
 			set(rx, y, rook);
 			set(move.start() + (mDiff / 2), null);
@@ -72,7 +70,7 @@ class ChessBoard {
 		} else if (move.type() == 2) {
 			int mDiff = move.end() - move.start();
 			int y = move.start() / 8;
-			int rx = MathHelper.clamp(mDiff * 8, 0, 7);
+			int rx = Mth.clamp(mDiff * 8, 0, 7);
 			ChessPiece rook = get(rx, y);
 			set(rx, y, null);
 			set(move.start() + (mDiff / 2), rook);

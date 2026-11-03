@@ -5,18 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import com.google.common.collect.Lists;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.emi.emi.EmiPort;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class EmiBind {
-	public static final EmiBind LEFT_CLICK = new EmiBind("", new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
+	public static final EmiBind LEFT_CLICK = new EmiBind("", new EmiBind.ModifiedKey(InputConstants.Type.MOUSE.getOrCreate(0), 0));
 	public static final int MAX_BINDS = 4;
 	public final String translationKey;
 	public final List<ModifiedKey> defaultKeys;
@@ -39,7 +37,7 @@ public class EmiBind {
 
 	public void updateBinds() {
 		if (boundKeys.size() == 0) {
-			boundKeys.add(new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
+			boundKeys.add(new ModifiedKey(InputConstants.UNKNOWN, 0));
 		}
 		for (int i = 0; i < boundKeys.size() - 1; i++) {
 			if (boundKeys.get(i).isUnbound()) {
@@ -48,7 +46,7 @@ public class EmiBind {
 			}
 		}
 		if (!boundKeys.get(boundKeys.size() - 1).isUnbound() && boundKeys.size() < MAX_BINDS) {
-			boundKeys.add(new ModifiedKey(InputUtil.UNKNOWN_KEY, 0));
+			boundKeys.add(new ModifiedKey(InputConstants.UNKNOWN, 0));
 		}
 	}
 
@@ -56,20 +54,20 @@ public class EmiBind {
 		return boundKeys.size() > 0 && !boundKeys.get(0).isUnbound();
 	}
 
-	public Text getBindText() {
+	public Component getBindText() {
 		if (!isBound()) {
-			return EmiPort.literal("[]", Formatting.GOLD);
+			return EmiPort.literal("[]", ChatFormatting.GOLD);
 		} else {
 			ModifiedKey bind = boundKeys.get(0);
 			for (ModifiedKey key : boundKeys) {
-				if (key.key.getCategory() == InputUtil.Type.MOUSE) {
+				if (key.key.getType() == InputConstants.Type.MOUSE) {
 					bind = key;
 					break;
 				}
 			}
-			return EmiPort.literal("[", Formatting.GOLD)
-				.append(bind.getKeyText(Formatting.GOLD))
-				.append(EmiPort.literal("]", Formatting.GOLD));
+			return EmiPort.literal("[", ChatFormatting.GOLD)
+				.append(bind.getKeyText(ChatFormatting.GOLD))
+				.append(EmiPort.literal("]", ChatFormatting.GOLD));
 		}
 	}
 
@@ -93,8 +91,8 @@ public class EmiBind {
 	public boolean isHeld() {
 		for (ModifiedKey boundKey : boundKeys) {
 			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
-				if (boundKey.key.getCategory() == InputUtil.Type.KEYSYM && boundKey.key.getCode() != -1) {
-					if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), boundKey.key.getCode())) {
+				if (boundKey.key.getType() == InputConstants.Type.KEYSYM && boundKey.key.getValue() != -1) {
+					if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), boundKey.key.getValue())) {
 						return true;
 					}
 				}
@@ -106,12 +104,12 @@ public class EmiBind {
 	public boolean matchesKey(int keyCode, int scanCode) {
 		for (ModifiedKey boundKey : boundKeys) {
 			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
-				if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
-					if (boundKey.key.getCategory() == InputUtil.Type.SCANCODE && boundKey.key.getCode() == scanCode) {
+				if (keyCode == InputConstants.UNKNOWN.getValue()) {
+					if (boundKey.key.getType() == InputConstants.Type.SCANCODE && boundKey.key.getValue() == scanCode) {
 						return true;
 					}
 				} else {
-					if (boundKey.key.getCategory() == InputUtil.Type.KEYSYM && boundKey.key.getCode() == keyCode) {
+					if (boundKey.key.getType() == InputConstants.Type.KEYSYM && boundKey.key.getValue() == keyCode) {
 						return true;
 					}
 				}
@@ -123,7 +121,7 @@ public class EmiBind {
 	public boolean matchesMouse(int code) {
 		for (ModifiedKey boundKey : boundKeys) {
 			if (EmiInput.getCurrentModifiers() == boundKey.modifiersToMatch()) {
-				if (boundKey.key.getCategory() == InputUtil.Type.MOUSE && boundKey.key.getCode() == code) {
+				if (boundKey.key.getType() == InputConstants.Type.MOUSE && boundKey.key.getValue() == code) {
 					return true;
 				}
 			}
@@ -135,10 +133,10 @@ public class EmiBind {
 		List<ModifiedKey> modifiedKeys = Lists.newArrayList();
 		for (String string : keys) {
 			String[] parts = string.split(" ");
-			InputUtil.Key key = InputUtil.UNKNOWN_KEY;
+			InputConstants.Key key = InputConstants.UNKNOWN;
 			int modifiers = 0;
 			if (parts.length > 0) {
-				key = InputUtil.fromTranslationKey(parts[parts.length - 1]);
+				key = InputConstants.getKey(parts[parts.length - 1]);
 				for (int i = 0; i < parts.length - 1; i++) {
 					if (parts[i].equals("ctrl") || parts[i].equals("control")) {
 						modifiers |= EmiInput.CONTROL_MASK;
@@ -155,10 +153,10 @@ public class EmiBind {
 		updateBinds();
 	}
 
-	public static record ModifiedKey(InputUtil.Key key, int modifiers) {
+	public static record ModifiedKey(InputConstants.Key key, int modifiers) {
 
 		public static ModifiedKey of(int code, int modifiers) {
-			return new ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(code), modifiers);
+			return new ModifiedKey(InputConstants.Type.KEYSYM.getOrCreate(code), modifiers);
 		}
 
 		public String toName() {
@@ -172,30 +170,30 @@ public class EmiBind {
 			if ((modifiers & EmiInput.SHIFT_MASK) > 0) {
 				name += "shift ";
 			}
-			name += key.getTranslationKey();
+			name += key.getName();
 			return name;
 		}
 
 		public int modifiersToMatch() {
 			int modifiers = this.modifiers;
-			if (key.getCategory() == InputUtil.Type.KEYSYM) {
-				modifiers ^= EmiInput.maskFromCode(key.getCode());
+			if (key.getType() == InputConstants.Type.KEYSYM) {
+				modifiers ^= EmiInput.maskFromCode(key.getValue());
 			}
 			return modifiers;
 		}
 
 		public boolean isUnbound() {
-			return key == InputUtil.UNKNOWN_KEY;
+			return key == InputConstants.UNKNOWN;
 		}
 
-		public MutableText getKeyText(Formatting formatting) {
-			MutableText text = EmiPort.literal("", formatting);
+		public MutableComponent getKeyText(ChatFormatting formatting) {
+			MutableComponent text = EmiPort.literal("", formatting);
 			appendModifiers(text, modifiers());
-			EmiPort.append(text, key().getLocalizedText());
+			EmiPort.append(text, key().getDisplayName());
 			return text;
 		}
 	
-		private void appendModifiers(MutableText text, int modifiers) {
+		private void appendModifiers(MutableComponent text, int modifiers) {
 			if ((modifiers & EmiInput.CONTROL_MASK) > 0) {
 				EmiPort.append(text, EmiPort.translatable("key.keyboard.control"));
 				EmiPort.append(text, EmiPort.literal(" + "));

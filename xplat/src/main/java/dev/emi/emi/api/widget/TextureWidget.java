@@ -2,11 +2,10 @@ package dev.emi.emi.api.widget;
 
 import java.util.List;
 import java.util.function.BiFunction;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.Identifier;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.util.Identifier;
 
 public class TextureWidget extends Widget implements WidgetTooltipHolder<TextureWidget> {
 	protected final Identifier texture;
@@ -15,7 +14,7 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	protected final int u, v;
 	protected final int regionWidth, regionHeight;
 	protected final int textureWidth, textureHeight;
-	private BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
+	private BiFunction<Integer, Integer, List<ClientTooltipComponent>> tooltipSupplier = (mouseX, mouseY) -> List.of();
 
 	public TextureWidget(Identifier texture, int x, int y, int width, int height, int u, int v,
 			int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
@@ -37,7 +36,7 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	}
 
 	@Override
-	public TextureWidget tooltip(BiFunction<Integer, Integer, List<TooltipComponent>> tooltipSupplier) {
+	public TextureWidget tooltip(BiFunction<Integer, Integer, List<ClientTooltipComponent>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;
 	}
@@ -48,12 +47,12 @@ public class TextureWidget extends Widget implements WidgetTooltipHolder<Texture
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return tooltipSupplier.apply(mouseX, mouseY);
 	}
 
 	@Override
-	public void render(DrawContext draw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
 		context.resetColor();
 		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);

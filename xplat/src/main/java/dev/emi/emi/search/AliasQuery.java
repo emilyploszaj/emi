@@ -10,7 +10,7 @@ public class AliasQuery extends Query {
 	private final Set<EmiStack> valid;
 
 	public AliasQuery(String name) {
-		valid = Sets.newHashSet(EmiSearch.aliases.findAll(name.toLowerCase()));
+		valid = Sets.newHashSet(EmiSearch.aliases.search(name.toLowerCase()));
 	}
 
 	@Override

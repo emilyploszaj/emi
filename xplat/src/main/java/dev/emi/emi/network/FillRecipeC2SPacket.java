@@ -2,21 +2,18 @@ package dev.emi.emi.network;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Identifier;
 
 public class FillRecipeC2SPacket implements EmiPacket {
 	private final int syncId;
@@ -25,16 +22,16 @@ public class FillRecipeC2SPacket implements EmiPacket {
 	private final int output;
 	private final List<ItemStack> stacks;
 
-	public FillRecipeC2SPacket(ScreenHandler handler, int action, List<Slot> slots, List<Slot> crafting, @Nullable Slot output, List<ItemStack> stacks) {
-		this.syncId = handler.syncId;
+	public FillRecipeC2SPacket(AbstractContainerMenu handler, int action, List<Slot> slots, List<Slot> crafting, @Nullable Slot output, List<ItemStack> stacks) {
+		this.syncId = handler.containerId;
 		this.action = action;
-		this.slots = slots.stream().map(s -> s == null ? -1 : s.id).toList();
-		this.crafting = crafting.stream().map(s -> s == null ? -1 : s.id).toList();
-		this.output = output == null ? -1 : output.id;
+		this.slots = slots.stream().map(s -> s == null ? -1 : s.index).toList();
+		this.crafting = crafting.stream().map(s -> s == null ? -1 : s.index).toList();
+		this.output = output == null ? -1 : output.index;
 		this.stacks = stacks;
 	}
 
-	public FillRecipeC2SPacket(RegistryByteBuf buf) {
+	public FillRecipeC2SPacket(RegistryFriendlyByteBuf buf) {
 		syncId = buf.readInt();
 		action = buf.readByte();
 		slots = parseCompressedSlots(buf);
@@ -52,12 +49,12 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		int size = buf.readVarInt();
 		stacks = Lists.newArrayList();
 		for (int i = 0; i < size; i++) {
-			stacks.add(ItemStack.OPTIONAL_PACKET_CODEC.decode(buf));
+			stacks.add(ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
 		}
 	}
 
 	@Override
-	public void write(RegistryByteBuf buf) {
+	public void write(RegistryFriendlyByteBuf buf) {
 		buf.writeInt(syncId);
 		buf.writeByte(action);
 		writeCompressedSlots(slots, buf);
@@ -73,18 +70,18 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		}
 		buf.writeVarInt(stacks.size());
 		for (ItemStack stack : stacks) {
-			ItemStack.OPTIONAL_PACKET_CODEC.encode(buf, stack);
+			ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
 		}
 	}
 
 	@Override
-	public void apply(PlayerEntity player) {
+	public void apply(Player player) {
 		if (slots == null || crafting == null) {
 			EmiLog.error("Client requested fill but passed input and crafting slot information was invalid, aborting");
 			return;
 		}
-		ScreenHandler handler = player.currentScreenHandler;
-		if (handler == null || handler.syncId != syncId) {
+		AbstractContainerMenu handler = player.containerMenu;
+		if (handler == null || handler.containerId != syncId) {
 			EmiLog.warn("Client requested fill but screen handler has changed, aborting");
 			return;
 		}
@@ -114,11 +111,11 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			List<ItemStack> rubble = Lists.newArrayList();
 			for (int i = 0; i < crafting.size(); i++) {
 				Slot s = crafting.get(i);
-				if (s != null && s.canTakeItems(player) && !s.getStack().isEmpty()) {
-					ItemStack taken = s.getStack();
+				if (s != null && s.mayPickup(player) && !s.getItem().isEmpty()) {
+					ItemStack taken = s.getItem();
 					rubble.add(taken.copy());
-					s.setStack(ItemStack.EMPTY);
-					s.onTakeItem(player, taken);
+					s.setByPlayer(ItemStack.EMPTY);
+					s.onTake(player, taken);
 				}
 			}
 			try {	
@@ -131,45 +128,45 @@ public class FillRecipeC2SPacket implements EmiPacket {
 					if (gotten != stack.getCount()) {
 						if (gotten > 0) {
 							stack.setCount(gotten);
-							player.getInventory().offerOrDrop(stack);
+							player.getInventory().placeItemBackInInventory(stack);
 						}
 						return;
 					} else {
 						Slot s = crafting.get(i);
-						if (s != null && s.canInsert(stack) && stack.getCount() <= s.getMaxItemCount() && stack.getCount() <= stack.getMaxCount()) {
-							if (!s.getStack().isEmpty()) { // Make sure we don't accidentally delete any items that could have been placed in this slot
-								if (s.canTakeItems(player)) {
-									ItemStack taken = s.getStack();
+						if (s != null && s.mayPlace(stack) && stack.getCount() <= s.getMaxStackSize() && stack.getCount() <= stack.getMaxStackSize()) {
+							if (!s.getItem().isEmpty()) { // Make sure we don't accidentally delete any items that could have been placed in this slot
+								if (s.mayPickup(player)) {
+									ItemStack taken = s.getItem();
 									rubble.add(taken.copy());
-									s.setStack(ItemStack.EMPTY);
-									s.onTakeItem(player, taken);
+									s.setByPlayer(ItemStack.EMPTY);
+									s.onTake(player, taken);
 								} else {
-									player.getInventory().offerOrDrop(stack);
+									player.getInventory().placeItemBackInInventory(stack);
 									continue;
 								}
 							}
-							s.setStack(stack);
+							s.setByPlayer(stack);
 						} else {
-							player.getInventory().offerOrDrop(stack);
+							player.getInventory().placeItemBackInInventory(stack);
 						}
 					}
 				}
 				if (output != null) {
 					if (action == 1) {
-						handler.onSlotClick(output.getIndex(), 0, SlotActionType.PICKUP, player);
+						handler.clicked(output.getContainerSlot(), 0, ContainerInput.PICKUP, player);
 					} else if (action == 2) {
-						handler.onSlotClick(output.getIndex(), 0, SlotActionType.QUICK_MOVE, player);
+						handler.clicked(output.getContainerSlot(), 0, ContainerInput.QUICK_MOVE, player);
 					}
 				}
 			} finally {
 				for (ItemStack stack : rubble) {
-					player.getInventory().offerOrDrop(stack);
+					player.getInventory().placeItemBackInInventory(stack);
 				}
 			}
 		}
 	}
 
-	private static List<Integer> parseCompressedSlots(PacketByteBuf buf) {
+	private static List<Integer> parseCompressedSlots(FriendlyByteBuf buf) {
 		List<Integer> list = Lists.newArrayList();
 		int amount = buf.readVarInt();
 		for (int i = 0; i < amount; i++) {
@@ -185,8 +182,8 @@ public class FillRecipeC2SPacket implements EmiPacket {
 		return list;
 	}
 	
-	private static void writeCompressedSlots(List<Integer> list, PacketByteBuf buf) {
-		List<Consumer<PacketByteBuf>> postWrite = Lists.newArrayList();
+	private static void writeCompressedSlots(List<Integer> list, FriendlyByteBuf buf) {
+		List<Consumer<FriendlyByteBuf>> postWrite = Lists.newArrayList();
 		int groups = 0;
 		int i = 0;
 		while (i < list.size()) {
@@ -203,12 +200,12 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			});
 		}
 		buf.writeVarInt(groups);
-		for (Consumer<PacketByteBuf> consumer : postWrite) {
+		for (Consumer<FriendlyByteBuf> consumer : postWrite) {
 			consumer.accept(buf);
 		}
 	}
 
-	private static int grabMatching(PlayerEntity player, List<Slot> slots, List<ItemStack> rubble, List<Slot> crafting, ItemStack stack) {
+	private static int grabMatching(Player player, List<Slot> slots, List<ItemStack> rubble, List<Slot> crafting, ItemStack stack) {
 		int amount = stack.getCount();
 		int grabbed = 0;
 		for (int i = 0; i < rubble.size(); i++) {
@@ -216,7 +213,7 @@ public class FillRecipeC2SPacket implements EmiPacket {
 				return grabbed;
 			}
 			ItemStack r = rubble.get(i);
-			if (ItemStack.areItemsAndComponentsEqual(stack, r)) {
+			if (ItemStack.isSameItemSameComponents(stack, r)) {
 				int wanted = amount - grabbed;
 				if (r.getCount() <= wanted) {
 					grabbed += r.getCount();
@@ -232,28 +229,28 @@ public class FillRecipeC2SPacket implements EmiPacket {
 			if (grabbed >= amount) {
 				return grabbed;
 			}
-			if (crafting.contains(s) || !s.canTakeItems(player)) {
+			if (crafting.contains(s) || !s.mayPickup(player)) {
 				continue;
 			}
-			ItemStack st = s.getStack();
-			if (ItemStack.areItemsAndComponentsEqual(stack, st)) {
+			ItemStack st = s.getItem();
+			if (ItemStack.isSameItemSameComponents(stack, st)) {
 				int wanted = amount - grabbed;
 				ItemStack taken = st.copy();
 				if (st.getCount() <= wanted) {
 					grabbed += st.getCount();
-					s.setStack(ItemStack.EMPTY);
+					s.setByPlayer(ItemStack.EMPTY);
 				} else {
 					grabbed = amount;
 					st.setCount(st.getCount() - wanted);
 				}
-				s.onTakeItem(player, taken);
+				s.onTake(player, taken);
 			}
 		}
 		return grabbed;
 	}
 
 	@Override
-	public Id<FillRecipeC2SPacket> getId() {
+	public Type<FillRecipeC2SPacket> type() {
 		return EmiNetwork.FILL_RECIPE;
 	}
 }

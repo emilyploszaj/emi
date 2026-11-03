@@ -1,8 +1,7 @@
 package dev.emi.emi.search;
 
 import java.util.function.Function;
-
-import net.minecraft.text.Style;
+import net.minecraft.network.chat.Style;
 
 public enum QueryType {
 	DEFAULT("",  0xffffff, 0xcc3737, 0xff5555, 0xfca955, NameQuery::new, RegexNameQuery::new),

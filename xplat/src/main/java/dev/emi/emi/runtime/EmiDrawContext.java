@@ -1,46 +1,59 @@
 package dev.emi.emi.runtime;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Matrix3x2fStack;
 
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiIngredient;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
 
 public class EmiDrawContext {
-	private final MinecraftClient client = MinecraftClient.getInstance();
-	private final DrawContext context;
-	
-	private EmiDrawContext(DrawContext context) {
+	// Shared across wrappers, mirroring the global shader color this replaced
+	private static int color = -1;
+	private final Minecraft client = Minecraft.getInstance();
+	private final GuiGraphicsExtractor context;
+
+	private EmiDrawContext(GuiGraphicsExtractor context) {
 		this.context = context;
 	}
 
-	public static EmiDrawContext wrap(DrawContext context) {
+	public static EmiDrawContext wrap(GuiGraphicsExtractor context) {
 		return new EmiDrawContext(context);
 	}
 
-	public DrawContext raw() {
+	/**
+	 * Text with no alpha used to be drawn opaque, now it is skipped entirely.
+	 */
+	public static int textColor(int color) {
+		return (color & 0xFC000000) == 0 ? color | 0xFF000000 : color;
+	}
+
+	public GuiGraphicsExtractor raw() {
 		return context;
 	}
 
-	public MatrixStack matrices() {
-		return context.getMatrices();
+	public Matrix3x2fStack matrices() {
+		return context.pose();
 	}
 
 	public void push() {
-		matrices().push();
+		matrices().pushMatrix();
 	}
 
 	public void pop() {
-		matrices().pop();
+		matrices().popMatrix();
 	}
 
 	public void translate(float x, float y) {
-		matrices().translate(x, y, 0);
+		matrices().translate(x, y);
+	}
+
+	public void scale(float x, float y) {
+		matrices().scale(x, y);
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int u, int v, int width, int height) {
@@ -52,77 +65,59 @@ public class EmiDrawContext {
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int z, float u, float v, int width, int height, int textureWidth, int textureHeight) {
-		EmiPort.setPositionTexShader();
-		context.drawTexture(texture, x, y, z, u, v, width, height, textureWidth, textureHeight);
+		context.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, textureWidth, textureHeight, color);
 	}
 
 	public void drawTexture(Identifier texture, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight) {
-		EmiPort.setPositionTexShader();
-		context.drawTexture(texture, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+		context.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
 	}
 
 	public void fill(int x, int y, int width, int height, int color) {
-		context.fill(x, y, x + width, y + height, color);
+		context.fill(x, y, x + width, y + height, ARGB.multiply(color, EmiDrawContext.color));
 	}
 
-	public void drawText(Text text, int x, int y) {
+	public void drawText(Component text, int x, int y) {
 		drawText(text, x, y, -1);
 	}
 
-	public void drawText(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, false);
+	public void drawText(Component text, int x, int y, int color) {
+		context.text(client.font, text, x, y, textColor(color), false);
 	}
 
-	public void drawText(OrderedText text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, false);
+	public void drawText(FormattedCharSequence text, int x, int y, int color) {
+		context.text(client.font, text, x, y, textColor(color), false);
 	}
 
-	public void drawTextWithShadow(Text text, int x, int y) {
+	public void drawTextWithShadow(Component text, int x, int y) {
 		drawTextWithShadow(text, x, y, -1);
 	}
 
-	public void drawTextWithShadow(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, true);
+	public void drawTextWithShadow(Component text, int x, int y, int color) {
+		context.text(client.font, text, x, y, textColor(color), true);
 	}
 
-	public void drawTextWithShadow(OrderedText text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x, y, color, true);
+	public void drawTextWithShadow(FormattedCharSequence text, int x, int y, int color) {
+		context.text(client.font, text, x, y, textColor(color), true);
 	}
 
-	public void drawCenteredText(Text text, int x, int y) {
+	public void drawCenteredText(Component text, int x, int y) {
 		drawCenteredText(text, x, y, -1);
 	}
 
-	public void drawCenteredText(Text text, int x, int y, int color) {
-		context.drawText(client.textRenderer, text, x - client.textRenderer.getWidth(text) / 2, y, color, false);
+	public void drawCenteredText(Component text, int x, int y, int color) {
+		context.text(client.font, text, x - client.font.width(text) / 2, y, textColor(color), false);
 	}
 
-	public void drawCenteredTextWithShadow(Text text, int x, int y) {
+	public void drawCenteredTextWithShadow(Component text, int x, int y) {
 		drawCenteredTextWithShadow(text, x, y, -1);
 	}
 
-	public void drawCenteredTextWithShadow(Text text, int x, int y, int color) {
-		context.drawCenteredTextWithShadow(client.textRenderer, text.asOrderedText(), x, y, color);
-	}
-
-	public void enableDepthTest() {
-		RenderSystem.enableDepthTest();
-	}
-
-	public void disableDepthTest() {
-		RenderSystem.disableDepthTest();
-	}
-
-	public void enableBlend() {
-		RenderSystem.enableBlend();
-	}
-
-	public void disableBlend() {
-		RenderSystem.disableBlend();
+	public void drawCenteredTextWithShadow(Component text, int x, int y, int color) {
+		context.centeredText(client.font, text.getVisualOrderText(), x, y, textColor(color));
 	}
 
 	public void resetColor() {
-		setColor(1f, 1f, 1f, 1f);
+		color = -1;
 	}
 
 	public void setColor(float r, float g, float b) {
@@ -130,15 +125,19 @@ public class EmiDrawContext {
 	}
 
 	public void setColor(float r, float g, float b, float a) {
-		raw().setShaderColor(r, g, b, a);
+		color = ARGB.colorFromFloat(a, r, g, b);
+	}
+
+	public int getColor() {
+		return color;
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y) {
-		stack.render(raw(), x, y, client.getRenderTickCounter().getTickDelta(false));
+		stack.render(raw(), x, y, client.getDeltaTracker().getGameTimeDeltaPartialTick(false));
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, int flags) {
-		drawStack(stack, x, y, client.getRenderTickCounter().getTickDelta(false), flags);
+		drawStack(stack, x, y, client.getDeltaTracker().getGameTimeDeltaPartialTick(false), flags);
 	}
 
 	public void drawStack(EmiIngredient stack, int x, int y, float delta, int flags) {

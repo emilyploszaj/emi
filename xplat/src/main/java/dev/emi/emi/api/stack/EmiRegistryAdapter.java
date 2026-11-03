@@ -1,9 +1,8 @@
 package dev.emi.emi.api.stack;
 
-import net.minecraft.component.ComponentChanges;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentPatch;
 import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.registry.Registry;
 
 /**
  * Provides EMI context for a {@link Registry} to construct stacks from the objects in the registry.
@@ -25,7 +24,7 @@ public interface EmiRegistryAdapter<T> {
 	/**
 	 * Constructs an {@link EmiStack} from a given object from the registry, or {@link EmiStack#EMPTY} if somehow invalid.
 	 */
-	EmiStack of(T t, ComponentChanges componentChanges, long amount);
+	EmiStack of(T t, DataComponentPatch componentChanges, long amount);
 
 	/**
 	 * Convenience method for creating an {@link EmiRegistryAdapter}.
@@ -44,13 +43,13 @@ public interface EmiRegistryAdapter<T> {
 			}
 
 			@Override
-			public EmiStack of(T t, ComponentChanges componentChanges, long amount) {
+			public EmiStack of(T t, DataComponentPatch componentChanges, long amount) {
 				return constructor.of(t, componentChanges, amount);
 			}
 		};
 	}
 
 	public static interface StackConstructor<T> {
-		EmiStack of(T t, ComponentChanges componentChanges, long amount);
+		EmiStack of(T t, DataComponentPatch componentChanges, long amount);
 	}
 }

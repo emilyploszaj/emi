@@ -1,11 +1,13 @@
 package dev.emi.emi.platform.neoforge;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import dev.emi.emi.network.EmiNetwork;
 import dev.emi.emi.network.PingS2CPacket;
 import dev.emi.emi.platform.EmiMain;
 import dev.emi.emi.registry.EmiCommands;
 import dev.emi.emi.runtime.EmiLog;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -20,7 +22,7 @@ public class EmiNeoForge {
 		EmiMain.init();
 		modEventBus.addListener(EmiPacketHandler::init);
 		EmiNetwork.initServer((player, packet) -> {
-			if (player.networkHandler.hasChannel(packet)) {
+			if (player.connection.hasChannel(packet)) {
 				PacketDistributor.sendToPlayer(player, EmiPacketHandler.wrap(packet));
 			} else {
 				EmiLog.warn("Can't send EMI packet to " + player + " as they're missing the channel");
@@ -28,14 +30,20 @@ public class EmiNeoForge {
 		});
 		NeoForge.EVENT_BUS.addListener(this::registerCommands);
 		NeoForge.EVENT_BUS.addListener(this::playerConnect);
+		NeoForge.EVENT_BUS.addListener(this::syncRecipes);
 	}
 
 	public void registerCommands(RegisterCommandsEvent event) {
 		EmiCommands.registerCommands(event.getDispatcher());
 	}
 
+	// Vanilla no longer sends recipes to clients, so EMI requests all of them
+	public void syncRecipes(OnDatapackSyncEvent event) {
+		event.sendRecipes(BuiltInRegistries.RECIPE_TYPE);
+	}
+
 	public void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
-		if (event.getEntity() instanceof ServerPlayerEntity spe) {
+		if (event.getEntity() instanceof ServerPlayer spe) {
 			EmiNetwork.sendToClient(spe, new PingS2CPacket());
 		}
 	}

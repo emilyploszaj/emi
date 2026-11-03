@@ -5,8 +5,8 @@ import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 
 public class RecipeBackground extends Widget {
 	private static final Identifier TEXTURE = EmiPort.id("emi", "textures/gui/background.png");
@@ -25,7 +25,7 @@ public class RecipeBackground extends Widget {
 	}
 
 	@Override
-	public void render(DrawContext raw, int mouseX, int mouseY, float delta) {
+	public void render(GuiGraphicsExtractor raw, int mouseX, int mouseY, float delta) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		EmiRenderHelper.drawNinePatch(context, TEXTURE, x, y, width, height, 27, 0, 4, 1);
 	}
