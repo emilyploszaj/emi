@@ -1,11 +1,15 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiTagKey;
@@ -82,6 +86,14 @@ public interface EmiIngredient extends EmiRenderable {
 	public static EmiIngredient of(Ingredient ingredient, long amount) {
 		if (ingredient == null || ingredient.isEmpty()) {
 			return EmiStack.EMPTY;
+		}
+		// Custom ingredients, like NeoForge's component ingredients, only carry their components in the display
+		SlotDisplay display = ingredient.display();
+		if (!(display instanceof SlotDisplay.TagSlotDisplay) && Minecraft.getInstance().level != null) {
+			List<ItemStack> stacks = display.resolveForStacks(EmiPort.displayContext());
+			if (stacks.stream().anyMatch(stack -> !stack.getComponentsPatch().isEmpty())) {
+				return of(stacks.stream().map(EmiStack::of).toList(), amount);
+			}
 		}
 		return EmiTags.getIngredient(Item.class, ingredient.items().map(i -> EmiStack.of(i.value())).toList(), amount);
 	}
