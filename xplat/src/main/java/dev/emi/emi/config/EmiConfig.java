@@ -92,12 +92,12 @@ public class EmiConfig {
 	public static boolean showHoverOverlay = true;
 
 	@ConfigGroup("ui.mod-id")
-	@Comment("Whether to add mod name to tooltips")
+	@Comment("Whether to add mod name to tooltips.")
 	@ConfigValue("ui.append-mod-id")
 	public static boolean appendModId = true;
 
 	@ConfigGroupEnd
-	@Comment("Whether to add mod name to item tooltips, in case another mod provides behavior")
+	@Comment("Whether to add mod name to item tooltips, in case another mod provides the same behavior.")
 	@ConfigValue("ui.append-item-mod-id")
 	public static boolean appendItemModId = true;
 
@@ -163,12 +163,12 @@ public class EmiConfig {
 	private static Predicate<SidebarSide> workstationLocationFilter = side -> {
 		return side != SidebarSide.TOP;
 	};
-	@Comment("Where to show workstations in the recipe screen")
+	@Comment("Where to show workstations in the recipe screen.")
 	@ConfigValue("ui.workstation-location")
 	public static SidebarSide workstationLocation = SidebarSide.BOTTOM;
 
 	@ConfigGroupEnd()
-	@Comment("Display cost per batch when hovering a recipe output")
+	@Comment("Display cost per batch when hovering a recipe output.")
 	@ConfigValue("ui.show-cost-per-batch")
 	public static boolean showCostPerBatch = true;
 
@@ -197,18 +197,18 @@ public class EmiConfig {
 	// Left sidebar
 
 	@ConfigGroup("ui.left-sidebar")
-	@Comment("The pages in the left sidebar")
+	@Comment("The pages in the left sidebar.")
 	@ConfigValue("ui.left-sidebar-pages")
 	public static SidebarPages leftSidebarPages = new SidebarPages(List.of(
 		new SidebarPages.SidebarPage(SidebarType.FAVORITES)
 	), SidebarSettings.LEFT);
 
-	@Comment("The subpanels in the left sidebar")
+	@Comment("The subpanels in the left sidebar.")
 	@ConfigValue("ui.left-sidebar-subpanels")
 	public static SidebarSubpanels leftSidebarSubpanels = new SidebarSubpanels(List.of(
 	), SidebarSettings.LEFT);
 	
-	@Comment("How many columns and rows of ingredients to limit the left sidebar to")
+	@Comment("How many columns and rows of ingredients to limit the left sidebar to.")
 	@ConfigValue("ui.left-sidebar-size")
 	public static IntGroup leftSidebarSize = new IntGroup(
 		"emi.sidebar.size.",
@@ -216,20 +216,20 @@ public class EmiConfig {
 		IntList.of(12, 100)
 	);
 
-	@Comment("How much space to maintain between the left sidebar and obstructions, in pixels")
+	@Comment("How much space to maintain between the left sidebar and obstructions, in pixels.")
 	@ConfigValue("ui.left-sidebar-margins")
 	public static Margins leftSidebarMargins = new Margins(2, 2, 2, 2);
 
-	@Comment("Where to position the left sidebar")
+	@Comment("Where to position the left sidebar.")
 	@ConfigValue("ui.left-sidebar-align")
 	public static ScreenAlign leftSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.LEFT, ScreenAlign.Vertical.TOP);
 
-	@Comment("Whether to render the header buttons and page count for the left sidebar")
+	@Comment("Whether to render the header buttons and page count for the left sidebar.")
 	@ConfigValue("ui.left-sidebar-header")
 	public static HeaderType leftSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
-	@Comment("Which theme to use for the left sidebar")
+	@Comment("Which theme to use for the left sidebar.")
 	@ConfigValue("ui.left-sidebar-theme")
 	public static SidebarTheme leftSidebarTheme = SidebarTheme.TRANSPARENT;
 
@@ -237,19 +237,19 @@ public class EmiConfig {
 	// Right sidebar
 
 	@ConfigGroup("ui.right-sidebar")
-	@Comment("The pages in the right sidebar")
+	@Comment("The pages in the right sidebar.")
 	@ConfigValue("ui.right-sidebar-pages")
 	public static SidebarPages rightSidebarPages = new SidebarPages(List.of(
 		new SidebarPages.SidebarPage(SidebarType.INDEX),
 		new SidebarPages.SidebarPage(SidebarType.CRAFTABLES)
 	), SidebarSettings.RIGHT);
 
-	@Comment("The subpanels in the right sidebar")
+	@Comment("The subpanels in the right sidebar.")
 	@ConfigValue("ui.right-sidebar-subpanels")
 	public static SidebarSubpanels rightSidebarSubpanels = new SidebarSubpanels(List.of(
 	), SidebarSettings.RIGHT);
 
-	@Comment("How many columns and rows of ingredients to limit the right sidebar to")
+	@Comment("How many columns and rows of ingredients to limit the right sidebar to.")
 	@ConfigValue("ui.right-sidebar-size")
 	public static IntGroup rightSidebarSize = new IntGroup(
 		"emi.sidebar.size.",
@@ -257,37 +257,37 @@ public class EmiConfig {
 		IntList.of(12, 100)
 	);
 
-	@Comment("How much space to maintain between the right sidebar and obstructions, in pixels")
+	@Comment("How much space to maintain between the right sidebar and obstructions, in pixels.")
 	@ConfigValue("ui.right-sidebar-margins")
 	public static Margins rightSidebarMargins = new Margins(2, 2, 2, 2);
 
-	@Comment("Where to position the right sidebar")
+	@Comment("Where to position the right sidebar.")
 	@ConfigValue("ui.right-sidebar-align")
 	public static ScreenAlign rightSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.RIGHT, ScreenAlign.Vertical.TOP);
 
-	@Comment("Whether to render the header buttons and page count for the right sidebar")
+	@Comment("Whether to render the header buttons and page count for the right sidebar.")
 	@ConfigValue("ui.right-sidebar-header")
 	public static HeaderType rightSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
-	@Comment("Which theme to use for the right sidebar")
+	@Comment("Which theme to use for the right sidebar.")
 	@ConfigValue("ui.right-sidebar-theme")
 	public static SidebarTheme rightSidebarTheme = SidebarTheme.TRANSPARENT;
 
 	// Top sidebar
 
 	@ConfigGroup("ui.top-sidebar")
-	@Comment("The pages in the top sidebar")
+	@Comment("The pages in the top sidebar.")
 	@ConfigValue("ui.top-sidebar-pages")
 	public static SidebarPages topSidebarPages = new SidebarPages(List.of(
 	), SidebarSettings.TOP);
 
-	@Comment("The subpanels in the top sidebar")
+	@Comment("The subpanels in the top sidebar.")
 	@ConfigValue("ui.top-sidebar-subpanels")
 	public static SidebarSubpanels topSidebarSubpanels = new SidebarSubpanels(List.of(
 	), SidebarSettings.TOP);
 
-	@Comment("How many columns and rows of ingredients to limit the top sidebar to")
+	@Comment("How many columns and rows of ingredients to limit the top sidebar to.")
 	@ConfigValue("ui.top-sidebar-size")
 	public static IntGroup topSidebarSize = new IntGroup(
 		"emi.sidebar.size.",
@@ -295,37 +295,37 @@ public class EmiConfig {
 		IntList.of(9, 9)
 	);
 
-	@Comment("How much space to maintain between the top sidebar and obstructions, in pixels")
+	@Comment("How much space to maintain between the top sidebar and obstructions, in pixels.")
 	@ConfigValue("ui.top-sidebar-margins")
 	public static Margins topSidebarMargins = new Margins(2, 2, 2, 2);
 
-	@Comment("Where to position the top sidebar")
+	@Comment("Where to position the top sidebar.")
 	@ConfigValue("ui.top-sidebar-align")
 	public static ScreenAlign topSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.CENTER, ScreenAlign.Vertical.CENTER);
 
-	@Comment("Whether to render the header buttons and page count for the top sidebar")
+	@Comment("Whether to render the header buttons and page count for the top sidebar.")
 	@ConfigValue("ui.top-sidebar-header")
 	public static HeaderType topSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
-	@Comment("Which theme to use for the top sidebar")
+	@Comment("Which theme to use for the top sidebar.")
 	@ConfigValue("ui.top-sidebar-theme")
 	public static SidebarTheme topSidebarTheme = SidebarTheme.TRANSPARENT;
 
 	// Bottom sidebar
 
 	@ConfigGroup("ui.bottom-sidebar")
-	@Comment("The pages in the bottom sidebar")
+	@Comment("The pages in the bottom sidebar.")
 	@ConfigValue("ui.bottom-sidebar-pages")
 	public static SidebarPages bottomSidebarPages = new SidebarPages(List.of(
 	), SidebarSettings.BOTTOM);
 
-	@Comment("The subpanels in the bottom sidebar")
+	@Comment("The subpanels in the bottom sidebar.")
 	@ConfigValue("ui.bottom-sidebar-subpanels")
 	public static SidebarSubpanels bottomSidebarSubpanels = new SidebarSubpanels(List.of(
 	), SidebarSettings.BOTTOM);
 
-	@Comment("How many columns and rows of ingredients to limit the bottom sidebar to")
+	@Comment("How many columns and rows of ingredients to limit the bottom sidebar to.")
 	@ConfigValue("ui.bottom-sidebar-size")
 	public static IntGroup bottomSidebarSize = new IntGroup(
 		"emi.sidebar.size.",
@@ -333,20 +333,20 @@ public class EmiConfig {
 		IntList.of(9, 9)
 	);
 
-	@Comment("How much space to maintain between the bottom sidebar and obstructions, in pixels")
+	@Comment("How much space to maintain between the bottom sidebar and obstructions, in pixels.")
 	@ConfigValue("ui.bottom-sidebar-margins")
 	public static Margins bottomSidebarMargins = new Margins(2, 2, 2, 2);
 
-	@Comment("Where to position the bottom sidebar")
+	@Comment("Where to position the bottom sidebar.")
 	@ConfigValue("ui.bottom-sidebar-align")
 	public static ScreenAlign bottomSidebarAlign = new ScreenAlign(ScreenAlign.Horizontal.CENTER, ScreenAlign.Vertical.CENTER);
 
-	@Comment("Whether to render the header buttons and page count for the bottom sidebar")
+	@Comment("Whether to render the header buttons and page count for the bottom sidebar.")
 	@ConfigValue("ui.bottom-sidebar-header")
 	public static HeaderType bottomSidebarHeader = HeaderType.VISIBLE;
 	
 	@ConfigGroupEnd
-	@Comment("Which theme to use for the bottom sidebar")
+	@Comment("Which theme to use for the bottom sidebar.")
 	@ConfigValue("ui.bottom-sidebar-theme")
 	public static SidebarTheme bottomSidebarTheme = SidebarTheme.TRANSPARENT;
 
@@ -379,7 +379,7 @@ public class EmiConfig {
 		new EmiBind.ModifiedKey(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_U), 0),
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(1), 0));
 
-	@Comment("Favorite the item to display on the side of the screen opposite of recipies for quick access.")
+	@Comment("Favorite the item to display in the favorites panel for quick access.")
 	@ConfigValue("binds.favorite")
 	public static EmiBind favorite = new EmiBind("key.emi.favorite", GLFW.GLFW_KEY_A);
 
@@ -428,7 +428,7 @@ public class EmiConfig {
 	public static EmiBind craftAllToInventory = new EmiBind("key.emi.craft_all_to_inventory", InputUtil.UNKNOWN_KEY.getCode());
 
 	@Comment("When on a stack with an associated recipe:\n"
-		+ "Move ingredients for a single result and put in cursor if possible.")
+		+ "Move ingredients for a single result and put on cursor if possible.")
 	@ConfigValue("binds.craft-one-to-cursor")
 	public static EmiBind craftOneToCursor = new EmiBind("key.emi.craft_one_to_cursor", 
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
@@ -449,31 +449,31 @@ public class EmiConfig {
 	public static EmiBind cheatStackToInventory = new EmiBind("key.emi.cheat_stack_to_inventory",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
 	
-	@Comment("Cheat in one of an item into the cursor.")
+	@Comment("Cheat in one of an item onto the cursor.")
 	@ConfigValue("binds.cheat-one-to-cursor")
 	public static EmiBind cheatOneToCursor = new EmiBind("key.emi.cheat_one_to_cursor",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(2), EmiInput.CONTROL_MASK));
 	
-	@Comment("Cheat in a stack of an item into the cursor.")
+	@Comment("Cheat in a stack of an item onto the cursor.")
 	@ConfigValue("binds.cheat-stack-to-cursor")
 	public static EmiBind cheatStackToCursor = new EmiBind("key.emi.cheat_stack_to_cursor", InputUtil.UNKNOWN_KEY.getCode());
 	
 	@ConfigGroupEnd
-	@Comment("Delete the stack in the cursor when hovering the index")
+	@Comment("Delete the stack on the cursor when hovering the index.")
 	@ConfigValue("binds.delete-cursor-stack")
 	public static EmiBind deleteCursorStack = new EmiBind("key.emi.delete_cursor_stack",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), 0));
 
-	@Comment("Copies the hovered recipe's ID to the clipboard")
+	@Comment("Copies the hovered recipe's ID to the clipboard.")
 	@ConfigValue("binds.copy-recipe-id")
 	public static EmiBind copyId = new EmiBind("key.emi.copy_recipe_id", InputUtil.UNKNOWN_KEY.getCode());
 
-	@Comment("In edit mode, hide the hovered stack")
+	@Comment("In edit mode, hide the hovered stack.")
 	@ConfigValue("binds.hide-stack")
 	public static EmiBind hideStack = new EmiBind("key.emi.hide_stack",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK));
 
-	@Comment("In edit mode, hide stacks with the hovered stack's id")
+	@Comment("In edit mode, hide stacks with the hovered stack's ID.")
 	@ConfigValue("binds.hide-stack-by-id")
 	public static EmiBind hideStackById = new EmiBind("key.emi.hide_stack_by_id",
 		new EmiBind.ModifiedKey(InputUtil.Type.MOUSE.createFromCode(0), EmiInput.CONTROL_MASK | EmiInput.SHIFT_MASK));
@@ -483,7 +483,7 @@ public class EmiConfig {
 	@ConfigValue("dev.dev-mode")
 	public static boolean devMode = EmiAgnos.isDevelopmentEnvironment();
 
-	@Comment("Whether editing the index is enabled")
+	@Comment("Whether editing the index is enabled.")
 	@ConfigValue("dev.edit-mode")
 	public static boolean editMode = false;
 
@@ -507,7 +507,7 @@ public class EmiConfig {
 	@ConfigValue("dev.highlight-defaulted")
 	public static boolean highlightDefaulted = false;
 
-	@Comment("Whether to display exclusion areas")
+	@Comment("Whether to display exclusion areas.")
 	@ConfigValue("dev.highlight-exclusion-areas")
 	public static boolean highlightExclusionAreas = false;
 
