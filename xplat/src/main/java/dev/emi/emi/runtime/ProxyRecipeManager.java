@@ -1,7 +1,9 @@
 package dev.emi.emi.runtime;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +38,12 @@ public class ProxyRecipeManager {
 		return recipeIds.get(recipe);
 	}
 
-	public static boolean hasId(Identifier id) {
-		return recipeIds.containsValue(id);
+	/**
+	 * Returns a non-null, detached snapshot of the registered recipe IDs.
+	 * Call after ID baking completes, without rebuilding IDs concurrently.
+	 */
+	public static Set<Identifier> getRecipeIds() {
+		return new HashSet<>(recipeIds.values());
 	}
 
 	public static @Nullable Recipe<?> getRecipe(Identifier id) {
