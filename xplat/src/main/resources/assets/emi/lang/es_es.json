@@ -135,6 +135,7 @@
 
   "config.emi.ui.effect_location": "Ubicación de Efectos",
   "config.emi.ui.center_search_bar": "Centrar Barra de Búsqueda",
+  "config.emi.ui.top_search_bar": "Barra de Búsqueda Superior",
   "config.emi.ui.show_hover_overlay": "Resaltar Objeto Bajo el Cursor",
   "config.emi.ui.append_mod_id": "Mostrar ID del Mod",
   "config.emi.ui.append_item_mod_id": "Mostrar ID del Mod en Objeto",
@@ -144,6 +145,7 @@
 
   "config.emi.tooltip.ui.effect_location": "Determina dónde deben mostrarse los efectos en la interfaz.",
   "config.emi.tooltip.ui.center_search_bar": "Determina si la barra de búsqueda está centrada o en el lateral.",
+  "config.emi.tooltip.ui.top_search_bar": "Determina si la barra de búsqueda está en la parte superior o inferior de la pantalla.",
   "config.emi.tooltip.ui.show_hover_overlay": "Determina si se muestra un color de resalte en el objeto que está bajo el cursor.",
   "config.emi.tooltip.ui.append_mod_id": "Determina si se muestra el nombre del mod en la descripción del objeto.",
   "config.emi.tooltip.ui.append_item_mod_id": "Determina si se muestra el nombre del mod en la descripción del objeto, en caso de que otro mod tenga una función similar.",

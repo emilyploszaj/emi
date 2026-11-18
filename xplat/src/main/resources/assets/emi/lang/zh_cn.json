@@ -149,6 +149,8 @@
   "config.emi.tooltip.ui.effect_location": "状态效果在物品栏界面中的位置",
   "config.emi.ui.center_search_bar": "中置搜索框",
   "config.emi.tooltip.ui.center_search_bar": "移动搜索框至屏幕中间而非贴边",
+  "config.emi.ui.top_search_bar": "顶置搜索框",
+  "config.emi.tooltip.ui.top_search_bar": "移动搜索框至屏幕顶部而非底部",
   "config.emi.ui.show_hover_overlay": "显示选中遮罩",
   "config.emi.tooltip.ui.show_hover_overlay": "光标悬停于物品上时显示灰色遮罩",
   "config.emi.ui.append_mod_id": "显示物品所属模组",

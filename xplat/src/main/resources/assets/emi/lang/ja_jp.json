@@ -134,6 +134,7 @@
 
   "config.emi.ui.effect_location": "効果の場所",
   "config.emi.ui.center_search_bar": "中央検索バー",
+  "config.emi.ui.top_search_bar": "上部検索バー",
   "config.emi.ui.show_hover_overlay": "ボタン判定の表示",
   "config.emi.ui.append_mod_id": "Mod IDを表示",
   "config.emi.ui.append_item_mod_id": "アイテムIDを表示",
@@ -143,6 +144,7 @@
 
   "config.emi.tooltip.ui.effect_location": "インベントリのどこにステータスエフェクトを表示するか。",
   "config.emi.tooltip.ui.center_search_bar": "検索バーを画面の横ではなく中央に表示するかどうか。",
+  "config.emi.tooltip.ui.top_search_bar": "検索バーを画面の下部ではなく上部に表示するかどうか。",
   "config.emi.tooltip.ui.show_hover_overlay": "スタックにカーソルを置いたときに灰色のオーバーレイを表示するかどうか。",
   "config.emi.tooltip.ui.append_mod_id": "ツールチップにMOD名を追加するかどうか。",
   "config.emi.tooltip.ui.append_item_mod_id": "他のMODが動作を提供する場合に備えて、アイテムのツールチップにMOD名を追加するかどうか。",

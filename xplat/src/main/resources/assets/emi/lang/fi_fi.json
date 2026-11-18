@@ -94,6 +94,7 @@
   
     "config.emi.ui.effect_location": "Vaikutusten sijainti",
     "config.emi.ui.center_search_bar": "Keskitä hakupankki",
+    "config.emi.ui.top_search_bar": "Yläreunan hakupalkki",
     "config.emi.ui.show_hover_overlay": "Näytä osoitetun peitekerros",
     "config.emi.ui.append_mod_id": "Lisää modi-ID",
     "config.emi.ui.append_item_mod_id": "Lisää tavaran modi-ID",
