@@ -382,7 +382,7 @@ public class BoMScreen extends Screen {
 			if (recipes.size() > 0) {
 				for (int i = 0; i < 100_000; i++) {
 					EmiRecipe recipe = recipes.get(EmiUtil.RANDOM.nextInt(recipes.size()));
-					if (recipe.supportsRecipeTree()) {
+					if (recipe.supportsRecipeTree() && !recipe.getOutputs().isEmpty()) {
 						BoM.setGoal(recipe);
 						init();
 						return true;
