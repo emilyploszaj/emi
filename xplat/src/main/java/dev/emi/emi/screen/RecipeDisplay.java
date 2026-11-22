@@ -38,7 +38,7 @@ public class RecipeDisplay {
 		if (EmiRecipeFiller.isSupported(recipe) && EmiConfig.recipeFillButton) {
 			rightButtons.add(ButtonType.FILL);
 		}
-		if (recipe.supportsRecipeTree()) {
+		if (recipe.supportsRecipeTree() && !recipe.getOutputs().isEmpty()) {
 			if (EmiConfig.recipeTreeButton) {
 				rightButtons.add(ButtonType.TREE);
 			}
