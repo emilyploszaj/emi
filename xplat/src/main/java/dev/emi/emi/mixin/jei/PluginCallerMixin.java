@@ -16,7 +16,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.jemi.JemiUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.library.load.PluginCaller;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 @Pseudo
 @Mixin(PluginCaller.class)
@@ -45,7 +45,10 @@ public class PluginCallerMixin {
 		} else if (uid != null) {
 			String namespace = uid.getNamespace();
 			if (SKIPPED_MODS.contains(namespace) && !namespace.equals("jei") && !namespace.equals("emi")) {
-				return;
+				// Mods with an EMI plugin may still rely on JEI for filling recipes, EMI's own handlers take priority
+				if (!title.equals("Registering recipes transfer handlers")) {
+					return;
+				}
 			}
 		}
 		target.accept(plugin);

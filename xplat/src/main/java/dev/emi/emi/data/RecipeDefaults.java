@@ -2,7 +2,8 @@ package dev.emi.emi.data;
 
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
@@ -14,8 +15,6 @@ import dev.emi.emi.api.recipe.EmiRecipeManager;
 import dev.emi.emi.api.recipe.EmiResolutionRecipe;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Identifier;
 
 public class RecipeDefaults {
 	public final List<Identifier> added = Lists.newArrayList();
@@ -47,8 +46,8 @@ public class RecipeDefaults {
 
 	public Map<EmiIngredient, EmiRecipe> bake() {
 		Map<EmiIngredient, EmiRecipe> map = Maps.newHashMap();
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world == null) {
+		Minecraft client = Minecraft.getInstance();
+		if (client.level == null) {
 			return map;
 		}
 		EmiRecipeManager manager = EmiApi.getRecipeManager();

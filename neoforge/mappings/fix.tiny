@@ -1,5 +1,0 @@
-tiny	2	0	intermediary	named
-c	net/minecraft/class_1496	
-	m	()Lnet/minecraft/class_1263;	method_56680	getInventoryVanilla
-c	net/minecraft/class_329	
-	m	(Lnet/minecraft/class_332;F)V	method_1759	renderHotbarVanilla

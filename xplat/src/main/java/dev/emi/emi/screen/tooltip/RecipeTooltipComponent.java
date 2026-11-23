@@ -3,7 +3,7 @@ package dev.emi.emi.screen.tooltip;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Font;
 
 public class RecipeTooltipComponent implements EmiTooltipComponent {
 	private final EmiRecipe recipe;
@@ -40,12 +40,14 @@ public class RecipeTooltipComponent implements EmiTooltipComponent {
 	}
 
 	@Override
-	public int getWidth(TextRenderer textRenderer) {
+	public int getWidth(Font textRenderer) {
 		return width;
 	}
 
 	@Override
 	public void drawTooltip(EmiDrawContext context, TooltipRenderData render) {
+		// Elements within a stratum are sorted by texture, keep the recipe above the tooltip background
+		context.raw().nextStratum();
 		EmiRenderHelper.renderRecipe(recipe, context, 0, 0, showMissing, overlayColor);
 	}
 }

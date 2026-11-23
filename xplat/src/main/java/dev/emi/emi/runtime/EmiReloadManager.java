@@ -3,7 +3,8 @@ package dev.emi.emi.runtime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -29,8 +30,6 @@ import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
 import dev.emi.emi.search.EmiSearch;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 
 public class EmiReloadManager {
 	private static int loadedResourcesMask = 0;
@@ -38,7 +37,7 @@ public class EmiReloadManager {
 	// 0 - empty, 1 - reloading, 2 - loaded, -1 - error
 	private static volatile int status = 0;
 	private static Thread thread;
-	public static volatile Text reloadStep = EmiPort.literal("");
+	public static volatile Component reloadStep = EmiPort.literal("");
 	public static volatile long reloadWorry = Long.MAX_VALUE;
 
 	static {
@@ -98,11 +97,11 @@ public class EmiReloadManager {
 		}
 	}
 
-	public static void step(Text text) {
+	public static void step(Component text) {
 		step(text, 5_000);
 	}
 
-	public static void step(Text text, long worry) {
+	public static void step(Component text, long worry) {
 		EmiLog.info(text.getString());
 		reloadStep = text;
 		reloadWorry = System.currentTimeMillis() + worry;
@@ -145,8 +144,8 @@ public class EmiReloadManager {
 						clear = false;
 						continue;
 					}
-					MinecraftClient client = MinecraftClient.getInstance();
-					if (client.world == null) {
+					Minecraft client = Minecraft.getInstance();
+					if (client.level == null) {
 						EmiReloadLog.warn("World is null");
 						break;
 					} else if (!ProxyRecipeManager.isAvailable()) {

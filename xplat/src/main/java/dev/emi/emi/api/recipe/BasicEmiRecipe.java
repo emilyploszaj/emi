@@ -1,14 +1,13 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import net.minecraft.util.Identifier;
 
 /**
  * A convenience type for easy implementation of {@link EmiRecipe}

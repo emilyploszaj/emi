@@ -13,7 +13,7 @@ public class ModQuery extends Query {
 
 	public ModQuery(String name) {
 		this.name = name.toLowerCase();
-		EmiSearch.mods.findAll(this.name).forEach(s -> valid.add(s.stack));
+		EmiSearch.mods.search(this.name).forEach(s -> valid.add(s.stack));
 	}
 
 	@Override

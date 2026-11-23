@@ -1,41 +1,29 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Matrix4f;
 
 import com.google.common.collect.Lists;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.config.EmiConfig;
-import dev.emi.emi.mixin.accessor.BakedModelManagerAccessor;
-import dev.emi.emi.mixin.accessor.ItemRendererAccessor;
-import dev.emi.emi.platform.EmiAgnos;
 import dev.emi.emi.registry.EmiTags;
 import dev.emi.emi.runtime.EmiDrawContext;
 import dev.emi.emi.runtime.EmiTagKey;
 import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import dev.emi.emi.screen.tooltip.RemainderTooltipComponent;
 import dev.emi.emi.screen.tooltip.TagTooltipComponent;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 @ApiStatus.Internal
 public class TagEmiIngredient implements EmiIngredient {
@@ -114,9 +102,9 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 		EmiDrawContext context = EmiDrawContext.wrap(draw);
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 
 		if ((flags & RENDER_ICON) != 0) {
 			if (!tagKey.hasCustomModel()) {
@@ -124,33 +112,9 @@ public class TagEmiIngredient implements EmiIngredient {
 					stacks.get(0).render(context.raw(), x, y, delta, -1 ^ RENDER_AMOUNT);
 				}
 			} else {
-				BakedModel model = EmiAgnos.getBakedTagModel(tagKey.getCustomModel());
-
-				context.matrices().push();
-				context.matrices().translate(x + 8, y + 8, 150);
-				context.matrices().multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 1.0f));
-				context.matrices().scale(16.0f, 16.0f, 16.0f);
-				
-				model.getTransformation().getTransformation(ModelTransformationMode.GUI).apply(false, context.matrices());
-				context.matrices().translate(-0.5f, -0.5f, -0.5f);
-				
-				if (!model.isSideLit()) {
-					DiffuseLighting.disableGuiDepthLighting();
-				}
-				VertexConsumerProvider.Immediate immediate = context.raw().getVertexConsumers();
-				
-				((ItemRendererAccessor) client.getItemRenderer())
-					.invokeRenderBakedItemModel(model,
-						ItemStack.EMPTY, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, context.matrices(), 
-						ItemRenderer.getDirectItemGlintConsumer(immediate,
-							TexturedRenderLayers.getEntityTranslucentCull(), true, false));
-				immediate.draw();
-				
-				if (!model.isSideLit()) {
-					DiffuseLighting.enableGuiDepthLighting();
-				}
-
-				context.matrices().pop();
+				ItemStack icon = new ItemStack(Items.BARRIER);
+				icon.set(DataComponents.ITEM_MODEL, tagKey.getCustomModel());
+				context.raw().fakeItem(icon, x, y);
 			}
 		}
 		if ((flags & RENDER_AMOUNT) != 0 && !tagKey.isOf(EmiPort.getFluidRegistry())) {
@@ -169,18 +133,18 @@ public class TagEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> list = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
 		list.add(new EmiTextTooltipWrapper(this, EmiPort.ordered(tagKey.getTagName())));
 		if (EmiUtil.showAdvancedTooltips()) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal("#" + id, Formatting.DARK_GRAY))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal("#" + id, ChatFormatting.DARK_GRAY))));
 		}
 		if (tagKey.isOf(EmiPort.getFluidRegistry()) && amount > 1) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiRenderHelper.getAmountText(this, amount))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiRenderHelper.getAmountText(this, amount))));
 		}
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(id.getNamespace());
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(mod, ChatFormatting.BLUE, ChatFormatting.ITALIC))));
 		}
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {

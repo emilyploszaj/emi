@@ -1,22 +1,22 @@
 package dev.emi.emi.mixin.accessor;
 
-import net.minecraft.item.Item;
-import net.minecraft.potion.Potion;
-import net.minecraft.recipe.BrewingRecipeRegistry;
-import net.minecraft.recipe.Ingredient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.crafting.Ingredient;
 
-@Mixin(BrewingRecipeRegistry.class)
+@Mixin(PotionBrewing.class)
 public interface BrewingRecipeRegistryAccessor {
-    @Accessor("potionTypes")
+    @Accessor("containers")
     List<Ingredient> getPotionTypes();
 
-    @Accessor("potionRecipes")
-    List<BrewingRecipeRegistry.Recipe<Potion>> getPotionRecipes();
+    @Accessor("potionMixes")
+    List<PotionBrewing.Mix<Potion>> getPotionRecipes();
 
-    @Accessor("itemRecipes")
-    List<BrewingRecipeRegistry.Recipe<Item>> getItemRecipes();
+    @Accessor("containerMixes")
+    List<PotionBrewing.Mix<Item>> getItemRecipes();
 }

@@ -1,20 +1,20 @@
 package dev.emi.emi.screen.tooltip;
 
-import org.joml.Matrix4f;
-
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.font.TextRenderer.TextLayerType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 
-public interface EmiTooltipComponent extends TooltipComponent {
+public interface EmiTooltipComponent extends ClientTooltipComponent {
+
+	int getHeight();
+
+	@Override
+	default int getHeight(Font font) {
+		return getHeight();
+	}
 
 	default void drawTooltip(EmiDrawContext context, TooltipRenderData tooltip) {
 	}
@@ -23,51 +23,46 @@ public interface EmiTooltipComponent extends TooltipComponent {
 	}
 
 	@Override
-	default void drawItems(TextRenderer textRenderer, int x, int y, DrawContext raw) {
+	default void extractImage(Font textRenderer, int x, int y, int w, int h, GuiGraphicsExtractor raw) {
 		EmiDrawContext context = EmiDrawContext.wrap(raw);
 		context.push();
 		context.translate(x, y);
-		MinecraftClient client = MinecraftClient.getInstance();
-		drawTooltip(context, new TooltipRenderData(textRenderer, client.getItemRenderer(), x, y));
+		drawTooltip(context, new TooltipRenderData(textRenderer, x, y));
 		context.pop();
 	}
 
 	@Override
-	default void drawText(TextRenderer textRenderer, int x, int y, Matrix4f matrix, Immediate vertexConsumers) {
-		drawTooltipText(new TextRenderData(textRenderer, x, y, matrix, vertexConsumers));
+	default void extractText(GuiGraphicsExtractor raw, Font textRenderer, int x, int y) {
+		drawTooltipText(new TextRenderData(textRenderer, x, y, raw));
 	}
 
 	public static class TextRenderData {
-		private final Matrix4f matrix;
-		private final Immediate vertexConsumers;
-		public final TextRenderer renderer;
+		private final GuiGraphicsExtractor raw;
+		public final Font renderer;
 		public final int x, y;
-		
-		public TextRenderData(TextRenderer renderer, int x, int y, Matrix4f matrix, Immediate vertexConsumers) {
+
+		public TextRenderData(Font renderer, int x, int y, GuiGraphicsExtractor raw) {
 			this.renderer = renderer;
 			this.x = x;
 			this.y = y;
-			this.matrix = matrix;
-			this.vertexConsumers = vertexConsumers;
+			this.raw = raw;
 		}
 
 		public void draw(String text, int x, int y, int color, boolean shadow) {
 			draw(EmiPort.literal(text), x, y, color, shadow);
 		}
 
-		public void draw(Text text, int x, int y, int color, boolean shadow) {
-			renderer.draw(text, x + this.x, y + this.y, color, shadow, matrix, vertexConsumers, TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+		public void draw(Component text, int x, int y, int color, boolean shadow) {
+			raw.text(renderer, text, x + this.x, y + this.y, EmiDrawContext.textColor(color), shadow);
 		}
 	}
 
 	public static class TooltipRenderData {
-		public final TextRenderer text;
-		public final ItemRenderer item;
+		public final Font text;
 		public final int x, y;
 
-		public TooltipRenderData(TextRenderer text, ItemRenderer item, int x, int y) {
+		public TooltipRenderData(Font text, int x, int y) {
 			this.text = text;
-			this.item = item;
 			this.x = x;
 			this.y = y;
 		}

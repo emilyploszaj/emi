@@ -1,10 +1,10 @@
 package dev.emi.emi.config;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public interface ConfigEnum {
 
 	String getName();
 
-	Text getText();
+	Component getText();
 }

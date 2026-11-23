@@ -1,29 +1,28 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.runtime.EmiDrawContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public class EmiInfoRecipe implements EmiRecipe {
 	private static final int STACK_WIDTH = 6, MAX_STACKS = STACK_WIDTH * 3;
 	private static final int PADDING = 4;
-	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+	private static final Minecraft CLIENT = Minecraft.getInstance();
 	private final List<EmiIngredient> stacks;
-	private final List<OrderedText> text;
+	private final List<FormattedCharSequence> text;
 	private final Identifier id;
 
-	public EmiInfoRecipe(List<EmiIngredient> stacks, List<Text> text, @Nullable Identifier id) {
+	public EmiInfoRecipe(List<EmiIngredient> stacks, List<Component> text, @Nullable Identifier id) {
 		this.stacks = stacks;
-		this.text = text.stream().flatMap(t -> CLIENT.textRenderer.wrapLines(t, getDisplayWidth() - 4).stream()).toList();
+		this.text = text.stream().flatMap(t -> CLIENT.font.split(t, getDisplayWidth() - 4).stream()).toList();
 		this.id = id;
 	}
 
@@ -60,7 +59,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 	@Override
 	public int getDisplayHeight() {
 		int stackHeight = ((Math.min(stacks.size(), MAX_STACKS) - 1) / STACK_WIDTH + 1) * 18;
-		return stackHeight + CLIENT.textRenderer.fontHeight * text.size() + PADDING;
+		return stackHeight + CLIENT.font.lineHeight * text.size() + PADDING;
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class EmiInfoRecipe implements EmiRecipe {
 			}
 		}
 		int y = stackHeight * 18 + PADDING;
-		int lineCount = (widgets.getHeight() - y) / CLIENT.textRenderer.fontHeight;
+		int lineCount = (widgets.getHeight() - y) / CLIENT.font.lineHeight;
 		PageManager manager = new PageManager(text, lineCount);
 		if (lineCount < text.size()) {
 			widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
@@ -99,18 +98,18 @@ public class EmiInfoRecipe implements EmiRecipe {
 				if (l >= manager.lines.size()) {
 					return;
 				}
-				OrderedText text = manager.lines.get(l);
-				context.drawText(text, 0, y - y + i * CLIENT.textRenderer.fontHeight, 0);
+				FormattedCharSequence text = manager.lines.get(l);
+				context.drawText(text, 0, y - y + i * CLIENT.font.lineHeight, 0);
 			}
 		});
 	}
 
 	private static class PageManager {
-		public final List<OrderedText> lines;
+		public final List<FormattedCharSequence> lines;
 		public final int pageSize;
 		public int currentPage;
 
-		public PageManager(List<OrderedText> lines, int pageSize) {
+		public PageManager(List<FormattedCharSequence> lines, int pageSize) {
 			this.lines = lines;
 			this.pageSize = pageSize;
 		}

@@ -6,8 +6,8 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.recipe.special.EmiAnvilRepairItemRecipe;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public class EmiGrindstoneRecipe extends EmiAnvilRepairItemRecipe {
 	private static final Identifier BACKGROUND = EmiPort.id("minecraft", "textures/gui/container/grindstone.png");

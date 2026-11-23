@@ -2,7 +2,8 @@ package dev.emi.emi.mixin;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,15 +16,13 @@ import dev.emi.emi.platform.EmiClient;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.emi.emi.runtime.ProxyRecipeManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public class MinecraftClientMixin {
 	@Shadow
-	public ClientWorld world;
+	public ClientLevel level;
 
-	@Inject(at = @At("RETURN"), method = "reloadResources(ZLnet/minecraft/client/MinecraftClient$LoadingContext;)Ljava/util/concurrent/CompletableFuture;")
+	@Inject(at = @At("RETURN"), method = "reloadResourcePacks(ZLnet/minecraft/client/Minecraft$GameLoadCookie;)Ljava/util/concurrent/CompletableFuture;")
 	private void reloadResources(boolean force, @Coerce Object loadingContext, CallbackInfoReturnable<CompletableFuture<Void>> info) {
 		CompletableFuture<Void> future = info.getReturnValue();
 		if (future != null) {
@@ -35,7 +34,7 @@ public class MinecraftClientMixin {
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V")
+	@Inject(at = @At("HEAD"), method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V")
 	private void disconnect(CallbackInfo info) {
 		EmiLog.info("Disconnecting from server, EMI data cleared");
 		EmiReloadManager.clear();

@@ -1,5 +1,7 @@
 package dev.emi.emi.jemi;
 
+import mezz.jei.api.ingredients.IIngredientHelper;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import java.util.Optional;
 
 import com.google.gson.JsonElement;
@@ -11,7 +13,7 @@ import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.runtime.IIngredientManager;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.util.GsonHelper;
 
 @SuppressWarnings("rawtypes")
 public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
@@ -31,7 +33,7 @@ public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
 			if (type == VanillaTypes.ITEM_STACK || type == JemiUtil.getFluidType()) {
 				continue;
 			}
-			Optional<EmiStack> opt = manager.getTypedIngredientByUid(type, uid).map(JemiUtil::getStack);
+			Optional<EmiStack> opt = findByUid(type, uid);
 			if (opt.isPresent()) {
 				return opt.get().setAmount(amount);
 			}
@@ -39,14 +41,24 @@ public class JemiStackSerializer implements EmiIngredientSerializer<JemiStack> {
 		return EmiStack.EMPTY;
 	}
 
+	private <T> Optional<EmiStack> findByUid(IIngredientType<T> type, String uid) {
+		IIngredientHelper<T> helper = manager.getIngredientHelper(type);
+		for (T ingredient : manager.getAllIngredients(type)) {
+			if (uid.equals(helper.getUid(ingredient, UidContext.Ingredient).toString())) {
+				return Optional.of(JemiUtil.getStack(type, ingredient));
+			}
+		}
+		return Optional.empty();
+	}
+
 	@Override
 	public EmiIngredient deserialize(JsonElement element) {
 		JsonObject json = element.getAsJsonObject();
-		String uid = JsonHelper.getString(json, "uid");
-		long amount = JsonHelper.getLong(json, "amount", 1);
-		float chance = JsonHelper.getFloat(json, "chance", 1);
+		String uid = GsonHelper.getAsString(json, "uid");
+		long amount = GsonHelper.getAsLong(json, "amount", 1);
+		float chance = GsonHelper.getAsFloat(json, "chance", 1);
 		EmiStack remainder = EmiStack.EMPTY;
-		if (JsonHelper.hasElement(json, "remainder")) {
+		if (GsonHelper.isValidNode(json, "remainder")) {
 			EmiIngredient ing = EmiIngredientSerializer.getDeserialized(json.get("remainder"));
 			if (ing instanceof EmiStack stack) {
 				remainder = stack;

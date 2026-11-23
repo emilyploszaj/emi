@@ -3,7 +3,7 @@ package dev.emi.emi.registry;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
+import net.minecraft.client.gui.screens.Screen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -12,7 +12,6 @@ import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.runtime.EmiLog;
 import dev.emi.emi.screen.EmiScreenBase;
 import dev.emi.emi.screen.EmiScreenManager;
-import net.minecraft.client.gui.screen.Screen;
 
 public class EmiExclusionAreas {
 	public static Map<Class<?>, List<EmiExclusionArea<?>>> fromClass = Maps.newHashMap();

@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum ButtonVisibility implements ConfigEnum {
 	AUTO("auto"),
@@ -29,7 +29,7 @@ public enum ButtonVisibility implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.button_visibility." + name);
 	}
 }

@@ -18,8 +18,8 @@ import mezz.jei.api.ingredients.IIngredientHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class JemiUtil {
@@ -63,7 +63,7 @@ public class JemiUtil {
 		if (stack.isEmpty()) {
 			return Optional.empty();
 		} else if (stack.getKey() instanceof Fluid f) {
-			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f.getRegistryEntry(), stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getComponentChanges()));
+			return JemiPlugin.runtime.getIngredientManager().createTypedIngredient(getFluidType(), getFluidHelper().create(f.builtInRegistryHolder(), stack.getAmount() == 0 ? 1000 : stack.getAmount(), stack.getComponentChanges()));
 		} else if (stack instanceof JemiStack js) {
 			return JemiPlugin.runtime.getIngredientManager().getIngredientTypeChecked(js.ingredient)
 				.map(t -> (Optional) JemiPlugin.runtime.getIngredientManager().createTypedIngredient(t, js.ingredient))

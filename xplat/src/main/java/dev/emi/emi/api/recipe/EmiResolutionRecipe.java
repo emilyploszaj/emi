@@ -1,7 +1,7 @@
 package dev.emi.emi.api.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.VanillaPlugin;
@@ -9,7 +9,6 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.util.Identifier;
 
 public class EmiResolutionRecipe implements EmiRecipe {
 	public final EmiIngredient ingredient;

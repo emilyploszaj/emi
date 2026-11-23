@@ -1,7 +1,7 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum EffectLocation implements ConfigEnum {
 	TOP("top", false),
@@ -26,7 +26,7 @@ public enum EffectLocation implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.effect_location." + name.replace("-", "_"));
 	}
 }

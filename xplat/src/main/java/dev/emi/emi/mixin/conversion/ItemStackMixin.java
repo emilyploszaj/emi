@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackConvertible;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements EmiStackConvertible {

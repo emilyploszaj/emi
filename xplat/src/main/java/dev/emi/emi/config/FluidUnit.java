@@ -4,7 +4,7 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.EmiRenderHelper;
 import dev.emi.emi.platform.EmiAgnos;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectFunction;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum FluidUnit implements ConfigEnum {
 	LITERS("liters", a -> EmiPort.translatable("emi.fluid.amount.liters",
@@ -19,10 +19,10 @@ public enum FluidUnit implements ConfigEnum {
 	public static final int BOTTLE = EmiAgnos.isForge() ? 250 : 27_000;
 
 	private final String name;
-	private final Text translation;
-	private final Double2ObjectFunction<Text> translator;
+	private final Component translation;
+	private final Double2ObjectFunction<Component> translator;
 
-	private FluidUnit(String name, Double2ObjectFunction<Text> translator) {
+	private FluidUnit(String name, Double2ObjectFunction<Component> translator) {
 		this.name = name;
 		translation = EmiPort.translatable("emi.unit." + name);
 		this.translator = translator;
@@ -41,12 +41,12 @@ public enum FluidUnit implements ConfigEnum {
 		return name;
 	}
 
-	public Text translate(double amount) {
+	public Component translate(double amount) {
 		return translator.apply(Double.valueOf(amount));
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return translation;
 	}
 }

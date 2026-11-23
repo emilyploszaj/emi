@@ -2,25 +2,24 @@ package dev.emi.emi.screen.widget.config;
 
 import java.util.List;
 import java.util.function.Supplier;
-
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.config.SidebarSubpanels;
 import dev.emi.emi.config.SidebarType;
 import dev.emi.emi.screen.ConfigScreen.Mutator;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.Text;
 
 public class SidebarSubpanelsWidget extends ConfigEntryWidget {
-	private List<ButtonWidget> buttons = Lists.newArrayList();
-	private List<ClickableWidget> raws = Lists.newArrayList();
+	private List<Button> buttons = Lists.newArrayList();
+	private List<AbstractWidget> raws = Lists.newArrayList();
 	private List<IntEdit> rows = Lists.newArrayList();
 	private Mutator<SidebarSubpanels> mutator;
 
-	public SidebarSubpanelsWidget(Text name, List<TooltipComponent> tooltip, Supplier<String> search, Mutator<SidebarSubpanels> mutator) {
+	public SidebarSubpanelsWidget(Component name, List<ClientTooltipComponent> tooltip, Supplier<String> search, Mutator<SidebarSubpanels> mutator) {
 		super(name, tooltip, search, 0);
 		this.mutator = mutator;
 		setChildren(raws);
@@ -56,10 +55,10 @@ public class SidebarSubpanelsWidget extends ConfigEntryWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		for (IntEdit edit : rows) {
 			if (edit.contains(mouseX, mouseY)) {
-				return List.of(TooltipComponent.of(EmiPort.ordered(
+				return List.of(ClientTooltipComponent.create(EmiPort.ordered(
 					EmiPort.translatable("emi.sidebar.size.rows"))));
 			}
 		}
@@ -70,7 +69,7 @@ public class SidebarSubpanelsWidget extends ConfigEntryWidget {
 	public void update(int y, int x, int width, int height) {
 		int h = 0;
 		for (int i = 0; i < buttons.size() - 1; i++) {
-			ButtonWidget button = buttons.get(i);
+			Button button = buttons.get(i);
 			button.x = x + width - 174;
 			button.y = y + h;
 			h += 24;
@@ -81,7 +80,7 @@ public class SidebarSubpanelsWidget extends ConfigEntryWidget {
 			edit.setPosition(x + width - 218, y + h);
 			h += 24;
 		}
-		ButtonWidget button = buttons.get(buttons.size() - 1);
+		Button button = buttons.get(buttons.size() - 1);
 		button.x = x + width - 20;
 		button.y = y;
 	}

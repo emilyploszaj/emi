@@ -4,10 +4,9 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.api.stack.serializer.EmiStackSerializer;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> {
 
@@ -17,8 +16,8 @@ public class ItemEmiStackSerializer implements EmiStackSerializer<ItemEmiStack> 
 	}
 
 	@Override
-	public EmiStack create(Identifier id, ComponentChanges componentChanges, long amount) {
-		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().getEntry(id).orElseThrow(), 1, componentChanges);
+	public EmiStack create(Identifier id, DataComponentPatch componentChanges, long amount) {
+		ItemStack stack = new ItemStack(EmiPort.getItemRegistry().get(id).orElseThrow(), 1, componentChanges);
 		return EmiStack.of(stack, amount);
 	}
 }

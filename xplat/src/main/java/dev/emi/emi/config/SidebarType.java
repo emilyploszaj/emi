@@ -1,8 +1,8 @@
 package dev.emi.emi.config;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public enum SidebarType implements ConfigEnum {
 	NONE("none", 0, 0),
@@ -30,12 +30,12 @@ public enum SidebarType implements ConfigEnum {
 	}
 
 	@Override
-	public Text getText() {
+	public Component getText() {
 		return EmiPort.translatable("emi.sidebar.type." + name.replace("-", "_"));
 	}
 
-	public Text getDescription() {
-		return EmiPort.translatable("emi.sidebar.type." + name.replace("-", "_") + ".description").formatted(Formatting.GRAY);
+	public Component getDescription() {
+		return EmiPort.translatable("emi.sidebar.type." + name.replace("-", "_") + ".description").withStyle(ChatFormatting.GRAY);
 	}
 
 	public static SidebarType fromName(String name) {

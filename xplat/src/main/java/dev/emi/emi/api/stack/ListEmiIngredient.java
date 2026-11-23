@@ -1,7 +1,8 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.Lists;
@@ -10,8 +11,6 @@ import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.render.EmiRender;
 import dev.emi.emi.screen.tooltip.EmiTextTooltipWrapper;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 @ApiStatus.Internal
 public class ListEmiIngredient implements EmiIngredient {
@@ -83,7 +82,7 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());
 		EmiIngredient current = ingredients.get(item);
 		if ((flags & RENDER_ICON) != 0) {
@@ -98,8 +97,8 @@ public class ListEmiIngredient implements EmiIngredient {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
-		List<TooltipComponent> tooltip = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip() {
+		List<ClientTooltipComponent> tooltip = Lists.newArrayList();
 		tooltip.add(new EmiTextTooltipWrapper(this, EmiPort.ordered(EmiPort.translatable("tooltip.emi.accepts"))));
 		tooltip.add(new IngredientTooltipComponent(ingredients));
 		int item = (int) (System.currentTimeMillis() / 1000 % ingredients.size());

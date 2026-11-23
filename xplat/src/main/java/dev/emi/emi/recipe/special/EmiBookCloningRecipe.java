@@ -4,21 +4,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.network.Filterable;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.WrittenBookContent;
 import dev.emi.emi.api.recipe.EmiPatternCraftingRecipe;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.GeneratedSlotWidget;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.platform.EmiAgnos;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.WrittenBookContentComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.WrittenBookItem;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.text.RawFilteredPair;
-import net.minecraft.util.Identifier;
 
 public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 	// TODO more book stuff
@@ -76,7 +73,7 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 	
 	private EmiStack getWrittenBook(Random random, boolean copy) {
 		ItemStack stack = new ItemStack(Items.WRITTEN_BOOK);
-		NbtCompound tag = new NbtCompound();
+		CompoundTag tag = new CompoundTag();
 		String title = TEMPLATES.get(random.nextInt(TEMPLATES.size())).resolve(random);
 		if (title.length() > 0) {
 			title = Character.toUpperCase(title.charAt(0)) + title.substring(1, title.length());
@@ -88,7 +85,7 @@ public class EmiBookCloningRecipe extends EmiPatternCraftingRecipe {
 			author = AUTHORS.get(random.nextInt(AUTHORS.size()));
 		}
 		int generationKey = (copy ? 1 : 0) + random.nextInt(2);
-		stack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(RawFilteredPair.of(title), author, generationKey, List.of(), false));
+		stack.set(DataComponents.WRITTEN_BOOK_CONTENT, new WrittenBookContent(Filterable.passThrough(title), author, generationKey, List.of(), false));
 
 		return EmiStack.of(stack);
 	}

@@ -1,12 +1,10 @@
 package dev.emi.emi.search;
 
-import net.minecraft.item.BlockItem;
-
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import net.minecraft.world.item.BlockItem;
 import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.registry.EmiTags;

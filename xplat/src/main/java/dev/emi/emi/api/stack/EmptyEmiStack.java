@@ -1,19 +1,16 @@
 package dev.emi.emi.api.stack;
 
 import java.util.List;
-
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.ApiStatus;
 
 import dev.emi.emi.EmiPort;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 @ApiStatus.Internal
 public class EmptyEmiStack extends EmiStack {
@@ -53,8 +50,8 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public ComponentChanges getComponentChanges() {
-		return ComponentChanges.EMPTY;
+	public DataComponentPatch getComponentChanges() {
+		return DataComponentPatch.EMPTY;
 	}
 
 	@Override
@@ -78,21 +75,21 @@ public class EmptyEmiStack extends EmiStack {
 	}
 
 	@Override
-	public void render(DrawContext draw, int x, int y, float delta, int flags) {
+	public void render(GuiGraphicsExtractor draw, int x, int y, float delta, int flags) {
 	}
 
 	@Override
-	public List<Text> getTooltipText() {
+	public List<Component> getTooltipText() {
 		return List.of();
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip() {
+	public List<ClientTooltipComponent> getTooltip() {
 		return List.of();
 	}
 
 	@Override
-	public Text getName() {
+	public Component getName() {
 		return EmiPort.literal("");
 	}
 

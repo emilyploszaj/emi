@@ -22,6 +22,6 @@ logoFile = "icon.png"
 [[dependencies.emi]]
 modId="neoforge"
 type="REQUIRED"
-versionRange="[20.4.72-beta,)" # network refactor
+versionRange="[26.1.2,)"
 ordering="NONE"
 side="BOTH"

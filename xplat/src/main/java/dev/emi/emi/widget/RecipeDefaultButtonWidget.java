@@ -1,7 +1,7 @@
 package dev.emi.emi.widget;
 
 import java.util.List;
-
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.EmiPort;
@@ -14,7 +14,6 @@ import dev.emi.emi.config.HelpLevel;
 import dev.emi.emi.runtime.EmiHistory;
 import dev.emi.emi.screen.RecipeScreen;
 import dev.emi.emi.screen.tooltip.IngredientTooltipComponent;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 
 public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 
@@ -34,8 +33,8 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 	}
 
 	@Override
-	public List<TooltipComponent> getTooltip(int mouseX, int mouseY) {
-		List<TooltipComponent> list = Lists.newArrayList();
+	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
+		List<ClientTooltipComponent> list = Lists.newArrayList();
 		switch(BoM.getRecipeStatus(recipe)) {
 			case PARTIAL:
 				List<EmiStack> stacks = Lists.newArrayList();
@@ -45,20 +44,20 @@ public class RecipeDefaultButtonWidget extends RecipeButtonWidget {
 					}
 				}
 				if (stacks.size() > 0) {
-					list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default"))));
-					list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.current_defaults"))));
+					list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default"))));
+					list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.current_defaults"))));
 					list.add(new IngredientTooltipComponent(stacks));
 					break;
 				}
 			case EMPTY:
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default"))));
+				list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default"))));
 				break;
 			case FULL:
-				list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.unset_default"))));
+				list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.unset_default"))));
 				break;
 		}
 		if (recipe.getOutputs().size() > 1 && EmiConfig.helpLevel.has(HelpLevel.NORMAL) && EmiConfig.defaultStack.isBound()) {
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default_stack", EmiConfig.defaultStack.getBindText()))));
+			list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.translatable("tooltip.emi.set_default_stack", EmiConfig.defaultStack.getBindText()))));
 		}
 		return list;
 	}

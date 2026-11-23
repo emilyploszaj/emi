@@ -1,7 +1,8 @@
 package dev.emi.emi.recipe;
 
 import java.util.List;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import dev.emi.emi.EmiPort;
@@ -14,8 +15,6 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.TextWidget.Alignment;
 import dev.emi.emi.api.widget.WidgetHolder;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
 
 public class EmiCompostingRecipe implements EmiRecipe {
 	private static final EmiStack BONE_MEAL = EmiStack.of(Items.BONE_MEAL);

@@ -1,16 +1,15 @@
 package dev.emi.emi.handler;
 
 import java.util.List;
-
+import net.minecraft.world.inventory.AbstractFurnaceMenu;
+import net.minecraft.world.inventory.Slot;
 import com.google.common.collect.Lists;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
-import net.minecraft.screen.AbstractFurnaceScreenHandler;
-import net.minecraft.screen.slot.Slot;
 
-public class CookingRecipeHandler<T extends AbstractFurnaceScreenHandler> implements StandardRecipeHandler<T> {
+public class CookingRecipeHandler<T extends AbstractFurnaceMenu> implements StandardRecipeHandler<T> {
 	private final EmiRecipeCategory category;
 
 	public CookingRecipeHandler(EmiRecipeCategory category) {
