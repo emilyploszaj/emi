@@ -144,6 +144,7 @@ public class EmiRecipes {
 	
 			Object2IntMap<Identifier> duplicateIds = new Object2IntOpenHashMap<>();
 			Set<Identifier> incorrectIds = new ObjectArraySet<>();
+			Set<Identifier> recipeIds = EmiConfig.devMode ? ProxyRecipeManager.getRecipeIds() : Set.of();
 			for (EmiRecipe recipe : recipes) {
 				Identifier id = recipe.getId();
 				EmiRecipeCategory category = recipe.getCategory();
@@ -167,7 +168,7 @@ public class EmiRecipes {
 						byId.put(id, recipe);
 					}
 
-					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !ProxyRecipeManager.hasId(id)) {
+					if (EmiConfig.devMode && !id.getPath().startsWith("/") && !recipeIds.contains(id)) {
 						incorrectIds.add(id);
 					}
 				}
