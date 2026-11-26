@@ -107,10 +107,10 @@ public class EmiApi {
 		Screen s = client.currentScreen;
 		if (s instanceof HandledScreen<?> hs) {
 			return hs;
-		} else if (s instanceof RecipeScreen rs) {
-			return rs.old;
-		} else if (s instanceof BoMScreen bs) {
-			return bs.old;
+		} else if (s instanceof RecipeScreen rs && rs.old instanceof HandledScreen<?> hs) {
+			return hs;
+		} else if (s instanceof BoMScreen bs && bs.old instanceof HandledScreen<?> hs) {
+			return hs;
 		}
 		return null;
 	}
@@ -254,13 +254,7 @@ public class EmiApi {
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		if (!recipes.isEmpty()) {
 			EmiSidebars.lookup(stack);
-			if (getHandledScreen() == null) {
-				client.setScreen(new InventoryScreen(client.player));
-			}
-			if (client.currentScreen instanceof HandledScreen<?> hs) {
-				push();
-				client.setScreen(new RecipeScreen(hs, recipes));
-			} else if (client.currentScreen instanceof BoMScreen bs) {
+			if (client.currentScreen instanceof BoMScreen bs) {
 				push();
 				client.setScreen(new RecipeScreen(bs.old, recipes));
 			} else if (client.currentScreen instanceof RecipeScreen rs) {
@@ -268,6 +262,9 @@ public class EmiApi {
 				RecipeScreen n = new RecipeScreen(rs.old, recipes);
 				client.setScreen(n);
 				n.focusCategory(rs.getFocusedCategory());
+			} else {
+				push();
+				client.setScreen(new RecipeScreen(client.currentScreen, recipes));
 			}
 		}
 	}
