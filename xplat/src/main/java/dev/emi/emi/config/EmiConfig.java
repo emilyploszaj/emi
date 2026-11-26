@@ -96,10 +96,27 @@ public class EmiConfig {
 	@ConfigValue("ui.append-mod-id")
 	public static boolean appendModId = true;
 
-	@ConfigGroupEnd
+	@Comment("Color for mod names displayed in tooltips")
+	@ConfigValue("ui.mod-id.color")
+	public static TextColor modIdColor = TextColor.BLUE;
+
+	@Comment("Text style for mod names displayed in tooltips")
+	@ConfigValue("ui.mod-id.format")
+	public static TextFormat modIdFormat = TextFormat.ITALIC;
+
 	@Comment("Whether to add mod name to item tooltips, in case another mod provides behavior")
 	@ConfigValue("ui.append-item-mod-id")
 	public static boolean appendItemModId = true;
+
+	@Comment("Color for item mod names displayed in item tooltips")
+	@ConfigValue("ui.mod-id.item-color")
+	public static TextColor itemModIdColor = TextColor.BLUE;
+	
+	@ConfigGroupEnd
+	@Comment("Text style for item mod names displayed in item tooltips")
+	@ConfigValue("ui.mod-id.item-format")
+	public static TextFormat itemModIdFormat = TextFormat.ITALIC;
+
 
 	@Comment("Prevents recipes being quick crafted from shifting around under the cursor.")
 	@ConfigValue("ui.miscraft-prevention")

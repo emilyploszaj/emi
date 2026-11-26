@@ -68,7 +68,7 @@ public class EmiTooltipComponents {
 	public static void appendModName(List<TooltipComponent> components, String namespace) {
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(namespace);
-			components.add(of(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC)));
+			components.add(of(EmiPort.literal(mod, EmiConfig.modIdColor.getFormatting(), EmiConfig.modIdFormat.getFormatting())));
 		}
 	}
 }

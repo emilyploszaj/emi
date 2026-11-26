@@ -99,7 +99,7 @@ public class JemiStack<T> extends EmiStack {
 		Identifier id = getId();
 		if (EmiConfig.appendModId && id != null) {
 			String mod = EmiUtil.getModName(id.getNamespace());
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, EmiConfig.modIdColor.getFormatting(), EmiConfig.modIdFormat.getFormatting()))));
 		}
 
 		list.addAll(super.getTooltip());

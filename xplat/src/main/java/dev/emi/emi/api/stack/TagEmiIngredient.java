@@ -180,7 +180,7 @@ public class TagEmiIngredient implements EmiIngredient {
 		}
 		if (EmiConfig.appendModId) {
 			String mod = EmiUtil.getModName(id.getNamespace());
-			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, Formatting.BLUE, Formatting.ITALIC))));
+			list.add(TooltipComponent.of(EmiPort.ordered(EmiPort.literal(mod, EmiConfig.modIdColor.getFormatting(), EmiConfig.modIdFormat.getFormatting()))));
 		}
 		list.add(new TagTooltipComponent(stacks));
 		for (EmiStack stack : stacks) {
